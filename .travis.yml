@@ -1,0 +1,35 @@
+language: node_js
+node_js:
+- stable
+sudo: false
+cache: bundler
+env:
+  global:
+  - GIT_OWNER=$(echo $TRAVIS_REPO_SLUG | cut -d/ -f1)
+  - GIT_REPO=$(echo $TRAVIS_REPO_SLUG | cut -d/ -f2)
+  - GIT_COMMITTER_NAME=$(git log -1 --pretty=format:%an)
+  - GIT_COMMITTER_EMAIL=$(git log -1 --pretty=format:%ae)
+  - GIT_COMMIT_ID=$(git rev-parse HEAD)
+before_install:
+- export DISPLAY=:99.0
+- export CHROME_BIN=chromium-browser
+- sh -e /etc/init.d/xvfb start
+before_deploy:
+- sed -i 's/"private":\ true/"private":\ false/' package.json
+- sed -i -E 's/^dist\/?.*$//' .gitignore
+deploy:
+  provider: npm
+  email:
+    secure: ww1P29w6mvispNikPUBhc9iFsc0sYlFNA+aOwsLxl46p2+Jxmb9xlsP2pweswIpQMFzT+SIeFcnqzflfUkmYSN9J5ULHLjAiDptPkzv0dzAAI2VewjiADYdG/Ii/ujdjXGWfFIutwUt6tHlMc3l6Jjlk4RvW3PD0H25f5M5hZz6Jbky8FrQ6z9PKQYUJcDgnW2pg7V7lBssyY8a2gJBRvVJeAR7bMwDGRdxedBdXj3e6CE8SjWdd388yQcJhSdx6JRgim/FNx/05PIElDgZzaaKjzMUNCvYcC1tHNLqmqolKanenWv3OXaEEEcq0p4HmRIWXREOVtkJIbG8vr+lDy7a3YydrTZVZYSKZXS1CtzJFrGLYu4R2NsISLArnftZxK+e2VyzXbpMoiojYgZWcNAbDfY3X9RMxumTc99Rm7zN4iQ3NQOUa9YuQVqRkmCVLsw2XHSqgtpqVDFmpxpuZbi2Kpfyol6ZE4uh12uLehiq/3MYZlPYjmVds1qyYNZLyViu/N3zTw2BuT+tSTT6KIS1a6BeBY6Pq2M5A4dTCu6Xgtd0WXExLHtS1KnQcxbpADjoWD6uQvNspK3s6fbCGBZu08LeSNag7mkgielxIM0jLweknyNX9VlFVNg58R2ZJsMpHjfnUVEIqbhvGx3gmo9vgUbgoHahUkwy98GFr8x0=
+  api_key:
+    secure: Il+APcr6HRW18tabPceaUEg72g/H/YyFepbvsUbO64dqXjhBkFAokXonOhUlndFfd5ZWVmSc/hQvmMtQPeYfCtu64vJWi//YkGzMHxVsdU1YlkoK3cNUBWHV4EjcEHkV/fJL6B+Je8dTGd0cRBqkXmZoCmzbYcD3IX3OypbzslZY1KUUO0wW74WjuY8SrrO8Z+/RT40ocSNv9ofEfKQTGF/uqEDKVCfb2OLGn99zkuoKrpLpfxy1Emd4I7qKsEt07QSPBNqj+RCkVN5l4OyMQd17v6j/PxZKBRlu3wOpV/10U1e9oZG/3e+R0in3w+qlbIpLjFw92Jyao9iY+GcgYg6N4VgBwikoqLpReQn3CFhea0DY8lwq7qhksTVHElwSIm5OQxa6F0H0iiHVGbMVcF4Xykf05J4d6/KUAgoYRArXwNNULVdpFFIp2r4AI8dmSOaOF3Ek5kZLgCy+wBsF5fDnMTE3/ky9zqYmJlqfSoT4qMin1SKN5QTW2PCEfe+JcUBRiDz1oEWtlsBe0a+7KgYaDrOWvzlvPMcbR+g9GF9po8IQLbTc1uWoid26q/TTqDlqckQJdD50I3ZypHLJ+IUd/lFqRxfIFyP/bPfYir3zrZejopsQBXCCeemoA3Wg5p7WazyaI9FxLCkIULH4IRV6lIvgQLuG4SvSOnCEEes=
+  on:
+    branch: master
+    node: stable
+  skip_cleanup: true
+notifications:
+  email:
+    recipients:
+    - secure: ww1P29w6mvispNikPUBhc9iFsc0sYlFNA+aOwsLxl46p2+Jxmb9xlsP2pweswIpQMFzT+SIeFcnqzflfUkmYSN9J5ULHLjAiDptPkzv0dzAAI2VewjiADYdG/Ii/ujdjXGWfFIutwUt6tHlMc3l6Jjlk4RvW3PD0H25f5M5hZz6Jbky8FrQ6z9PKQYUJcDgnW2pg7V7lBssyY8a2gJBRvVJeAR7bMwDGRdxedBdXj3e6CE8SjWdd388yQcJhSdx6JRgim/FNx/05PIElDgZzaaKjzMUNCvYcC1tHNLqmqolKanenWv3OXaEEEcq0p4HmRIWXREOVtkJIbG8vr+lDy7a3YydrTZVZYSKZXS1CtzJFrGLYu4R2NsISLArnftZxK+e2VyzXbpMoiojYgZWcNAbDfY3X9RMxumTc99Rm7zN4iQ3NQOUa9YuQVqRkmCVLsw2XHSqgtpqVDFmpxpuZbi2Kpfyol6ZE4uh12uLehiq/3MYZlPYjmVds1qyYNZLyViu/N3zTw2BuT+tSTT6KIS1a6BeBY6Pq2M5A4dTCu6Xgtd0WXExLHtS1KnQcxbpADjoWD6uQvNspK3s6fbCGBZu08LeSNag7mkgielxIM0jLweknyNX9VlFVNg58R2ZJsMpHjfnUVEIqbhvGx3gmo9vgUbgoHahUkwy98GFr8x0=
+    on_success: change
+    on_failure: always
