@@ -8,9 +8,10 @@ describe('Integration: TypedHTML', function () {
         content: TypedHTML.p()
       });
       assert(struct.raw.nodeName === 'ARTICLE');
-      assert(struct.contents.title.raw === struct.raw.firstChild);
       assert(struct.contents.title.raw.nodeName === 'H1');
+      assert(struct.contents.title.raw === struct.raw.firstChild);
       assert(struct.contents.content.raw.nodeName === 'P');
+      assert(struct.contents.content.raw === struct.raw.lastChild);
     });
 
     it('struct contents update', function () {
@@ -20,8 +21,8 @@ describe('Integration: TypedHTML', function () {
       struct.contents = {
         title: TypedHTML.h2()
       };
-      assert(struct.raw.children[0].nodeName === 'H2');
-      assert(struct.contents.title.raw === struct.raw.children[0]);
+      assert(struct.contents.title.raw.nodeName === 'H2');
+      assert(struct.contents.title.raw === struct.raw.firstChild);
     });
 
     it('struct contents partial update', function () {
@@ -29,8 +30,8 @@ describe('Integration: TypedHTML', function () {
         title: TypedHTML.h1()
       });
       struct.contents.title = TypedHTML.h2();
-      assert(struct.raw.children[0].nodeName === 'H2');
-      assert(struct.contents.title.raw === struct.raw.children[0]);
+      assert(struct.contents.title.raw.nodeName === 'H2');
+      assert(struct.contents.title.raw === struct.raw.firstChild);
     });
 
     it('list', function () {
@@ -39,11 +40,12 @@ describe('Integration: TypedHTML', function () {
         TypedHTML.li()
       ]);
       assert(list.raw.nodeName === 'UL');
-      assert(list.raw.children[0].nodeName === 'LI');
+      assert(list.contents[0].raw.nodeName === 'LI');
       assert(list.contents[0].raw === list.raw.children[0]);
-      assert(list.raw.children[1].nodeName === 'LI');
+      assert(list.contents[1].raw.nodeName === 'LI');
       assert(list.contents[1].raw === list.raw.children[1]);
-      assert(list.contents[2] === void 0 && list.raw.children[2] === void 0);
+      assert(list.contents[2] === void 0);
+      assert(list.raw.children[2] === void 0);
     });
 
     it('list contents update', function () {
@@ -54,9 +56,10 @@ describe('Integration: TypedHTML', function () {
       list.contents = [
         TypedHTML.li()
       ];
-      assert(list.raw.children[0].nodeName === 'LI');
+      assert(list.contents[0].raw.nodeName === 'LI');
       assert(list.contents[0].raw === list.raw.children[0]);
-      assert(list.contents[1] === void 0 && list.raw.children[1] === void 0);
+      assert(list.contents[1] === void 0);
+      assert(list.raw.children[1] === void 0);
     });
 
   });
