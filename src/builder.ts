@@ -678,18 +678,18 @@ export const TypedHTML: typeof Builder = {
 function build<T extends HTMLElement, U extends TypedHTMLElementChildren<HTMLElement>>(factory: () => T, children: U = <any>[]): TypedHTMLElement<T, U> {
   const raw = factory();
   void Object.keys(children)
-    .forEach(idx => void raw.appendChild(children[idx].raw));
+    .forEach(k => void raw.appendChild(children[k].raw));
   if (children instanceof Array === false) {
     const c = children;
     children = Object.keys(children)
-      .reduce((obj, idx) => {
-        Object.defineProperty(obj, idx, {
+      .reduce((obj, k) => {
+        Object.defineProperty(obj, k, {
           get() {
-            return c[idx];
+            return c[k];
           },
           set(newElt) {
-            const oldElt = c[idx];
-            c[idx] = newElt;
+            const oldElt = c[k];
+            c[k] = newElt;
             raw.replaceChild(newElt.raw, oldElt.raw);
           }
         });
