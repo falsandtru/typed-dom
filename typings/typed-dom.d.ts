@@ -17,6 +17,7 @@ declare module 'typed-dom' {
   }
 
   const TypedHTML: {
+    // lib.d.ts
     a: TypedHTMLElementBuilder<HTMLAnchorElement>;
     abbr: TypedHTMLElementBuilder<HTMLPhraseElement>;
     acronym: TypedHTMLElementBuilder<HTMLPhraseElement>;
@@ -124,6 +125,12 @@ declare module 'typed-dom' {
     var: TypedHTMLElementBuilder<HTMLPhraseElement>;
     video: TypedHTMLElementBuilder<HTMLVideoElement>;
     xmp: TypedHTMLElementBuilder<HTMLBlockElement>;
+    // sectioning contents
+    article: TypedHTMLElementBuilder<HTMLElement>;
+    aside: TypedHTMLElementBuilder<HTMLElement>;
+    nav: TypedHTMLElementBuilder<HTMLElement>;
+    section: TypedHTMLElementBuilder<HTMLElement>;
+    // untyped
     untyped<T extends TypedHTMLElementChildren<HTMLElement>, U extends HTMLElement>(children: T, factory: () => U): TypedHTMLElement<U, T>;
   };
   export default TypedHTML;

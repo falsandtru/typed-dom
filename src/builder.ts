@@ -643,6 +643,30 @@ export const TypedHTML: typeof Builder = {
     : TypedHTMLElement<HTMLBlockElement, T> {
     return build(factory, children);
   },
+  article
+    <T extends TypedHTMLElementChildren<HTMLElement>>
+    (children?: T, factory: () => HTMLElement = () => document.createElement('article'))
+    : TypedHTMLElement<HTMLElement, T> {
+    return build(factory, children);
+  },
+  aside
+    <T extends TypedHTMLElementChildren<HTMLElement>>
+    (children?: T, factory: () => HTMLElement = () => document.createElement('aside'))
+    : TypedHTMLElement<HTMLElement, T> {
+    return build(factory, children);
+  },
+  nav
+    <T extends TypedHTMLElementChildren<HTMLElement>>
+    (children?: T, factory: () => HTMLElement = () => document.createElement('nav'))
+    : TypedHTMLElement<HTMLElement, T> {
+    return build(factory, children);
+  },
+  section
+    <T extends TypedHTMLElementChildren<HTMLElement>>
+    (children?: T, factory: () => HTMLElement = () => document.createElement('section'))
+    : TypedHTMLElement<HTMLElement, T> {
+    return build(factory, children);
+  },
   untyped
     <T extends TypedHTMLElementChildren<HTMLElement>, U extends HTMLElement>
     (children: T, factory: () => U)
