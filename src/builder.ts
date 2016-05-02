@@ -701,12 +701,17 @@ function build<T extends HTMLElement, U extends TypedHTMLElementChildren<HTMLEle
     get contents(): typeof children {
       return children;
     },
-    set contents(c) {
-      if (children instanceof Array === false) throw new TypeError(`TypedDOM: Children cannot update when its type is not an array.`);
-      children = c;
-      raw.innerHTML = '';
-      (<any[]><any>children)
-        .forEach(child => raw.appendChild(child.raw));
+    set contents(cs) {
+      if (children instanceof Array) {
+        raw.innerHTML = '';
+        void (<any[]><any>cs)
+          .forEach(c => void raw.appendChild(c.raw));
+      }
+      else {
+        void Object.keys(cs)
+          .forEach(k => void raw.replaceChild(cs[k].raw, children[k].raw));
+      }
+      children = cs;
     }
   };
 }

@@ -8,6 +8,7 @@ describe('Integration: TypedHTML', function () {
         list: TypedHTML.ul([TypedHTML.li()])
       });
       assert(struct.raw.nodeName === 'DIV');
+      assert(struct.raw.firstChild === struct.contents.title.raw);
       assert(struct.contents.title.raw.nodeName === 'H1');
       assert(struct.contents.list.raw.nodeName === 'UL');
       assert(struct.contents.list.contents[0].raw.nodeName === 'LI');
@@ -15,6 +16,12 @@ describe('Integration: TypedHTML', function () {
       struct.contents.title = TypedHTML.h2();
       assert(struct.raw.children[0].nodeName === 'H2');
       assert(struct.contents.title.raw.nodeName === 'H2');
+      struct.contents = {
+        title: TypedHTML.h1(),
+        list: TypedHTML.ul([TypedHTML.li()])
+      };
+      assert(struct.raw.children[0].nodeName === 'H1');
+      assert(struct.contents.title.raw.nodeName === 'H1');
     });
 
     it('list', function () {
