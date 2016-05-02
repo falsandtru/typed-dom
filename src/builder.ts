@@ -679,30 +679,17 @@ function build<T extends HTMLElement, U extends TypedHTMLElementChildren<HTMLEle
   const raw = factory();
   void Object.keys(children)
     .forEach(k => void raw.appendChild(children[k].raw));
-  if (children instanceof Array === false) {
-    const cs = children;
-    children = Object.keys(children)
-      .reduce((obj, k) => {
-        Object.defineProperty(obj, k, {
-          get() {
-            return cs[k];
-          },
-          set(newElt) {
-            const oldElt = cs[k];
-            cs[k] = newElt;
-            raw.replaceChild(newElt.raw, oldElt.raw);
-          }
-        });
-        return obj;
-      }, <typeof children>{});
-  }
-  return {
+  children = children instanceof Array
+    ? Object.freeze(children)
+    : observe(children);
+  return Object.freeze({
     raw,
-    get contents(): typeof children {
+    get contents(): U {
       return children;
     },
     set contents(cs) {
       if (children instanceof Array) {
+        void Object.freeze(cs);
         raw.innerHTML = '';
         void (<any[]><any>cs)
           .forEach(c => void raw.appendChild(c.raw));
@@ -710,8 +697,26 @@ function build<T extends HTMLElement, U extends TypedHTMLElementChildren<HTMLEle
       else {
         void Object.keys(cs)
           .forEach(k => void raw.replaceChild(cs[k].raw, children[k].raw));
+        cs = observe(cs);
       }
       children = cs;
     }
-  };
+  });
+
+  function observe(children: U): U {
+    return Object.keys(children)
+      .reduce((obj, k) => {
+        Object.defineProperty(obj, k, {
+          get() {
+            return children[k];
+          },
+          set(newElt) {
+            const oldElt = children[k];
+            children[k] = newElt;
+            raw.replaceChild(newElt.raw, oldElt.raw);
+          }
+        });
+        return obj;
+      }, <U>{});
+  }
 }
