@@ -680,16 +680,16 @@ function build<T extends HTMLElement, U extends TypedHTMLElementChildren<HTMLEle
   void Object.keys(children)
     .forEach(k => void raw.appendChild(children[k].raw));
   if (children instanceof Array === false) {
-    const c = children;
+    const cs = children;
     children = Object.keys(children)
       .reduce((obj, k) => {
         Object.defineProperty(obj, k, {
           get() {
-            return c[k];
+            return cs[k];
           },
           set(newElt) {
-            const oldElt = c[k];
-            c[k] = newElt;
+            const oldElt = cs[k];
+            cs[k] = newElt;
             raw.replaceChild(newElt.raw, oldElt.raw);
           }
         });
