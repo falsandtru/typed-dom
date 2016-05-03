@@ -5,7 +5,7 @@ describe('Integration: TypedHTML', function () {
     it('struct', function () {
       const struct = TypedHTML.article({
         title: TypedHTML.h1(),
-        content: TypedHTML.p()
+        content: TypedHTML.p([TypedHTML.a()])
       });
       assert(struct.raw.nodeName === 'ARTICLE');
       assert(struct.contents.title.raw.nodeName === 'H1');

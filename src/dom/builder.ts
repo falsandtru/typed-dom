@@ -1,6 +1,6 @@
-import {default as Builder, TypedHTMLElement, TypedHTMLElementChildren} from 'typed-dom';
+import {default as Builder, TypedHTML, TypedHTMLContents} from 'typed-dom';
 
-export function build<T extends HTMLElement, U extends TypedHTMLElementChildren<HTMLElement>>(factory: () => T, contents: U = <any>[]): TypedHTMLElement<T, U> {
+export function build<T extends HTMLElement, U extends TypedHTMLContents<HTMLElement>>(factory: () => T, contents: U = <any>[]): TypedHTML<T, U> {
   const raw = factory();
   void Object.keys(contents)
     .forEach(k => void raw.appendChild(contents[k].raw));

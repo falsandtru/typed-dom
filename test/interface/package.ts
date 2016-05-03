@@ -1,6 +1,5 @@
 import TypedHTML, {
-  TypedHTMLElement,
-  TypedHTMLElementChildren
+  TypedHTMLContents
 } from 'typed-dom';
 
 describe('Interface: Package', function () {
