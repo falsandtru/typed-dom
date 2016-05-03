@@ -62,6 +62,18 @@ describe('Integration: TypedHTML', function () {
       assert(list.raw.children[1] === void 0);
     });
 
+    it('list contents partial update', function () {
+      const list = TypedHTML.ul([
+        TypedHTML.li()
+      ]);
+      assert.throws(() => list.contents[0] = TypedHTML.li());
+      assert.throws(() => list.contents[1] = TypedHTML.li());
+      assert.throws(() => list.contents.push(TypedHTML.li()));
+      assert.throws(() => list.contents.pop());
+      assert.throws(() => list.contents.length = 0);
+      assert(list.contents.length === 1);
+    });
+
   });
 
 });
