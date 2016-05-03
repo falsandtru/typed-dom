@@ -1,19 +1,19 @@
 import {default as Builder, TypedHTMLElement, TypedHTMLElementChildren} from 'typed-dom';
 
-export function build<T extends HTMLElement, U extends TypedHTMLElementChildren<HTMLElement>>(factory: () => T, children: U = <any>[]): TypedHTMLElement<T, U> {
+export function build<T extends HTMLElement, U extends TypedHTMLElementChildren<HTMLElement>>(factory: () => T, contents: U = <any>[]): TypedHTMLElement<T, U> {
   const raw = factory();
-  void Object.keys(children)
-    .forEach(k => void raw.appendChild(children[k].raw));
-  children = children instanceof Array
-    ? Object.freeze(children)
-    : observe(children);
+  void Object.keys(contents)
+    .forEach(k => void raw.appendChild(contents[k].raw));
+  contents = contents instanceof Array
+    ? Object.freeze(contents)
+    : observe(contents);
   return Object.freeze({
     raw,
     get contents(): U {
-      return children;
+      return contents;
     },
     set contents(cs) {
-      if (children instanceof Array) {
+      if (contents instanceof Array) {
         cs = Object.freeze(cs);
         raw.innerHTML = '';
         void (<any[]><any>cs)
@@ -21,23 +21,23 @@ export function build<T extends HTMLElement, U extends TypedHTMLElementChildren<
       }
       else {
         void Object.keys(cs)
-          .forEach(k => void raw.replaceChild(cs[k].raw, children[k].raw));
+          .forEach(k => void raw.replaceChild(cs[k].raw, contents[k].raw));
         cs = observe(cs);
       }
-      children = cs;
+      contents = cs;
     }
   });
 
-  function observe(children: U): U {
-    return Object.keys(children)
+  function observe(contents: U): U {
+    return Object.keys(contents)
       .reduce((obj, k) => {
         Object.defineProperty(obj, k, {
           get() {
-            return children[k];
+            return contents[k];
           },
           set(newElt) {
-            const oldElt = children[k];
-            children[k] = newElt;
+            const oldElt = contents[k];
+            contents[k] = newElt;
             raw.replaceChild(newElt.raw, oldElt.raw);
           }
         });

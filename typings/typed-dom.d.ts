@@ -13,7 +13,7 @@ declare module 'typed-dom' {
   export type TypedHTMLElementChildren<T extends HTMLElement> = void[] | TypedHTMLElement<T, any>[] | { [name: string]: TypedHTMLElement<T, any>; };
   interface TypedHTMLElementBuilder<T extends HTMLElement> {
     (): TypedHTMLElement<T, void[]>;
-    <U extends TypedHTMLElementChildren<HTMLElement>>(children: U, factory?: () => T): TypedHTMLElement<T, U>;
+    <U extends TypedHTMLElementChildren<HTMLElement>>(contents: U, factory?: () => T): TypedHTMLElement<T, U>;
   }
 
   const TypedHTML: {
@@ -131,7 +131,7 @@ declare module 'typed-dom' {
     nav: TypedHTMLElementBuilder<HTMLElement>;
     section: TypedHTMLElementBuilder<HTMLElement>;
     // untyped
-    untyped<T extends TypedHTMLElementChildren<HTMLElement>, U extends HTMLElement>(children: T, factory: () => U): TypedHTMLElement<U, T>;
+    untyped<T extends TypedHTMLElementChildren<HTMLElement>, U extends HTMLElement>(contents: T, factory: () => U): TypedHTMLElement<U, T>;
   };
   export default TypedHTML;
 }
