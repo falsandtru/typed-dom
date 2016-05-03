@@ -34,44 +34,44 @@ describe('Integration: TypedHTML', function () {
       assert(struct.contents.title.raw === struct.raw.firstChild);
     });
 
-    it('list', function () {
-      const list = TypedHTML.ul([
+    it('collection', function () {
+      const collection = TypedHTML.ul([
         TypedHTML.li(),
         TypedHTML.li()
       ]);
-      assert(list.raw.nodeName === 'UL');
-      assert(list.contents[0].raw.nodeName === 'LI');
-      assert(list.contents[0].raw === list.raw.children[0]);
-      assert(list.contents[1].raw.nodeName === 'LI');
-      assert(list.contents[1].raw === list.raw.children[1]);
-      assert(list.contents[2] === void 0);
-      assert(list.raw.children[2] === void 0);
+      assert(collection.raw.nodeName === 'UL');
+      assert(collection.contents[0].raw.nodeName === 'LI');
+      assert(collection.contents[0].raw === collection.raw.children[0]);
+      assert(collection.contents[1].raw.nodeName === 'LI');
+      assert(collection.contents[1].raw === collection.raw.children[1]);
+      assert(collection.contents[2] === void 0);
+      assert(collection.raw.children[2] === void 0);
     });
 
-    it('list contents update', function () {
-      const list = TypedHTML.ul([
+    it('collection contents update', function () {
+      const collection = TypedHTML.ul([
         TypedHTML.li(),
         TypedHTML.li()
       ]);
-      list.contents = [
+      collection.contents = [
         TypedHTML.li()
       ];
-      assert(list.contents[0].raw.nodeName === 'LI');
-      assert(list.contents[0].raw === list.raw.children[0]);
-      assert(list.contents[1] === void 0);
-      assert(list.raw.children[1] === void 0);
+      assert(collection.contents[0].raw.nodeName === 'LI');
+      assert(collection.contents[0].raw === collection.raw.children[0]);
+      assert(collection.contents[1] === void 0);
+      assert(collection.raw.children[1] === void 0);
     });
 
-    it('list contents partial update', function () {
-      const list = TypedHTML.ul([
+    it('collection contents partial update', function () {
+      const collection = TypedHTML.ul([
         TypedHTML.li()
       ]);
-      assert.throws(() => list.contents[0] = TypedHTML.li());
-      assert.throws(() => list.contents[1] = TypedHTML.li());
-      assert.throws(() => list.contents.push(TypedHTML.li()));
-      assert.throws(() => list.contents.pop());
-      assert.throws(() => list.contents.length = 0);
-      assert(list.contents.length === 1);
+      assert.throws(() => collection.contents[0] = TypedHTML.li());
+      assert.throws(() => collection.contents[1] = TypedHTML.li());
+      assert.throws(() => collection.contents.push(TypedHTML.li()));
+      assert.throws(() => collection.contents.pop());
+      assert.throws(() => collection.contents.length = 0);
+      assert(collection.contents.length === 1);
     });
 
   });
