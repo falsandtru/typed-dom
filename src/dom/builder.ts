@@ -29,19 +29,21 @@ export function build<T extends HTMLElement, U extends TypedHTMLContents<HTMLEle
   });
 
   function observe(contents: U): U {
+    const cache = {};
     return Object.keys(contents)
-      .reduce((obj, k) => {
-        Object.defineProperty(obj, k, {
+      .reduce((contents, k) => {
+        cache[k] = contents[k];
+        Object.defineProperty(contents, k, {
           get() {
-            return contents[k];
+            return cache[k];
           },
           set(newElt) {
-            const oldElt = contents[k];
-            contents[k] = newElt;
+            const oldElt = cache[k];
+            cache[k] = newElt;
             raw.replaceChild(newElt.raw, oldElt.raw);
           }
         });
-        return obj;
-      }, <U>{});
+        return contents;
+      }, contents);
   }
 }
