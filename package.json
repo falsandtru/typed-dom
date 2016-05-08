@@ -1,6 +1,6 @@
 {
   "name": "typed-dom",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Typed html dom structs.",
   "private": true,
   "homepage": "https://github.com/falsandtru/typed-dom",
