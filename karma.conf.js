@@ -5,10 +5,6 @@ module.exports = {
 
 
   customLaunchers: {
-    Chromium: {
-      base: 'Chrome',
-      flags: ['--no-sandbox']
-    },
     IE11: {
       base: 'IE',
       'x-ua-compatible': 'IE=EmulateIE11'
