@@ -1,8 +1,8 @@
-import {default as builder, TypedHTML as ITypedHTML, TypedHTMLContents} from 'typed-dom';
+import {TypedHTML as ITypedHTML, TypedHTMLContents, HTML} from 'typed-dom';
 import {build} from './builder';
 
 export type TypedHTML<T extends HTMLElement, U extends TypedHTMLContents<HTMLElement>> = ITypedHTML<T, U>;
-export const TypedHTML: typeof builder = {
+export const TypedHTML = {
   a
     <T extends TypedHTMLContents<HTMLElement>>
     (contents?: T, factory: () => HTMLAnchorElement = () => document.createElement('a'))
