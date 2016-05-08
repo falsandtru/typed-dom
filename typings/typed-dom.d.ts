@@ -6,19 +6,19 @@
 */
 
 declare module 'typed-dom' {
-  export interface TypedHTML<T extends HTMLElement, U extends TypedHTMLContents<HTMLElement>> {
+  class HTML<T extends string> {
+    private TAG: T;
+  }
+  export interface TypedHTML<S extends string, T extends HTMLElement, U extends TypedHTMLContents<HTMLElement>> extends HTML<S> {
     raw: T;
     contents: U;
   }
-  export type TypedHTMLContents<T extends HTMLElement> = void[] | TypedHTML<T, any>[] | { [name: string]: TypedHTML<T, any>; };
+  export type TypedHTMLContents<T extends HTMLElement> = void[] | TypedHTML<string, T, any>[] | { [name: string]: TypedHTML<string, T, any>; };
   interface TypedHTMLBuilder<T extends HTMLElement, S extends string> {
-    (): HTML<S> & TypedHTML<T, void[]>;
-    <U extends TypedHTMLContents<HTMLElement>>(contents: U, factory?: () => T): HTML<S> & TypedHTML<T, U>;
+    (): TypedHTML<S, T, void[]>;
+    <U extends TypedHTMLContents<HTMLElement>>(contents: U, factory?: () => T): TypedHTML<S, T, U>;
   }
 
-  export class HTML<T extends string> {
-    private NOMINAL: T;
-  }
   const TypedHTML: {
     // lib.d.ts
     a: TypedHTMLBuilder<HTMLAnchorElement, 'a'>;
@@ -134,7 +134,7 @@ declare module 'typed-dom' {
     nav: TypedHTMLBuilder<HTMLElement, 'nav'>;
     section: TypedHTMLBuilder<HTMLElement, 'section'>;
     // untyped
-    untyped<T extends TypedHTMLContents<HTMLElement>, U extends HTMLElement, V extends string>(contents: T, factory: () => U, identity: V): TypedHTML<U, T> & HTML<V>;
+    untyped<T extends TypedHTMLContents<HTMLElement>, U extends HTMLElement, V extends string>(contents: T, factory: () => U, identity: V): TypedHTML<V, U, T>;
   };
   export default TypedHTML;
 }

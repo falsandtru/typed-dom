@@ -1,13 +1,13 @@
 import {default as Builder, TypedHTML, TypedHTMLContents} from 'typed-dom';
 
-export function build<T extends HTMLElement, U extends TypedHTMLContents<HTMLElement>>(factory: () => T, contents: U = <any>[]): TypedHTML<T, U> {
+export function build<S extends string, T extends HTMLElement, U extends TypedHTMLContents<HTMLElement>>(factory: () => T, contents: U = <any>[]): TypedHTML<S, T, U> {
   const raw = factory();
   void Object.keys(contents)
     .forEach(k => void raw.appendChild(contents[k].raw));
   contents = contents instanceof Array
     ? Object.freeze(contents)
     : observe(contents);
-  return Object.freeze({
+  return <TypedHTML<S, T, U>>Object.freeze({
     raw,
     get contents(): U {
       return contents;
