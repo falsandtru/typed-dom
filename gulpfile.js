@@ -93,7 +93,7 @@ const config = {
       singleRun: false
     }),
     test: extend({}, require('./karma.conf.js'), {
-      browsers: ['Chrome', 'Firefox', 'IE11', 'IE10', 'IE9'],
+      browsers: ['Chrome', 'Firefox', 'IE11'],
       reporters: ['dots'],
       preprocessors: {
         'dist/*.js': ['espower'],

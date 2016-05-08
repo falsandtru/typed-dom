@@ -12,22 +12,6 @@ module.exports = {
     IE11: {
       base: 'IE',
       'x-ua-compatible': 'IE=EmulateIE11'
-    },
-    IE10: {
-      base: 'IE',
-      'x-ua-compatible': 'IE=EmulateIE10'
-    },
-    IE9: {
-      base: 'IE',
-      'x-ua-compatible': 'IE=EmulateIE9'
-    },
-    IE8: {
-      base: 'IE',
-      'x-ua-compatible': 'IE=EmulateIE8'
-    },
-    PhantomJSB: {
-      base: 'PhantomJS',
-      flags: ['--remote-debugger-port=9000']
     }
   },
 
@@ -73,7 +57,8 @@ module.exports = {
     options: {
       // emit espowerified code.
       // default: false (in-memory)
-      emitActualCode: false
+      emitActualCode: false,
+      ignoreUpstreamSourceMap: true
     }
   },
 
