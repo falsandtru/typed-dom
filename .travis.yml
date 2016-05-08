@@ -1,8 +1,15 @@
+sudo: required
+dist: trusty
 language: node_js
 node_js:
 - stable
-sudo: false
-cache: bundler
+addons:
+  firefox: latest
+  apt:
+    sources:
+    - google-chrome
+    packages:
+    - google-chrome-stable
 env:
   global:
   - GIT_OWNER=$(echo $TRAVIS_REPO_SLUG | cut -d/ -f1)
