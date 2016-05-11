@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/falsandtru/typed-dom.svg?branch=master)](https://travis-ci.org/falsandtru/typed-dom)
 
-Enhance dom accessibility by static typings of TypeScript.
+Enhance dom manipulability via static typings of TypeScript.
 
 ```ts
 import TypedHTML from 'typed-dom';

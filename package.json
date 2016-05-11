@@ -1,7 +1,7 @@
 {
   "name": "typed-dom",
   "version": "0.0.6",
-  "description": "Typed html dom structs.",
+  "description": "Static typed html dom builder.",
   "private": true,
   "homepage": "https://github.com/falsandtru/typed-dom",
   "repository": {
