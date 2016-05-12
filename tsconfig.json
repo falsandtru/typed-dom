@@ -3,6 +3,7 @@
     "target": "es5",
     "module": "amd",
     "moduleResolution": "node",
+    "lib": ["es6", "dom"],
     "allowSyntheticDefaultImports": true,
     "noImplicitAny": true,
     "suppressImplicitAnyIndexErrors": true,
@@ -10,6 +11,7 @@
     "noFallthroughCasesInSwitch": true,
     "allowUnusedLabels": true,
     "preserveConstEnums": true,
+    "strictNullChecks": true,
     "rootDir": "./",
     "forceConsistentCasingInFileNames": true,
     "removeComments": false

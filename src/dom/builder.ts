@@ -5,7 +5,8 @@ export function build<S extends string, T extends HTMLElement, U extends TypedHT
   void Object.keys(contents)
     .forEach(k => void raw.appendChild(contents[k].raw));
   contents = contents instanceof Array
-    ? Object.freeze(contents)
+    // https://github.com/Microsoft/TypeScript/issues/8563
+    ? <any>Object.freeze(contents)
     : observe(contents);
   return <TypedHTML<S, T, U>>Object.freeze({
     raw,
