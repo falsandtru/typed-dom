@@ -61,7 +61,7 @@
     "power-assert": "^1.4.1",
     "run-sequence": "^1.1.5",
     "tsd": "^0.6.5",
-    "typescript": "^1.9.0-dev.20160512"
+    "typescript": "1.9.0-dev.20160513"
   },
   "engines": {
     "node": ">=4.0"
