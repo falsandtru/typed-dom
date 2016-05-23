@@ -17,7 +17,7 @@ declare module 'typed-dom' {
   interface TypedHTMLBuilder<T extends HTMLElement, S extends string> {
     (): TypedHTML<S, T, void[]>;
     <U extends TypedHTMLContents<HTMLElement>>(contents: U, factory?: () => T): TypedHTML<S, T, U>;
-    <U extends TypedHTMLContents<HTMLElement>>(contents: U, attrs: { [attr: string]: string; }, factory?: () => T): TypedHTML<S, T, U>;
+    <U extends TypedHTMLContents<HTMLElement>>(contents: U, attrs: { [name: string]: string; }, factory?: () => T): TypedHTML<S, T, U>;
   }
 
   const TypedHTML: {

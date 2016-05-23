@@ -3,7 +3,7 @@ import {default as Builder, TypedHTML, TypedHTMLContents} from 'typed-dom';
 export function build<S extends string, T extends HTMLElement, U extends TypedHTMLContents<HTMLElement>>(factory: () => T, contents: U = <any>[], attrs: {} = {}): TypedHTML<S, T, U> {
   const raw = factory();
   void Object.keys(attrs)
-    .forEach(attr => raw.setAttribute(attr, attrs[attr] || ''));
+    .forEach(name => raw.setAttribute(name, attrs[name] || ''));
   void Object.keys(contents)
     .forEach(k => void raw.appendChild(contents[k].raw));
   contents = contents instanceof Array
