@@ -7,6 +7,12 @@ describe('Integration: TypedHTML', function () {
       return el;
     }
 
+    it('attr', function () {
+      const dom = TypedHTML.script([], { id: 'test', src: './' });
+      assert(dom.raw.id === 'test');
+      assert(dom.raw.getAttribute('src') === './');
+    });
+
     it('struct', function () {
       const struct = TypedHTML.article({
         title: TypedHTML.h1(),
