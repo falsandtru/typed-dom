@@ -59,8 +59,5 @@
     "test": "gulp server"
   },
   "author": "falsandtru",
-  "license": {
-    "type": "MIT",
-    "url": "https://opensource.org/licenses/MIT"
-  }
+  "license": "MIT"
 }
