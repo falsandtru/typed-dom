@@ -1,12 +1,6 @@
 module.exports = function (config) {
   config.set({
     basePath: '',
-    customLaunchers: {
-      IE11: {
-        base: 'IE',
-        'x-ua-compatible': 'IE=EmulateIE11'
-      }
-    },
     frameworks: ['mocha'],
     files: [
       { pattern: 'node_modules/power-assert/build/power-assert.js', watched: true, served: true, included: true },
@@ -32,6 +26,12 @@ module.exports = function (config) {
       ]
     },
     autoWatch: true,
+    customLaunchers: {
+      IE11: {
+        base: 'IE',
+        'x-ua-compatible': 'IE=EmulateIE11'
+      }
+    },
     browsers: ['Chrome']
   });
 }
