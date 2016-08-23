@@ -15,14 +15,12 @@ const config = {
     }),
     dist: {
       src: [
-        'typings/*.d.ts',
         '*.ts'
       ],
       dest: 'dist'
     },
     test: {
       src: [
-        'typings/*.d.ts',
         '*.ts',
         'src/**/*.ts',
         'test/**/*.ts'
@@ -31,7 +29,7 @@ const config = {
     }
   },
   banner: [
-    `/*! ${pkg.name} v${pkg.version} ${pkg.repository.url} | (c) 2016, ${pkg.author} | ${pkg.license.type} License (${pkg.license.url}) */`,
+    `/*! ${pkg.name} v${pkg.version} ${pkg.repository.url} | (c) 2016, ${pkg.author} | ${pkg.license} License */`,
     ''
   ].join('\n'),
   exporter:
@@ -99,6 +97,7 @@ gulp.task('ts:dist', function () {
 gulp.task('karma:watch', function (done) {
   new Server({
     configFile: __dirname + '/karma.conf.js',
+    browsers: ['Chrome', 'Firefox'],
     preprocessors: {
       'dist/*.js': ['espower']
     },
@@ -108,7 +107,7 @@ gulp.task('karma:watch', function (done) {
 gulp.task('karma:test', function (done) {
   new Server({
     configFile: __dirname + '/karma.conf.js',
-    browsers: ['Chrome', 'Firefox', 'IE11'],
+    browsers: ['Chrome', 'Firefox'],
     reporters: ['dots', 'coverage'],
     preprocessors: {
       'dist/*.js': ['coverage', 'espower']
@@ -121,7 +120,7 @@ gulp.task('karma:server', function (done) {
   new Server({
     configFile: __dirname + '/karma.conf.js',
     browsers: ['Chrome', 'Firefox'],
-    reporters: ['dots', 'coverage'],
+    reporters: ['dots', 'coverage', 'coveralls'],
     preprocessors: {
       'dist/*.js': ['coverage', 'espower']
     },
@@ -135,13 +134,11 @@ gulp.task('clean', function () {
 
 gulp.task('install', function () {
   shell('npm i');
-  shell('tsd install --save --overwrite');
 });
 
 gulp.task('update', function () {
   shell('npm-check-updates -u');
   shell('npm i');
-  //shell('tsd update --save --overwrite');
 });
 
 gulp.task('watch', ['clean'], function () {

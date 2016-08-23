@@ -1,2 +1,3 @@
-﻿export * from './src/export';
+﻿import './src/import';
+export * from './src/export';
 export {default} from './src/export';

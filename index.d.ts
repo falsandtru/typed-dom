@@ -1,2 +1,2 @@
-﻿import './typings/typed-dom';
+﻿import './typed-dom.d';
 export * from 'typed-dom';

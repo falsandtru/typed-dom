@@ -1,6 +1,4 @@
-import TypedHTML, {
-  TypedHTMLContents
-} from 'typed-dom';
+import TypedHTML from 'typed-dom';
 
 describe('Interface: Package', function () {
   describe('TypedHTML', function () {
@@ -14,7 +12,7 @@ describe('Interface: Package', function () {
     it('assertion self-check', function (done) {
       setTimeout(function () {
         try {
-          console.log(assert(false === true), assert); // LOG: undefined, function powerAssert() { ... }
+          console.log(assert(!false === !true), assert); // LOG: undefined, function powerAssert() { ... }
         }
         catch (e) {
           done();
