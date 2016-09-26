@@ -7,10 +7,38 @@ describe('Integration: TypedHTML', function () {
       return el;
     }
 
-    it('attr', function () {
-      const dom = TypedHTML.script([], { id: 'test', src: './' });
+    it('attr with array', function () {
+      const dom = TypedHTML.script({ id: 'test', src: './' }, []);
       assert(dom.raw.id === 'test');
       assert(dom.raw.getAttribute('src') === './');
+      assert.deepStrictEqual(dom.contents, []);
+    });
+
+    it('attr with object', function () {
+      const dom = TypedHTML.script({ id: 'test', src: './' }, {});
+      assert(dom.raw.id === 'test');
+      assert(dom.raw.getAttribute('src') === './');
+      assert.deepStrictEqual(dom.contents, {});
+    });
+
+    it('factory with array', function () {
+      const dom = TypedHTML.script([], () => {
+        const el = document.createElement('script');
+        el.id = 'test';
+        return el;
+      });
+      assert(dom.raw.id === 'test');
+      assert.deepStrictEqual(dom.contents, []);
+    });
+
+    it('factory with object', function () {
+      const dom = TypedHTML.script({}, () => {
+        const el = document.createElement('script');
+        el.id = 'test';
+        return el;
+      });
+      assert(dom.raw.id === 'test');
+      assert.deepStrictEqual(dom.contents, {});
     });
 
     it('struct', function () {
@@ -78,8 +106,7 @@ describe('Integration: TypedHTML', function () {
         TypedHTML.li()
       ]);
       assert.throws(() => collection.contents[0] = TypedHTML.li());
-      // IE doesn't throw an error here.
-      //assert.throws(() => collection.contents[1] = TypedHTML.li());
+      assert.throws(() => collection.contents[1] = TypedHTML.li());
       assert.throws(() => collection.contents.push(TypedHTML.li()));
       assert.throws(() => collection.contents.pop());
       assert.throws(() => collection.contents.length = 0);
