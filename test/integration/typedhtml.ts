@@ -106,7 +106,6 @@ describe('Integration: TypedHTML', function () {
         TypedHTML.li()
       ]);
       assert.throws(() => collection.contents[0] = TypedHTML.li());
-      assert.throws(() => collection.contents[1] = TypedHTML.li());
       assert.throws(() => collection.contents.push(TypedHTML.li()));
       assert.throws(() => collection.contents.pop());
       assert.throws(() => collection.contents.length = 0);
