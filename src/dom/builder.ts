@@ -1,14 +1,17 @@
 import { TypedHTML, TypedHTMLContents } from 'typed-dom';
 
-export function build<S extends string, T extends HTMLElement, U extends TypedHTMLContents<HTMLElement>>(factory: () => T, attrs: {}, contents: U = <any>[]): TypedHTML<S, T, U> {
+export function build
+  <S extends string, T extends HTMLElement, U extends TypedHTMLContents<HTMLElement>>
+  (factory: () => T, attrs: {}, contents: U = <U>[])
+  : TypedHTML<S, T, U> {
   const raw = factory();
   void Object.keys(attrs)
     .forEach(name => raw.setAttribute(name, attrs[name] || ''));
   void Object.keys(contents)
     .forEach(k => void raw.appendChild(contents[k].raw));
-  contents = contents instanceof Array
+  contents = Array.isArray(contents)
     // https://github.com/Microsoft/TypeScript/issues/8563
-    ? <any>Object.freeze(contents)
+    ? <U>Object.freeze(contents)
     : observe(contents);
   return <TypedHTML<S, T, U>>Object.freeze({
     raw,
@@ -16,10 +19,18 @@ export function build<S extends string, T extends HTMLElement, U extends TypedHT
       return contents;
     },
     set contents(cs) {
-      if (contents instanceof Array) {
+      if (Array.isArray(contents)) {
         cs = Object.freeze(cs);
-        raw.innerHTML = '';
-        void (<any[]><any>cs)
+        void (<TypedHTML<string, T, any>[]>cs)
+          .reduce<TypedHTML<string, T, any>[]>((os, n) => {
+            const i = os.indexOf(n);
+            if (i === -1) return os;
+            void os.splice(i, 1);
+            return os;
+          }, contents.slice())
+          .forEach(a =>
+            void a.raw.remove());
+        void (<TypedHTML<string, T, any>[]>cs)
           .forEach(c => void raw.appendChild(c.raw));
       }
       else {
