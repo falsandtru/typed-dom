@@ -13,9 +13,9 @@ declare module 'typed-dom' {
     raw: T;
     contents: U;
   }
-  export type TypedHTMLContents<T extends HTMLElement> = void[] | TypedHTML<string, T, any>[] | { [name: string]: TypedHTML<string, T, any>; };
+  export type TypedHTMLContents<T extends HTMLElement> = never[] | TypedHTML<string, T, any>[] | { [name: string]: TypedHTML<string, T, any>; };
   interface TypedHTMLBuilder<T extends HTMLElement, S extends string> {
-    (): TypedHTML<S, T, void[]>;
+    (): TypedHTML<S, T, never[]>;
     <U extends TypedHTMLContents<HTMLElement>>(contents: U, factory?: () => T): TypedHTML<S, T, U>;
     <U extends TypedHTMLContents<HTMLElement>>(attrs: { [name: string]: string; }, contents: U, factory?: () => T): TypedHTML<S, T, U>;
   }
