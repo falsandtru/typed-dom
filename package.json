@@ -55,6 +55,7 @@
     "npm-check-updates": "^2.8.9",
     "power-assert": "^1.4.2",
     "run-sequence": "^1.2.2",
+    "spica": "0.0.46",
     "tsify": "^3.0.0",
     "typescript": "2.2.0-dev.20170115",
     "vinyl-buffer": "^1.0.0",

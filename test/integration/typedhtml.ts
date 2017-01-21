@@ -1,4 +1,9 @@
+import { Sequence } from 'spica';
 import TypedHTML from 'typed-dom';
+
+declare const _: {
+  shuffle<T>(as: T[]): T[]; 
+};
 
 describe('Integration: TypedHTML', function () {
   describe('spec', function () {
@@ -105,11 +110,41 @@ describe('Integration: TypedHTML', function () {
       const collection = TypedHTML.ul([
         TypedHTML.li()
       ]);
+
+      // readonly
       assert.throws(() => collection.contents[0] = TypedHTML.li());
       assert.throws(() => collection.contents.push(TypedHTML.li()));
       assert.throws(() => collection.contents.pop());
       assert.throws(() => collection.contents.length = 0);
       assert(collection.contents.length === 1);
+
+      // update
+      const ss = Array(3).fill(0).map(() => TypedHTML.li());
+      void Sequence.zip(
+        Sequence.cycle([Array(3).fill(0).map(() => TypedHTML.li()).concat(ss)]),
+        Sequence.cycle([Array(3).fill(0).map(() => TypedHTML.li()).concat(ss)]))
+        .take(1000)
+        .map(lss =>
+          lss
+            .map(ls =>
+              _.shuffle(ls.slice(-ls.length % (Math.random() * ls.length | 0)))))
+        .extract()
+        .forEach(([os, ns]) => {
+          collection.contents = os;
+          Sequence.zip(
+            Sequence.from(Array.from(collection.raw.children)),
+            Sequence.from(os.map(({raw}) => raw)))
+            .extract()
+            .forEach(([a, b]) =>
+              void assert(a === b));
+          collection.contents = ns;
+          Sequence.zip(
+            Sequence.from(Array.from(collection.raw.children)),
+            Sequence.from(ns.map(({raw}) => raw)))
+            .extract()
+            .forEach(([a, b]) =>
+              void assert(a === b));
+        });
     });
 
   });
