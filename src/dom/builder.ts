@@ -1,4 +1,4 @@
-import {TypedHTML, TypedHTMLContents} from 'typed-dom';
+import { TypedHTML, TypedHTMLContents } from 'typed-dom';
 
 export function build<S extends string, T extends HTMLElement, U extends TypedHTMLContents<HTMLElement>>(factory: () => T, attrs: {}, contents: U = <any>[]): TypedHTML<S, T, U> {
   const raw = factory();

@@ -1,1 +1,1 @@
-export {TypedHTML as default} from './dom/html';
+export { TypedHTML as default } from './dom/html';

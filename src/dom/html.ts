@@ -1,5 +1,5 @@
-import {TypedHTML as ITypedHTML, TypedHTMLContents} from 'typed-dom';
-import {build} from './builder';
+import { TypedHTML as ITypedHTML, TypedHTMLContents } from 'typed-dom';
+import { build } from './builder';
 
 export type TypedHTML<S extends string, T extends HTMLElement, U extends TypedHTMLContents<HTMLElement>> = ITypedHTML<S, T, U>;
 export const TypedHTML: TypedHTML<string, HTMLElement, TypedHTMLContents<HTMLElement>> = [
