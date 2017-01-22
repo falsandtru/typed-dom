@@ -6,9 +6,8 @@
 */
 
 declare module 'typed-dom' {
-  class HTML<T extends string> {
-    private TAG: T;
-  }
+  export default typedHTMLBuilder;
+
   export interface TypedHTML<S extends string, T extends HTMLElement, U extends TypedHTMLChildren<HTMLElement>> extends HTML<S> {
     element: T;
     children: U;
@@ -17,6 +16,10 @@ declare module 'typed-dom' {
     = string
     | TypedHTML<string, T, any>[]
     | { [name: string]: TypedHTML<string, T, any>; };
+  abstract class HTML<T extends string> {
+    private identifier: T;
+  }
+
   interface TypedHTMLBuilder<T extends HTMLElement, S extends string> {
     (): TypedHTML<S, T, never>;
     <U extends string>(children: U): TypedHTML<S, T, U>;
@@ -25,8 +28,7 @@ declare module 'typed-dom' {
     <U extends string>(attrs: { [name: string]: string; }, children: U, factory?: () => T): never;
     <U extends TypedHTMLChildren<HTMLElement>>(attrs: { [name: string]: string; }, children: U, factory?: () => T): TypedHTML<S, T, U>;
   }
-
-  const TypedHTML: {
+  const typedHTMLBuilder: {
     // lib.dom.d.ts
     //[K in keyof HTMLElementTagNameMap]: TypedHTMLBuilder<HTMLElementTagNameMap[K], K>;
     a: TypedHTMLBuilder<HTMLAnchorElement, 'a'>;
@@ -154,5 +156,4 @@ declare module 'typed-dom' {
     // custom
     custom<T extends TypedHTMLChildren<HTMLElement>, U extends HTMLElement, V extends string>(children: T, factory: () => U, identity: V): TypedHTML<V, U, T>;
   };
-  export default TypedHTML;
 }
