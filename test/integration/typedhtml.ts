@@ -46,12 +46,8 @@ describe('Integration: TypedHTML', function () {
         title: TypedHTML.h1(['<text>']),
         content: TypedHTML.p([TypedHTML.a()])
       });
-      assert(struct.raw.nodeName === 'ARTICLE');
-      assert(struct.contents.title.raw.nodeName === 'H1');
-      assert(struct.contents.title.raw.textContent === '<text>');
-      assert(struct.contents.title.raw.innerHTML === '&lt;text&gt;');
+      assert(struct.raw.outerHTML === '<article><h1>&lt;text&gt;</h1><p><a></a></p></article>');
       assert(struct.contents.title.raw === struct.raw.firstChild);
-      assert(struct.contents.content.raw.nodeName === 'P');
       assert(struct.contents.content.raw === struct.raw.lastChild);
     });
 
@@ -77,16 +73,13 @@ describe('Integration: TypedHTML', function () {
 
     it('collection', function () {
       const collection = TypedHTML.ul([
-        TypedHTML.li(),
-        TypedHTML.li()
+        TypedHTML.li(['1']),
+        TypedHTML.li(['2'])
       ]);
-      assert(collection.raw.nodeName === 'UL');
-      assert(collection.contents[0].raw.nodeName === 'LI');
+      assert(collection.raw.outerHTML === '<ul><li>1</li><li>2</li></ul>');
+      assert(collection.contents.length === collection.raw.children.length);
       assert(collection.contents[0].raw === collection.raw.children[0]);
-      assert(collection.contents[1].raw.nodeName === 'LI');
       assert(collection.contents[1].raw === collection.raw.children[1]);
-      assert(collection.contents[2] === void 0);
-      assert(collection.raw.children[2] === void 0);
     });
 
     it('collection contents update', function () {
@@ -97,10 +90,8 @@ describe('Integration: TypedHTML', function () {
       collection.contents = [
         TypedHTML.li()
       ];
-      assert(collection.contents[0].raw.nodeName === 'LI');
+      assert(collection.contents.length === collection.raw.children.length);
       assert(collection.contents[0].raw === collection.raw.children[0]);
-      assert(collection.contents[1] === void 0);
-      assert(collection.raw.children[1] === void 0);
     });
 
     it('collection contents partial update', function () {
