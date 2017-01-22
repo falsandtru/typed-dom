@@ -129,17 +129,13 @@ export const TypedHTML: TypedHTML<string, HTMLElement, TypedHTMLContents<HTMLEle
   // custom
   'custom'
 ]
-  .reduce((obj, tag) => {
+  .reduce((obj, tag) => (
     obj[tag] =
       <T extends TypedHTMLContents<HTMLElement>>
-        (attrs: { [name: string]: string; }, children: T, factory?: () => HTMLElement)
-        : TypedHTML<string, HTMLElement, T> => {
-        if (!children || typeof children === 'function') {
-          factory = <any>children;
-          children = <any>attrs;
-          attrs = {};
-        }
-        return build(factory || (() => document.createElement(tag)), attrs, children);
-      }
-    return obj;
-  }, <TypedHTML<string, HTMLElement, TypedHTMLContents<HTMLElement>>>{});
+      (attrs?: { [name: string]: string; }, children?: T, factory?: () => HTMLElement)
+      : TypedHTML<string, HTMLElement, T> =>
+          !attrs || !children || typeof children === 'function'
+            ? build(<any>children || (() => document.createElement(tag)), {}, <T><any>attrs)
+            : build(factory || (() => document.createElement(tag)), attrs, children),
+    obj
+  ), <TypedHTML<string, HTMLElement, TypedHTMLContents<HTMLElement>>>{});
