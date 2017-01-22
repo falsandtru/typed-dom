@@ -20,5 +20,5 @@ assert(component.element.outerHTML === '<article><h1>title</h1><ul><li>item</li>
 assert(component.children.title.element.outerHTML === '<h1>title</h1>');
 assert(component.children.title.children === 'title');
 assert(component.children.content.element.outerHTML === '<ul><li>item</li><li>item</li></ul>');
-assert(component.children.content.children[0].content === 'item');
+assert(component.children.content.children[0].children === 'item');
 ```
