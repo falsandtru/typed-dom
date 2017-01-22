@@ -9,16 +9,16 @@ describe('Integration: TypedHTML', function () {
   describe('spec', function () {
     it('attr with array', function () {
       const dom = TypedHTML.script({ id: 'test', src: './' }, []);
-      assert(dom.raw.id === 'test');
-      assert(dom.raw.getAttribute('src') === './');
-      assert.deepStrictEqual(dom.contents, []);
+      assert(dom.element.id === 'test');
+      assert(dom.element.getAttribute('src') === './');
+      assert.deepStrictEqual(dom.children, []);
     });
 
     it('attr with object', function () {
       const dom = TypedHTML.script({ id: 'test', src: './' }, {});
-      assert(dom.raw.id === 'test');
-      assert(dom.raw.getAttribute('src') === './');
-      assert.deepStrictEqual(dom.contents, {});
+      assert(dom.element.id === 'test');
+      assert(dom.element.getAttribute('src') === './');
+      assert.deepStrictEqual(dom.children, {});
     });
 
     it('factory with array', function () {
@@ -27,8 +27,8 @@ describe('Integration: TypedHTML', function () {
         el.id = 'test';
         return el;
       });
-      assert(dom.raw.id === 'test');
-      assert.deepStrictEqual(dom.contents, []);
+      assert(dom.element.id === 'test');
+      assert.deepStrictEqual(dom.children, []);
     });
 
     it('factory with object', function () {
@@ -37,23 +37,23 @@ describe('Integration: TypedHTML', function () {
         el.id = 'test';
         return el;
       });
-      assert(dom.raw.id === 'test');
-      assert.deepStrictEqual(dom.contents, {});
+      assert(dom.element.id === 'test');
+      assert.deepStrictEqual(dom.children, {});
     });
 
     it('sanitize', function () {
       const dom = TypedHTML.div('<script>');
-      assert(dom.raw.innerHTML === '&lt;script&gt;');
-      assert(dom.contents === '<script>');
-      dom.contents = '<script>';
-      assert(dom.raw.innerHTML === '&lt;script&gt;');
-      assert(dom.contents === '<script>');
+      assert(dom.element.innerHTML === '&lt;script&gt;');
+      assert(dom.children === '<script>');
+      dom.children = '<script>';
+      assert(dom.element.innerHTML === '&lt;script&gt;');
+      assert(dom.children === '<script>');
     });
 
     it('empty', function () {
       const empty = TypedHTML.div();
-      assert(empty.raw.outerHTML === '<div></div>');
-      assert(empty.contents === void 0);
+      assert(empty.element.outerHTML === '<div></div>');
+      assert(empty.children === void 0);
     });
 
     it('struct', function () {
@@ -61,35 +61,35 @@ describe('Integration: TypedHTML', function () {
         title: TypedHTML.h1('title'),
         content: TypedHTML.p([TypedHTML.a()])
       });
-      assert(struct.raw.outerHTML === '<article><h1>title</h1><p><a></a></p></article>');
-      assert(struct.contents.title.raw === struct.raw.firstChild);
-      assert(struct.contents.content.raw === struct.raw.lastChild);
+      assert(struct.element.outerHTML === '<article><h1>title</h1><p><a></a></p></article>');
+      assert(struct.children.title.element === struct.element.firstChild);
+      assert(struct.children.content.element === struct.element.lastChild);
     });
 
     it('struct contents update', function () {
       const struct = TypedHTML.article({
         title: TypedHTML.h1<string>('a')
       });
-      struct.contents = {
+      struct.children = {
         title: TypedHTML.h1('b')
       };
-      assert(struct.contents.title.raw.textContent === 'b');
-      assert(struct.contents.title.raw === struct.raw.firstChild);
-      assert(struct.contents.title.contents === 'b');
+      assert(struct.children.title.element.textContent === 'b');
+      assert(struct.children.title.element === struct.element.firstChild);
+      assert(struct.children.title.children === 'b');
     });
 
     it('struct contents partial update', function () {
       const struct = TypedHTML.article({
         title: TypedHTML.h1<string>('a')
       });
-      struct.contents.title = TypedHTML.h1('b');
-      assert(struct.contents.title.raw.textContent === 'b');
-      assert(struct.contents.title.raw === struct.raw.firstChild);
-      assert(struct.contents.title.contents === 'b');
-      struct.contents.title.contents = 'c';
-      assert(struct.contents.title.raw.textContent === 'c');
-      assert(struct.contents.title.raw === struct.raw.firstChild);
-      assert(struct.contents.title.contents === 'c');
+      struct.children.title = TypedHTML.h1('b');
+      assert(struct.children.title.element.textContent === 'b');
+      assert(struct.children.title.element === struct.element.firstChild);
+      assert(struct.children.title.children === 'b');
+      struct.children.title.children = 'c';
+      assert(struct.children.title.element.textContent === 'c');
+      assert(struct.children.title.element === struct.element.firstChild);
+      assert(struct.children.title.children === 'c');
     });
 
     it('collection', function () {
@@ -97,28 +97,28 @@ describe('Integration: TypedHTML', function () {
         TypedHTML.li('1'),
         TypedHTML.li('2')
       ]);
-      assert(collection.raw.outerHTML === '<ul><li>1</li><li>2</li></ul>');
-      assert(collection.contents.length === 2);
-      assert(collection.contents.every(({raw}, i) => raw === collection.raw.children[i]));
+      assert(collection.element.outerHTML === '<ul><li>1</li><li>2</li></ul>');
+      assert(collection.children.length === 2);
+      assert(collection.children.every(({element}, i) => element === collection.element.children[i]));
     });
 
     it('collection contents update', function () {
       const collection = TypedHTML.ul([
         TypedHTML.li<string>('1')
       ]);
-      collection.contents = [
+      collection.children = [
         TypedHTML.li('2'),
         TypedHTML.li('3')
       ];
-      assert(collection.raw.outerHTML === '<ul><li>2</li><li>3</li></ul>');
-      assert(collection.contents.length === 2);
-      assert(collection.contents.every(({raw}, i) => raw === collection.raw.children[i]));
-      collection.contents = [
+      assert(collection.element.outerHTML === '<ul><li>2</li><li>3</li></ul>');
+      assert(collection.children.length === 2);
+      assert(collection.children.every(({element}, i) => element === collection.element.children[i]));
+      collection.children = [
         TypedHTML.li('4')
       ];
-      assert(collection.raw.outerHTML === '<ul><li>4</li></ul>');
-      assert(collection.contents.length === 1);
-      assert(collection.contents.every(({raw}, i) => raw === collection.raw.children[i]));
+      assert(collection.element.outerHTML === '<ul><li>4</li></ul>');
+      assert(collection.children.length === 1);
+      assert(collection.children.every(({element}, i) => element === collection.element.children[i]));
 
       // property test
       const ss = Array(3).fill(0).map(() => TypedHTML.li());
@@ -132,17 +132,17 @@ describe('Integration: TypedHTML', function () {
               _.shuffle(ls.slice(-ls.length % (Math.random() * ls.length | 0)))))
         .extract()
         .forEach(([os, ns]) => {
-          collection.contents = os;
+          collection.children = os;
           Sequence.zip(
-            Sequence.from(Array.from(collection.raw.children)),
-            Sequence.from(os.map(({raw}) => raw)))
+            Sequence.from(Array.from(collection.element.children)),
+            Sequence.from(os.map(({element}) => element)))
             .extract()
             .forEach(([a, b]) =>
               void assert(a === b));
-          collection.contents = ns;
+          collection.children = ns;
           Sequence.zip(
-            Sequence.from(Array.from(collection.raw.children)),
-            Sequence.from(ns.map(({raw}) => raw)))
+            Sequence.from(Array.from(collection.element.children)),
+            Sequence.from(ns.map(({element}) => element)))
             .extract()
             .forEach(([a, b]) =>
               void assert(a === b));
@@ -153,12 +153,12 @@ describe('Integration: TypedHTML', function () {
       const collection = TypedHTML.ul([
         TypedHTML.li()
       ]);
-      assert.throws(() => collection.contents[0] = TypedHTML.li());
-      assert.throws(() => collection.contents.push(TypedHTML.li()));
-      assert.throws(() => collection.contents.pop());
-      assert.throws(() => collection.contents.length = 0);
-      assert(collection.contents.length === 1);
-      assert(collection.contents.every(({raw}, i) => raw === collection.raw.children[i]));
+      assert.throws(() => collection.children[0] = TypedHTML.li());
+      assert.throws(() => collection.children.push(TypedHTML.li()));
+      assert.throws(() => collection.children.pop());
+      assert.throws(() => collection.children.length = 0);
+      assert(collection.children.length === 1);
+      assert(collection.children.every(({element}, i) => element === collection.element.children[i]));
     });
 
   });

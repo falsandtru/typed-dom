@@ -16,12 +16,9 @@ const component = TypedHTML.article({
     TypedHTML.li('item'),
   ])
 });
-assert(component.raw.nodeName === 'ARTICLE');
-assert(component.raw.outerHTML === '<article><h1>title</h1><ul><li>item</li><li>item</li></ul></article>');
-assert(component.contents.title.raw.nodeName === 'H1');
-assert(component.contents.title.raw.outerHTML === '<h1>title</h1>');
-assert(component.contents.title.contents === 'title');
-assert(component.contents.content.raw.nodeName === 'UL');
-assert(component.contents.content.raw.outerHTML === '<ul><li>item</li><li>item</li></ul>');
-assert(component.contents.content.contents[0].content === 'item');
+assert(component.element.outerHTML === '<article><h1>title</h1><ul><li>item</li><li>item</li></ul></article>');
+assert(component.children.title.element.outerHTML === '<h1>title</h1>');
+assert(component.children.title.children === 'title');
+assert(component.children.content.element.outerHTML === '<ul><li>item</li><li>item</li></ul>');
+assert(component.children.content.children[0].content === 'item');
 ```

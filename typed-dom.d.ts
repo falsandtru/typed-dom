@@ -10,14 +10,14 @@ declare module 'typed-dom' {
     private TAG: T;
   }
   export interface TypedHTML<S extends string, T extends HTMLElement, U extends TypedHTMLContents<HTMLElement>> extends HTML<S> {
-    raw: T;
-    contents: U;
+    element: T;
+    children: U;
   }
   export type TypedHTMLContents<T extends HTMLElement> = never | string | TypedHTML<string, T, any>[] | { [name: string]: TypedHTML<string, T, any>; };
   interface TypedHTMLBuilder<T extends HTMLElement, S extends string> {
     (): TypedHTML<S, T, never>;
-    <U extends TypedHTMLContents<HTMLElement>>(contents: U, factory?: () => T): TypedHTML<S, T, U>;
-    <U extends TypedHTMLContents<HTMLElement>>(attrs: { [name: string]: string; }, contents: U, factory?: () => T): TypedHTML<S, T, U>;
+    <U extends TypedHTMLContents<HTMLElement>>(children: U, factory?: () => T): TypedHTML<S, T, U>;
+    <U extends TypedHTMLContents<HTMLElement>>(attrs: { [name: string]: string; }, children: U, factory?: () => T): TypedHTML<S, T, U>;
   }
 
   const TypedHTML: {
@@ -144,7 +144,7 @@ declare module 'typed-dom' {
     wbr: TypedHTMLBuilder<HTMLElement, 'wbr'>;
     xmp: TypedHTMLBuilder<HTMLPreElement, 'xmp'>;
     // custom
-    custom<T extends TypedHTMLContents<HTMLElement>, U extends HTMLElement, V extends string>(contents: T, factory: () => U, identity: V): TypedHTML<V, U, T>;
+    custom<T extends TypedHTMLContents<HTMLElement>, U extends HTMLElement, V extends string>(children: T, factory: () => U, identity: V): TypedHTML<V, U, T>;
   };
   export default TypedHTML;
 }
