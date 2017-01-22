@@ -7,11 +7,6 @@ declare const _: {
 
 describe('Integration: TypedHTML', function () {
   describe('spec', function () {
-    function text<T extends { raw: HTMLElement; }>(el: T, str: string): T {
-      el.raw.textContent = str;
-      return el;
-    }
-
     it('attr with array', function () {
       const dom = TypedHTML.script({ id: 'test', src: './' }, []);
       assert(dom.raw.id === 'test');
@@ -48,11 +43,13 @@ describe('Integration: TypedHTML', function () {
 
     it('struct', function () {
       const struct = TypedHTML.article({
-        title: TypedHTML.h1(),
+        title: TypedHTML.h1(['<text>']),
         content: TypedHTML.p([TypedHTML.a()])
       });
       assert(struct.raw.nodeName === 'ARTICLE');
       assert(struct.contents.title.raw.nodeName === 'H1');
+      assert(struct.contents.title.raw.textContent === '<text>');
+      assert(struct.contents.title.raw.innerHTML === '&lt;text&gt;');
       assert(struct.contents.title.raw === struct.raw.firstChild);
       assert(struct.contents.content.raw.nodeName === 'P');
       assert(struct.contents.content.raw === struct.raw.lastChild);
@@ -60,10 +57,10 @@ describe('Integration: TypedHTML', function () {
 
     it('struct contents update', function () {
       const struct = TypedHTML.article({
-        title: text(TypedHTML.h1(), 'a')
+        title: TypedHTML.h1(['a'])
       });
       struct.contents = {
-        title: text(TypedHTML.h1(), 'b')
+        title: TypedHTML.h1(['b'])
       };
       assert(struct.contents.title.raw.textContent === 'b');
       assert(struct.contents.title.raw === struct.raw.firstChild);
@@ -71,9 +68,9 @@ describe('Integration: TypedHTML', function () {
 
     it('struct contents partial update', function () {
       const struct = TypedHTML.article({
-        title: text(TypedHTML.h1(), 'a')
+        title: TypedHTML.h1(['a'])
       });
-      struct.contents.title = text(TypedHTML.h1(), 'b');
+      struct.contents.title = TypedHTML.h1(['b']);
       assert(struct.contents.title.raw.textContent === 'b');
       assert(struct.contents.title.raw === struct.raw.firstChild);
     });

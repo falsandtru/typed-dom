@@ -8,7 +8,7 @@ export function build
   void Object.keys(attrs)
     .forEach(name => raw.setAttribute(name, attrs[name] || ''));
   void Object.keys(contents)
-    .forEach(k => void raw.appendChild(contents[k].raw));
+    .forEach(k => void raw.appendChild(contents[k].raw || document.createTextNode(contents[k])));
   contents = Array.isArray(contents)
     // https://github.com/Microsoft/TypeScript/issues/8563
     ? <U>Object.freeze(contents)
@@ -21,17 +21,19 @@ export function build
     set contents(cs) {
       if (Array.isArray(contents)) {
         cs = Object.freeze(cs);
-        void (<TypedHTML<string, T, any>[]>cs)
-          .reduce<TypedHTML<string, T, any>[]>((os, n) => {
+        void (<Array<TypedHTML<string, T, any> | string>>cs)
+          .reduce<Array<TypedHTML<string, T, any> | string>>((os, n) => {
             const i = os.indexOf(n);
             if (i === -1) return os;
             void os.splice(i, 1);
             return os;
           }, contents.slice())
+          .map(a => (<TypedHTML<string, T, any>>a).raw || document.createTextNode(<string>a))
           .forEach(a =>
-            void a.raw.remove());
-        void (<TypedHTML<string, T, any>[]>cs)
-          .forEach(c => void raw.appendChild(c.raw));
+            void a.remove());
+        void (<Array<TypedHTML<string, T, any> | string>>cs)
+          .map(a => (<TypedHTML<string, T, any>>a).raw || document.createTextNode(<string>a))
+          .forEach(c => void raw.appendChild(c));
       }
       else {
         void Object.keys(cs)
