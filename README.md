@@ -7,12 +7,17 @@ Enhance dom manipulability via static typings of TypeScript.
 ```ts
 import TypedHTML from 'typed-dom';
 
-const struct = TypedHTML.div({
-  title: TypedHTML.h1(),
-  list: TypedHTML.ul([TypedHTML.li()])
+const component = TypedHTML.article({
+  title: TypedHTML.h1(['title']),
+  content: TypedHTML.ul([
+    TypedHTML.li(['item']),
+    TypedHTML.li(['item']),
+  ])
 });
-assert(struct.raw.nodeName === 'DIV');
-assert(struct.contents.title.raw.nodeName === 'H1');
-assert(struct.contents.list.raw.nodeName === 'UL');
-assert(struct.contents.list.contents[0].raw.nodeName === 'LI');
+assert(component.raw.nodeName === 'ARTICLE');
+assert(component.raw.outerHTML === '<article><h1>title</h1><ul><li>item</li><li>item</li></ul></article>');
+assert(component.contents.title.raw.nodeName === 'H1');
+assert(component.contents.title.raw.outerHTML === '<h1>title</h1>');
+assert(component.contents.content.raw.nodeName === 'UL');
+assert(component.contents.content.raw.outerHTML === '<ul><li>item</li><li>item</li></ul>');
 ```
