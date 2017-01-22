@@ -4,6 +4,8 @@
 
 Enhance dom manipulability via static typings of TypeScript.
 
+[typed-dom.d.ts](typed-dom.d.ts)
+
 ```ts
 import TypedHTML from 'typed-dom';
 
@@ -21,5 +23,5 @@ assert(component.contents.title.raw.outerHTML === '<h1>title</h1>');
 assert(component.contents.title.contents === 'title');
 assert(component.contents.content.raw.nodeName === 'UL');
 assert(component.contents.content.raw.outerHTML === '<ul><li>item</li><li>item</li></ul>');
-assert(component.contents.content[0].contents === 'item');
+assert(component.contents.content.contents[0].content === 'item');
 ```
