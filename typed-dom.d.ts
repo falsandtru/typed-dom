@@ -13,10 +13,16 @@ declare module 'typed-dom' {
     element: T;
     children: U;
   }
-  export type TypedHTMLContents<T extends HTMLElement> = never | string | TypedHTML<string, T, any>[] | { [name: string]: TypedHTML<string, T, any>; };
+  export type TypedHTMLContents<T extends HTMLElement>
+    = string
+    | TypedHTML<string, T, any>[]
+    | { [name: string]: TypedHTML<string, T, any>; };
   interface TypedHTMLBuilder<T extends HTMLElement, S extends string> {
     (): TypedHTML<S, T, never>;
+    <U extends string>(children: U): TypedHTML<S, T, U>;
+    <U extends string>(children: U, factory?: () => T): never;
     <U extends TypedHTMLContents<HTMLElement>>(children: U, factory?: () => T): TypedHTML<S, T, U>;
+    <U extends string>(attrs: { [name: string]: string; }, children: U, factory?: () => T): never;
     <U extends TypedHTMLContents<HTMLElement>>(attrs: { [name: string]: string; }, children: U, factory?: () => T): TypedHTML<S, T, U>;
   }
 
