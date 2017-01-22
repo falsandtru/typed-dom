@@ -113,21 +113,8 @@ describe('Integration: TypedHTML', function () {
       ];
       assert(collection.contents.length === collection.raw.children.length);
       assert(collection.contents[0].raw === collection.raw.children[0]);
-    });
 
-    it('collection contents partial update', function () {
-      const collection = TypedHTML.ul([
-        TypedHTML.li()
-      ]);
-
-      // readonly
-      assert.throws(() => collection.contents[0] = TypedHTML.li());
-      assert.throws(() => collection.contents.push(TypedHTML.li()));
-      assert.throws(() => collection.contents.pop());
-      assert.throws(() => collection.contents.length = 0);
-      assert(collection.contents.length === 1);
-
-      // update
+      // property test
       const ss = Array(3).fill(0).map(() => TypedHTML.li());
       void Sequence.zip(
         Sequence.cycle([Array(3).fill(0).map(() => TypedHTML.li()).concat(ss)]),
@@ -154,6 +141,17 @@ describe('Integration: TypedHTML', function () {
             .forEach(([a, b]) =>
               void assert(a === b));
         });
+    });
+
+    it('collection contents partial update', function () {
+      const collection = TypedHTML.ul([
+        TypedHTML.li()
+      ]);
+      assert.throws(() => collection.contents[0] = TypedHTML.li());
+      assert.throws(() => collection.contents.push(TypedHTML.li()));
+      assert.throws(() => collection.contents.pop());
+      assert.throws(() => collection.contents.length = 0);
+      assert(collection.contents.length === 1);
     });
 
   });
