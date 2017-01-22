@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/falsandtru/typed-dom.svg?branch=master)](https://travis-ci.org/falsandtru/typed-dom)
 
+Static typed dom component builder.
 Enhance dom manipulability via static typings of TypeScript.
 
 [typed-dom.d.ts](typed-dom.d.ts)
