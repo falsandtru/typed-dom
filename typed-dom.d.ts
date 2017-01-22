@@ -9,11 +9,11 @@ declare module 'typed-dom' {
   class HTML<T extends string> {
     private TAG: T;
   }
-  export interface TypedHTML<S extends string, T extends HTMLElement, U extends TypedHTMLContents<HTMLElement>> extends HTML<S> {
+  export interface TypedHTML<S extends string, T extends HTMLElement, U extends TypedHTMLChildren<HTMLElement>> extends HTML<S> {
     element: T;
     children: U;
   }
-  export type TypedHTMLContents<T extends HTMLElement>
+  export type TypedHTMLChildren<T extends HTMLElement>
     = string
     | TypedHTML<string, T, any>[]
     | { [name: string]: TypedHTML<string, T, any>; };
@@ -21,9 +21,9 @@ declare module 'typed-dom' {
     (): TypedHTML<S, T, never>;
     <U extends string>(children: U): TypedHTML<S, T, U>;
     <U extends string>(children: U, factory?: () => T): never;
-    <U extends TypedHTMLContents<HTMLElement>>(children: U, factory?: () => T): TypedHTML<S, T, U>;
+    <U extends TypedHTMLChildren<HTMLElement>>(children: U, factory?: () => T): TypedHTML<S, T, U>;
     <U extends string>(attrs: { [name: string]: string; }, children: U, factory?: () => T): never;
-    <U extends TypedHTMLContents<HTMLElement>>(attrs: { [name: string]: string; }, children: U, factory?: () => T): TypedHTML<S, T, U>;
+    <U extends TypedHTMLChildren<HTMLElement>>(attrs: { [name: string]: string; }, children: U, factory?: () => T): TypedHTML<S, T, U>;
   }
 
   const TypedHTML: {
@@ -152,7 +152,7 @@ declare module 'typed-dom' {
     wbr: TypedHTMLBuilder<HTMLElement, 'wbr'>;
     xmp: TypedHTMLBuilder<HTMLPreElement, 'xmp'>;
     // custom
-    custom<T extends TypedHTMLContents<HTMLElement>, U extends HTMLElement, V extends string>(children: T, factory: () => U, identity: V): TypedHTML<V, U, T>;
+    custom<T extends TypedHTMLChildren<HTMLElement>, U extends HTMLElement, V extends string>(children: T, factory: () => U, identity: V): TypedHTML<V, U, T>;
   };
   export default TypedHTML;
 }

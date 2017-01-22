@@ -1,8 +1,8 @@
-import { TypedHTML as ITypedHTML, TypedHTMLContents } from 'typed-dom';
+import { TypedHTML as ITypedHTML, TypedHTMLChildren } from 'typed-dom';
 import { build } from './builder';
 
-export type TypedHTML<S extends string, T extends HTMLElement, U extends TypedHTMLContents<HTMLElement>> = ITypedHTML<S, T, U>;
-export const TypedHTML: TypedHTML<string, HTMLElement, TypedHTMLContents<HTMLElement>> = [
+export type TypedHTML<S extends string, T extends HTMLElement, U extends TypedHTMLChildren<HTMLElement>> = ITypedHTML<S, T, U>;
+export const TypedHTML: TypedHTML<string, HTMLElement, TypedHTMLChildren<HTMLElement>> = [
   // lib.dom.d.ts
   'a',
   'abbr',
@@ -131,11 +131,11 @@ export const TypedHTML: TypedHTML<string, HTMLElement, TypedHTMLContents<HTMLEle
 ]
   .reduce((obj, tag) => (
     obj[tag] =
-      <T extends TypedHTMLContents<HTMLElement>>
+      <T extends TypedHTMLChildren<HTMLElement>>
       (attrs?: { [name: string]: string; }, children?: T, factory?: () => HTMLElement)
       : TypedHTML<string, HTMLElement, T> =>
           !attrs || !children || typeof children === 'function'
             ? build(<any>children || (() => document.createElement(tag)), {}, <T><any>attrs)
             : build(factory || (() => document.createElement(tag)), attrs, children),
     obj
-  ), <TypedHTML<string, HTMLElement, TypedHTMLContents<HTMLElement>>>{});
+  ), <TypedHTML<string, HTMLElement, TypedHTMLChildren<HTMLElement>>>{});

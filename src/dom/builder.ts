@@ -1,7 +1,7 @@
-import { TypedHTML, TypedHTMLContents } from 'typed-dom';
+import { TypedHTML, TypedHTMLChildren } from 'typed-dom';
 
 export function build
-  <S extends string, T extends HTMLElement, U extends TypedHTMLContents<HTMLElement>>
+  <S extends string, T extends HTMLElement, U extends TypedHTMLChildren<HTMLElement>>
   (factory: () => T, attrs: {}, children: U)
   : TypedHTML<S, T, U> {
   const element = factory();
