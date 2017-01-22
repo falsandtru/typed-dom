@@ -22,6 +22,7 @@ declare module 'typed-dom' {
 
   const TypedHTML: {
     // lib.dom.d.ts
+    //[K in keyof HTMLElementTagNameMap]: TypedHTMLBuilder<HTMLElementTagNameMap[K], K>;
     a: TypedHTMLBuilder<HTMLAnchorElement, 'a'>;
     abbr: TypedHTMLBuilder<HTMLElement, 'abbr'>;
     acronym: TypedHTMLBuilder<HTMLElement, 'acronym'>;
@@ -94,6 +95,7 @@ declare module 'typed-dom' {
     marquee: TypedHTMLBuilder<HTMLMarqueeElement, 'marquee'>;
     menu: TypedHTMLBuilder<HTMLMenuElement, 'menu'>;
     meta: TypedHTMLBuilder<HTMLMetaElement, 'meta'>;
+    meter: TypedHTMLBuilder<HTMLMeterElement, 'meter'>;
     nav: TypedHTMLBuilder<HTMLElement, 'nav'>;
     nextid: TypedHTMLBuilder<HTMLUnknownElement, 'nextid'>;
     nobr: TypedHTMLBuilder<HTMLElement, 'nobr'>;

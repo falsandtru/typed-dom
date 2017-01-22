@@ -76,6 +76,7 @@ export const TypedHTML: TypedHTML<string, HTMLElement, TypedHTMLContents<HTMLEle
   'marquee',
   'menu',
   'meta',
+  'meter',
   'nav',
   'nextid',
   'nobr',
