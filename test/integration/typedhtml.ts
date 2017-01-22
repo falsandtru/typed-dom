@@ -98,21 +98,27 @@ describe('Integration: TypedHTML', function () {
         TypedHTML.li('2')
       ]);
       assert(collection.raw.outerHTML === '<ul><li>1</li><li>2</li></ul>');
-      assert(collection.contents.length === collection.raw.children.length);
-      assert(collection.contents[0].raw === collection.raw.children[0]);
-      assert(collection.contents[1].raw === collection.raw.children[1]);
+      assert(collection.contents.length === 2);
+      assert(collection.contents.every(({raw}, i) => raw === collection.raw.children[i]));
     });
 
     it('collection contents update', function () {
       const collection = TypedHTML.ul([
-        TypedHTML.li(),
-        TypedHTML.li()
+        TypedHTML.li<string>('1')
       ]);
       collection.contents = [
-        TypedHTML.li()
+        TypedHTML.li('2'),
+        TypedHTML.li('3')
       ];
-      assert(collection.contents.length === collection.raw.children.length);
-      assert(collection.contents[0].raw === collection.raw.children[0]);
+      assert(collection.raw.outerHTML === '<ul><li>2</li><li>3</li></ul>');
+      assert(collection.contents.length === 2);
+      assert(collection.contents.every(({raw}, i) => raw === collection.raw.children[i]));
+      collection.contents = [
+        TypedHTML.li('4')
+      ];
+      assert(collection.raw.outerHTML === '<ul><li>4</li></ul>');
+      assert(collection.contents.length === 1);
+      assert(collection.contents.every(({raw}, i) => raw === collection.raw.children[i]));
 
       // property test
       const ss = Array(3).fill(0).map(() => TypedHTML.li());
@@ -152,6 +158,7 @@ describe('Integration: TypedHTML', function () {
       assert.throws(() => collection.contents.pop());
       assert.throws(() => collection.contents.length = 0);
       assert(collection.contents.length === 1);
+      assert(collection.contents.every(({raw}, i) => raw === collection.raw.children[i]));
     });
 
   });
