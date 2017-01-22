@@ -41,40 +41,61 @@ describe('Integration: TypedHTML', function () {
       assert.deepStrictEqual(dom.contents, {});
     });
 
+    it('sanitize', function () {
+      const dom = TypedHTML.div('<script>');
+      assert(dom.raw.innerHTML === '&lt;script&gt;');
+      assert(dom.contents === '<script>');
+      dom.contents = '<script>';
+      assert(dom.raw.innerHTML === '&lt;script&gt;');
+      assert(dom.contents === '<script>');
+    });
+
+    it('empty', function () {
+      const empty = TypedHTML.div();
+      assert(empty.raw.outerHTML === '<div></div>');
+      assert(empty.contents === void 0);
+    });
+
     it('struct', function () {
       const struct = TypedHTML.article({
-        title: TypedHTML.h1(['<text>']),
+        title: TypedHTML.h1('title'),
         content: TypedHTML.p([TypedHTML.a()])
       });
-      assert(struct.raw.outerHTML === '<article><h1>&lt;text&gt;</h1><p><a></a></p></article>');
+      assert(struct.raw.outerHTML === '<article><h1>title</h1><p><a></a></p></article>');
       assert(struct.contents.title.raw === struct.raw.firstChild);
       assert(struct.contents.content.raw === struct.raw.lastChild);
     });
 
     it('struct contents update', function () {
       const struct = TypedHTML.article({
-        title: TypedHTML.h1(['a'])
+        title: TypedHTML.h1<string>('a')
       });
       struct.contents = {
-        title: TypedHTML.h1(['b'])
+        title: TypedHTML.h1('b')
       };
       assert(struct.contents.title.raw.textContent === 'b');
       assert(struct.contents.title.raw === struct.raw.firstChild);
+      assert(struct.contents.title.contents === 'b');
     });
 
     it('struct contents partial update', function () {
       const struct = TypedHTML.article({
-        title: TypedHTML.h1(['a'])
+        title: TypedHTML.h1<string>('a')
       });
-      struct.contents.title = TypedHTML.h1(['b']);
+      struct.contents.title = TypedHTML.h1('b');
       assert(struct.contents.title.raw.textContent === 'b');
       assert(struct.contents.title.raw === struct.raw.firstChild);
+      assert(struct.contents.title.contents === 'b');
+      struct.contents.title.contents = 'c';
+      assert(struct.contents.title.raw.textContent === 'c');
+      assert(struct.contents.title.raw === struct.raw.firstChild);
+      assert(struct.contents.title.contents === 'c');
     });
 
     it('collection', function () {
       const collection = TypedHTML.ul([
-        TypedHTML.li(['1']),
-        TypedHTML.li(['2'])
+        TypedHTML.li('1'),
+        TypedHTML.li('2')
       ]);
       assert(collection.raw.outerHTML === '<ul><li>1</li><li>2</li></ul>');
       assert(collection.contents.length === collection.raw.children.length);
