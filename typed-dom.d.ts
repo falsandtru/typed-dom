@@ -8,7 +8,11 @@
 declare module 'typed-dom' {
   export default TypedHTML;
 
-  export interface TypedHTMLElement<S extends string, T extends HTMLElement, U extends TypedHTMLElementChildren<HTMLElement>> extends AbstractTypedHTMLElement<S> {
+  export interface TypedHTMLElement<
+    S extends string,
+    T extends HTMLElement,
+    U extends TypedHTMLElementChildren<HTMLElement>,
+  > extends AbstractTypedHTMLElement<S> {
     element: T;
     children: U;
   }
@@ -22,11 +26,16 @@ declare module 'typed-dom' {
 
   interface TypedHTMLElementBuilder<T extends HTMLElement, S extends string> {
     (): TypedHTMLElement<S, T, never>;
-    <U extends string>(children: U): TypedHTMLElement<S, T, U>;
-    <U extends string>(children: U, factory?: () => T): never;
-    <U extends TypedHTMLElementChildren<HTMLElement>>(children: U, factory?: () => T): TypedHTMLElement<S, T, U>;
-    <U extends string>(attrs: { [name: string]: string; }, children: U, factory?: () => T): never;
-    <U extends TypedHTMLElementChildren<HTMLElement>>(attrs: { [name: string]: string; }, children: U, factory?: () => T): TypedHTMLElement<S, T, U>;
+    <U extends string>
+    (children: U): TypedHTMLElement<S, T, U>;
+    <U extends string>
+    (children: U, factory?: () => T): never;
+    <U extends TypedHTMLElementChildren<HTMLElement>>
+    (children: U, factory?: () => T): TypedHTMLElement<S, T, U>;
+    <U extends string>
+    (attrs: { [name: string]: string; }, children: U, factory?: () => T): never;
+    <U extends TypedHTMLElementChildren<HTMLElement>>
+    (attrs: { [name: string]: string; }, children: U, factory?: () => T): TypedHTMLElement<S, T, U>;
   }
 
   const TypedHTML: {
