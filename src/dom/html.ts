@@ -1,7 +1,7 @@
-import { TypedHTMLElement, TypedHTMLElementChildren } from 'typed-dom';
-import { build } from './builder';
+import { TypedHTMLElementChildren } from 'typed-dom';
+import { TypedHTMLElement } from './builder';
 
-export const TypedHTML: TypedHTMLElement<string, HTMLElement, TypedHTMLElementChildren<HTMLElement>> = [
+export const TypedHTML: TypedHTMLElement<string, HTMLElement, TypedHTMLElementChildren> = [
   // lib.dom.d.ts
   'a',
   'abbr',
@@ -130,11 +130,18 @@ export const TypedHTML: TypedHTMLElement<string, HTMLElement, TypedHTMLElementCh
 ]
   .reduce((obj, tag) => (
     obj[tag] =
-      <T extends TypedHTMLElementChildren<HTMLElement>>
-      (attrs?: { [name: string]: string; }, children?: T, factory?: () => HTMLElement)
-      : TypedHTMLElement<string, HTMLElement, T> =>
+      <C extends TypedHTMLElementChildren>
+      (attrs?: { [name: string]: string; }, children?: C, factory?: () => HTMLElement)
+      : TypedHTMLElement<string, HTMLElement, C> =>
           !attrs || !children || typeof children === 'function'
-            ? build(<any>children || (() => document.createElement(tag)), {}, <T><any>attrs)
-            : build(factory || (() => document.createElement(tag)), attrs, children),
+            ? new TypedHTMLElement((<any>children || (() => document.createElement(tag)))(), <C><any>attrs)
+            : new TypedHTMLElement(attribute(attrs, (factory || (() => document.createElement(tag)))()), children),
     obj
-  ), <TypedHTMLElement<string, HTMLElement, TypedHTMLElementChildren<HTMLElement>>>{});
+  ), <TypedHTMLElement<string, HTMLElement, TypedHTMLElementChildren>>{});
+
+function attribute<E extends HTMLElement>(attrs: { [name: string]: string }, element: E): E {
+  void Object.keys(attrs)
+    .forEach(name =>
+      void element.setAttribute(name, attrs[name] || ''));
+  return element;
+}

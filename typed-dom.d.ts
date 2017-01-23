@@ -11,15 +11,20 @@ declare module 'typed-dom' {
   export interface TypedHTMLElement<
     T extends string,
     E extends HTMLElement,
-    C extends TypedHTMLElementChildren<HTMLElement>,
+    C extends TypedHTMLElementChildren,
   > extends AbstractTypedHTMLElement<T> {
     readonly element: E;
     children: C;
   }
-  export type TypedHTMLElementChildren<E extends HTMLElement>
-    = string
-    | TypedHTMLElement<string, E, any>[]
-    | { [name: string]: TypedHTMLElement<string, E, any>; };
+  export type TypedHTMLElementChildren
+    = TypedHTMLElementChildren.Text
+    | TypedHTMLElementChildren.Collection
+    | TypedHTMLElementChildren.Struct;
+  export namespace TypedHTMLElementChildren {
+    export type Text = string;
+    export type Collection = TypedHTMLElement<string, HTMLElement, any>[];
+    export type Struct = { [name: string]: TypedHTMLElement<string, HTMLElement, any>; };
+  }
   abstract class AbstractTypedHTMLElement<E extends string> {
     private identifier: E;
   }
@@ -30,11 +35,11 @@ declare module 'typed-dom' {
     (children: C): TypedHTMLElement<T, E, C>;
     <C extends string>
     (children: C, factory?: () => E): never;
-    <C extends TypedHTMLElementChildren<HTMLElement>>
+    <C extends TypedHTMLElementChildren>
     (children: C, factory?: () => E): TypedHTMLElement<T, E, C>;
     <C extends string>
     (attrs: { [name: string]: string; }, children: C, factory?: () => E): never;
-    <C extends TypedHTMLElementChildren<HTMLElement>>
+    <C extends TypedHTMLElementChildren>
     (attrs: { [name: string]: string; }, children: C, factory?: () => E): TypedHTMLElement<T, E, C>;
   }
 
@@ -164,6 +169,6 @@ declare module 'typed-dom' {
     wbr: TypedHTMLElementBuilder<HTMLElement, 'wbr'>;
     xmp: TypedHTMLElementBuilder<HTMLPreElement, 'xmp'>;
     // custom
-    custom<E extends HTMLElement, T extends string, C extends TypedHTMLElementChildren<HTMLElement>>(children: C, factory: () => E, tag: T): TypedHTMLElement<T, E, C>;
+    custom<E extends HTMLElement, T extends string, C extends TypedHTMLElementChildren>(children: C, factory: () => E, tag: T): TypedHTMLElement<T, E, C>;
   };
 }
