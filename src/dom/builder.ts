@@ -21,15 +21,17 @@ export function build
       break;
     default:
       void Object.keys(attrs)
-        .forEach(name => element.setAttribute(name, attrs[name] || ''));
+        .forEach(name =>
+          void element.setAttribute(name, attrs[name] || ''));
       void Object.keys(children)
-        .forEach(k => void element.appendChild(children[k].element));
+        .forEach(k =>
+          void element.appendChild(children[k].element));
       switch (mode) {
         case 'array':
           void Object.freeze(children);
           break;
         case 'object':
-          void observe(children);
+          void observe(<{ [name: string]: TypedHTMLElement<string, HTMLElement, any>; }>children);
           break;
       }
   }
@@ -52,25 +54,25 @@ export function build
 
         case 'array':
           cs = <U>Object.freeze(cs);
-          void (<TypedHTMLElement<string, T, any>[]><any>cs)
-            .reduce<TypedHTMLElement<string, T, any>[]>((os, n) => {
+          void (<TypedHTMLElement<string, HTMLElement, any>[]>cs)
+            .reduce<TypedHTMLElement<string, HTMLElement, any>[]>((os, n) => {
               const i = os.indexOf(n);
               if (i === -1) return os;
               void os.splice(i, 1);
               return os;
-            }, (<TypedHTMLElement<string, T, any>[]><any>children).slice())
-            .map(a => (<TypedHTMLElement<string, T, any>>a).element)
-            .forEach(a =>
-              void a.remove());
-          void (<TypedHTMLElement<string, T, any>[]><any>cs)
-            .map(a => (<TypedHTMLElement<string, T, any>>a).element)
-            .forEach(c => void element.appendChild(c));
+            }, (<TypedHTMLElement<string, HTMLElement, any>[]>children).slice())
+            .forEach(({element: child}) =>
+              void child.remove());
+          void (<TypedHTMLElement<string, HTMLElement, any>[]>cs)
+            .forEach(({element: child}) =>
+              void element.appendChild(child));
           break;
 
         case 'object':
-          void Object.keys(cs)
-            .forEach(k => void element.replaceChild(cs[k].element, children[k].element));
-          cs = observe(cs);
+          void Object.keys(children)
+            .forEach(k =>
+              void element.replaceChild(cs[k].element, children[k].element));
+          cs = <U>observe(<{ [name: string]: TypedHTMLElement<string, HTMLElement, any>; }>cs);
           break;
 
       }
@@ -78,8 +80,8 @@ export function build
     }
   });
 
-  function observe(children: U): U {
-    const cache = {};
+  function observe<T extends { [name: string]: TypedHTMLElement<string, HTMLElement, any>; }>(children: T): T {
+    const cache: T = <T>{};
     return Object.keys(children)
       .reduce((children, k) => {
         cache[k] = children[k];
