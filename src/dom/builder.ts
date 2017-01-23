@@ -1,13 +1,13 @@
 import { TypedHTMLElement, TypedHTMLElementChildren } from 'typed-dom';
 
 export function build
-  <S extends string, T extends HTMLElement, U extends TypedHTMLElementChildren<HTMLElement>>
-  (factory: () => T, attrs: {}, children: U)
-  : TypedHTMLElement<S, T, U> {
+  <T extends string, E extends HTMLElement, C extends TypedHTMLElementChildren<HTMLElement>>
+  (factory: () => E, attrs: {}, children: C)
+  : TypedHTMLElement<T, E, C> {
   const element = factory();
-  if (children === void 0) return <TypedHTMLElement<S, T, U>>Object.freeze({
+  if (children === void 0) return <TypedHTMLElement<T, E, C>>Object.freeze({
     element,
-    children: <U>children
+    children: <C>children
   });
   const mode = typeof children === 'string'
     ? 'text'
@@ -35,12 +35,12 @@ export function build
           break;
       }
   }
-  return <TypedHTMLElement<S, T, U>>Object.freeze({
+  return <TypedHTMLElement<T, E, C>>Object.freeze({
     element,
-    get children(): U {
+    get children(): C {
       switch (mode) {
         case 'text':
-          return <U>(<Text><any>children).data;
+          return <C>(<Text><any>children).data;
         default:
           return children;
       }
@@ -53,7 +53,7 @@ export function build
           break;
 
         case 'array':
-          cs = <U>Object.freeze(cs);
+          cs = <C>Object.freeze(cs);
           void (<TypedHTMLElement<string, HTMLElement, any>[]>cs)
             .reduce<TypedHTMLElement<string, HTMLElement, any>[]>((os, n) => {
               const i = os.indexOf(n);
@@ -72,7 +72,7 @@ export function build
           void Object.keys(children)
             .forEach(k =>
               void element.replaceChild(cs[k].element, children[k].element));
-          cs = <U>observe(<{ [name: string]: TypedHTMLElement<string, HTMLElement, any>; }>cs);
+          cs = <C>observe(<{ [name: string]: TypedHTMLElement<string, HTMLElement, any>; }>cs);
           break;
 
       }
@@ -80,8 +80,8 @@ export function build
     }
   });
 
-  function observe<T extends { [name: string]: TypedHTMLElement<string, HTMLElement, any>; }>(children: T): T {
-    const cache: T = <T>{};
+  function observe<C extends { [name: string]: TypedHTMLElement<string, HTMLElement, any>; }>(children: C): C {
+    const cache: C = <C>{};
     return Object.keys(children)
       .reduce((children, k) => {
         cache[k] = children[k];
