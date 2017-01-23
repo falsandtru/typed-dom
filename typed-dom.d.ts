@@ -164,6 +164,6 @@ declare module 'typed-dom' {
     wbr: TypedHTMLElementBuilder<HTMLElement, 'wbr'>;
     xmp: TypedHTMLElementBuilder<HTMLPreElement, 'xmp'>;
     // custom
-    custom<T extends TypedHTMLElementChildren<HTMLElement>, U extends HTMLElement, V extends string>(children: T, factory: () => U, identity: V): TypedHTMLElement<V, U, T>;
+    custom<T extends HTMLElement, S extends string, U extends TypedHTMLElementChildren<HTMLElement>>(children: U, factory: () => T, tag: S): TypedHTMLElement<S, T, U>;
   };
 }
