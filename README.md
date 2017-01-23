@@ -10,9 +10,9 @@ Static typed dom component builder.
 
 [typed-dom.d.ts](typed-dom.d.ts)
 
-## Example
+## Usage
 
-Create a dom component.
+Build a typed dom object.
 
 ```ts
 import TypedHTML from 'typed-dom';
@@ -84,4 +84,50 @@ component.children.content = TypedHTML.ul([
   TypedHTML.li('Item!')
 ]);
 component.element.outerHTML; // '<article id="id"><style>#id ul { width: 100px; }</style><h1>Title!</h1><ul><li>Item!</li></ul></article>'
+```
+
+## Example
+
+### Micro DOM Component
+
+Use micro dom components to hide and manage the typed dom object.
+
+```ts
+import TypedHTML from 'typed-dom';
+
+class MicroComponent {
+  constructor(private parent: HTMLElement) {
+    parent.appendChild(this.dom.element);
+  }
+  private id = this.parent.id;
+  private dom = TypedHTML.article({ id: this.id }, {
+    content: TypedHTML.ul([
+      TypedHTML.li(`item`)
+    ])
+  });
+  destroy() {
+    this.dom.element.remove();
+  }
+}
+```
+
+### DOM Component
+
+Use dom components to manage the micro dom components.
+
+```ts
+import TypedHTML from 'typed-dom';
+
+class Component {
+  constructor(private parent: HTMLElement) {
+    parent.appendChild(this.element);
+  }
+  private element = document.createElement('div');
+  private children = {
+    todo: new MicroComponent(this.element)
+  };
+  destroy() {
+    this.element.remove();
+  }
+}
 ```
