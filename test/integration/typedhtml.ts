@@ -58,7 +58,7 @@ describe('Integration: TypedHTML', function () {
 
     it('struct', function () {
       const struct = TypedHTML.article({
-        title: TypedHTML.h1('title'),
+        title: TypedHTML.h1(`title`),
         content: TypedHTML.p([TypedHTML.a()])
       });
       assert(struct.element.outerHTML === '<article><h1>title</h1><p><a></a></p></article>');
@@ -68,10 +68,10 @@ describe('Integration: TypedHTML', function () {
 
     it('struct contents update', function () {
       const struct = TypedHTML.article({
-        title: TypedHTML.h1<string>('a')
+        title: TypedHTML.h1(`a`)
       });
       struct.children = {
-        title: TypedHTML.h1('b')
+        title: TypedHTML.h1(`b`)
       };
       assert(struct.children.title.element.textContent === 'b');
       assert(struct.children.title.element === struct.element.firstChild);
@@ -80,9 +80,9 @@ describe('Integration: TypedHTML', function () {
 
     it('struct contents partial update', function () {
       const struct = TypedHTML.article({
-        title: TypedHTML.h1<string>('a')
+        title: TypedHTML.h1(`a`)
       });
-      struct.children.title = TypedHTML.h1('b');
+      struct.children.title = TypedHTML.h1(`b`);
       assert(struct.children.title.element.textContent === 'b');
       assert(struct.children.title.element === struct.element.firstChild);
       assert(struct.children.title.children === 'b');
@@ -94,8 +94,8 @@ describe('Integration: TypedHTML', function () {
 
     it('collection', function () {
       const collection = TypedHTML.ul([
-        TypedHTML.li('1'),
-        TypedHTML.li('2')
+        TypedHTML.li(`1`),
+        TypedHTML.li(`2`)
       ]);
       assert(collection.element.outerHTML === '<ul><li>1</li><li>2</li></ul>');
       assert(collection.children.length === 2);
@@ -104,7 +104,7 @@ describe('Integration: TypedHTML', function () {
 
     it('collection contents update', function () {
       const collection = TypedHTML.ul([
-        TypedHTML.li<string>('1')
+        TypedHTML.li(`1`)
       ]);
       collection.children = [
         TypedHTML.li('2'),
