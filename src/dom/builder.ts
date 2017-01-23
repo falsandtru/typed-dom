@@ -70,6 +70,8 @@ export function build
 
         case 'object':
           void Object.keys(children)
+            .filter(k =>
+              cs[k].element !== children[k].element)
             .forEach(k =>
               void element.replaceChild(cs[k].element, children[k].element));
           cs = <C>observe(<{ [name: string]: TypedHTMLElement<string, HTMLElement, any>; }>cs);
@@ -89,10 +91,11 @@ export function build
           get() {
             return cache[k];
           },
-          set(newElt) {
+          set(newElt: C[keyof C]) {
             const oldElt = cache[k];
             cache[k] = newElt;
-            element.replaceChild(newElt.element, oldElt.element);
+            if (newElt.element === oldElt.element) return;
+            void element.replaceChild(newElt.element, oldElt.element);
           }
         });
         return children;
