@@ -13,7 +13,7 @@ declare module 'typed-dom' {
     T extends HTMLElement,
     U extends TypedHTMLElementChildren<HTMLElement>,
   > extends AbstractTypedHTMLElement<S> {
-    element: T;
+    readonly element: T;
     children: U;
   }
   export type TypedHTMLElementChildren<T extends HTMLElement>
