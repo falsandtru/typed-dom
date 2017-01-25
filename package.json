@@ -9,10 +9,8 @@
     "url": "https://github.com/falsandtru/typed-dom"
   },
   "keywords": [
-    "component",
     "dom",
-    "vdom",
-    "virtual dom",
+    "component",
     "html",
     "typed",
     "typing"

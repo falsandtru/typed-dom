@@ -15,9 +15,6 @@ declare module 'typed-dom' {
   > extends AbstractTypedHTMLElement<T> {
     readonly element: E;
     children: C;
-    buffer(): this;
-    unbuffer(): this;
-    render(): void;
   }
   type TypedHTMLElementChildren
     = TypedHTMLElementChildren.Text

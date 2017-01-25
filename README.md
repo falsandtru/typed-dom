@@ -12,8 +12,6 @@ Static typed dom component builder.
 
 ## Usage
 
-### Basic
-
 Build a typed dom object.
 
 ```ts
@@ -95,46 +93,48 @@ component.children.content = TypedHTML.ul([
 component.element.outerHTML; // '<article id="id"><style>#id ul { width: 100px; }</style><h1>Title!</h1><ul><li>Item!</li></ul></article>'
 ```
 
-### Virtual DOM (experimental)
+## Example
 
-Typed dom optimize the dom node manipulation in buffer mode.
-However, attributes and properties are not.
+### Micro DOM Component
 
-Render(Synchronize) command will be dispatched manually by calling `.render()` method, or automatically by accessing `.element` property.
+Use micro dom components to hide and manage the typed dom object.
 
 ```ts
-const native = TypedHTML.div().element;
-const article = TypedHTML.article({
-  title: TypedHTML.h1(`a`)
-});
+import TypedHTML from 'typed-dom';
 
-native.appendChild(article.element);
-assert(native.textContent === 'a');
+class MicroComponent {
+  constructor(private parent: HTMLElement) {
+    parent.appendChild(this.dom.element);
+  }
+  private id = this.parent.id;
+  private dom = TypedHTML.article({ id: this.id }, {
+    content: TypedHTML.ul([
+      TypedHTML.li(`item`)
+    ])
+  });
+  destroy() {
+    this.dom.element.remove();
+  }
+}
+```
 
-article.children.title = TypedHTML.h1('b');
-assert(native.textContent === 'b');
+### DOM Component
 
-article.buffer();
+Use dom components to manage the micro dom components.
 
-article.children.title = TypedHTML.h1('c');
-assert(native.textContent === 'b');
+```ts
+import TypedHTML from 'typed-dom';
 
-assert(article.element.textContent === 'c');
-assert(native.textContent === 'c');
-
-article.children.title = TypedHTML.h1('d');
-article.render();
-assert(native.textContent === 'd');
-
-article.children.title = TypedHTML.h1('e');
-assert(native.textContent === 'd');
-
-article.unbuffer();
-
-assert(native.textContent === 'd');
-article.render();
-assert(native.textContent === 'e');
-
-article.children.title = TypedHTML.h1('f');
-assert(native.textContent === 'f');
+class Component {
+  constructor(private parent: HTMLElement) {
+    parent.appendChild(this.element);
+  }
+  private element = document.createElement('div');
+  private children = {
+    todo: new MicroComponent(this.element)
+  };
+  destroy() {
+    this.element.remove();
+  }
+}
 ```
