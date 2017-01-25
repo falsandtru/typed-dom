@@ -12,6 +12,8 @@ Static typed dom component builder.
 
 ## Usage
 
+### Basic
+
 Build a typed dom object.
 
 ```ts
@@ -42,15 +44,22 @@ TypedHTMLElement<"article", HTMLElement, {
 export interface TypedHTMLElement<
   T extends string,
   E extends HTMLElement,
-  C extends TypedHTMLElementChildren<HTMLElement>,
+  C extends TypedHTMLElementChildren,
 > extends AbstractTypedHTMLElement<T> {
   readonly element: E;
   children: C;
+  buffer(): Promise<undefined>;
+  render(): void;
 }
-export type TypedHTMLElementChildren<E extends HTMLElement>
-  = string
-  | TypedHTMLElement<string, E, any>[]
-  | { [name: string]: TypedHTMLElement<string, E, any>; };
+type TypedHTMLElementChildren
+  = TypedHTMLElementChildren.Text
+  | TypedHTMLElementChildren.Collection
+  | TypedHTMLElementChildren.Struct;
+namespace TypedHTMLElementChildren {
+  export type Text = string;
+  export type Collection = TypedHTMLElement<string, HTMLElement, any>[];
+  export type Struct = { [name: string]: TypedHTMLElement<string, HTMLElement, any>; };
+}
 abstract class AbstractTypedHTMLElement<E extends string> {
   private identifier: E;
 }
@@ -86,48 +95,46 @@ component.children.content = TypedHTML.ul([
 component.element.outerHTML; // '<article id="id"><style>#id ul { width: 100px; }</style><h1>Title!</h1><ul><li>Item!</li></ul></article>'
 ```
 
-## Example
+### Virtual DOM (experimental)
 
-### Micro DOM Component
+Typed dom optimize the dom node manipulation in buffer mode.
+However, attributes and properties are not.
 
-Use micro dom components to hide and manage the typed dom object.
-
-```ts
-import TypedHTML from 'typed-dom';
-
-class MicroComponent {
-  constructor(private parent: HTMLElement) {
-    parent.appendChild(this.dom.element);
-  }
-  private id = this.parent.id;
-  private dom = TypedHTML.article({ id: this.id }, {
-    content: TypedHTML.ul([
-      TypedHTML.li(`item`)
-    ])
-  });
-  destroy() {
-    this.dom.element.remove();
-  }
-}
-```
-
-### DOM Component
-
-Use dom components to manage the micro dom components.
+Render(Synchronize) command will be dispatched manually by calling `.render()` method, or automatically by accessing `.element` property.
 
 ```ts
-import TypedHTML from 'typed-dom';
+const native = TypedHTML.div().element;
+const article = TypedHTML.article({
+  title: TypedHTML.h1(`a`)
+});
 
-class Component {
-  constructor(private parent: HTMLElement) {
-    parent.appendChild(this.element);
-  }
-  private element = document.createElement('div');
-  private children = {
-    todo: new MicroComponent(this.element)
-  };
-  destroy() {
-    this.element.remove();
-  }
-}
+native.appendChild(article.element);
+assert(native.textContent === 'a');
+
+article.children.title = TypedHTML.h1('b');
+assert(native.textContent === 'b');
+
+article.buffer();
+
+article.children.title = TypedHTML.h1('c');
+assert(native.textContent === 'b');
+
+assert(article.element.textContent === 'c');
+assert(native.textContent === 'c');
+
+article.children.title = TypedHTML.h1('d');
+article.render();
+assert(native.textContent === 'd');
+
+article.children.title = TypedHTML.h1('e');
+assert(native.textContent === 'd');
+
+article.unbuffer();
+
+assert(native.textContent === 'd');
+article.render();
+assert(native.textContent === 'e');
+
+article.children.title = TypedHTML.h1('f');
+assert(native.textContent === 'f');
 ```

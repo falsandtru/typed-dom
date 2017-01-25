@@ -5,7 +5,7 @@ declare const _: {
   shuffle<T>(as: T[]): T[]; 
 };
 
-describe('Integration: TypedHTML', function () {
+describe('Integration: Typed DOM', function () {
   describe('spec', function () {
     it('attr with array', function () {
       const dom = TypedHTML.script({ id: 'test', src: './' }, []);
@@ -56,6 +56,19 @@ describe('Integration: TypedHTML', function () {
       assert(empty.children === void 0);
     });
 
+    it('text', function () {
+      const text = TypedHTML.p(`a`);
+      assert(text.element.outerHTML === '<p>a</p>');
+      assert(text.children === 'a');
+    });
+
+    it('text children update', function () {
+      const text = TypedHTML.p(`a`);
+      text.children = 'b';
+      assert(text.element.outerHTML === '<p>b</p>');
+      assert(text.children === 'b');
+    });
+
     it('struct', function () {
       const struct = TypedHTML.article({
         title: TypedHTML.h1(`title`),
@@ -66,7 +79,7 @@ describe('Integration: TypedHTML', function () {
       assert(struct.children.content.element === struct.element.lastChild);
     });
 
-    it('struct contents update', function () {
+    it('struct children update', function () {
       const struct = TypedHTML.article({
         title: TypedHTML.h1(`a`)
       });
@@ -78,7 +91,7 @@ describe('Integration: TypedHTML', function () {
       assert(struct.children.title.children === 'b');
     });
 
-    it('struct contents partial update', function () {
+    it('struct children partial update', function () {
       const struct = TypedHTML.article({
         title: TypedHTML.h1(`a`)
       });
@@ -102,7 +115,7 @@ describe('Integration: TypedHTML', function () {
       assert(collection.children.every(({element}, i) => element === collection.element.children[i]));
     });
 
-    it('collection contents update', function () {
+    it('collection children update', function () {
       const collection = TypedHTML.ul([
         TypedHTML.li(`1`)
       ]);
@@ -149,7 +162,7 @@ describe('Integration: TypedHTML', function () {
         });
     });
 
-    it('collection contents partial update', function () {
+    it('collection children partial update', function () {
       const collection = TypedHTML.ul([
         TypedHTML.li()
       ]);

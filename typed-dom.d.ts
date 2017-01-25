@@ -15,12 +15,15 @@ declare module 'typed-dom' {
   > extends AbstractTypedHTMLElement<T> {
     readonly element: E;
     children: C;
+    buffer(): this;
+    unbuffer(): this;
+    render(): void;
   }
-  export type TypedHTMLElementChildren
+  type TypedHTMLElementChildren
     = TypedHTMLElementChildren.Text
     | TypedHTMLElementChildren.Collection
     | TypedHTMLElementChildren.Struct;
-  export namespace TypedHTMLElementChildren {
+  namespace TypedHTMLElementChildren {
     export type Text = string;
     export type Collection = TypedHTMLElement<string, HTMLElement, any>[];
     export type Struct = { [name: string]: TypedHTMLElement<string, HTMLElement, any>; };
