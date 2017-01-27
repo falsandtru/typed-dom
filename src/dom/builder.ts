@@ -33,16 +33,27 @@ export class TypedHTMLElement<
         this.children = children_;
         break;
       case 'collection':
-        void Object.freeze(children_);
-        this.children_ = <C><TypedHTMLElementChildren.Collection>[];
+        this.children_ = <C><TypedHTMLElementChildren.Collection><never[]>Object.freeze([]);
         this.children = children_;
         break;
       case 'struct':
-        this.children_ = <C><TypedHTMLElementChildren.Struct>Object.create(null);
-        this.children = children_;
+        this.children_ = <C>this.observe({ ...<TypedHTMLElementChildren.Struct>children_ });
+        void this.structkeys
+          .forEach(k =>
+            void this.element_.appendChild(children_[k].element));
         break;
     }
   }
+  private readonly mode: 'empty' | 'text' | 'collection' | 'struct' = this.children_ === void 0
+    ? 'empty'
+    : typeof this.children_ === 'string'
+      ? 'text'
+      : Array.isArray(this.children_)
+        ? 'collection'
+        : 'struct';
+  private readonly structkeys: string[] = this.mode === 'struct'
+    ? Object.keys(this.children_)
+    : [];
   public get element(): E {
     return this.element_;
   }
@@ -63,7 +74,7 @@ export class TypedHTMLElement<
 
       case 'collection':
         if (children === this.children_) break;
-        void Object.freeze(children);
+        if (!Object.isFrozen(this.children_)) throw new Error('TypedHTMLElement collections cannot be updated recursively.');
         void (<TypedHTMLElementChildren.Collection>children)
           .reduce<TypedHTMLElementChildren.Collection>((ccs, ic) => {
             const i = ccs.indexOf(ic);
@@ -73,52 +84,41 @@ export class TypedHTMLElement<
           }, (<TypedHTMLElementChildren.Collection>this.children_).slice())
           .forEach(child =>
             void child.element.remove());
+        this.children_ = <C><TypedHTMLElementChildren.Collection>[];
         void (<TypedHTMLElementChildren.Collection>children)
-          .forEach(child =>
-            void this.element_.appendChild(child.element));
-        this.children_ = children;
+          .forEach((child, i) => (
+            this.children_[i] = child,
+            void this.element_.appendChild(child.element)));
+        void Object.freeze(this.children_);
         break;
 
       case 'struct':
         if (children === this.children_) break;
         void this.structkeys
           .forEach(k =>
-            this.children_[k] && this.children_[k].element.parentElement === this.element_
-              ? void this.element_.replaceChild(children[k].element, this.children_[k].element)
-              : void this.element_.appendChild(children[k].element));
-        void this.observe(<TypedHTMLElementChildren.Struct>children);
-        this.children_ = children;
+            this.children_[k] = children[k]);
         break;
 
     }
   }
-  private observe(children: TypedHTMLElementChildren.Struct): void {
-    void Object.defineProperties(children, this.structkeys
+  private observe<C extends TypedHTMLElementChildren.Struct>(children: C): C {
+    return Object.defineProperties(children, this.structkeys
       .reduce<PropertyDescriptorMap>((descs, key) => {
-        let oldChild = children[key];
+        let current = children[key];
         descs[key] = {
           configurable: true,
           enumerable: true,
           get: (): ITypedHTMLElement<string, HTMLElement, any> => {
-            return oldChild;
+            return current;
           },
           set: (newChild: TypedHTMLElement<string, HTMLElement, any>) => {
+            const oldChild = current;
             if (newChild === oldChild) return;
+            current = newChild;
             void this.element_.replaceChild(newChild.element, oldChild.element);
-            oldChild = newChild;
           }
         };
         return descs;
       }, {}));
   }
-  private readonly mode: 'empty' | 'text' | 'collection' | 'struct' = this.children_ === void 0
-    ? 'empty'
-    : typeof this.children_ === 'string'
-      ? 'text'
-      : Array.isArray(this.children_)
-        ? 'collection'
-        : 'struct';
-  private readonly structkeys: string[] = this.mode === 'struct'
-    ? Object.keys(this.children_)
-    : [];
 }
