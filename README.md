@@ -42,12 +42,11 @@ TypedHTMLElement<"article", HTMLElement, {
 export interface TypedHTMLElement<
   T extends string,
   E extends HTMLElement,
-  C extends TypedHTMLElementChildren,
-> extends AbstractTypedHTMLElement<T> {
+  C extends TypedHTMLElementChildren
+>
+  extends AbstractTypedHTMLElement<T> {
   readonly element: E;
   children: C;
-  buffer(): Promise<undefined>;
-  render(): void;
 }
 type TypedHTMLElementChildren
   = TypedHTMLElementChildren.Text
@@ -58,8 +57,8 @@ namespace TypedHTMLElementChildren {
   export type Collection = TypedHTMLElement<string, HTMLElement, any>[];
   export type Struct = { [name: string]: TypedHTMLElement<string, HTMLElement, any>; };
 }
-abstract class AbstractTypedHTMLElement<E extends string> {
-  private identifier: E;
+abstract class AbstractTypedHTMLElement<T extends string> {
+  private identifier: T;
 }
 ```
 

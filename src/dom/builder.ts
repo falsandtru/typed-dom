@@ -12,14 +12,15 @@ export namespace TypedHTMLElementChildren {
 export interface TypedHTMLElement<
   T extends string,
   E extends HTMLElement,
-  C extends TypedHTMLElementChildren,
-  > extends ITypedHTMLElement<T, E, C> {
+  C extends TypedHTMLElementChildren
+>
+  extends ITypedHTMLElement<T, E, C> {
 }
 export class TypedHTMLElement<
   T extends string,
   E extends HTMLElement,
-  C extends TypedHTMLElementChildren,
-  >
+  C extends TypedHTMLElementChildren
+>
   implements ITypedHTMLElement<T, E, C> {
   constructor(
     private readonly element_: E,
@@ -27,21 +28,23 @@ export class TypedHTMLElement<
   ) {
     if (children_ === void 0) return;
     switch (this.mode) {
+      case 'empty':
+        return;
       case 'text':
         this.children_ = <any>document.createTextNode('');
         void this.element_.appendChild(<Text><any>this.children_);
         this.children = children_;
-        break;
+        return;
       case 'collection':
         this.children_ = <C><TypedHTMLElementChildren.Collection><never[]>Object.freeze([]);
         this.children = children_;
-        break;
+        return;
       case 'struct':
         this.children_ = <C>this.observe({ ...<TypedHTMLElementChildren.Struct>children_ });
         void this.structkeys
           .forEach(k =>
             void this.element_.appendChild(children_[k].element));
-        break;
+        return;
     }
   }
   private readonly mode: 'empty' | 'text' | 'collection' | 'struct' = this.children_ === void 0
@@ -67,13 +70,16 @@ export class TypedHTMLElement<
   }
   public set children(children: C) {
     switch (this.mode) {
+      case 'empty':
+        return;
+
       case 'text':
-        if (children === (<Text><any>this.children_).data) break;
+        if (children === (<Text><any>this.children_).data) return;
         (<Text><any>this.children_).data = <string>children;
-        break;
+        return;
 
       case 'collection':
-        if (children === this.children_) break;
+        if (children === this.children_) return;
         if (!Object.isFrozen(this.children_)) throw new Error('TypedHTMLElement collections cannot be updated recursively.');
         void (<TypedHTMLElementChildren.Collection>children)
           .reduce<TypedHTMLElementChildren.Collection>((ccs, ic) => {
@@ -90,35 +96,37 @@ export class TypedHTMLElement<
             this.children_[i] = child,
             void this.element_.appendChild(child.element)));
         void Object.freeze(this.children_);
-        break;
+        return;
 
       case 'struct':
-        if (children === this.children_) break;
+        if (children === this.children_) return;
         void this.structkeys
           .forEach(k =>
             this.children_[k] = children[k]);
-        break;
+        return;
 
     }
   }
   private observe<C extends TypedHTMLElementChildren.Struct>(children: C): C {
-    return Object.defineProperties(children, this.structkeys
-      .reduce<PropertyDescriptorMap>((descs, key) => {
-        let current = children[key];
-        descs[key] = {
-          configurable: true,
-          enumerable: true,
-          get: (): ITypedHTMLElement<string, HTMLElement, any> => {
-            return current;
-          },
-          set: (newChild: TypedHTMLElement<string, HTMLElement, any>) => {
-            const oldChild = current;
-            if (newChild === oldChild) return;
-            current = newChild;
-            void this.element_.replaceChild(newChild.element, oldChild.element);
-          }
-        };
-        return descs;
-      }, {}));
+    return Object.defineProperties(
+      children,
+      this.structkeys
+        .reduce<PropertyDescriptorMap>((descs, key) => {
+          let current = children[key];
+          descs[key] = {
+            configurable: true,
+            enumerable: true,
+            get: (): ITypedHTMLElement<string, HTMLElement, any> => {
+              return current;
+            },
+            set: (newChild: TypedHTMLElement<string, HTMLElement, any>) => {
+              const oldChild = current;
+              if (newChild === oldChild) return;
+              current = newChild;
+              void this.element_.replaceChild(newChild.element, oldChild.element);
+            }
+          };
+          return descs;
+        }, {}));
   }
 }
