@@ -15,6 +15,7 @@
     "typed",
     "typing"
   ],
+  "types": "./index.d.ts",
   "main": "./dist/typed-dom.js",
   "files": [
     "dist",
