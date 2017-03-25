@@ -1,4 +1,4 @@
-import TypedHTML from 'typed-dom';
+import TypedHTML from '../../';
 
 describe('Interface: Package', function () {
   describe('TypedHTML', function () {

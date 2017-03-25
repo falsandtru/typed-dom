@@ -1,5 +1,5 @@
 import { Sequence } from 'spica';
-import TypedHTML from 'typed-dom';
+import TypedHTML from '../../';
 
 declare const _: {
   shuffle<T>(as: T[]): T[]; 

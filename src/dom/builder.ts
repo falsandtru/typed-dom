@@ -1,4 +1,4 @@
-import { TypedHTMLElement as ITypedHTMLElement } from 'typed-dom';
+import { TypedHTMLElement as ITypedHTMLElement } from '../../';
 
 export type TypedHTMLElementChildren
   = TypedHTMLElementChildren.Text
