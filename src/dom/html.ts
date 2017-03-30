@@ -1,6 +1,7 @@
+import { TypedHTML as ITypedHTML } from '../../';
 import { TypedHTMLElement, TypedHTMLElementChildren } from './builder';
 
-export const TypedHTML: TypedHTMLElement<string, HTMLElement, TypedHTMLElementChildren> = [
+export const TypedHTML: typeof ITypedHTML = [
   // lib.dom.d.ts
   'a',
   'abbr',
@@ -136,7 +137,7 @@ export const TypedHTML: TypedHTMLElement<string, HTMLElement, TypedHTMLElementCh
             ? new TypedHTMLElement((<any>children || (() => document.createElement(tag)))(), <C><any>attrs)
             : new TypedHTMLElement(attribute(attrs, (factory || (() => document.createElement(tag)))()), children),
     obj
-  ), <TypedHTMLElement<string, HTMLElement, TypedHTMLElementChildren>>{});
+  ), <typeof ITypedHTML>{});
 
 function attribute<E extends HTMLElement>(attrs: { [name: string]: string }, element: E): E {
   void Object.keys(attrs)
