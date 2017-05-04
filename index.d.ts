@@ -20,16 +20,16 @@ type TypedHTMLElementChildren
   = TypedHTMLElementChildren.Text
   | TypedHTMLElementChildren.Collection
   | TypedHTMLElementChildren.Struct;
-export namespace TypedHTMLElementChildren {
+declare namespace TypedHTMLElementChildren {
   export type Text = string;
   export type Collection = TypedHTMLElement<string, HTMLElement, any>[];
   export type Struct = { [name: string]: TypedHTMLElement<string, HTMLElement, any>; };
 }
-export abstract class AbstractTypedHTMLElement<T extends string> {
+declare abstract class AbstractTypedHTMLElement<T extends string> {
   private identifier: T;
 }
 
-export interface TypedHTMLElementBuilder<E extends HTMLElement, T extends string> {
+interface TypedHTMLElementBuilder<E extends HTMLElement, T extends string> {
   (): TypedHTMLElement<T, E, never>;
   <C extends string>
   (children: C): TypedHTMLElement<T, E, C>;
