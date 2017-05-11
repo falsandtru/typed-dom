@@ -36,15 +36,36 @@ export class TypedHTMLElement<
         this.children = children_;
         return;
       case 'collection':
+        if (element_.id) {
+          void (<TypedHTMLElementChildren.Collection>children_)
+            .forEach(({ element }) =>
+              element instanceof HTMLStyleElement &&
+              void scope(element));
+        }
         this.children_ = <C><TypedHTMLElementChildren.Collection><never[]>Object.freeze([]);
         this.children = children_;
         return;
       case 'struct':
+        if (element_.id) {
+          void Object.keys(children_)
+            .map(k => (<TypedHTMLElementChildren.Struct>children_)[k])
+            .forEach(({ element }) =>
+              element instanceof HTMLStyleElement &&
+              void scope(element));
+        }
         this.children_ = <C>this.observe({ ...<TypedHTMLElementChildren.Struct>children_ });
         void this.structkeys
           .forEach(k =>
             void this.element_.appendChild(children_[k].element));
         return;
+    }
+
+    function scope(style: HTMLStyleElement): void {
+      if (!element_.id.match(/^[\w\-]+$/)) return;
+      style.innerHTML = style.innerHTML.replace(/^\s*\$scope(?!\w)/gm, `#${element_.id}`);
+      void Array.from(style.querySelectorAll('*'))
+        .forEach(el =>
+          void el.remove());
     }
   }
   private readonly mode: 'empty' | 'text' | 'collection' | 'struct' = this.children_ === void 0

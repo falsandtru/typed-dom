@@ -50,6 +50,15 @@ describe('Integration: Typed DOM', function () {
       assert(dom.children === '<script>');
     });
 
+    it('scope', function () {
+      const template = `$scope {}\n  $scope {}`;
+      const result = `#test {}\n#test {}`;
+      assert(TypedHTML.div({ id: 'test' }, [TypedHTML.style(template)]).children[0].element.innerHTML === result);
+      assert(TypedHTML.div({ id: 'test' }, { style: TypedHTML.style(template) }).children.style.element.innerHTML === result);
+      assert(TypedHTML.div({ id: 'test' }, [TypedHTML.style(`<script>`)]).children[0].element.children.length === 0);
+      assert(TypedHTML.div({ id: '><script>' }, [TypedHTML.style(template)]).children[0].element.innerHTML === template);
+    });
+
     it('empty', function () {
       const empty = TypedHTML.div();
       assert(empty.element.outerHTML === '<div></div>');

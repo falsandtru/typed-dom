@@ -17,9 +17,8 @@ Build a typed dom object.
 ```ts
 import TypedHTML from 'typed-dom';
 
-const id = 'id';
-const component = TypedHTML.article({ id }, {
-  style: TypedHTML.style(`#${id} ul { width: 100px; }`),
+const component = TypedHTML.article({ id: 'id' }, {
+  style: TypedHTML.style(`$scope ul { width: 100px; }`),
   title: TypedHTML.h1(`title`),
   content: TypedHTML.ul([
     TypedHTML.li(`item`),
