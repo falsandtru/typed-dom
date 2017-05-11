@@ -8,7 +8,7 @@ Static typed dom component builder.
 
 ## API
 
-[typed-dom.d.ts](typed-dom.d.ts)
+[index.d.ts](index.d.ts)
 
 ## Usage
 
