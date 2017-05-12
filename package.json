@@ -12,6 +12,8 @@
     "dom",
     "component",
     "html",
+    "css",
+    "css-in-js",
     "typed",
     "typing"
   ],
