@@ -93,7 +93,7 @@ component.element.outerHTML; // '<article id="id"><style>#id ul { width: 100px; 
 
 ## Example
 
-### Micro DOM Component
+### Micro DOM Components
 
 Use micro dom components to hide and manage the typed dom object.
 
@@ -101,22 +101,19 @@ Use micro dom components to hide and manage the typed dom object.
 import TypedHTML from 'typed-dom';
 
 class MicroComponent {
-  constructor(private parent: HTMLElement) {
-    parent.appendChild(this.dom.element);
+  constructor(private readonly parent: HTMLElement) {
+    this.parent.appendChild(this.dom.element);
   }
-  private id = this.parent.id;
-  private dom = TypedHTML.article({ id: this.id }, {
+  private readonly dom = TypedHTML.div({ id: `${this.parent.id}-list-${Date.now()}-${Math.random() * 1e9 | 0}` }, {
+    style: TypedHTML.style(`$scope ul { width: 100px; }`),
     content: TypedHTML.ul([
       TypedHTML.li(`item`)
     ])
   });
-  destroy() {
-    this.dom.element.remove();
-  }
 }
 ```
 
-### DOM Component
+### DOM Components
 
 Use dom components to manage the micro dom components.
 
@@ -124,13 +121,15 @@ Use dom components to manage the micro dom components.
 import TypedHTML from 'typed-dom';
 
 class Component {
-  constructor(private parent: HTMLElement) {
-    parent.appendChild(this.element);
+  constructor(private readonly parent: HTMLElement) {
+    this.parent.appendChild(this.element);
   }
-  private element = document.createElement('div');
-  private children = {
-    todo: new MicroComponent(this.element)
-  };
+  private readonly element = TypedHTML.div({ id: 'id' }, [
+    TypedHTML.style(`$scope { position: relative; }`)
+  ]).element;
+  private readonly children = Object.freeze({
+    list: new MicroComponent(this.element)
+  });
   destroy() {
     this.element.remove();
   }

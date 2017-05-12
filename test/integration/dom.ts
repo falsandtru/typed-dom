@@ -185,4 +185,42 @@ describe('Integration: Typed DOM', function () {
 
   });
 
+  describe('usage', function () {
+    class MicroComponent {
+      constructor(private readonly parent: HTMLElement) {
+        this.parent.appendChild(this.dom.element);
+      }
+      private readonly dom = TypedHTML.div({ id: `${this.parent.id}-list-${Date.now()}-${Math.random() * 1e9 | 0}` }, {
+        style: TypedHTML.style(`$scope ul { width: 100px; }`),
+        content: TypedHTML.ul([
+          TypedHTML.li(`item`)
+        ])
+      });
+    }
+    class Component {
+      constructor(private readonly parent: HTMLElement) {
+        this.parent.appendChild(this.element);
+      }
+      private readonly element = TypedHTML.div({ id: 'id' }, [
+        TypedHTML.style(`$scope { position: relative; }`)
+      ]).element;
+      private readonly children = Object.freeze({
+        list: new MicroComponent(this.element)
+      });
+      destroy() {
+        this.children;
+        this.element.remove();
+      }
+    }
+
+    it('micro component', function () {
+      new MicroComponent(document.createElement('div'));
+    });
+
+    it('component', function () {
+      new Component(document.createElement('div'));
+    });
+
+  });
+
 });
