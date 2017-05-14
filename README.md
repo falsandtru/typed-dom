@@ -37,7 +37,7 @@ TypedHTMLElement<"article", HTMLElement, {
   content: TypedHTMLElement<"ul", HTMLUListElement, TypedHTMLElement<"li", HTMLLIElement, string>[]>;
 }>;
 
-// Note: TypedHTMLElement type is defined as follows in typed-dom.d.ts.
+// Note: TypedHTMLElement type is defined as follows in index.d.ts.
 export interface TypedHTMLElement<
   T extends string,
   E extends HTMLElement,
