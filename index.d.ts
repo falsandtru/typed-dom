@@ -29,67 +29,61 @@ declare abstract class AbstractTypedHTMLElement<T extends string> {
   private identifier: T;
 }
 
-interface TypedHTMLElementBuilder<E extends HTMLElement, T extends string> {
+interface TypedHTMLElementBuilder<T extends string, E extends HTMLElement> {
   (): TypedHTMLElement<T, E, never>;
-  <C extends string>
-  (children: C): TypedHTMLElement<T, E, C>;
-  <C extends string>
-  (children: C, factory?: () => E): never;
   <C extends TypedHTMLElementChildren>
   (children: C, factory?: () => E): TypedHTMLElement<T, E, C>;
-  <C extends string>
-  (attrs: { [name: string]: string; }, children: C, factory?: () => E): never;
   <C extends TypedHTMLElementChildren>
   (attrs: { [name: string]: string; }, children: C, factory?: () => E): TypedHTMLElement<T, E, C>;
 }
 
 export const TypedHTML: {
   // lib.dom.d.ts
-  [K in keyof HTMLElementTagNameMap]: TypedHTMLElementBuilder<HTMLElementTagNameMap[K], K>;
+  [K in keyof HTMLElementTagNameMap]: TypedHTMLElementBuilder<K, HTMLElementTagNameMap[K]>;
 } & {
-  abbr: TypedHTMLElementBuilder<HTMLElement, 'abbr'>;
-  acronym: TypedHTMLElementBuilder<HTMLElement, 'acronym'>;
-  address: TypedHTMLElementBuilder<HTMLElement, 'address'>;
-  article: TypedHTMLElementBuilder<HTMLElement, 'article'>;
-  aside: TypedHTMLElementBuilder<HTMLElement, 'aside'>;
-  b: TypedHTMLElementBuilder<HTMLElement, 'b'>;
-  bdo: TypedHTMLElementBuilder<HTMLElement, 'bdo'>;
-  big: TypedHTMLElementBuilder<HTMLElement, 'big'>;
-  center: TypedHTMLElementBuilder<HTMLElement, 'center'>;
-  cite: TypedHTMLElementBuilder<HTMLElement, 'cite'>;
-  code: TypedHTMLElementBuilder<HTMLElement, 'code'>;
-  dd: TypedHTMLElementBuilder<HTMLElement, 'dd'>;
-  dfn: TypedHTMLElementBuilder<HTMLElement, 'dfn'>;
-  dt: TypedHTMLElementBuilder<HTMLElement, 'dt'>;
-  em: TypedHTMLElementBuilder<HTMLElement, 'em'>;
-  figcaption: TypedHTMLElementBuilder<HTMLElement, 'figcaption'>;
-  figure: TypedHTMLElementBuilder<HTMLElement, 'figure'>;
-  footer: TypedHTMLElementBuilder<HTMLElement, 'footer'>;
-  header: TypedHTMLElementBuilder<HTMLElement, 'header'>;
-  hgroup: TypedHTMLElementBuilder<HTMLElement, 'hgroup'>;
-  i: TypedHTMLElementBuilder<HTMLElement, 'i'>;
-  kbd: TypedHTMLElementBuilder<HTMLElement, 'kbd'>;
-  keygen: TypedHTMLElementBuilder<HTMLElement, 'keygen'>;
-  mark: TypedHTMLElementBuilder<HTMLElement, 'mark'>;
-  nav: TypedHTMLElementBuilder<HTMLElement, 'nav'>;
-  nobr: TypedHTMLElementBuilder<HTMLElement, 'nobr'>;
-  noframes: TypedHTMLElementBuilder<HTMLElement, 'noframes'>;
-  noscript: TypedHTMLElementBuilder<HTMLElement, 'noscript'>;
-  plaintext: TypedHTMLElementBuilder<HTMLElement, 'plaintext'>;
-  rt: TypedHTMLElementBuilder<HTMLElement, 'rt'>;
-  ruby: TypedHTMLElementBuilder<HTMLElement, 'ruby'>;
-  s: TypedHTMLElementBuilder<HTMLElement, 's'>;
-  samp: TypedHTMLElementBuilder<HTMLElement, 'samp'>;
-  section: TypedHTMLElementBuilder<HTMLElement, 'section'>;
-  small: TypedHTMLElementBuilder<HTMLElement, 'small'>;
-  strike: TypedHTMLElementBuilder<HTMLElement, 'strike'>;
-  strong: TypedHTMLElementBuilder<HTMLElement, 'strong'>;
-  sub: TypedHTMLElementBuilder<HTMLElement, 'sub'>;
-  sup: TypedHTMLElementBuilder<HTMLElement, 'sup'>;
-  tt: TypedHTMLElementBuilder<HTMLElement, 'tt'>;
-  u: TypedHTMLElementBuilder<HTMLElement, 'u'>;
-  var: TypedHTMLElementBuilder<HTMLElement, 'var'>;
-  wbr: TypedHTMLElementBuilder<HTMLElement, 'wbr'>;
+  abbr: TypedHTMLElementBuilder<'abbr', HTMLElement>;
+  acronym: TypedHTMLElementBuilder<'acronym', HTMLElement>;
+  address: TypedHTMLElementBuilder<'address', HTMLElement>;
+  article: TypedHTMLElementBuilder<'article', HTMLElement>;
+  aside: TypedHTMLElementBuilder<'aside', HTMLElement>;
+  b: TypedHTMLElementBuilder<'b', HTMLElement>;
+  bdo: TypedHTMLElementBuilder<'bdo', HTMLElement>;
+  big: TypedHTMLElementBuilder<'big', HTMLElement>;
+  center: TypedHTMLElementBuilder<'center', HTMLElement>;
+  cite: TypedHTMLElementBuilder<'cite', HTMLElement>;
+  code: TypedHTMLElementBuilder<'code', HTMLElement>;
+  dd: TypedHTMLElementBuilder<'dd', HTMLElement>;
+  dfn: TypedHTMLElementBuilder<'dfn', HTMLElement>;
+  dt: TypedHTMLElementBuilder<'dt', HTMLElement>;
+  em: TypedHTMLElementBuilder<'em', HTMLElement>;
+  figcaption: TypedHTMLElementBuilder<'figcaption', HTMLElement>;
+  figure: TypedHTMLElementBuilder<'figure', HTMLElement>;
+  footer: TypedHTMLElementBuilder<'footer', HTMLElement>;
+  header: TypedHTMLElementBuilder<'header', HTMLElement>;
+  hgroup: TypedHTMLElementBuilder<'hgroup', HTMLElement>;
+  i: TypedHTMLElementBuilder<'i', HTMLElement>;
+  kbd: TypedHTMLElementBuilder<'kbd', HTMLElement>;
+  keygen: TypedHTMLElementBuilder<'keygen', HTMLElement>;
+  mark: TypedHTMLElementBuilder<'mark', HTMLElement>;
+  nav: TypedHTMLElementBuilder<'nav', HTMLElement>;
+  nobr: TypedHTMLElementBuilder<'nobr', HTMLElement>;
+  noframes: TypedHTMLElementBuilder<'noframes', HTMLElement>;
+  noscript: TypedHTMLElementBuilder<'noscript', HTMLElement>;
+  plaintext: TypedHTMLElementBuilder<'plaintext', HTMLElement>;
+  rt: TypedHTMLElementBuilder<'rt', HTMLElement>;
+  ruby: TypedHTMLElementBuilder<'ruby', HTMLElement>;
+  s: TypedHTMLElementBuilder<'s', HTMLElement>;
+  samp: TypedHTMLElementBuilder<'samp', HTMLElement>;
+  section: TypedHTMLElementBuilder<'section', HTMLElement>;
+  small: TypedHTMLElementBuilder<'small', HTMLElement>;
+  strike: TypedHTMLElementBuilder<'strike', HTMLElement>;
+  strong: TypedHTMLElementBuilder<'strong', HTMLElement>;
+  sub: TypedHTMLElementBuilder<'sub', HTMLElement>;
+  sup: TypedHTMLElementBuilder<'sup', HTMLElement>;
+  tt: TypedHTMLElementBuilder<'tt', HTMLElement>;
+  u: TypedHTMLElementBuilder<'u', HTMLElement>;
+  var: TypedHTMLElementBuilder<'var', HTMLElement>;
+  wbr: TypedHTMLElementBuilder<'wbr', HTMLElement>;
   // custom
   custom<T extends string, E extends HTMLElement = HTMLElement, C extends TypedHTMLElementChildren = TypedHTMLElementChildren>(children: C, factory: () => E, tag: T): TypedHTMLElement<T, E, C>;
   custom<T extends string, E extends HTMLElement = HTMLElement, C extends TypedHTMLElementChildren = TypedHTMLElementChildren>(attrs: { [name: string]: string; }, children: C, factory: () => E, tag: T): TypedHTMLElement<T, E, C>;
