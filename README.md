@@ -98,13 +98,13 @@ component.element.outerHTML; // '<article id="id"><style>#id ul { width: 100px; 
 Use micro dom components to hide and manage the typed dom object.
 
 ```ts
-import TypedHTML from 'typed-dom';
+import TypedHTML, { unique } from 'typed-dom';
 
 class MicroComponent {
   constructor(private readonly parent: HTMLElement) {
     this.parent.appendChild(this.dom.element);
   }
-  private readonly dom = TypedHTML.div({ id: `${this.parent.id}-list-${Date.now()}-${Math.random() * 1e9 | 0}` }, {
+  private readonly dom = TypedHTML.div({ id: `${this.parent.id}-list-${unique()}` }, {
     style: TypedHTML.style(`$scope ul { width: 100px; }`),
     content: TypedHTML.ul([
       TypedHTML.li(`item`)

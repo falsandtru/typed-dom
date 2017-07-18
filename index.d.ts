@@ -89,6 +89,8 @@ export const TypedHTML: {
   custom<T extends string, E extends HTMLElement = HTMLElement, C extends TypedHTMLElementChildren = TypedHTMLElementChildren>(attrs: { [name: string]: string; }, children: C, factory: () => E, tag: T): TypedHTMLElement<T, E, C>;
 };
 
+export function unique(): string;
+
 export function bind<T extends keyof WindowEventMap>(target: Window, type: T, listener: (ev: WindowEventMap[T]) => any, option?: boolean | EventListenerOption): () => undefined;
 export function bind<T extends keyof DocumentEventMap>(target: Document, type: T, listener: (ev: DocumentEventMap[T]) => any, option?: boolean | EventListenerOption): () => undefined;
 export function bind<T extends keyof HTMLElementEventMap>(target: HTMLElement, type: T, listener: (ev: HTMLElementEventMap[T]) => any, option?: boolean | EventListenerOption): () => undefined;
