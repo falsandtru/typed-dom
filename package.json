@@ -17,7 +17,6 @@
     "typed",
     "typing"
   ],
-  "main": "./dist/typed-dom.js",
   "files": [
     "dist",
     "index.*",
@@ -57,7 +56,7 @@
     "power-assert": "^1.4.4",
     "pump": "^1.0.2",
     "run-sequence": "^2.0.0",
-    "spica": "0.0.94",
+    "spica": "0.0.98",
     "tsify": "^3.0.1",
     "typescript": "2.4.0",
     "vinyl-buffer": "^1.0.0",
