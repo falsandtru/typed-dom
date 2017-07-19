@@ -1,5 +1,3 @@
-import { TypedHTMLElement as ITypedHTMLElement } from '../../';
-
 export type TypedHTMLElementChildren
   = TypedHTMLElementChildren.Text
   | TypedHTMLElementChildren.Collection
@@ -9,23 +7,18 @@ export namespace TypedHTMLElementChildren {
   export type Collection = TypedHTMLElement<string, HTMLElement, any>[];
   export type Struct = { [name: string]: TypedHTMLElement<string, HTMLElement, any>; };
 }
-export interface TypedHTMLElement<
-  T extends string,
-  E extends HTMLElement,
-  C extends TypedHTMLElementChildren
->
-  extends ITypedHTMLElement<T, E, C> {
-}
+
 export class TypedHTMLElement<
   T extends string,
   E extends HTMLElement,
   C extends TypedHTMLElementChildren
->
-  implements ITypedHTMLElement<T, E, C> {
+  > {
+  private tag: T;
   constructor(
     private readonly element_: E,
     private children_: C
   ) {
+    this.tag;
     if (children_ === void 0) return;
     switch (this.mode) {
       case 'empty':
@@ -137,7 +130,7 @@ export class TypedHTMLElement<
           descs[key] = {
             configurable: true,
             enumerable: true,
-            get: (): ITypedHTMLElement<string, HTMLElement, any> => {
+            get: (): TypedHTMLElement<string, HTMLElement, any> => {
               return current;
             },
             set: (newChild: TypedHTMLElement<string, HTMLElement, any>) => {

@@ -6,10 +6,6 @@ Static typed dom component builder.
 
 **Visualize** dom structures and **Assist** dom access by static types of TypeScript.
 
-## API
-
-[index.d.ts](index.d.ts)
-
 ## Usage
 
 Build a typed dom object.

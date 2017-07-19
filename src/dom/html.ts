@@ -1,7 +1,66 @@
-import { TypedHTML as ITypedHTML } from '../../';
 import { TypedHTMLElement, TypedHTMLElementChildren } from './builder';
 
-export const TypedHTML: typeof ITypedHTML = [
+interface TypedHTMLElementBuilder<T extends string, E extends HTMLElement> {
+  (): TypedHTMLElement<T, E, never>;
+  <C extends TypedHTMLElementChildren>
+  (children: C, factory?: () => E): TypedHTMLElement<T, E, C>;
+  <C extends TypedHTMLElementChildren>
+  (attrs: { [name: string]: string; }, children: C, factory?: () => E): TypedHTMLElement<T, E, C>;
+}
+
+
+export const TypedHTML: {
+  // lib.dom.d.ts
+  [K in keyof HTMLElementTagNameMap]: TypedHTMLElementBuilder<K, HTMLElementTagNameMap[K]>;
+} & {
+  // other
+  abbr: TypedHTMLElementBuilder<'abbr', HTMLElement>;
+  acronym: TypedHTMLElementBuilder<'acronym', HTMLElement>;
+  address: TypedHTMLElementBuilder<'address', HTMLElement>;
+  article: TypedHTMLElementBuilder<'article', HTMLElement>;
+  aside: TypedHTMLElementBuilder<'aside', HTMLElement>;
+  b: TypedHTMLElementBuilder<'b', HTMLElement>;
+  bdo: TypedHTMLElementBuilder<'bdo', HTMLElement>;
+  big: TypedHTMLElementBuilder<'big', HTMLElement>;
+  center: TypedHTMLElementBuilder<'center', HTMLElement>;
+  cite: TypedHTMLElementBuilder<'cite', HTMLElement>;
+  code: TypedHTMLElementBuilder<'code', HTMLElement>;
+  dd: TypedHTMLElementBuilder<'dd', HTMLElement>;
+  dfn: TypedHTMLElementBuilder<'dfn', HTMLElement>;
+  dt: TypedHTMLElementBuilder<'dt', HTMLElement>;
+  em: TypedHTMLElementBuilder<'em', HTMLElement>;
+  figcaption: TypedHTMLElementBuilder<'figcaption', HTMLElement>;
+  figure: TypedHTMLElementBuilder<'figure', HTMLElement>;
+  footer: TypedHTMLElementBuilder<'footer', HTMLElement>;
+  header: TypedHTMLElementBuilder<'header', HTMLElement>;
+  hgroup: TypedHTMLElementBuilder<'hgroup', HTMLElement>;
+  i: TypedHTMLElementBuilder<'i', HTMLElement>;
+  kbd: TypedHTMLElementBuilder<'kbd', HTMLElement>;
+  keygen: TypedHTMLElementBuilder<'keygen', HTMLElement>;
+  mark: TypedHTMLElementBuilder<'mark', HTMLElement>;
+  nav: TypedHTMLElementBuilder<'nav', HTMLElement>;
+  nobr: TypedHTMLElementBuilder<'nobr', HTMLElement>;
+  noframes: TypedHTMLElementBuilder<'noframes', HTMLElement>;
+  noscript: TypedHTMLElementBuilder<'noscript', HTMLElement>;
+  plaintext: TypedHTMLElementBuilder<'plaintext', HTMLElement>;
+  rt: TypedHTMLElementBuilder<'rt', HTMLElement>;
+  ruby: TypedHTMLElementBuilder<'ruby', HTMLElement>;
+  s: TypedHTMLElementBuilder<'s', HTMLElement>;
+  samp: TypedHTMLElementBuilder<'samp', HTMLElement>;
+  section: TypedHTMLElementBuilder<'section', HTMLElement>;
+  small: TypedHTMLElementBuilder<'small', HTMLElement>;
+  strike: TypedHTMLElementBuilder<'strike', HTMLElement>;
+  strong: TypedHTMLElementBuilder<'strong', HTMLElement>;
+  sub: TypedHTMLElementBuilder<'sub', HTMLElement>;
+  sup: TypedHTMLElementBuilder<'sup', HTMLElement>;
+  tt: TypedHTMLElementBuilder<'tt', HTMLElement>;
+  u: TypedHTMLElementBuilder<'u', HTMLElement>;
+  var: TypedHTMLElementBuilder<'var', HTMLElement>;
+  wbr: TypedHTMLElementBuilder<'wbr', HTMLElement>;
+  // custom
+  custom<T extends string, E extends HTMLElement = HTMLElement, C extends TypedHTMLElementChildren = TypedHTMLElementChildren>(children: C, factory: () => E, tag: T): TypedHTMLElement<T, E, C>;
+  custom<T extends string, E extends HTMLElement = HTMLElement, C extends TypedHTMLElementChildren = TypedHTMLElementChildren>(attrs: { [name: string]: string; }, children: C, factory: () => E, tag: T): TypedHTMLElement<T, E, C>;
+} = [
   // lib.dom.d.ts
   "a",
   "applet",
@@ -142,7 +201,7 @@ export const TypedHTML: typeof ITypedHTML = [
             ? new TypedHTMLElement((<any>children || (() => document.createElement(tag)))(), <C><any>attrs)
             : new TypedHTMLElement(attribute(attrs, (factory || (() => document.createElement(tag)))()), children),
     obj
-  ), <typeof ITypedHTML>{});
+  ), <any>{});
 
 function attribute<E extends HTMLElement>(attrs: { [name: string]: string }, element: E): E {
   void Object.keys(attrs)
