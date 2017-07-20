@@ -1,4 +1,4 @@
-import def, { TypedHTML, unique, bind, once, delegate } from '../../index';
+import def, { TypedHTML, bind, once, delegate } from '../../index';
 
 describe('Interface: Package', function () {
   describe('default', function () {
@@ -11,13 +11,6 @@ describe('Interface: Package', function () {
   describe('TypedHTML', function () {
     it('TypedHTML', function () {
       assert(typeof TypedHTML === 'object');
-    });
-
-  });
-
-  describe('unique', function () {
-    it('unique', function () {
-      assert(typeof unique === 'function');
     });
 
   });

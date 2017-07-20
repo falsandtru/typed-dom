@@ -1,5 +1,6 @@
-import TypedHTML, { unique } from '../../index';
+import TypedHTML from '../../index';
 import { Sequence } from 'spica/sequence';
+import { sqid } from 'spica/sqid';
 
 declare const _: {
   shuffle<T>(as: T[]): T[]; 
@@ -183,11 +184,6 @@ describe('Integration: Typed DOM', function () {
       assert(collection.children.every(({element}, i) => element === collection.element.children[i]));
     });
 
-    it('unique', function () {
-      assert(unique().match(/^0\d{8}$/));
-      assert(unique() < unique());
-    });
-
   });
 
   describe('usage', function () {
@@ -195,7 +191,7 @@ describe('Integration: Typed DOM', function () {
       constructor(private readonly parent: HTMLElement) {
         this.parent.appendChild(this.dom.element);
       }
-      private readonly dom = TypedHTML.div({ id: `${this.parent.id}-list-${unique()}` }, {
+      private readonly dom = TypedHTML.div({ id: `${this.parent.id}-list-${sqid()}` }, {
         style: TypedHTML.style(`$scope ul { width: 100px; }`),
         content: TypedHTML.ul([
           TypedHTML.li(`item`)
