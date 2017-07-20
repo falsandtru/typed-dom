@@ -17,6 +17,7 @@
     "typed",
     "typing"
   ],
+  "browser": "./dist/typed-dom.js",
   "files": [
     "dist",
     "index.*",
