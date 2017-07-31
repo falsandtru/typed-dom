@@ -8,6 +8,13 @@ declare const _: {
 
 describe('Integration: Typed DOM', function () {
   describe('spec', function () {
+    it('attr with text', function () {
+      const dom = TypedHTML.script({ id: 'test', src: './' }, '');
+      assert(dom.element.id === 'test');
+      assert(dom.element.getAttribute('src') === './');
+      assert.deepStrictEqual(dom.children, '');
+    });
+
     it('attr with array', function () {
       const dom = TypedHTML.script({ id: 'test', src: './' }, []);
       assert(dom.element.id === 'test');

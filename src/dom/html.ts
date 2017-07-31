@@ -197,7 +197,7 @@ export const TypedHTML: {
       <C extends TypedHTMLElementChildren>
       (attrs?: { [name: string]: string; }, children?: C, factory?: () => HTMLElement)
       : TypedHTMLElement<string, HTMLElement, C> =>
-          !attrs || !children || typeof children === 'function'
+          !attrs || children === void 0 || typeof children === 'function'
             ? new TypedHTMLElement((<any>children || (() => document.createElement(tag)))(), <C><any>attrs)
             : new TypedHTMLElement(attribute(attrs, (factory || (() => document.createElement(tag)))()), children),
     obj
