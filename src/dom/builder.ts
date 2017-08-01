@@ -19,7 +19,6 @@ export class TypedHTMLElement<
     private children_: C
   ) {
     this.tag;
-    if (children_ === void 0) return;
     switch (this.mode) {
       case 'empty':
         return;
