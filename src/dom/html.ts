@@ -200,17 +200,18 @@ export const TypedHTML: {
       : TypedHTMLElement<string, HTMLElement, C> => {
         switch (typeof attrs) {
           case 'undefined':
-            return new TypedHTMLElement(document.createElement(tag), <any>void 0);
+            return new TypedHTMLElement(document.createElement(tag), <never>void 0);
           case 'function':
-            return new TypedHTMLElement((<any>attrs)(), <any>void 0);
+            return new TypedHTMLElement((<any>attrs)(), <never>void 0);
           case 'string':
-            return new TypedHTMLElement((<any>children || (() => document.createElement(tag)))(), <C><any>attrs);
+            return new TypedHTMLElement((<any>children || (() => document.createElement(tag)))(), <never>attrs);
           case 'object':
-            return Object.keys(attrs).some(key => typeof attrs![key] === 'string')
-              ? typeof children === 'function'
-                ? new TypedHTMLElement(attribute(attrs!, (children || (() => document.createElement(tag)))()), <any>void 0)
-                : new TypedHTMLElement(attribute(attrs!, (factory || (() => document.createElement(tag)))()), children!)
-              : new TypedHTMLElement((<any>children || (() => document.createElement(tag)))(), <C><any>attrs);
+            factory = typeof children === 'function'
+              ? children
+              : factory || (() => document.createElement(tag));
+            return [Object.keys(attrs)[0]].every(key => key === void 0 || typeof attrs![key] === 'object')
+              ? new TypedHTMLElement(factory(), <any>attrs)
+              : new TypedHTMLElement(define(factory(), attrs!), <never>children === factory ? void 0 : children)
           default:
             throw new TypeError(`Invalid arguments: [${attrs}, ${children}, ${factory}]`);
         }
@@ -218,9 +219,10 @@ export const TypedHTML: {
     obj
   ), <any>{});
 
-function attribute<E extends HTMLElement>(attrs: { [name: string]: string }, element: E): E {
-  void Object.keys(attrs)
-    .forEach(name =>
-      void element.setAttribute(name, attrs[name] || ''));
-  return element;
+function define<E extends HTMLElement>(el: E, attrs: { [name: string]: string }): E {
+  return Object.keys(attrs)
+    .reduce((el, name) => (
+      void el.setAttribute(name, attrs[name] || ''),
+      el)
+    , el);
 }
