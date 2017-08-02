@@ -1,9 +1,10 @@
 import { TypedHTMLElement, TypedHTMLElementChildren } from './builder';
 
 interface TypedHTMLElementBuilder<T extends string, E extends HTMLElement> {
-  (): TypedHTMLElement<T, E, never>;
+  (factory?: () => E): TypedHTMLElement<T, E, void>;
   <C extends TypedHTMLElementChildren>
   (children: C, factory?: () => E): TypedHTMLElement<T, E, C>;
+  (attrs: { [name: string]: string; }, factory?: () => E): TypedHTMLElement<T, E, void>;
   <C extends TypedHTMLElementChildren>
   (attrs: { [name: string]: string; }, children: C, factory?: () => E): TypedHTMLElement<T, E, C>;
 }
@@ -196,10 +197,24 @@ export const TypedHTML: {
     obj[tag] =
       <C extends TypedHTMLElementChildren>
       (attrs?: { [name: string]: string; }, children?: C, factory?: () => HTMLElement)
-      : TypedHTMLElement<string, HTMLElement, C> =>
-          !attrs || children === void 0 || typeof children === 'function'
-            ? new TypedHTMLElement((<any>children || (() => document.createElement(tag)))(), <C><any>attrs)
-            : new TypedHTMLElement(attribute(attrs, (factory || (() => document.createElement(tag)))()), children),
+      : TypedHTMLElement<string, HTMLElement, C> => {
+        switch (typeof attrs) {
+          case 'undefined':
+            return new TypedHTMLElement(document.createElement(tag), <any>void 0);
+          case 'function':
+            return new TypedHTMLElement((<any>attrs)(), <any>void 0);
+          case 'string':
+            return new TypedHTMLElement((<any>children || (() => document.createElement(tag)))(), <C><any>attrs);
+          case 'object':
+            return Object.keys(attrs).some(key => typeof attrs![key] === 'string')
+              ? typeof children === 'function'
+                ? new TypedHTMLElement(attribute(attrs!, (children || (() => document.createElement(tag)))()), <any>void 0)
+                : new TypedHTMLElement(attribute(attrs!, (factory || (() => document.createElement(tag)))()), children!)
+              : new TypedHTMLElement((<any>children || (() => document.createElement(tag)))(), <C><any>attrs);
+          default:
+            throw new TypeError(`Invalid arguments: [${attrs}, ${children}, ${factory}]`);
+        }
+      },
     obj
   ), <any>{});
 

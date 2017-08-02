@@ -1,8 +1,10 @@
 export type TypedHTMLElementChildren
-  = TypedHTMLElementChildren.Text
+  = TypedHTMLElementChildren.Void
+  | TypedHTMLElementChildren.Text
   | TypedHTMLElementChildren.Collection
   | TypedHTMLElementChildren.Struct;
 export namespace TypedHTMLElementChildren {
+  export type Void = void;
   export type Text = string;
   export type Collection = TypedHTMLElement<string, HTMLElement, any>[];
   export type Struct = { [name: string]: TypedHTMLElement<string, HTMLElement, any>; };

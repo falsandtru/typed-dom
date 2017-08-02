@@ -44,10 +44,12 @@ export interface TypedHTMLElement<
   children: C;
 }
 type TypedHTMLElementChildren
-  = TypedHTMLElementChildren.Text
+  = TypedHTMLElementChildren.Void
+  | TypedHTMLElementChildren.Text
   | TypedHTMLElementChildren.Collection
   | TypedHTMLElementChildren.Struct;
 namespace TypedHTMLElementChildren {
+  export type Void = void;
   export type Text = string;
   export type Collection = TypedHTMLElement<string, HTMLElement, any>[];
   export type Struct = { [name: string]: TypedHTMLElement<string, HTMLElement, any>; };
