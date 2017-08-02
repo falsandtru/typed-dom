@@ -1,7 +1,7 @@
 import { TypedHTMLElement, TypedHTMLElementChildren } from './builder';
 
 interface TypedHTMLElementBuilder<T extends string, E extends HTMLElement> {
-  (factory?: (() => E) | E): TypedHTMLElement<T, E, void>;
+  (factory?: () => E): TypedHTMLElement<T, E, void>;
   <C extends TypedHTMLElementChildren>
   (children: C, factory?: () => E): TypedHTMLElement<T, E, C>;
   (attrs: { [name: string]: string; }, factory?: () => E): TypedHTMLElement<T, E, void>;
@@ -206,7 +206,6 @@ export const TypedHTML: {
           case 'string':
             return new TypedHTMLElement((<any>children || (() => document.createElement(tag)))(), <C><any>attrs);
           case 'object':
-            if (attrs instanceof HTMLElement) return new TypedHTMLElement(<any>attrs, <any>void 0);
             return Object.keys(attrs).some(key => typeof attrs![key] === 'string')
               ? typeof children === 'function'
                 ? new TypedHTMLElement(attribute(attrs!, (children || (() => document.createElement(tag)))()), <any>void 0)

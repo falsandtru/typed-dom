@@ -14,15 +14,9 @@ describe('Integration: Typed DOM', function () {
       assert(empty.children === void 0);
     });
 
-    it('element', function () {
-      const dom = TypedHTML.strong(document.createElement('em'));
-      assert(dom.element.outerHTML === '<em></em>');
-      assert.deepStrictEqual(dom.children, void 0);
-    });
-
     it('factory', function () {
-      const dom = TypedHTML.strong(() => document.createElement('em'));
-      assert(dom.element.outerHTML === '<em></em>');
+      const dom = TypedHTML.div(() => <any>document.createElement('p'));
+      assert(dom.element.outerHTML === '<p></p>');
       assert.deepStrictEqual(dom.children, void 0);
     });
 
