@@ -15,8 +15,8 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('factory', function () {
-      const dom = TypedHTML.div(() => <any>document.createElement('p'));
-      assert(dom.element.outerHTML === '<p></p>');
+      const dom = TypedHTML.strong(() => document.createElement('em'));
+      assert(dom.element.outerHTML === '<em></em>');
       assert.deepStrictEqual(dom.children, void 0);
     });
 
