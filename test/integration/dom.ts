@@ -262,6 +262,13 @@ describe('Integration: Typed DOM', function () {
       assert(TypedHTML.div({ id: '><script>' }, [TypedHTML.style(template)]).children[0].element.innerHTML === template);
     });
 
+    it('clear', function () {
+      assert(TypedHTML.p(() => TypedHTML.p('a').element).element.innerHTML === 'a');
+      assert(TypedHTML.p('', () => TypedHTML.p('a').element).element.innerHTML === '');
+      assert(TypedHTML.p([], () => TypedHTML.p('a').element).element.childNodes.length === 0);
+      assert(TypedHTML.p({}, () => TypedHTML.p('a').element).element.childNodes.length === 0);
+    });
+
   });
 
   describe('usage', function () {

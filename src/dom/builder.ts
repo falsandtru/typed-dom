@@ -1,5 +1,5 @@
-export type TypedHTMLElementChildren
-  = TypedHTMLElementChildren.Void
+export type TypedHTMLElementChildren =
+  | TypedHTMLElementChildren.Void
   | TypedHTMLElementChildren.Text
   | TypedHTMLElementChildren.Collection
   | TypedHTMLElementChildren.Struct;
@@ -22,14 +22,16 @@ export class TypedHTMLElement<
   ) {
     this.tag;
     switch (this.mode) {
-      case 'empty':
+      case 'void':
         return;
       case 'text':
+        void clear();
         this.children_ = <any>document.createTextNode('');
         void this.element_.appendChild(<Text><any>this.children_);
         this.children = children_;
         return;
       case 'collection':
+        void clear();
         if (element_.id) {
           void (<TypedHTMLElementChildren.Collection>children_)
             .forEach(({ element }) =>
@@ -40,6 +42,7 @@ export class TypedHTMLElement<
         this.children = children_;
         return;
       case 'struct':
+        void clear();
         if (element_.id) {
           void Object.keys(children_)
             .map(k => (<TypedHTMLElementChildren.Struct>children_)[k])
@@ -54,6 +57,11 @@ export class TypedHTMLElement<
         return;
     }
 
+    function clear(): void {
+      while (element_.childNodes.length > 0) {
+        void element_.removeChild(element_.firstChild!);
+      }
+    }
     function scope(style: HTMLStyleElement): void {
       if (!element_.id.match(/^[\w\-]+$/)) return;
       style.innerHTML = style.innerHTML.replace(/^\s*\$scope(?!\w)/gm, `#${element_.id}`);
@@ -62,16 +70,18 @@ export class TypedHTMLElement<
           void el.remove());
     }
   }
-  private readonly mode: 'empty' | 'text' | 'collection' | 'struct' = this.children_ === void 0
-    ? 'empty'
-    : typeof this.children_ === 'string'
-      ? 'text'
-      : Array.isArray(this.children_)
-        ? 'collection'
-        : 'struct';
-  private readonly structkeys: string[] = this.mode === 'struct'
-    ? Object.keys(this.children_)
-    : [];
+  private readonly mode: 'void' | 'text' | 'collection' | 'struct' =
+    this.children_ === void 0
+      ? 'void'
+      : typeof this.children_ === 'string'
+        ? 'text'
+        : Array.isArray(this.children_)
+          ? 'collection'
+          : 'struct';
+  private readonly structkeys: string[] =
+    this.mode === 'struct'
+      ? Object.keys(this.children_)
+      : [];
   public get element(): E {
     return this.element_;
   }
@@ -85,7 +95,7 @@ export class TypedHTMLElement<
   }
   public set children(children: C) {
     switch (this.mode) {
-      case 'empty':
+      case 'void':
         return;
 
       case 'text':
