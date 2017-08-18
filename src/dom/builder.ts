@@ -6,7 +6,7 @@ export type TypedHTMLElementChildren =
 export namespace TypedHTMLElementChildren {
   export type Void = void;
   export type Text = string;
-  export type Collection = TypedHTMLElement<string, HTMLElement, any>[];
+  export type Collection = ReadonlyArray<TypedHTMLElement<string, HTMLElement, any>>;
   export type Struct = { [name: string]: TypedHTMLElement<string, HTMLElement, any>; };
 }
 
@@ -26,31 +26,31 @@ export class TypedHTMLElement<
         return;
       case 'text':
         void clear();
-        this.children_ = <any>document.createTextNode('');
-        void this.element_.appendChild(<Text><any>this.children_);
+        this.children_ = document.createTextNode('') as any;
+        void this.element_.appendChild(this.children_ as any);
         this.children = children_;
         return;
       case 'collection':
         void clear();
         if (element_.id) {
-          void (<TypedHTMLElementChildren.Collection>children_)
+          void (children_ as TypedHTMLElementChildren.Collection)
             .forEach(({ element }) =>
               element instanceof HTMLStyleElement &&
               void scope(element));
         }
-        this.children_ = <C><TypedHTMLElementChildren.Collection><never[]>Object.freeze([]);
+        this.children_ = Object.freeze([]) as TypedHTMLElementChildren.Collection as C;
         this.children = children_;
         return;
       case 'struct':
         void clear();
         if (element_.id) {
-          void Object.keys(children_)
-            .map(k => (<TypedHTMLElementChildren.Struct>children_)[k])
+          void Object.keys(children_ as TypedHTMLElementChildren.Struct)
+            .map(k => (children_ as TypedHTMLElementChildren.Struct)[k])
             .forEach(({ element }) =>
               element instanceof HTMLStyleElement &&
               void scope(element));
         }
-        this.children_ = <C>this.observe({ ...<TypedHTMLElementChildren.Struct>children_ });
+        this.children_ = this.observe({ ...<TypedHTMLElementChildren.Struct>children_ }) as C;
         void this.structkeys
           .forEach(k =>
             void this.element_.appendChild(children_[k].element));
@@ -80,7 +80,7 @@ export class TypedHTMLElement<
           : 'struct';
   private readonly structkeys: string[] =
     this.mode === 'struct'
-      ? Object.keys(this.children_)
+      ? Object.keys(this.children_ as TypedHTMLElementChildren.Struct)
       : [];
   public get element(): E {
     return this.element_;
@@ -88,7 +88,7 @@ export class TypedHTMLElement<
   public get children(): C {
     switch (this.mode) {
       case 'text':
-        return <C>(<Text><any>this.children_).data;
+        return (this.children_ as any as Text).data as C;
       default:
         return this.children_;
     }
@@ -99,24 +99,24 @@ export class TypedHTMLElement<
         return;
 
       case 'text':
-        if (children === (<Text><any>this.children_).data) return;
+        if (children === (this.children_ as any as Text).data) return;
         (<Text><any>this.children_).data = <string>children;
         return;
 
       case 'collection':
         if (children === this.children_) return;
         if (!Object.isFrozen(this.children_)) throw new Error('TypedHTMLElement collections cannot be updated recursively.');
-        void (<TypedHTMLElementChildren.Collection>children)
-          .reduce<TypedHTMLElementChildren.Collection>((ccs, ic) => {
-            const i = ccs.indexOf(ic);
-            if (i === -1) return ccs;
-            void ccs.splice(i, 1);
-            return ccs;
-          }, (<TypedHTMLElementChildren.Collection>this.children_).slice())
+        void (children as TypedHTMLElementChildren.Collection)
+          .reduce((cs, c) => {
+            const i = cs.indexOf(c);
+            if (i === -1) return cs;
+            void cs.splice(i, 1);
+            return cs;
+          }, (this.children_ as TypedHTMLElementChildren.Collection).slice())
           .forEach(child =>
             void child.element.remove());
-        this.children_ = <C><TypedHTMLElementChildren.Collection>[];
-        void (<TypedHTMLElementChildren.Collection>children)
+        this.children_ = [] as TypedHTMLElementChildren.Collection as C;
+        void (children as TypedHTMLElementChildren.Collection)
           .forEach((child, i) => (
             this.children_[i] = child,
             void this.element_.appendChild(child.element)));

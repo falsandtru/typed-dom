@@ -27,7 +27,7 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('text children update', function () {
-      const text = TypedHTML.p(`a`);
+      const text = TypedHTML.p(`a` as string);
       text.children = 'b';
       assert(text.element.outerHTML === '<p>b</p>');
       assert(text.children === 'b');
@@ -55,7 +55,7 @@ describe('Integration: Typed DOM', function () {
 
     it('collection children update', function () {
       const collection = TypedHTML.ul([
-        TypedHTML.li(`1`)
+        TypedHTML.li(`1` as string)
       ]);
       collection.children = [
         TypedHTML.li('2'),
@@ -134,7 +134,7 @@ describe('Integration: Typed DOM', function () {
 
     it('struct children update', function () {
       const struct = TypedHTML.article({
-        title: TypedHTML.h1(`a`)
+        title: TypedHTML.h1(`a` as string)
       });
       struct.children = {
         title: TypedHTML.h1(`b`)
@@ -146,7 +146,7 @@ describe('Integration: Typed DOM', function () {
 
     it('struct children partial update', function () {
       const struct = TypedHTML.article({
-        title: TypedHTML.h1(`a`)
+        title: TypedHTML.h1(`a` as string)
       });
       struct.children.title = TypedHTML.h1(`b`);
       assert(struct.children.title.element.textContent === 'b');

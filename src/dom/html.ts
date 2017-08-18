@@ -209,7 +209,7 @@ export const TypedHTML: {
             factory = typeof children === 'function'
               ? children
               : factory || (() => document.createElement(tag));
-            return [Object.keys(attrs)[0]].every(key => key === void 0 || typeof attrs![key] === 'object')
+            return [Object.keys(attrs!)[0]].every(key => key === void 0 || typeof attrs![key] === 'object')
               ? new TypedHTMLElement(factory(), <any>attrs)
               : new TypedHTMLElement(define(factory(), attrs!), <never>children === factory ? void 0 : children)
           default:
