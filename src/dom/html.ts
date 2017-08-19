@@ -202,14 +202,14 @@ export const TypedHTML: {
           case 'undefined':
             return new TypedHTMLElement(document.createElement(tag), <never>void 0);
           case 'function':
-            return new TypedHTMLElement((<any>attrs)(), <never>void 0);
+            return new TypedHTMLElement((attrs as any)(), <never>void 0);
           case 'string':
-            return new TypedHTMLElement((<any>children || (() => document.createElement(tag)))(), <never>attrs);
+            return new TypedHTMLElement((children as any || (() => document.createElement(tag)))(), <never>attrs);
           case 'object':
             factory = typeof children === 'function'
               ? children
               : factory || (() => document.createElement(tag));
-            return [Object.keys(attrs!)[0]].every(key => key === void 0 || typeof attrs![key] === 'object')
+            return Object.keys(attrs!).slice(-1).every(key => key === void 0 || typeof attrs![key] === 'object')
               ? new TypedHTMLElement(factory(), <any>attrs)
               : new TypedHTMLElement(define(factory(), attrs!), <never>children === factory ? void 0 : children)
           default:
@@ -217,7 +217,7 @@ export const TypedHTML: {
         }
       },
     obj
-  ), <any>{});
+  ), {} as any);
 
 function define<E extends HTMLElement>(el: E, attrs: { [name: string]: string }): E {
   return Object.keys(attrs)

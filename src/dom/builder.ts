@@ -100,7 +100,7 @@ export class TypedHTMLElement<
 
       case 'text':
         if (children === (this.children_ as any as Text).data) return;
-        (<Text><any>this.children_).data = <string>children;
+        (this.children_ as any as Text).data = <string>children;
         return;
 
       case 'collection':
