@@ -15,9 +15,9 @@ import TypedHTML from 'typed-dom';
 
 const component = TypedHTML.article({ id: 'id' }, {
   style: TypedHTML.style(`$scope ul { width: 100px; }`),
-  title: TypedHTML.h1(`title`),
+  title: TypedHTML.h1(`title` as string),
   content: TypedHTML.ul([
-    TypedHTML.li(`item`),
+    TypedHTML.li(`item` as string),
     TypedHTML.li(`item`),
   ])
 });
@@ -106,7 +106,7 @@ class MicroComponent {
   private readonly dom = TypedHTML.div({ id: `${this.parent.id}-list-${sqid()}` }, {
     style: TypedHTML.style(`$scope ul { width: 100px; }`),
     content: TypedHTML.ul([
-      TypedHTML.li(`item`)
+      TypedHTML.li(`item` as string)
     ])
   });
 }
