@@ -45,7 +45,7 @@ describe('Integration: Typed DOM', function () {
 
     it('collection', function () {
       const collection = TypedHTML.ul([
-        TypedHTML.li(`1`),
+        TypedHTML.li(`1` as string),
         TypedHTML.li(`2`)
       ]);
       assert(collection.element.outerHTML === '<ul><li>1</li><li>2</li></ul>');
@@ -264,9 +264,13 @@ describe('Integration: Typed DOM', function () {
 
     it('clear', function () {
       assert(TypedHTML.p(() => TypedHTML.p('a').element).element.innerHTML === 'a');
+      assert(TypedHTML.p(() => TypedHTML.p('a').element).children === void 0);
       assert(TypedHTML.p('', () => TypedHTML.p('a').element).element.innerHTML === '');
+      assert(TypedHTML.p('', () => TypedHTML.p('a').element).children === '');
       assert(TypedHTML.p([], () => TypedHTML.p('a').element).element.childNodes.length === 0);
+      assert.deepStrictEqual(TypedHTML.p([], () => TypedHTML.p('a').element).children, []);
       assert(TypedHTML.p({}, () => TypedHTML.p('a').element).element.childNodes.length === 0);
+      assert.deepStrictEqual(TypedHTML.p({}, () => TypedHTML.p('a').element).children, {});
     });
 
   });
