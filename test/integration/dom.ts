@@ -17,7 +17,7 @@ describe('Integration: Typed DOM', function () {
     it('factory', function () {
       const dom = TypedHTML.strong(() => document.createElement('em'));
       assert(dom.element.outerHTML === '<em></em>');
-      assert.deepStrictEqual(dom.children, void 0);
+      assert(dom.children === void 0);
     });
 
     it('text', function () {
@@ -40,7 +40,7 @@ describe('Integration: Typed DOM', function () {
         return el;
       });
       assert(dom.element.id === 'test');
-      assert.deepStrictEqual(dom.children, 'a');
+      assert(dom.children === 'a');
     });
 
     it('collection', function () {
@@ -172,7 +172,7 @@ describe('Integration: Typed DOM', function () {
       const dom = TypedHTML.div({ id: 'test', class: 'test' });
       assert(dom.element.id === 'test');
       assert(dom.element.getAttribute('class') === 'test');
-      assert.deepStrictEqual(dom.children, void 0);
+      assert(dom.children === void 0);
     });
 
     it('attr with factory', function () {
@@ -184,14 +184,14 @@ describe('Integration: Typed DOM', function () {
       });
       assert(dom.element.id === 'test');
       assert(dom.element.className === 'test');
-      assert.deepStrictEqual(dom.children, void 0);
+      assert(dom.children === void 0);
     });
 
     it('attr with text', function () {
       const dom = TypedHTML.div({ id: 'test', class: 'test' }, '');
       assert(dom.element.id === 'test');
       assert(dom.element.getAttribute('class') === 'test');
-      assert.deepStrictEqual(dom.children, '');
+      assert(dom.children === '');
     });
 
     it('attr with collection', function () {
@@ -217,7 +217,7 @@ describe('Integration: Typed DOM', function () {
       });
       assert(dom.element.id === 'test');
       assert(dom.element.className === 'test');
-      assert.deepStrictEqual(dom.children, '');
+      assert(dom.children === '');
     });
 
     it('attr with collection and factory', function () {
