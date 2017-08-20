@@ -178,7 +178,7 @@ describe('Integration: Typed DOM', function () {
     it('attr with factory', function () {
       const dom = TypedHTML.div({ id: 'test' }, () => {
         const el = document.createElement('div');
-        el.id = 'test';
+        el.id = 'id';
         el.className = 'test';
         return el;
       });
@@ -211,7 +211,7 @@ describe('Integration: Typed DOM', function () {
     it('attr with text and factory', function () {
       const dom = TypedHTML.div({ id: 'test' }, '', () => {
         const el = document.createElement('div');
-        el.id = 'test';
+        el.id = 'id';
         el.className = 'test';
         return el;
       });
@@ -223,7 +223,7 @@ describe('Integration: Typed DOM', function () {
     it('attr with collection and factory', function () {
       const dom = TypedHTML.div({ id: 'test' }, [], () => {
         const el = document.createElement('div');
-        el.id = 'test';
+        el.id = 'id';
         el.className = 'test';
         return el;
       });
@@ -235,7 +235,72 @@ describe('Integration: Typed DOM', function () {
     it('attr with struct and factory', function () {
       const dom = TypedHTML.div({ id: 'test' }, {}, () => {
         const el = document.createElement('div');
-        el.id = 'test';
+        el.id = 'id';
+        el.className = 'test';
+        return el;
+      });
+      assert(dom.element.id === 'test');
+      assert(dom.element.className === 'test');
+      assert.deepStrictEqual(dom.children, {});
+    });
+
+    it('create', function () {
+      const dom = TypedHTML.create('some');
+      assert(dom.element.outerHTML === '<some></some>');
+      assert(dom.children === void 0);
+    });
+
+    it('create with factory', function () {
+      const dom = TypedHTML.create('some', () =>
+        document.createElement('some'));
+      assert(dom.element.outerHTML === '<some></some>');
+      assert(dom.children === void 0);
+    });
+
+    it('create with children', function () {
+      const dom = TypedHTML.create('some', 'a');
+      assert(dom.element.outerHTML === '<some>a</some>');
+      assert(dom.children === 'a');
+    });
+
+    it('create with children and factory', function () {
+      const dom = TypedHTML.create('some', 'a', () => {
+        const el = document.createElement('some');
+        el.textContent = 'b';
+        return el;
+      });
+      assert(dom.element.outerHTML === '<some>a</some>');
+      assert(dom.children === 'a');
+    });
+
+    it('create with attr', function () {
+      const dom = TypedHTML.create('some', { id: 'test' });
+      assert(dom.element.id === 'test');
+      assert(dom.children === void 0);
+    });
+
+    it('create with attr and factory', function () {
+      const dom = TypedHTML.create('some', { id: 'test' }, () => {
+        const el = document.createElement('some');
+        el.id = 'id';
+        el.className = 'test';
+        return el;
+      });
+      assert(dom.element.id === 'test');
+      assert(dom.element.className === 'test');
+      assert(dom.children === void 0);
+    });
+
+    it('create with attr and children', function () {
+      const dom = TypedHTML.create('some', { id: 'test' }, {});
+      assert(dom.element.id === 'test');
+      assert.deepStrictEqual(dom.children, {});
+    });
+
+    it('create with attr, children, and factory', function () {
+      const dom = TypedHTML.create('some', { id: 'test' }, {}, () => {
+        const el = document.createElement('some');
+        el.id = 'id';
         el.className = 'test';
         return el;
       });

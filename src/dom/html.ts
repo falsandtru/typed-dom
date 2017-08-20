@@ -58,9 +58,23 @@ export const TypedHTML: {
   u: TypedHTMLElementBuilder<'u', HTMLElement>;
   var: TypedHTMLElementBuilder<'var', HTMLElement>;
   wbr: TypedHTMLElementBuilder<'wbr', HTMLElement>;
-  // custom
-  custom<T extends string, E extends HTMLElement = HTMLElement, C extends TypedHTMLElementChildren = TypedHTMLElementChildren>(children: C, factory: () => E, tag: T): TypedHTMLElement<T, E, C>;
-  custom<T extends string, E extends HTMLElement = HTMLElement, C extends TypedHTMLElementChildren = TypedHTMLElementChildren>(attrs: { [name: string]: string; }, children: C, factory: () => E, tag: T): TypedHTMLElement<T, E, C>;
+  // create
+  create<T extends keyof HTMLElementTagNameMap>
+  (tag: T, factory?: () => HTMLElementTagNameMap[T]): TypedHTMLElement<T, HTMLElementTagNameMap[T], void>;
+  create<T extends keyof HTMLElementTagNameMap, C extends TypedHTMLElementChildren = TypedHTMLElementChildren>
+  (tag: T, children: C, factory?: () => HTMLElementTagNameMap[T]): TypedHTMLElement<T, HTMLElementTagNameMap[T], C>;
+  create<T extends keyof HTMLElementTagNameMap>
+  (tag: T, attrs: { [name: string]: string; }, factory?: () => HTMLElementTagNameMap[T]): TypedHTMLElement<T, HTMLElementTagNameMap[T], void>;
+  create<T extends keyof HTMLElementTagNameMap, C extends TypedHTMLElementChildren = TypedHTMLElementChildren>
+  (tag: T, attrs: { [name: string]: string; }, children: C, factory?: () => HTMLElementTagNameMap[T]): TypedHTMLElement<T, HTMLElementTagNameMap[T], C>;
+  create<T extends string, E extends HTMLElement = HTMLElement>
+  (tag: T, factory?: () => E): TypedHTMLElement<T, E, void>;
+  create<T extends string, E extends HTMLElement = HTMLElement, C extends TypedHTMLElementChildren = TypedHTMLElementChildren>
+  (tag: T, children: C, factory?: () => E): TypedHTMLElement<T, E, C>;
+  create<T extends string, E extends HTMLElement = HTMLElement>
+  (tag: T, attrs: { [name: string]: string; }, factory?: () => E): TypedHTMLElement<T, E, void>;
+  create<T extends string, E extends HTMLElement = HTMLElement, C extends TypedHTMLElementChildren = TypedHTMLElementChildren>
+  (tag: T, attrs: { [name: string]: string; }, children: C, factory?: () => E): TypedHTMLElement<T, E, C>;
 } = [
   // lib.dom.d.ts
   "a",
@@ -190,32 +204,34 @@ export const TypedHTML: {
   'u',
   'var',
   'wbr',
-  // custom
-  'custom'
+  // create
+  'create',
 ]
   .reduce((obj, tag) => (
-    obj[tag] =
-      <C extends TypedHTMLElementChildren>
-      (attrs?: { [name: string]: string; }, children?: C, factory?: () => HTMLElement)
-      : TypedHTMLElement<string, HTMLElement, C> => {
-        switch (typeof attrs) {
-          case 'undefined':
-            return new TypedHTMLElement(document.createElement(tag), <never>void 0);
-          case 'function':
-            return new TypedHTMLElement((attrs as any)(), <never>void 0);
-          case 'string':
-            return new TypedHTMLElement((children as any || (() => document.createElement(tag)))(), <never>attrs);
-          case 'object':
-            factory = typeof children === 'function'
-              ? children
-              : factory || (() => document.createElement(tag));
-            return Object.keys(attrs!).slice(-1).every(key => key === void 0 || typeof attrs![key] === 'object')
-              ? new TypedHTMLElement(factory(), <any>attrs)
-              : new TypedHTMLElement(define(factory(), attrs!), <never>children === factory ? void 0 : children)
-          default:
-            throw new TypeError(`Invalid arguments: [${attrs}, ${children}, ${factory}]`);
-        }
-      },
+    obj[tag] = tag === 'create'
+      ? (tag: string, b: any = () => document.createElement(tag), c: any = () => document.createElement(tag), d: any = () => document.createElement(tag)) =>
+          TypedHTML.div(b, c, d)
+      : <C extends TypedHTMLElementChildren>
+        (attrs?: { [name: string]: string; }, children?: C, factory?: () => HTMLElement)
+        : TypedHTMLElement<string, HTMLElement, C> => {
+          switch (typeof attrs) {
+            case 'undefined':
+              return new TypedHTMLElement(document.createElement(tag), <never>void 0);
+            case 'function':
+              return new TypedHTMLElement((attrs as any)(), <never>void 0);
+            case 'string':
+              return new TypedHTMLElement((children as any || (() => document.createElement(tag)))(), <never>attrs);
+            case 'object':
+              factory = typeof children === 'function'
+                ? children
+                : factory || (() => document.createElement(tag));
+              return Object.keys(attrs!).slice(-1).every(key => key === void 0 || typeof attrs![key] === 'object')
+                ? new TypedHTMLElement(factory(), <any>attrs)
+                : new TypedHTMLElement(define(factory(), attrs!), <never>children === factory ? void 0 : children)
+            default:
+              throw new TypeError(`Invalid arguments: [${attrs}, ${children}, ${factory}]`);
+          }
+        },
     obj
   ), {} as any);
 
