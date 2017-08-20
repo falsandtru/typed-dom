@@ -206,14 +206,16 @@ export const TypedHTML: {
   'wbr',
   // create
   'create',
+  'any',
 ]
   .reduce((obj, prop) => (
     obj[prop] = prop === 'create'
       ? (tag: string, b: any = () => document.createElement(tag), c: any = () => document.createElement(tag), d: any = () => document.createElement(tag)) =>
-          TypedHTML['div' as string](b, c, d, tag)
+          TypedHTML['any'](b, c, d, tag)
       : <C extends TypedHTMLElementChildren>
         (attrs?: { [name: string]: string; }, children?: C, factory?: () => HTMLElement, tag = prop)
         : TypedHTMLElement<string, HTMLElement, C> => {
+          tag = prop === 'any' ? tag : prop;
           switch (typeof attrs) {
             case 'undefined':
               return new TypedHTMLElement(define(tag, () => document.createElement(tag)), <never>void 0);
@@ -237,7 +239,7 @@ export const TypedHTML: {
 
 function define<E extends HTMLElement>(tag: string, factory: () => E, attrs?: { [name: string]: string }): E {
   const el = factory();
-  if (tag !== el.tagName.toLowerCase()) throw new Error(`Tag name must be "${tag}" but "${el.tagName.toLowerCase()}".`);
+  if (tag !== el.tagName && tag !== el.tagName.toLowerCase()) throw new Error(`Tag name must be "${tag}" but "${el.tagName.toLowerCase()}".`);
   if (!attrs) return el;
   return Object.keys(attrs)
     .reduce((el, name) => (
