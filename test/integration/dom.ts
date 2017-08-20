@@ -315,6 +315,7 @@ describe('Integration: Typed DOM', function () {
 
     it('check tag name', function () {
       TypedHTML.create('div', [TypedHTML.create('p')]);
+      TypedHTML.create('div', () => TypedHTML.div([TypedHTML.create('p')]).element);
       assert.throws(() => TypedHTML.section(() => document.createElement('any')));
       assert.throws(() => TypedHTML.create('div', () => document.createElement('any')));
       assert.throws(() => TypedHTML.create('any', () => document.createElement('div')));

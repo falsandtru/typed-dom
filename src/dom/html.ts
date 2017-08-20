@@ -75,7 +75,6 @@ export const TypedHTML: {
   (tag: T, attrs: { [name: string]: string; }, factory?: () => E): TypedHTMLElement<T, E, void>;
   create<T extends string, E extends HTMLElement = HTMLElement, C extends TypedHTMLElementChildren = TypedHTMLElementChildren>
   (tag: T, attrs: { [name: string]: string; }, children: C, factory?: () => E): TypedHTMLElement<T, E, C>;
-  any: TypedHTMLElementBuilder<string, HTMLElement>;
 } = [
   // lib.dom.d.ts
   "a",
@@ -207,15 +206,13 @@ export const TypedHTML: {
   'wbr',
   // create
   'create',
-  'any',
 ]
-  .reduce((obj, tag) => (
-    obj[tag] = tag === 'create'
-      ? (tag: string, b: any = () => document.createElement(tag), c: any = () => document.createElement(tag), d: any = () => document.createElement(tag)) => (
-          TypedHTML.any['tag'] = tag,
-          TypedHTML.any(b, c, d))
+  .reduce((obj, prop) => (
+    obj[prop] = prop === 'create'
+      ? (tag: string, b: any = () => document.createElement(tag), c: any = () => document.createElement(tag), d: any = () => document.createElement(tag)) =>
+          TypedHTML['div' as string](b, c, d, tag)
       : <C extends TypedHTMLElementChildren>
-        (attrs?: { [name: string]: string; }, children?: C, factory?: () => HTMLElement)
+        (attrs?: { [name: string]: string; }, children?: C, factory?: () => HTMLElement, tag = prop)
         : TypedHTMLElement<string, HTMLElement, C> => {
           switch (typeof attrs) {
             case 'undefined':
@@ -240,8 +237,7 @@ export const TypedHTML: {
 
 function define<E extends HTMLElement>(tag: string, factory: () => E, attrs?: { [name: string]: string }): E {
   const el = factory();
-  if ((tag === 'any' && TypedHTML.any['tag'] || tag).toLowerCase() !== el.tagName.toLowerCase()) throw new Error(`Tag name must be "${tag}" but "${el.tagName.toLowerCase()}".`);
-  TypedHTML.any['tag'] = '';
+  if (tag !== el.tagName.toLowerCase()) throw new Error(`Tag name must be "${tag}" but "${el.tagName.toLowerCase()}".`);
   if (!attrs) return el;
   return Object.keys(attrs)
     .reduce((el, name) => (
