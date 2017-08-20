@@ -313,6 +313,13 @@ describe('Integration: Typed DOM', function () {
       assert.deepStrictEqual(dom.children, {});
     });
 
+    it('check tag name', function () {
+      TypedHTML.create('div', [TypedHTML.create('p')]);
+      assert.throws(() => TypedHTML.section(() => document.createElement('any')));
+      assert.throws(() => TypedHTML.create('div', () => document.createElement('any')));
+      assert.throws(() => TypedHTML.create('any', () => document.createElement('div')));
+    });
+
     it('sanitize', function () {
       const dom = TypedHTML.div('<script>');
       assert(dom.element.innerHTML === '&lt;script&gt;');

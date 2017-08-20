@@ -211,8 +211,9 @@ export const TypedHTML: {
 ]
   .reduce((obj, tag) => (
     obj[tag] = tag === 'create'
-      ? (tag: string, b: any = () => document.createElement(tag), c: any = () => document.createElement(tag), d: any = () => document.createElement(tag)) =>
-          TypedHTML.any(b, c, d)
+      ? (tag: string, b: any = () => document.createElement(tag), c: any = () => document.createElement(tag), d: any = () => document.createElement(tag)) => (
+          TypedHTML.any['tag'] = tag,
+          TypedHTML.any(b, c, d))
       : <C extends TypedHTMLElementChildren>
         (attrs?: { [name: string]: string; }, children?: C, factory?: () => HTMLElement)
         : TypedHTMLElement<string, HTMLElement, C> => {
@@ -239,7 +240,8 @@ export const TypedHTML: {
 
 function define<E extends HTMLElement>(tag: string, factory: () => E, attrs?: { [name: string]: string }): E {
   const el = factory();
-  if (tag !== 'any' && el.tagName.toLowerCase() !== tag) throw new Error(`Tag name must be "${tag}" but "${el.tagName.toLowerCase()}".`);
+  if ((tag === 'any' && TypedHTML.any['tag'] || tag).toLowerCase() !== el.tagName.toLowerCase()) throw new Error(`Tag name must be "${tag}" but "${el.tagName.toLowerCase()}".`);
+  TypedHTML.any['tag'] = '';
   if (!attrs) return el;
   return Object.keys(attrs)
     .reduce((el, name) => (
