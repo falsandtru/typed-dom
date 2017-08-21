@@ -1,19 +1,19 @@
-export type TypedHTMLElementChildren =
-  | TypedHTMLElementChildren.Void
-  | TypedHTMLElementChildren.Text
-  | TypedHTMLElementChildren.Collection
-  | TypedHTMLElementChildren.Struct;
-export namespace TypedHTMLElementChildren {
+export type ElChildren =
+  | ElChildren.Void
+  | ElChildren.Text
+  | ElChildren.Collection
+  | ElChildren.Struct;
+export namespace ElChildren {
   export type Void = void;
   export type Text = string;
-  export type Collection = ReadonlyArray<TypedHTMLElement<string, HTMLElement, any>>;
-  export type Struct = { [name: string]: TypedHTMLElement<string, HTMLElement, any>; };
+  export type Collection = ReadonlyArray<El<string, HTMLElement, any>>;
+  export type Struct = { [name: string]: El<string, HTMLElement, any>; };
 }
 
-export class TypedHTMLElement<
+export class El<
   T extends string,
   E extends HTMLElement,
-  C extends TypedHTMLElementChildren
+  C extends ElChildren
   > {
   private tag: T;
   constructor(
@@ -33,24 +33,24 @@ export class TypedHTMLElement<
       case 'collection':
         void clear();
         if (element_.id) {
-          void (children_ as TypedHTMLElementChildren.Collection)
+          void (children_ as ElChildren.Collection)
             .forEach(({ element }) =>
               element instanceof HTMLStyleElement &&
               void scope(element));
         }
-        this.children_ = Object.freeze([]) as TypedHTMLElementChildren.Collection as C;
+        this.children_ = Object.freeze([]) as ElChildren.Collection as C;
         this.children = children_;
         return;
       case 'struct':
         void clear();
         if (element_.id) {
-          void Object.keys(children_ as TypedHTMLElementChildren.Struct)
-            .map(k => (children_ as TypedHTMLElementChildren.Struct)[k])
+          void Object.keys(children_ as ElChildren.Struct)
+            .map(k => (children_ as ElChildren.Struct)[k])
             .forEach(({ element }) =>
               element instanceof HTMLStyleElement &&
               void scope(element));
         }
-        this.children_ = this.observe({ ...<TypedHTMLElementChildren.Struct>children_ }) as C;
+        this.children_ = this.observe({ ...<ElChildren.Struct>children_ }) as C;
         void this.structkeys
           .forEach(k =>
             void this.element_.appendChild(children_[k].element));
@@ -80,7 +80,7 @@ export class TypedHTMLElement<
           : 'struct';
   private readonly structkeys: string[] =
     this.mode === 'struct'
-      ? Object.keys(this.children_ as TypedHTMLElementChildren.Struct)
+      ? Object.keys(this.children_ as ElChildren.Struct)
       : [];
   public get element(): E {
     return this.element_;
@@ -106,17 +106,17 @@ export class TypedHTMLElement<
       case 'collection':
         if (children === this.children_) return;
         if (!Object.isFrozen(this.children_)) throw new Error('TypedHTMLElement collections cannot be updated recursively.');
-        void (children as TypedHTMLElementChildren.Collection)
+        void (children as ElChildren.Collection)
           .reduce((cs, c) => {
             const i = cs.indexOf(c);
             if (i === -1) return cs;
             void cs.splice(i, 1);
             return cs;
-          }, (this.children_ as TypedHTMLElementChildren.Collection).slice())
+          }, (this.children_ as ElChildren.Collection).slice())
           .forEach(child =>
             void child.element.remove());
-        this.children_ = [] as TypedHTMLElementChildren.Collection as C;
-        void (children as TypedHTMLElementChildren.Collection)
+        this.children_ = [] as ElChildren.Collection as C;
+        void (children as ElChildren.Collection)
           .forEach((child, i) => (
             this.children_[i] = child,
             void this.element_.appendChild(child.element)));
@@ -132,7 +132,7 @@ export class TypedHTMLElement<
 
     }
   }
-  private observe<C extends TypedHTMLElementChildren.Struct>(children: C): C {
+  private observe<C extends ElChildren.Struct>(children: C): C {
     return Object.defineProperties(
       children,
       this.structkeys
@@ -141,10 +141,10 @@ export class TypedHTMLElement<
           descs[key] = {
             configurable: true,
             enumerable: true,
-            get: (): TypedHTMLElement<string, HTMLElement, any> => {
+            get: (): El<string, HTMLElement, any> => {
               return current;
             },
-            set: (newChild: TypedHTMLElement<string, HTMLElement, any>) => {
+            set: (newChild: El<string, HTMLElement, any>) => {
               const oldChild = current;
               if (newChild === oldChild) return;
               current = newChild;

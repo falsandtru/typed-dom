@@ -1,80 +1,73 @@
-import { TypedHTMLElement, TypedHTMLElementChildren } from './builder';
+import { El, ElChildren } from './builder';
 
-interface TypedHTMLElementBuilder<T extends string, E extends HTMLElement> {
-  (factory?: () => E): TypedHTMLElement<T, E, void>;
-  <C extends TypedHTMLElementChildren>
-  (children: C, factory?: () => E): TypedHTMLElement<T, E, C>;
-  (attrs: { [name: string]: string; }, factory?: () => E): TypedHTMLElement<T, E, void>;
-  <C extends TypedHTMLElementChildren>
-  (attrs: { [name: string]: string; }, children: C, factory?: () => E): TypedHTMLElement<T, E, C>;
+interface ElBuilder<T extends string, E extends HTMLElement = HTMLElement> {
+  (factory?: () => E): El<T, E, void>;                                                <C extends ElChildren>
+  (children: C, factory?: () => E): El<T, E, C>;
+  (attrs: { [name: string]: string; }, factory?: () => E): El<T, E, void>;            <C extends ElChildren>
+  (attrs: { [name: string]: string; }, children: C, factory?: () => E): El<T, E, C>;
 }
-
 
 export const TypedHTML: {
   // lib.dom.d.ts
-  [K in keyof HTMLElementTagNameMap]: TypedHTMLElementBuilder<K, HTMLElementTagNameMap[K]>;
+  [K in keyof HTMLElementTagNameMap]: ElBuilder<K, HTMLElementTagNameMap[K]>;
 } & {
   // other
-  abbr: TypedHTMLElementBuilder<'abbr', HTMLElement>;
-  acronym: TypedHTMLElementBuilder<'acronym', HTMLElement>;
-  address: TypedHTMLElementBuilder<'address', HTMLElement>;
-  article: TypedHTMLElementBuilder<'article', HTMLElement>;
-  aside: TypedHTMLElementBuilder<'aside', HTMLElement>;
-  b: TypedHTMLElementBuilder<'b', HTMLElement>;
-  bdo: TypedHTMLElementBuilder<'bdo', HTMLElement>;
-  big: TypedHTMLElementBuilder<'big', HTMLElement>;
-  center: TypedHTMLElementBuilder<'center', HTMLElement>;
-  cite: TypedHTMLElementBuilder<'cite', HTMLElement>;
-  code: TypedHTMLElementBuilder<'code', HTMLElement>;
-  dd: TypedHTMLElementBuilder<'dd', HTMLElement>;
-  dfn: TypedHTMLElementBuilder<'dfn', HTMLElement>;
-  dt: TypedHTMLElementBuilder<'dt', HTMLElement>;
-  em: TypedHTMLElementBuilder<'em', HTMLElement>;
-  figcaption: TypedHTMLElementBuilder<'figcaption', HTMLElement>;
-  figure: TypedHTMLElementBuilder<'figure', HTMLElement>;
-  footer: TypedHTMLElementBuilder<'footer', HTMLElement>;
-  header: TypedHTMLElementBuilder<'header', HTMLElement>;
-  hgroup: TypedHTMLElementBuilder<'hgroup', HTMLElement>;
-  i: TypedHTMLElementBuilder<'i', HTMLElement>;
-  kbd: TypedHTMLElementBuilder<'kbd', HTMLElement>;
-  keygen: TypedHTMLElementBuilder<'keygen', HTMLElement>;
-  mark: TypedHTMLElementBuilder<'mark', HTMLElement>;
-  nav: TypedHTMLElementBuilder<'nav', HTMLElement>;
-  nobr: TypedHTMLElementBuilder<'nobr', HTMLElement>;
-  noframes: TypedHTMLElementBuilder<'noframes', HTMLElement>;
-  noscript: TypedHTMLElementBuilder<'noscript', HTMLElement>;
-  plaintext: TypedHTMLElementBuilder<'plaintext', HTMLElement>;
-  rt: TypedHTMLElementBuilder<'rt', HTMLElement>;
-  ruby: TypedHTMLElementBuilder<'ruby', HTMLElement>;
-  s: TypedHTMLElementBuilder<'s', HTMLElement>;
-  samp: TypedHTMLElementBuilder<'samp', HTMLElement>;
-  section: TypedHTMLElementBuilder<'section', HTMLElement>;
-  small: TypedHTMLElementBuilder<'small', HTMLElement>;
-  strike: TypedHTMLElementBuilder<'strike', HTMLElement>;
-  strong: TypedHTMLElementBuilder<'strong', HTMLElement>;
-  sub: TypedHTMLElementBuilder<'sub', HTMLElement>;
-  sup: TypedHTMLElementBuilder<'sup', HTMLElement>;
-  tt: TypedHTMLElementBuilder<'tt', HTMLElement>;
-  u: TypedHTMLElementBuilder<'u', HTMLElement>;
-  var: TypedHTMLElementBuilder<'var', HTMLElement>;
-  wbr: TypedHTMLElementBuilder<'wbr', HTMLElement>;
+  abbr: ElBuilder<'abbr'>;
+  acronym: ElBuilder<'acronym'>;
+  address: ElBuilder<'address'>;
+  article: ElBuilder<'article'>;
+  aside: ElBuilder<'aside'>;
+  b: ElBuilder<'b'>;
+  bdo: ElBuilder<'bdo'>;
+  big: ElBuilder<'big'>;
+  center: ElBuilder<'center'>;
+  cite: ElBuilder<'cite'>;
+  code: ElBuilder<'code'>;
+  dd: ElBuilder<'dd'>;
+  dfn: ElBuilder<'dfn'>;
+  dt: ElBuilder<'dt'>;
+  em: ElBuilder<'em'>;
+  figcaption: ElBuilder<'figcaption'>;
+  figure: ElBuilder<'figure'>;
+  footer: ElBuilder<'footer'>;
+  header: ElBuilder<'header'>;
+  hgroup: ElBuilder<'hgroup'>;
+  i: ElBuilder<'i'>;
+  kbd: ElBuilder<'kbd'>;
+  keygen: ElBuilder<'keygen'>;
+  mark: ElBuilder<'mark'>;
+  nav: ElBuilder<'nav'>;
+  nobr: ElBuilder<'nobr'>;
+  noframes: ElBuilder<'noframes'>;
+  noscript: ElBuilder<'noscript'>;
+  plaintext: ElBuilder<'plaintext'>;
+  rt: ElBuilder<'rt'>;
+  ruby: ElBuilder<'ruby'>;
+  s: ElBuilder<'s'>;
+  samp: ElBuilder<'samp'>;
+  section: ElBuilder<'section'>;
+  small: ElBuilder<'small'>;
+  strike: ElBuilder<'strike'>;
+  strong: ElBuilder<'strong'>;
+  sub: ElBuilder<'sub'>;
+  sup: ElBuilder<'sup'>;
+  tt: ElBuilder<'tt'>;
+  u: ElBuilder<'u'>;
+  var: ElBuilder<'var'>;
+  wbr: ElBuilder<'wbr'>;
+
   // create
-  create<T extends keyof HTMLElementTagNameMap>
-  (tag: T, factory?: () => HTMLElementTagNameMap[T]): TypedHTMLElement<T, HTMLElementTagNameMap[T], void>;
-  create<T extends keyof HTMLElementTagNameMap, C extends TypedHTMLElementChildren = TypedHTMLElementChildren>
-  (tag: T, children: C, factory?: () => HTMLElementTagNameMap[T]): TypedHTMLElement<T, HTMLElementTagNameMap[T], C>;
-  create<T extends keyof HTMLElementTagNameMap>
-  (tag: T, attrs: { [name: string]: string; }, factory?: () => HTMLElementTagNameMap[T]): TypedHTMLElement<T, HTMLElementTagNameMap[T], void>;
-  create<T extends keyof HTMLElementTagNameMap, C extends TypedHTMLElementChildren = TypedHTMLElementChildren>
-  (tag: T, attrs: { [name: string]: string; }, children: C, factory?: () => HTMLElementTagNameMap[T]): TypedHTMLElement<T, HTMLElementTagNameMap[T], C>;
-  create<T extends string, E extends HTMLElement = HTMLElement>
-  (tag: T, factory?: () => E): TypedHTMLElement<T, E, void>;
-  create<T extends string, E extends HTMLElement = HTMLElement, C extends TypedHTMLElementChildren = TypedHTMLElementChildren>
-  (tag: T, children: C, factory?: () => E): TypedHTMLElement<T, E, C>;
-  create<T extends string, E extends HTMLElement = HTMLElement>
-  (tag: T, attrs: { [name: string]: string; }, factory?: () => E): TypedHTMLElement<T, E, void>;
-  create<T extends string, E extends HTMLElement = HTMLElement, C extends TypedHTMLElementChildren = TypedHTMLElementChildren>
-  (tag: T, attrs: { [name: string]: string; }, children: C, factory?: () => E): TypedHTMLElement<T, E, C>;
+  create: {                                                                                                                                   <T extends keyof HTMLElementTagNameMap>
+    (tag: T, factory?: () => HTMLElementTagNameMap[T]): El<T, HTMLElementTagNameMap[T], void>;                                                <T extends keyof HTMLElementTagNameMap, C extends ElChildren = ElChildren>
+    (tag: T, children: C, factory?: () => HTMLElementTagNameMap[T]): El<T, HTMLElementTagNameMap[T], C>;                                      <T extends keyof HTMLElementTagNameMap>
+    (tag: T, attrs: { [name: string]: string; }, factory?: () => HTMLElementTagNameMap[T]): El<T, HTMLElementTagNameMap[T], void>;            <T extends keyof HTMLElementTagNameMap, C extends ElChildren = ElChildren>
+    (tag: T, attrs: { [name: string]: string; }, children: C, factory?: () => HTMLElementTagNameMap[T]): El<T, HTMLElementTagNameMap[T], C>;
+                                                                                                                                              <T extends string, E extends HTMLElement = HTMLElement>
+    (tag: T, factory?: () => E): El<T, E, void>;                                                                                              <T extends string, E extends HTMLElement = HTMLElement, C extends ElChildren = ElChildren>
+    (tag: T, children: C, factory?: () => E): El<T, E, C>;                                                                                    <T extends string, E extends HTMLElement = HTMLElement>
+    (tag: T, attrs: { [name: string]: string; }, factory?: () => E): El<T, E, void>;                                                          <T extends string, E extends HTMLElement = HTMLElement, C extends ElChildren = ElChildren>
+    (tag: T, attrs: { [name: string]: string; }, children: C, factory?: () => E): El<T, E, C>;
+  };
 } = [
   // lib.dom.d.ts
   "a",
@@ -212,24 +205,24 @@ export const TypedHTML: {
     obj[prop] = prop === 'create'
       ? (tag: string, b: any = () => document.createElement(tag), c: any = () => document.createElement(tag), d: any = () => document.createElement(tag)) =>
           TypedHTML['any'](b, c, d, tag)
-      : <C extends TypedHTMLElementChildren>
+      : <C extends ElChildren>
         (attrs?: { [name: string]: string; }, children?: C, factory?: () => HTMLElement, tag = prop)
-        : TypedHTMLElement<string, HTMLElement, C> => {
+        : El<string, HTMLElement, C> => {
           tag = prop === 'any' ? tag : prop;
           switch (typeof attrs) {
             case 'undefined':
-              return new TypedHTMLElement(define(tag, () => document.createElement(tag)), <never>void 0);
+              return new El(define(tag, () => document.createElement(tag)), <never>void 0);
             case 'function':
-              return new TypedHTMLElement(define(tag, attrs as any), <never>void 0);
+              return new El(define(tag, attrs as any), <never>void 0);
             case 'string':
-              return new TypedHTMLElement(define(tag, children as any || (() => document.createElement(tag))), <never>attrs);
+              return new El(define(tag, children as any || (() => document.createElement(tag))), <never>attrs);
             case 'object':
               factory = typeof children === 'function'
                 ? children
                 : factory || (() => document.createElement(tag));
               return Object.keys(attrs!).slice(-1).every(key => key === void 0 || typeof attrs![key] === 'object')
-                ? new TypedHTMLElement(define(tag, factory), <any>attrs)
-                : new TypedHTMLElement(define(tag, factory, attrs!), <never>children === factory ? void 0 : children)
+                ? new El(define(tag, factory), <any>attrs)
+                : new El(define(tag, factory, attrs!), <never>children === factory ? void 0 : children)
             default:
               throw new TypeError(`Invalid arguments: [${attrs}, ${children}, ${factory}]`);
           }
