@@ -2,16 +2,14 @@ import TypedHTML from '../../index';
 import { Sequence } from 'spica/sequence';
 import { sqid } from 'spica/sqid';
 
-declare const _: {
-  shuffle<T>(as: T[]): T[]; 
-};
+declare const _: { shuffle<T>(as: T[]): T[]; };
 
 describe('Integration: Typed DOM', function () {
   describe('spec', function () {
     it('empty', function () {
-      const empty = TypedHTML.p();
-      assert(empty.element.outerHTML === '<p></p>');
-      assert(empty.children === void 0);
+      const dom = TypedHTML.p();
+      assert(dom.element.outerHTML === '<p></p>');
+      assert(dom.children === void 0);
     });
 
     it('factory', function () {
@@ -25,16 +23,16 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('text', function () {
-      const text = TypedHTML.p(`a`);
-      assert(text.element.outerHTML === '<p>a</p>');
-      assert(text.children === 'a');
+      const dom = TypedHTML.p(`a`);
+      assert(dom.element.outerHTML === '<p>a</p>');
+      assert(dom.children === 'a');
     });
 
     it('text children update', function () {
-      const text = TypedHTML.p(`a` as string);
-      text.children = 'b';
-      assert(text.element.outerHTML === '<p>b</p>');
-      assert(text.children === 'b');
+      const dom = TypedHTML.p(`a` as string);
+      dom.children = 'b';
+      assert(dom.element.outerHTML === '<p>b</p>');
+      assert(dom.children === 'b');
     });
 
     it('text with factory', function () {
@@ -48,32 +46,32 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('collection', function () {
-      const collection = TypedHTML.ul([
+      const dom = TypedHTML.ul([
         TypedHTML.li(`1` as string),
         TypedHTML.li(`2`)
       ]);
-      assert(collection.element.outerHTML === '<ul><li>1</li><li>2</li></ul>');
-      assert(collection.children.length === 2);
-      assert(collection.children.every(({element}, i) => element === collection.element.children[i]));
+      assert(dom.element.outerHTML === '<ul><li>1</li><li>2</li></ul>');
+      assert(dom.children.length === 2);
+      assert(dom.children.every(({element}, i) => element === dom.element.children[i]));
     });
 
     it('collection children update', function () {
-      const collection = TypedHTML.ul([
+      const dom = TypedHTML.ul([
         TypedHTML.li(`1` as string)
       ]);
-      collection.children = [
+      dom.children = [
         TypedHTML.li('2'),
         TypedHTML.li('3')
       ];
-      assert(collection.element.outerHTML === '<ul><li>2</li><li>3</li></ul>');
-      assert(collection.children.length === 2);
-      assert(collection.children.every(({element}, i) => element === collection.element.children[i]));
-      collection.children = [
+      assert(dom.element.outerHTML === '<ul><li>2</li><li>3</li></ul>');
+      assert(dom.children.length === 2);
+      assert(dom.children.every(({element}, i) => element === dom.element.children[i]));
+      dom.children = [
         TypedHTML.li('4')
       ];
-      assert(collection.element.outerHTML === '<ul><li>4</li></ul>');
-      assert(collection.children.length === 1);
-      assert(collection.children.every(({element}, i) => element === collection.element.children[i]));
+      assert(dom.element.outerHTML === '<ul><li>4</li></ul>');
+      assert(dom.children.length === 1);
+      assert(dom.children.every(({element}, i) => element === dom.element.children[i]));
 
       // property test
       const ss = Array(3).fill(0).map(() => TypedHTML.li(``));
@@ -87,16 +85,16 @@ describe('Integration: Typed DOM', function () {
               _.shuffle(ls.slice(-ls.length % (Math.random() * ls.length | 0)))))
         .extract()
         .forEach(([os, ns]) => {
-          collection.children = os;
+          dom.children = os;
           Sequence.zip(
-            Sequence.from(Array.from(collection.element.children)),
+            Sequence.from(Array.from(dom.element.children)),
             Sequence.from(os.map(({element}) => element)))
             .extract()
             .forEach(([a, b]) =>
               void assert(a === b));
-          collection.children = ns;
+          dom.children = ns;
           Sequence.zip(
-            Sequence.from(Array.from(collection.element.children)),
+            Sequence.from(Array.from(dom.element.children)),
             Sequence.from(ns.map(({element}) => element)))
             .extract()
             .forEach(([a, b]) =>
@@ -105,15 +103,15 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('collection children partial update', function () {
-      const collection = TypedHTML.ul([
+      const dom = TypedHTML.ul([
         TypedHTML.li()
       ]);
-      assert.throws(() => collection.children[0] = TypedHTML.li());
-      assert.throws(() => collection.children.push(TypedHTML.li()));
-      assert.throws(() => collection.children.pop());
-      assert.throws(() => collection.children.length = 0);
-      assert(collection.children.length === 1);
-      assert(collection.children.every(({element}, i) => element === collection.element.children[i]));
+      assert.throws(() => dom.children[0] = TypedHTML.li());
+      assert.throws(() => dom.children.push(TypedHTML.li()));
+      assert.throws(() => dom.children.pop());
+      assert.throws(() => dom.children.length = 0);
+      assert(dom.children.length === 1);
+      assert(dom.children.every(({element}, i) => element === dom.element.children[i]));
     });
 
     it('collection with factory', function () {
@@ -127,39 +125,39 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('struct', function () {
-      const struct = TypedHTML.article({
+      const dom = TypedHTML.article({
         title: TypedHTML.h1(`title`),
         content: TypedHTML.p([TypedHTML.a()])
       });
-      assert(struct.element.outerHTML === '<article><h1>title</h1><p><a></a></p></article>');
-      assert(struct.children.title.element === struct.element.firstChild);
-      assert(struct.children.content.element === struct.element.lastChild);
+      assert(dom.element.outerHTML === '<article><h1>title</h1><p><a></a></p></article>');
+      assert(dom.children.title.element === dom.element.firstChild);
+      assert(dom.children.content.element === dom.element.lastChild);
     });
 
     it('struct children update', function () {
-      const struct = TypedHTML.article({
+      const dom = TypedHTML.article({
         title: TypedHTML.h1(`a` as string)
       });
-      struct.children = {
+      dom.children = {
         title: TypedHTML.h1(`b`)
       };
-      assert(struct.children.title.element.textContent === 'b');
-      assert(struct.children.title.element === struct.element.firstChild);
-      assert(struct.children.title.children === 'b');
+      assert(dom.children.title.element.textContent === 'b');
+      assert(dom.children.title.element === dom.element.firstChild);
+      assert(dom.children.title.children === 'b');
     });
 
     it('struct children partial update', function () {
-      const struct = TypedHTML.article({
+      const dom = TypedHTML.article({
         title: TypedHTML.h1(`a` as string)
       });
-      struct.children.title = TypedHTML.h1(`b`);
-      assert(struct.children.title.element.textContent === 'b');
-      assert(struct.children.title.element === struct.element.firstChild);
-      assert(struct.children.title.children === 'b');
-      struct.children.title.children = 'c';
-      assert(struct.children.title.element.textContent === 'c');
-      assert(struct.children.title.element === struct.element.firstChild);
-      assert(struct.children.title.children === 'c');
+      dom.children.title = TypedHTML.h1(`b`);
+      assert(dom.children.title.element.textContent === 'b');
+      assert(dom.children.title.element === dom.element.firstChild);
+      assert(dom.children.title.children === 'b');
+      dom.children.title.children = 'c';
+      assert(dom.children.title.element.textContent === 'c');
+      assert(dom.children.title.element === dom.element.firstChild);
+      assert(dom.children.title.children === 'c');
     });
 
     it('struct with factory', function () {
