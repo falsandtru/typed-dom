@@ -1,7 +1,7 @@
-import 'mocha';
-import _assert from 'power-assert';
+import assert from 'power-assert';
+
+type Assert = typeof assert;
 
 declare global {
-  const assert: typeof _assert;
-
+  const assert: Assert;
 }
