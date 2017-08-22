@@ -1,4 +1,4 @@
-import def, { TypedHTML, bind, once, delegate } from '../../index';
+import def, { TypedHTML, bind, once, delegate, currentTargets } from '../../index';
 
 describe('Interface: Package', function () {
   describe('default', function () {
@@ -26,6 +26,10 @@ describe('Interface: Package', function () {
 
     it('delegate', function () {
       assert(typeof delegate === 'function');
+    });
+
+    it('currentTargets', function () {
+      assert(currentTargets instanceof WeakMap);
     });
 
   });

@@ -1,5 +1,7 @@
 import { noop } from './noop';
 
+export const currentTargets = new WeakMap<Event, EventTarget>();
+
 export function bind<T extends keyof WindowEventMap>(target: Window, type: T, listener: (ev: WindowEventMap[T]) => any, option?: boolean | EventListenerOption): () => undefined;
 export function bind<T extends keyof DocumentEventMap>(target: Document, type: T, listener: (ev: DocumentEventMap[T]) => any, option?: boolean | EventListenerOption): () => undefined;
 export function bind<T extends keyof HTMLElementEventMap>(target: HTMLElement, type: T, listener: (ev: HTMLElementEventMap[T]) => any, option?: boolean | EventListenerOption): () => undefined;
@@ -14,6 +16,7 @@ export function bind<T extends keyof WindowEventMap | keyof DocumentEventMap | k
     if (typeof option === 'object' && option.passive) {
       ev.preventDefault = noop;
     }
+    void currentTargets.set(ev, ev.currentTarget);
     void listener(ev);
   }
 }

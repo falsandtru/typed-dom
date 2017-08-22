@@ -1,7 +1,8 @@
 import {
   bind,
   delegate,
-  once
+  once,
+  currentTargets,
 } from './dom';
 import { TypedHTML } from '../dom/html';
 
@@ -11,6 +12,7 @@ describe('Unit: util/dom', () => {
       const a = TypedHTML.a().element;
       bind(a, 'click', ev => {
         assert(ev instanceof Event);
+        assert(currentTargets.get(ev) instanceof HTMLAnchorElement);
         bind(a, 'click', () => done());
       });
       document.createDocumentFragment().appendChild(a);
@@ -25,6 +27,7 @@ describe('Unit: util/dom', () => {
       const dom = TypedHTML.div([TypedHTML.a()]);
       delegate(dom.element, 'a', 'click', ev => {
         assert(ev instanceof Event);
+        assert(currentTargets.get(ev) instanceof HTMLAnchorElement);
         delegate(dom.element, 'a', 'click', () => done());
       });
       document.createDocumentFragment().appendChild(dom.element);
@@ -42,6 +45,7 @@ describe('Unit: util/dom', () => {
       let cnt = 0;
       once(a, 'click', ev => {
         assert(ev instanceof Event);
+        assert(currentTargets.get(ev) instanceof HTMLAnchorElement);
         assert(cnt === 0 && ++cnt);
         once(a, 'click', () => assert(cnt === 1 && ++cnt) || done());
       });
