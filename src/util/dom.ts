@@ -25,7 +25,7 @@ export function once<T extends keyof WindowEventMap>(target: Window, type: T, li
 export function once<T extends keyof DocumentEventMap>(target: Document, type: T, listener: (ev: DocumentEventMap[T]) => any, option?: boolean | EventListenerOption): () => undefined;
 export function once<T extends keyof HTMLElementEventMap>(target: HTMLElement, type: T, listener: (ev: HTMLElementEventMap[T]) => any, option?: boolean | EventListenerOption): () => undefined;
 export function once<T extends keyof WindowEventMap | keyof DocumentEventMap | keyof HTMLElementEventMap>(target: Window | Document | HTMLElement, type: T, listener: (ev: Event) => any, option: boolean | EventListenerOption = false): () => undefined {
-  const unbind: () => undefined = bind(<Window>target, <keyof WindowEventMap>type, ev => {
+  const unbind: () => undefined = bind(target as Window, type as keyof WindowEventMap, ev => {
     void unbind();
     void listener(ev);
   }, option);
@@ -34,9 +34,9 @@ export function once<T extends keyof WindowEventMap | keyof DocumentEventMap | k
 
 export function delegate<T extends keyof HTMLElementEventMap>(target: HTMLElement, selector: string, type: T, listener: (ev: HTMLElementEventMap[T]) => any, option: EventListenerOption = {}): () => undefined {
   return bind(target, type, ev => {
-    const cx = (<HTMLElement>ev.target).closest(selector);
+    const cx = (ev.target as HTMLElement).closest(selector);
     if (!cx) return;
-    void Array.from(<NodeListOf<HTMLElement>>target.querySelectorAll(selector))
+    void Array.from(target.querySelectorAll(selector) as NodeListOf<HTMLElement>)
       .filter(el => el === cx)
       .forEach(el =>
         void once(el, type, ev => {
@@ -47,11 +47,11 @@ export function delegate<T extends keyof HTMLElementEventMap>(target: HTMLElemen
 
 let supportEventListenerOptions = false;
 try {
-  document.createElement("div").addEventListener("test", function () { }, <any>{
+  document.createElement("div").addEventListener("test", function () { }, {
     get capture() {
       return supportEventListenerOptions = true;
     }
-  });
+  } as any);
 } catch (e) { }
 interface EventListenerOption {
   capture?: boolean;
@@ -59,6 +59,6 @@ interface EventListenerOption {
 }
 function adjustEventListenerOptions(option: boolean | EventListenerOption): boolean | undefined {
   return supportEventListenerOptions
-    ? <boolean>option
+    ? option as boolean
     : typeof option === 'boolean' ? option : option.capture;
 }

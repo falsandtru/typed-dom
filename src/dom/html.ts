@@ -211,18 +211,18 @@ export const TypedHTML: {
           tag = prop === 'any' ? tag : prop;
           switch (typeof attrs) {
             case 'undefined':
-              return new El(define(tag, () => document.createElement(tag)), <never>void 0);
+              return new El(define(tag, () => document.createElement(tag)), void 0 as never);
             case 'function':
-              return new El(define(tag, attrs as any), <never>void 0);
+              return new El(define(tag, attrs as any), void 0 as never);
             case 'string':
-              return new El(define(tag, children as any || (() => document.createElement(tag))), <never>attrs);
+              return new El(define(tag, children as any || (() => document.createElement(tag))), attrs as never);
             case 'object':
               factory = typeof children === 'function'
                 ? children
                 : factory || (() => document.createElement(tag));
               return Object.keys(attrs!).slice(-1).every(key => key === void 0 || typeof attrs![key] === 'object')
-                ? new El(define(tag, factory), <any>attrs)
-                : new El(define(tag, factory, attrs!), <never>children === factory ? void 0 : children)
+                ? new El(define(tag, factory), attrs as any)
+                : new El(define(tag, factory, attrs!), children as any === factory ? void 0 : children)
             default:
               throw new TypeError(`Invalid arguments: [${attrs}, ${children}, ${factory}]`);
           }

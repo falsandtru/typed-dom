@@ -50,7 +50,7 @@ export class El<
               element instanceof HTMLStyleElement &&
               void scope(element));
         }
-        this.children_ = this.observe({ ...<ElChildren.Struct>children_ }) as C;
+        this.children_ = this.observe({ ...children_ as ElChildren.Struct }) as C;
         void this.structkeys
           .forEach(k =>
             void this.element_.appendChild(children_[k].element));
@@ -100,7 +100,7 @@ export class El<
 
       case 'text':
         if (children === (this.children_ as any as Text).data) return;
-        (this.children_ as any as Text).data = <string>children;
+        (this.children_ as any as Text).data = children as string;
         return;
 
       case 'collection':
