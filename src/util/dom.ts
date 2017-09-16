@@ -32,8 +32,8 @@ export function once<T extends keyof WindowEventMap | keyof DocumentEventMap | k
   return () => void unbind();
 }
 
-export function delegate<T extends keyof HTMLElementEventMap>(target: HTMLElement, selector: string, type: T, listener: (ev: HTMLElementEventMap[T]) => any, option: EventListenerOption = {}): () => undefined {
-  return bind(target, type, ev => {
+export function delegate<T extends keyof HTMLElementEventMap>(target: Document | HTMLElement, selector: string, type: T, listener: (ev: HTMLElementEventMap[T]) => any, option: EventListenerOption = {}): () => undefined {
+  return bind(target instanceof Document ? target.documentElement : target, type, ev => {
     const cx = (ev.target as HTMLElement).closest(selector);
     if (!cx) return;
     void Array.from(target.querySelectorAll(selector) as NodeListOf<HTMLElement>)
