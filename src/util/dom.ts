@@ -36,7 +36,7 @@ export function delegate<T extends keyof HTMLElementEventMap>(target: Document |
   return bind(target instanceof Document ? target.documentElement : target, type, ev => {
     const cx = (ev.target as HTMLElement).closest(selector);
     if (!cx) return;
-    void Array.from(target.querySelectorAll(selector) as NodeListOf<HTMLElement>)
+    void [...target.querySelectorAll<HTMLElement>(selector)]
       .filter(el => el === cx)
       .forEach(el =>
         void once(el, type, ev => {

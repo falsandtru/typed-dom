@@ -76,8 +76,8 @@ describe('Integration: Typed DOM', function () {
       // property test
       const ss = Array(3).fill(0).map(() => TypedHTML.li(``));
       void Sequence.zip(
-        Sequence.cycle([Array(3).fill(0).map(() => TypedHTML.li(``)).concat(ss)]),
-        Sequence.cycle([Array(3).fill(0).map(() => TypedHTML.li(``)).concat(ss)]))
+        Sequence.cycle([[...Array(3).fill(0).map(() => TypedHTML.li(``)), ...ss]]),
+        Sequence.cycle([[...Array(3).fill(0).map(() => TypedHTML.li(``)), ...ss]]))
         .take(1000)
         .map(lss =>
           lss

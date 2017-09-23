@@ -65,7 +65,7 @@ export class El<
     function scope(style: HTMLStyleElement): void {
       if (!element_.id.match(/^[\w\-]+$/)) return;
       style.innerHTML = style.innerHTML.replace(/^\s*\$scope(?!\w)/gm, `#${element_.id}`);
-      void Array.from(style.querySelectorAll('*'))
+      void [...style.querySelectorAll('*')]
         .forEach(el =>
           void el.remove());
     }

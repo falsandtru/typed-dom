@@ -42,6 +42,7 @@
     "gulp-rename": "^1.2.2",
     "gulp-uglify": "^3.0.0",
     "gulp-unassert": "^1.0.1",
+    "isparta": "^4.0.0",
     "karma": "1.7.1",
     "karma-chrome-launcher": "^2.2.0",
     "karma-coverage": "^1.1.1",
@@ -55,12 +56,13 @@
     "npm-check-updates": "^2.12.1",
     "power-assert": "^1.4.4",
     "pump": "^1.0.2",
-    "run-sequence": "^2.1.0",
-    "spica": "0.0.105",
+    "run-sequence": "^2.2.0",
+    "spica": "0.0.106",
     "tsify": "^3.0.3",
-    "typescript": "2.6.0-dev.20170916",
+    "typescript": "2.6.0-dev.20170922",
     "vinyl-buffer": "^1.0.0",
-    "vinyl-source-stream": "^1.1.0"
+    "vinyl-source-stream": "^1.1.0",
+    "watchify": "^3.9.0"
   },
   "scripts": {
     "test": "gulp test",
