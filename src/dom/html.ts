@@ -1,9 +1,9 @@
 import { El, ElChildren } from './builder';
 
 interface ElBuilder<T extends string, E extends HTMLElement = HTMLElement> {
-  (factory?: () => E): El<T, E, void>;                                                <C extends ElChildren>
+  (factory?: () => E): El<T, E, undefined>;                                           <C extends ElChildren>
   (children: C, factory?: () => E): El<T, E, C>;
-  (attrs: { [name: string]: string; }, factory?: () => E): El<T, E, void>;            <C extends ElChildren>
+  (attrs: { [name: string]: string; }, factory?: () => E): El<T, E, undefined>;       <C extends ElChildren>
   (attrs: { [name: string]: string; }, children: C, factory?: () => E): El<T, E, C>;
 }
 
@@ -58,14 +58,14 @@ export const TypedHTML: {
 
   // create
   create: {                                                                                                                                   <T extends keyof HTMLElementTagNameMap>
-    (tag: T, factory?: () => HTMLElementTagNameMap[T]): El<T, HTMLElementTagNameMap[T], void>;                                                <T extends keyof HTMLElementTagNameMap, C extends ElChildren = ElChildren>
+    (tag: T, factory?: () => HTMLElementTagNameMap[T]): El<T, HTMLElementTagNameMap[T], undefined>;                                           <T extends keyof HTMLElementTagNameMap, C extends ElChildren = ElChildren>
     (tag: T, children: C, factory?: () => HTMLElementTagNameMap[T]): El<T, HTMLElementTagNameMap[T], C>;                                      <T extends keyof HTMLElementTagNameMap>
-    (tag: T, attrs: { [name: string]: string; }, factory?: () => HTMLElementTagNameMap[T]): El<T, HTMLElementTagNameMap[T], void>;            <T extends keyof HTMLElementTagNameMap, C extends ElChildren = ElChildren>
+    (tag: T, attrs: { [name: string]: string; }, factory?: () => HTMLElementTagNameMap[T]): El<T, HTMLElementTagNameMap[T], undefined>;       <T extends keyof HTMLElementTagNameMap, C extends ElChildren = ElChildren>
     (tag: T, attrs: { [name: string]: string; }, children: C, factory?: () => HTMLElementTagNameMap[T]): El<T, HTMLElementTagNameMap[T], C>;
                                                                                                                                               <T extends string, E extends HTMLElement = HTMLElement>
-    (tag: T, factory?: () => E): El<T, E, void>;                                                                                              <T extends string, E extends HTMLElement = HTMLElement, C extends ElChildren = ElChildren>
+    (tag: T, factory?: () => E): El<T, E, undefined>;                                                                                         <T extends string, E extends HTMLElement = HTMLElement, C extends ElChildren = ElChildren>
     (tag: T, children: C, factory?: () => E): El<T, E, C>;                                                                                    <T extends string, E extends HTMLElement = HTMLElement>
-    (tag: T, attrs: { [name: string]: string; }, factory?: () => E): El<T, E, void>;                                                          <T extends string, E extends HTMLElement = HTMLElement, C extends ElChildren = ElChildren>
+    (tag: T, attrs: { [name: string]: string; }, factory?: () => E): El<T, E, undefined>;                                                     <T extends string, E extends HTMLElement = HTMLElement, C extends ElChildren = ElChildren>
     (tag: T, attrs: { [name: string]: string; }, children: C, factory?: () => E): El<T, E, C>;
   };
 } = [

@@ -4,7 +4,7 @@ export type ElChildren =
   | ElChildren.Collection
   | ElChildren.Struct;
 export namespace ElChildren {
-  export type Void = void;
+  export type Void = undefined;
   export type Text = string;
   export type Collection = ReadonlyArray<El<string, HTMLElement, any>>;
   export type Struct = { [name: string]: El<string, HTMLElement, any>; };
@@ -53,7 +53,7 @@ export class El<
         this.children_ = this.observe({ ...children_ as ElChildren.Struct }) as C;
         void this.structkeys
           .forEach(k =>
-            void this.element_.appendChild(children_[k].element));
+            void this.element_.appendChild(children_![k].element));
         return;
     }
 
@@ -118,7 +118,7 @@ export class El<
         this.children_ = [] as ElChildren.Collection as C;
         void (children as ElChildren.Collection)
           .forEach((child, i) => (
-            this.children_[i] = child,
+            this.children_![i] = child,
             void this.element_.appendChild(child.element)));
         void Object.freeze(this.children_);
         return;
@@ -127,7 +127,7 @@ export class El<
         if (children === this.children_) return;
         void this.structkeys
           .forEach(k =>
-            this.children_[k] = children[k]);
+            this.children_![k] = children![k]);
         return;
 
     }
