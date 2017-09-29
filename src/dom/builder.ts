@@ -38,7 +38,7 @@ export class El<
               element instanceof HTMLStyleElement &&
               void scope(element));
         }
-        this.children_ = Object.freeze([]) as ElChildren.Collection as C;
+        this.children_ = [] as ElChildren.Collection as C;
         this.children = children_;
         return;
       case 'struct':
@@ -86,6 +86,7 @@ export class El<
     return this.element_;
   }
   public get children(): C {
+    assert(['void', 'collection'].includes(this.mode) ? Object.isFrozen(this.children_) : !Object.isFrozen(this.children_));
     switch (this.mode) {
       case 'text':
         return (this.children_ as any as Text).data as C;
@@ -101,18 +102,18 @@ export class El<
       case 'text':
         if (children === (this.children_ as any as Text).data) return;
         (this.children_ as any as Text).data = children as string;
+        assert(this.children_ !== children);
         return;
 
       case 'collection':
         if (children === this.children_) return;
-        if (!Object.isFrozen(this.children_)) throw new Error('TypedHTMLElement collections cannot be updated recursively.');
         void (children as ElChildren.Collection)
           .reduce((cs, c) => {
             const i = cs.indexOf(c);
             if (i === -1) return cs;
             void cs.splice(i, 1);
             return cs;
-          }, (this.children_ as ElChildren.Collection).slice())
+          }, [...this.children_ as ElChildren.Collection])
           .forEach(child =>
             void child.element.remove());
         this.children_ = [] as ElChildren.Collection as C;
@@ -120,6 +121,7 @@ export class El<
           .forEach((child, i) => (
             this.children_![i] = child,
             void this.element_.appendChild(child.element)));
+        assert(this.children_ !== children);
         void Object.freeze(this.children_);
         return;
 
@@ -128,6 +130,7 @@ export class El<
         void this.structkeys
           .forEach(k =>
             this.children_![k] = children![k]);
+        assert(this.children_ !== children);
         return;
 
     }
