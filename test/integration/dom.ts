@@ -134,6 +134,11 @@ describe('Integration: Typed DOM', function () {
       assert(dom.children.content.element === dom.element.lastChild);
     });
 
+    it('struct empty', function () {
+      const dom = TypedHTML.div({});
+      assert.deepStrictEqual(dom.children, {});
+    });
+
     it('struct children update', function () {
       const dom = TypedHTML.article({
         title: TypedHTML.h1(`a` as string)
