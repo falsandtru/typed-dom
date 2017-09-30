@@ -32,28 +32,17 @@ export class El<
         return;
       case 'collection':
         void clear();
-        if (element_.id) {
-          void (children_ as ElChildren.Collection)
-            .forEach(({ element }) =>
-              element instanceof HTMLStyleElement &&
-              void scope(element));
-        }
         this.children_ = [] as ElChildren.Collection as C;
         this.children = children_;
+        void scope(this.element_.id, this.children_ as ElChildren.Collection);
         return;
       case 'struct':
         void clear();
-        if (element_.id) {
-          void Object.keys(children_ as ElChildren.Struct)
-            .map(k => (children_ as ElChildren.Struct)[k])
-            .forEach(({ element }) =>
-              element instanceof HTMLStyleElement &&
-              void scope(element));
-        }
-        this.children_ = this.observe({ ...children_ as ElChildren.Struct }) as C;
+        this.children_ = observe(this.element_, { ...children_ as ElChildren.Struct }) as C;
         void this.structkeys
           .forEach(k =>
             void this.element_.appendChild(children_![k].element));
+        void scope(this.element_.id, this.structkeys.map(k => (this.children_ as ElChildren.Struct)[k]));
         return;
     }
 
@@ -62,12 +51,44 @@ export class El<
         void element_.removeChild(element_.firstChild!);
       }
     }
-    function scope(style: HTMLStyleElement): void {
-      if (!element_.id.match(/^[\w\-]+$/)) return;
-      style.innerHTML = style.innerHTML.replace(/^\s*\$scope(?!\w)/gm, `#${element_.id}`);
-      void [...style.querySelectorAll('*')]
-        .forEach(el =>
-          void el.remove());
+
+    function scope(id: string, children: ReadonlyArray<El<string, HTMLElement, any>>): void {
+      if (!id.match(/^[\w\-]+$/)) return;
+      return void children
+        .map(({ element }) => element)
+        .forEach(element =>
+          element instanceof HTMLStyleElement &&
+          void parse(element, id));
+
+      function parse(style: HTMLStyleElement, id: string): void {
+        style.innerHTML = style.innerHTML.replace(/^\s*\$scope(?!\w)/gm, `#${id}`);
+        void [...style.querySelectorAll('*')]
+          .forEach(el =>
+            void el.remove());
+      }
+    }
+
+    function observe<C extends ElChildren.Struct>(element: HTMLElement, children: C): C {
+      return Object.defineProperties(
+        children,
+        Object.keys(children)
+          .reduce<PropertyDescriptorMap>((descs, key) => {
+            let current = children[key];
+            descs[key] = {
+              configurable: true,
+              enumerable: true,
+              get: (): El<string, HTMLElement, any> => {
+                return current;
+              },
+              set: (newChild: El<string, HTMLElement, any>) => {
+                const oldChild = current;
+                if (newChild === oldChild) return;
+                current = newChild;
+                void element.replaceChild(newChild.element, oldChild.element);
+              }
+            };
+            return descs;
+          }, {}));
     }
   }
   private readonly mode: 'void' | 'text' | 'collection' | 'struct' =
@@ -134,27 +155,5 @@ export class El<
         return;
 
     }
-  }
-  private observe<C extends ElChildren.Struct>(children: C): C {
-    return Object.defineProperties(
-      children,
-      this.structkeys
-        .reduce<PropertyDescriptorMap>((descs, key) => {
-          let current = children[key];
-          descs[key] = {
-            configurable: true,
-            enumerable: true,
-            get: (): El<string, HTMLElement, any> => {
-              return current;
-            },
-            set: (newChild: El<string, HTMLElement, any>) => {
-              const oldChild = current;
-              if (newChild === oldChild) return;
-              current = newChild;
-              void this.element_.replaceChild(newChild.element, oldChild.element);
-            }
-          };
-          return descs;
-        }, {}));
   }
 }
