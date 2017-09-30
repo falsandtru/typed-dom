@@ -1,16 +1,12 @@
 type ElChildrenType =
-  | ElChildrenType.Void
-  | ElChildrenType.Text
-  | ElChildrenType.Collection
-  | ElChildrenType.Struct;
+  | typeof ElChildrenType.Void
+  | typeof ElChildrenType.Text
+  | typeof ElChildrenType.Collection
+  | typeof ElChildrenType.Struct;
 namespace ElChildrenType {
-  export type Void = typeof Void;
   export const Void = 'void';
-  export type Text = typeof Text;
   export const Text = 'text';
-  export type Collection = typeof Collection;
   export const Collection = 'collection';
-  export type Struct = typeof Struct;
   export const Struct = 'struct';
 }
 
@@ -137,13 +133,11 @@ export class El<
         return;
 
       case ElChildrenType.Text:
-        if (children === (this.children_ as any as Text).data) return;
         (this.children_ as any as Text).data = children as string;
         assert(this.children_ !== children);
         return;
 
       case ElChildrenType.Collection:
-        if (children === this.children_) return;
         void (children as ElChildren.Collection)
           .reduce((cs, c) => {
             const i = cs.indexOf(c);
@@ -163,7 +157,6 @@ export class El<
         return;
 
       case ElChildrenType.Struct:
-        if (children === this.children_) return;
         void this.structkeys
           .forEach(k =>
             this.children_![k] = children![k]);

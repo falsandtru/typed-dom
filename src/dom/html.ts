@@ -224,19 +224,18 @@ export const TypedHTML: {
                 ? new El(define(tag, factory), attrs as any)
                 : new El(define(tag, factory, attrs!), children as any === factory ? void 0 : children)
             default:
-              throw new TypeError(`Invalid arguments: [${attrs}, ${children}, ${factory}]`);
+              throw new TypeError(`TypedDOM: Invalid arguments: [${attrs}, ${children}, ${factory}]`);
           }
         },
     obj
   ), {} as any);
 
-function define<E extends HTMLElement>(tag: string, factory: () => E, attrs?: { [name: string]: string }): E {
+function define<E extends HTMLElement>(tag: string, factory: () => E, attrs?: { [name: string]: string; }): E {
   const el = factory();
-  if (tag !== el.tagName && tag !== el.tagName.toLowerCase()) throw new Error(`Tag name must be "${tag}" but "${el.tagName.toLowerCase()}".`);
+  if (tag !== el.tagName.toLowerCase()) throw new Error(`TypedDOM: Tag name must be "${tag}" but "${el.tagName.toLowerCase()}".`);
   if (!attrs) return el;
-  return Object.keys(attrs)
-    .reduce((el, name) => (
-      void el.setAttribute(name, attrs[name] || ''),
-      el)
-    , el);
+  void Object.keys(attrs)
+    .forEach(name =>
+      void el.setAttribute(name, attrs[name]));
+  return el;
 }
