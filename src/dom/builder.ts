@@ -39,7 +39,7 @@ export class El<
       case ElChildrenType.Text:
         void clear();
         this.children_ = document.createTextNode('') as any;
-        void this.element_.appendChild(this.children_ as any);
+        void this.element_.appendChild(this.children_ as any as Text);
         this.children = children_;
         return;
       case ElChildrenType.Collection:
@@ -134,20 +134,20 @@ export class El<
         return;
 
       case ElChildrenType.Collection:
-        void (children as ElChildren.Collection)
+        void (this.children_ as ElChildren.Collection)
           .reduce((cs, c) => {
             const i = cs.indexOf(c);
-            if (i === -1) return cs;
+            if (i > -1) return cs;
             void cs.splice(i, 1);
+            void c.element.remove();
             return cs;
-          }, [...this.children_ as ElChildren.Collection])
-          .forEach(child =>
-            void child.element.remove());
+          }, [...children as ElChildren.Collection]);
         this.children_ = [] as ElChildren.Collection as C;
         void (children as ElChildren.Collection)
           .forEach((child, i) => (
             this.children_![i] = child,
             void this.element_.appendChild(child.element)));
+        assert((this.children_ as ElChildren.Collection).every(({ element }, i) => element === this.element_.childNodes[i]));
         assert(this.children_ !== children);
         void Object.freeze(this.children_);
         return;
@@ -157,6 +157,7 @@ export class El<
         void Object.keys(this.children_ as ElChildren.Struct)
           .forEach(k =>
             this.children_![k] = children![k]);
+        assert(Object.entries(this.children_ as ElChildren.Struct).every(([k, v]) => children![k] === v));
         assert(this.children_ !== children);
         return;
 
