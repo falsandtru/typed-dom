@@ -1,3 +1,19 @@
+type ElChildrenType =
+  | ElChildrenType.Void
+  | ElChildrenType.Text
+  | ElChildrenType.Collection
+  | ElChildrenType.Struct;
+namespace ElChildrenType {
+  export type Void = typeof Void;
+  export const Void = 'void';
+  export type Text = typeof Text;
+  export const Text = 'text';
+  export type Collection = typeof Collection;
+  export const Collection = 'collection';
+  export type Struct = typeof Struct;
+  export const Struct = 'struct';
+}
+
 export type ElChildren =
   | ElChildren.Void
   | ElChildren.Text
@@ -21,22 +37,22 @@ export class El<
     private children_: C
   ) {
     this.tag;
-    switch (this.mode) {
-      case 'void':
+    switch (this.type) {
+      case ElChildrenType.Void:
         return;
-      case 'text':
+      case ElChildrenType.Text:
         void clear();
         this.children_ = document.createTextNode('') as any;
         void this.element_.appendChild(this.children_ as any);
         this.children = children_;
         return;
-      case 'collection':
+      case ElChildrenType.Collection:
         void clear();
         this.children_ = [] as ElChildren.Collection as C;
         this.children = children_;
         void scope(this.element_.id, this.children_ as ElChildren.Collection);
         return;
-      case 'struct':
+      case ElChildrenType.Struct:
         void clear();
         this.children_ = observe(this.element_, { ...children_ as ElChildren.Struct }) as C;
         void this.structkeys
@@ -91,42 +107,42 @@ export class El<
           }, {}));
     }
   }
-  private readonly mode: 'void' | 'text' | 'collection' | 'struct' =
+  private readonly type: ElChildrenType =
     this.children_ === void 0
-      ? 'void'
+      ? ElChildrenType.Void
       : typeof this.children_ === 'string'
-        ? 'text'
+        ? ElChildrenType.Text
         : Array.isArray(this.children_)
-          ? 'collection'
-          : 'struct';
+          ? ElChildrenType.Collection
+          : ElChildrenType.Struct;
   private readonly structkeys: string[] =
-    this.mode === 'struct'
+    this.type === 'struct'
       ? Object.keys(this.children_ as ElChildren.Struct)
       : [];
   public get element(): E {
     return this.element_;
   }
   public get children(): C {
-    assert(['void', 'collection'].includes(this.mode) ? Object.isFrozen(this.children_) : !Object.isFrozen(this.children_));
-    switch (this.mode) {
-      case 'text':
+    assert([ElChildrenType.Void, ElChildrenType.Collection].includes(this.type) ? Object.isFrozen(this.children_) : !Object.isFrozen(this.children_));
+    switch (this.type) {
+      case ElChildrenType.Text:
         return (this.children_ as any as Text).data as C;
       default:
         return this.children_;
     }
   }
   public set children(children: C) {
-    switch (this.mode) {
-      case 'void':
+    switch (this.type) {
+      case ElChildrenType.Void:
         return;
 
-      case 'text':
+      case ElChildrenType.Text:
         if (children === (this.children_ as any as Text).data) return;
         (this.children_ as any as Text).data = children as string;
         assert(this.children_ !== children);
         return;
 
-      case 'collection':
+      case ElChildrenType.Collection:
         if (children === this.children_) return;
         void (children as ElChildren.Collection)
           .reduce((cs, c) => {
@@ -146,7 +162,7 @@ export class El<
         void Object.freeze(this.children_);
         return;
 
-      case 'struct':
+      case ElChildrenType.Struct:
         if (children === this.children_) return;
         void this.structkeys
           .forEach(k =>
