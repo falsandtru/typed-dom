@@ -51,10 +51,10 @@ export class El<
       case ElChildrenType.Struct:
         void clear();
         this.children_ = observe(this.element_, { ...children_ as ElChildren.Struct }) as C;
-        void this.structkeys
-          .forEach(k =>
-            void this.element_.appendChild(children_![k].element));
-        void scope(this.element_.id, this.structkeys.map(k => (this.children_ as ElChildren.Struct)[k]));
+        void Object.values(this.children_ as ElChildren.Struct)
+          .forEach(child =>
+            void this.element_.appendChild(child.element));
+        void scope(this.element_.id, Object.values(this.children_ as ElChildren.Struct));
         return;
     }
 
@@ -111,10 +111,6 @@ export class El<
         : Array.isArray(this.children_)
           ? ElChildrenType.Collection
           : ElChildrenType.Struct;
-  private readonly structkeys: string[] =
-    this.type === 'struct'
-      ? Object.keys(this.children_ as ElChildren.Struct)
-      : [];
   public get element(): E {
     return this.element_;
   }
@@ -157,7 +153,8 @@ export class El<
         return;
 
       case ElChildrenType.Struct:
-        void this.structkeys
+        assert.deepStrictEqual(Object.keys(children as object), Object.keys(this.children_ as object));
+        void Object.keys(this.children_ as ElChildren.Struct)
           .forEach(k =>
             this.children_![k] = children![k]);
         assert(this.children_ !== children);
