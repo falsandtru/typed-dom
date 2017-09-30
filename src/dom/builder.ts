@@ -51,9 +51,6 @@ export class El<
       case ElChildrenType.Struct:
         void clear();
         this.children_ = observe(this.element_, { ...children_ as ElChildren.Struct }) as C;
-        void Object.values(this.children_ as ElChildren.Struct)
-          .forEach(child =>
-            void this.element_.appendChild(child.element));
         void scope(this.element_.id, Object.values(this.children_ as ElChildren.Struct));
         return;
     }
@@ -86,6 +83,7 @@ export class El<
         Object.keys(children)
           .reduce<PropertyDescriptorMap>((descs, key) => {
             let current = children[key];
+            void element.appendChild(current.element);
             descs[key] = {
               configurable: true,
               enumerable: true,
@@ -144,9 +142,10 @@ export class El<
           }, [...children as ElChildren.Collection]);
         this.children_ = [] as ElChildren.Collection as C;
         void (children as ElChildren.Collection)
-          .forEach((child, i) => (
-            this.children_![i] = child,
-            void this.element_.appendChild(child.element)));
+          .forEach((child, i) => {
+            this.children_![i] = child;
+            void this.element_.appendChild(child.element);
+          });
         assert((this.children_ as ElChildren.Collection).every(({ element }, i) => element === this.element_.childNodes[i]));
         assert(this.children_ !== children);
         void Object.freeze(this.children_);
