@@ -51,7 +51,7 @@ export class El<
       case ElChildrenType.Struct:
         void clear();
         this.children_ = observe(this.element_, { ...children_ as ElChildren.Struct }) as C;
-        void scope(this.element_.id, Object.values(this.children_ as ElChildren.Struct));
+        void scope(this.element_.id, this.children_ as ElChildren.Struct);
         return;
     }
 
@@ -61,9 +61,9 @@ export class El<
       }
     }
 
-    function scope(id: string, children: ReadonlyArray<El<string, HTMLElement, any>>): void {
+    function scope(id: string, children: ElChildren.Collection | ElChildren.Struct): void {
       if (!id.match(/^[\w\-]+$/)) return;
-      return void children
+      return void Object.values(children)
         .map(({ element }) => element)
         .forEach(element =>
           element instanceof HTMLStyleElement &&
@@ -83,7 +83,7 @@ export class El<
         Object.keys(children)
           .reduce<PropertyDescriptorMap>((descs, key) => {
             let current = children[key];
-            if (current.element.parentElement) throw new Error(`TypedDOM: Cannot add child used in another dom.`);
+            if (!isOrphan(current)) throw new Error(`TypedDOM: Cannot add a child element used in another dom.`);
             void element.appendChild(current.element);
             descs[key] = {
               configurable: true,
@@ -94,7 +94,7 @@ export class El<
               set: (newChild: El<string, HTMLElement, any>) => {
                 const oldChild = current;
                 if (newChild === oldChild) return;
-                if (newChild.element.parentElement) throw new Error(`TypedDOM: Cannot add child used in another dom.`);
+                if (!isOrphan(newChild)) throw new Error(`TypedDOM: Cannot add a child element used in another dom.`);
                 current = newChild;
                 void element.replaceChild(newChild.element, oldChild.element);
               }
@@ -145,7 +145,7 @@ export class El<
         this.children_ = [] as ElChildren.Collection as C;
         void (children as ElChildren.Collection)
           .forEach((child, i) => {
-            if (child.element.parentElement) throw new Error(`TypedDOM: Cannot add child used in another dom.`);
+            if (!isOrphan(child)) throw new Error(`TypedDOM: Cannot add a child element used in another dom.`);
             this.children_![i] = child;
             void this.element_.appendChild(child.element);
           });
@@ -165,4 +165,9 @@ export class El<
 
     }
   }
+}
+
+function isOrphan({ element }: El<string, HTMLElement, any>): boolean {
+  return element.parentNode === null
+      || element.parentNode instanceof DocumentFragment;
 }

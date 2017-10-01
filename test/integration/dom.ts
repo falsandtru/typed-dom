@@ -56,6 +56,8 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('collection children update', function () {
+      this.timeout(9 * 1e3);
+
       const dom = TypedHTML.ul([
         TypedHTML.li(`1` as string)
       ]);
@@ -363,6 +365,10 @@ describe('Integration: Typed DOM', function () {
       assert.deepStrictEqual(TypedHTML.p([], () => TypedHTML.p('a').element).children, []);
       assert(TypedHTML.p({}, () => TypedHTML.p('a').element).element.childNodes.length === 0);
       assert.deepStrictEqual(TypedHTML.p({}, () => TypedHTML.p('a').element).children, {});
+    });
+
+    it('fragment', function () {
+      TypedHTML.div([TypedHTML.p(() => document.createDocumentFragment().appendChild(document.createElement('p')))]);
     });
 
   });
