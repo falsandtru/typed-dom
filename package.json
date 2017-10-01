@@ -59,7 +59,7 @@
     "run-sequence": "^2.2.0",
     "spica": "0.0.108",
     "tsify": "^3.0.3",
-    "typescript": "2.6.0-dev.20170928",
+    "typescript": "2.6.0-dev.20170930",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.9.0"
