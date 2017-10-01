@@ -59,6 +59,10 @@ describe('Integration: Typed DOM', function () {
       const dom = TypedHTML.ul([
         TypedHTML.li(`1` as string)
       ]);
+      assert.throws(() => dom.children = TypedHTML.ul([TypedHTML.li(`1`)]).children);
+      //assert(dom.element.outerHTML === '<ul><li>1</li></ul>');
+      //assert(dom.children.length === 1);
+      //assert(dom.children.every(({ element }, i) => element === dom.element.children[i]));
       dom.children = [
         TypedHTML.li('2'),
         TypedHTML.li('3')
@@ -74,10 +78,10 @@ describe('Integration: Typed DOM', function () {
       assert(dom.children.every(({element}, i) => element === dom.element.children[i]));
 
       // property test
-      const ss = Array(3).fill(0).map(() => TypedHTML.li(``));
+      const ss = Array(3).fill(0).map(() => TypedHTML.li(sqid()));
       void Sequence.zip(
-        Sequence.cycle([[...Array(3).fill(0).map(() => TypedHTML.li(``)), ...ss]]),
-        Sequence.cycle([[...Array(3).fill(0).map(() => TypedHTML.li(``)), ...ss]]))
+        Sequence.cycle([[...Array(3).fill(0).map(() => TypedHTML.li(sqid())), ...ss]]),
+        Sequence.cycle([[...Array(3).fill(0).map(() => TypedHTML.li(sqid())), ...ss]]))
         .take(1000)
         .map(lss =>
           lss
@@ -85,20 +89,20 @@ describe('Integration: Typed DOM', function () {
               _.shuffle(ls.slice(-ls.length % (Math.random() * ls.length | 0)))))
         .extract()
         .forEach(([os, ns]) => {
-          dom.children = os;
+          dom.children = os.map(({ element }) => TypedHTML.li(element.textContent!));
           Sequence.zip(
             Sequence.from(Array.from(dom.element.children)),
-            Sequence.from(os.map(({element}) => element)))
+            Sequence.from(os.map(({ element }) => element)))
             .extract()
             .forEach(([a, b]) =>
-              void assert(a === b));
-          dom.children = ns;
+              void assert(a.textContent === b.textContent));
+          dom.children = ns.map(({ element }) => TypedHTML.li(element.textContent!));
           Sequence.zip(
             Sequence.from(Array.from(dom.element.children)),
-            Sequence.from(ns.map(({element}) => element)))
+            Sequence.from(ns.map(({ element }) => element)))
             .extract()
             .forEach(([a, b]) =>
-              void assert(a === b));
+              void assert(a.textContent === b.textContent));
         });
     });
 
@@ -143,11 +147,15 @@ describe('Integration: Typed DOM', function () {
       const dom = TypedHTML.article({
         title: TypedHTML.h1(`a` as string)
       });
+      assert.throws(() => dom.children = TypedHTML.article({ title: TypedHTML.h1(`b`) }).children);
+      assert(dom.children.title.element === dom.element.firstChild);
+      assert(dom.children.title.element.textContent === 'a');
+      assert(dom.children.title.children === 'a');
       dom.children = {
         title: TypedHTML.h1(`b`)
       };
-      assert(dom.children.title.element.textContent === 'b');
       assert(dom.children.title.element === dom.element.firstChild);
+      assert(dom.children.title.element.textContent === 'b');
       assert(dom.children.title.children === 'b');
     });
 
@@ -155,13 +163,17 @@ describe('Integration: Typed DOM', function () {
       const dom = TypedHTML.article({
         title: TypedHTML.h1(`a` as string)
       });
-      dom.children.title = TypedHTML.h1(`b`);
-      assert(dom.children.title.element.textContent === 'b');
+      assert.throws(() => dom.children.title = TypedHTML.article({ title: TypedHTML.h1(`b`) }).children.title);
       assert(dom.children.title.element === dom.element.firstChild);
+      assert(dom.children.title.element.textContent === 'a');
+      assert(dom.children.title.children === 'a');
+      dom.children.title = TypedHTML.h1(`b`);
+      assert(dom.children.title.element === dom.element.firstChild);
+      assert(dom.children.title.element.textContent === 'b');
       assert(dom.children.title.children === 'b');
       dom.children.title.children = 'c';
-      assert(dom.children.title.element.textContent === 'c');
       assert(dom.children.title.element === dom.element.firstChild);
+      assert(dom.children.title.element.textContent === 'c');
       assert(dom.children.title.children === 'c');
     });
 

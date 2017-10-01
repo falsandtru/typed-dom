@@ -83,6 +83,7 @@ export class El<
         Object.keys(children)
           .reduce<PropertyDescriptorMap>((descs, key) => {
             let current = children[key];
+            if (current.element.parentElement) throw new Error(`TypedDOM: Cannot add child used in another dom.`);
             void element.appendChild(current.element);
             descs[key] = {
               configurable: true,
@@ -93,6 +94,7 @@ export class El<
               set: (newChild: El<string, HTMLElement, any>) => {
                 const oldChild = current;
                 if (newChild === oldChild) return;
+                if (newChild.element.parentElement) throw new Error(`TypedDOM: Cannot add child used in another dom.`);
                 current = newChild;
                 void element.replaceChild(newChild.element, oldChild.element);
               }
@@ -143,6 +145,7 @@ export class El<
         this.children_ = [] as ElChildren.Collection as C;
         void (children as ElChildren.Collection)
           .forEach((child, i) => {
+            if (child.element.parentElement) throw new Error(`TypedDOM: Cannot add child used in another dom.`);
             this.children_![i] = child;
             void this.element_.appendChild(child.element);
           });
