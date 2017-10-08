@@ -35,6 +35,7 @@ export class El<
     private children_: C
   ) {
     this.tag;
+    if (memory.has(element_.parentElement!)) throw new Error(`TypedDOM: Cannot use a child element of another typed dom.`);
     void memory.add(element_);
     switch (this.type) {
       case ElChildrenType.Void:

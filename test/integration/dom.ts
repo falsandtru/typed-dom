@@ -20,6 +20,7 @@ describe('Integration: Typed DOM', function () {
       });
       assert(dom.element.id === 'test');
       assert(dom.children === void 0);
+      assert.throws(() => TypedHTML.p(() => TypedHTML.div([TypedHTML.p()]).children[0].element));
     });
 
     it('text', function () {
