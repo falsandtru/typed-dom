@@ -97,7 +97,7 @@ export class El<
               set: (newChild: El<string, HTMLElement, any>) => {
                 const oldChild = child;
                 if (newChild === oldChild) return;
-                void throwErrorIfNotUsable(newChild);
+                newChild.element_.parentElement === element || void throwErrorIfNotUsable(newChild);
                 child = newChild;
                 void element.replaceChild(newChild.element, oldChild.element);
               }
@@ -133,7 +133,6 @@ export class El<
 
       case ElChildrenType.Text:
         (this.children_ as any as Text).data = children as string;
-        assert(this.children_ !== children);
         return;
 
       case ElChildrenType.Collection:
@@ -148,12 +147,11 @@ export class El<
         this.children_ = [] as ElChildren.Collection as C;
         void (children as ElChildren.Collection)
           .forEach((child, i) => {
-            void throwErrorIfNotUsable(child);
+            child.element_.parentElement === this.element_ || void throwErrorIfNotUsable(child);
             this.children_![i] = child;
             void this.element_.appendChild(child.element);
           });
         assert((this.children_ as ElChildren.Collection).every(({ element }, i) => element === this.element_.childNodes[i]));
-        assert(this.children_ !== children);
         void Object.freeze(this.children_);
         return;
 
@@ -163,7 +161,6 @@ export class El<
           .forEach(k =>
             this.children_![k] = children![k]);
         assert(Object.entries(this.children_ as ElChildren.Struct).every(([k, v]) => children![k] === v));
-        assert(this.children_ !== children);
         return;
 
     }

@@ -62,6 +62,7 @@ describe('Integration: Typed DOM', function () {
       const dom = TypedHTML.ul([
         TypedHTML.li(`1` as string)
       ]);
+      assert.doesNotThrow(() => dom.children = dom.children);
       assert.throws(() => dom.children = TypedHTML.ul([TypedHTML.li(`1`)]).children);
       dom.children = [
         TypedHTML.li('2'),
@@ -78,10 +79,10 @@ describe('Integration: Typed DOM', function () {
       assert(dom.children.every(({element}, i) => element === dom.element.children[i]));
 
       // property test
-      const ss = Array(3).fill(0).map(() => TypedHTML.li(sqid()));
+      const ss = Array(3).fill(0).map(() => TypedHTML.li(``));
       void Sequence.zip(
-        Sequence.cycle([[...Array(3).fill(0).map(() => TypedHTML.li(sqid())), ...ss]]),
-        Sequence.cycle([[...Array(3).fill(0).map(() => TypedHTML.li(sqid())), ...ss]]))
+        Sequence.cycle([[...Array(3).fill(0).map(() => TypedHTML.li(``)), ...ss]]),
+        Sequence.cycle([[...Array(3).fill(0).map(() => TypedHTML.li(``)), ...ss]]))
         .take(1000)
         .map(lss =>
           lss
@@ -89,20 +90,20 @@ describe('Integration: Typed DOM', function () {
               _.shuffle(ls.slice(-ls.length % (Math.random() * ls.length | 0)))))
         .extract()
         .forEach(([os, ns]) => {
-          dom.children = os.map(({ element }) => TypedHTML.li(element.textContent!));
+          dom.children = os;
           Sequence.zip(
             Sequence.from(Array.from(dom.element.children)),
             Sequence.from(os.map(({ element }) => element)))
             .extract()
             .forEach(([a, b]) =>
-              void assert(a.textContent === b.textContent));
-          dom.children = ns.map(({ element }) => TypedHTML.li(element.textContent!));
+              void assert(a === b));
+          dom.children = ns;
           Sequence.zip(
             Sequence.from(Array.from(dom.element.children)),
             Sequence.from(ns.map(({ element }) => element)))
             .extract()
             .forEach(([a, b]) =>
-              void assert(a.textContent === b.textContent));
+              void assert(a === b));
         });
     });
 
@@ -110,6 +111,7 @@ describe('Integration: Typed DOM', function () {
       const dom = TypedHTML.ul([
         TypedHTML.li()
       ]);
+      assert.throws(() => dom.children[0] = dom.children[0]);
       assert.throws(() => dom.children[0] = TypedHTML.li());
       assert.throws(() => dom.children.push(TypedHTML.li()));
       assert.throws(() => dom.children.pop());
@@ -147,6 +149,7 @@ describe('Integration: Typed DOM', function () {
       const dom = TypedHTML.article({
         title: TypedHTML.h1(`a` as string)
       });
+      assert.doesNotThrow(() => dom.children = dom.children);
       assert.throws(() => dom.children = TypedHTML.article({ title: TypedHTML.h1(`b`) }).children);
       assert(dom.children.title.element === dom.element.firstChild);
       assert(dom.children.title.element.textContent === 'a');
@@ -163,6 +166,7 @@ describe('Integration: Typed DOM', function () {
       const dom = TypedHTML.article({
         title: TypedHTML.h1(`a` as string)
       });
+      assert.doesNotThrow(() => dom.children.title = dom.children.title);
       assert.throws(() => dom.children.title = TypedHTML.article({ title: TypedHTML.h1(`b`) }).children.title);
       assert(dom.children.title.element === dom.element.firstChild);
       assert(dom.children.title.element.textContent === 'a');
