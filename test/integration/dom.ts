@@ -14,7 +14,7 @@ describe('Integration: Typed DOM', function () {
 
     it('factory', function () {
       const dom = TypedHTML.p(() => {
-        const el = document.createElement('p');
+        const el = document.createElement('div').appendChild(document.createElement('p'));
         el.id = 'test';
         return el;
       });
@@ -62,9 +62,6 @@ describe('Integration: Typed DOM', function () {
         TypedHTML.li(`1` as string)
       ]);
       assert.throws(() => dom.children = TypedHTML.ul([TypedHTML.li(`1`)]).children);
-      //assert(dom.element.outerHTML === '<ul><li>1</li></ul>');
-      //assert(dom.children.length === 1);
-      //assert(dom.children.every(({ element }, i) => element === dom.element.children[i]));
       dom.children = [
         TypedHTML.li('2'),
         TypedHTML.li('3')

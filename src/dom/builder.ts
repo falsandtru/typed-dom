@@ -22,6 +22,8 @@ export namespace ElChildren {
   export type Struct = { [name: string]: El<string, HTMLElement, any>; };
 }
 
+const memory = new WeakSet<HTMLElement>();
+
 export class El<
   T extends string,
   E extends HTMLElement,
@@ -33,6 +35,7 @@ export class El<
     private children_: C
   ) {
     this.tag;
+    void memory.add(element_);
     switch (this.type) {
       case ElChildrenType.Void:
         return;
@@ -169,5 +172,6 @@ export class El<
 
 function isOrphan({ element }: El<string, HTMLElement, any>): boolean {
   return element.parentNode === null
-      || element.parentNode instanceof DocumentFragment;
+      || element.parentNode instanceof DocumentFragment
+      || !memory.has(element);
 }
