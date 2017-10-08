@@ -174,5 +174,5 @@ export class El<
 function isOrphan({ element }: El<string, HTMLElement, any>): boolean {
   return element.parentNode === null
       || element.parentNode instanceof DocumentFragment
-      || !memory.has(element);
+      || !memory.has(element.parentElement!);
 }
