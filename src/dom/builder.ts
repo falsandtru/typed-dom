@@ -35,7 +35,7 @@ export class El<
     private children_: C
   ) {
     this.tag;
-    if (memory.has(element_.parentElement!)) throw new Error(`TypedDOM: Cannot use a child element of another typed dom.`);
+    void throwErrorIfNotUsable(this);
     void memory.add(element_);
     switch (this.type) {
       case ElChildrenType.Void:
@@ -87,7 +87,7 @@ export class El<
         Object.keys(children)
           .reduce<PropertyDescriptorMap>((descs, key) => {
             let current = children[key];
-            if (!isOrphan(current)) throw new Error(`TypedDOM: Cannot add a child element used in another typed dom.`);
+            void throwErrorIfNotUsable(current);
             void element.appendChild(current.element);
             descs[key] = {
               configurable: true,
@@ -98,7 +98,7 @@ export class El<
               set: (newChild: El<string, HTMLElement, any>) => {
                 const oldChild = current;
                 if (newChild === oldChild) return;
-                if (!isOrphan(newChild)) throw new Error(`TypedDOM: Cannot add a child element used in another typed dom.`);
+                void throwErrorIfNotUsable(newChild);
                 current = newChild;
                 void element.replaceChild(newChild.element, oldChild.element);
               }
@@ -149,7 +149,7 @@ export class El<
         this.children_ = [] as ElChildren.Collection as C;
         void (children as ElChildren.Collection)
           .forEach((child, i) => {
-            if (!isOrphan(child)) throw new Error(`TypedDOM: Cannot add a child element used in another typed dom.`);
+            void throwErrorIfNotUsable(child);
             this.children_![i] = child;
             void this.element_.appendChild(child.element);
           });
@@ -171,7 +171,7 @@ export class El<
   }
 }
 
-function isOrphan({ element }: El<string, HTMLElement, any>): boolean {
-  return element.parentNode === null
-      || !memory.has(element.parentElement!);
+function throwErrorIfNotUsable({ element }: El<string, HTMLElement, any>): void {
+  if (element.parentElement === null || !memory.has(element.parentElement)) return;
+  throw new Error(`TypedDOM: Cannot add an element used in another typed dom.`);
 }
