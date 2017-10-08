@@ -86,7 +86,7 @@ export class El<
         Object.keys(children)
           .reduce<PropertyDescriptorMap>((descs, key) => {
             let current = children[key];
-            if (!isOrphan(current)) throw new Error(`TypedDOM: Cannot add a child element used in another dom.`);
+            if (!isOrphan(current)) throw new Error(`TypedDOM: Cannot add a child element used in another typed dom.`);
             void element.appendChild(current.element);
             descs[key] = {
               configurable: true,
@@ -97,7 +97,7 @@ export class El<
               set: (newChild: El<string, HTMLElement, any>) => {
                 const oldChild = current;
                 if (newChild === oldChild) return;
-                if (!isOrphan(newChild)) throw new Error(`TypedDOM: Cannot add a child element used in another dom.`);
+                if (!isOrphan(newChild)) throw new Error(`TypedDOM: Cannot add a child element used in another typed dom.`);
                 current = newChild;
                 void element.replaceChild(newChild.element, oldChild.element);
               }
@@ -148,7 +148,7 @@ export class El<
         this.children_ = [] as ElChildren.Collection as C;
         void (children as ElChildren.Collection)
           .forEach((child, i) => {
-            if (!isOrphan(child)) throw new Error(`TypedDOM: Cannot add a child element used in another dom.`);
+            if (!isOrphan(child)) throw new Error(`TypedDOM: Cannot add a child element used in another typed dom.`);
             this.children_![i] = child;
             void this.element_.appendChild(child.element);
           });
