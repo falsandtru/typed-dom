@@ -84,22 +84,21 @@ export class El<
     function observe<C extends ElChildren.Struct>(element: HTMLElement, children: C): C {
       return Object.defineProperties(
         children,
-        Object.keys(children)
-          .reduce<PropertyDescriptorMap>((descs, key) => {
-            let current = children[key];
-            void throwErrorIfNotUsable(current);
-            void element.appendChild(current.element);
-            descs[key] = {
+        Object.entries(children)
+          .reduce<PropertyDescriptorMap>((descs, [name, child]) => {
+            void throwErrorIfNotUsable(child);
+            void element.appendChild(child.element);
+            descs[name] = {
               configurable: true,
               enumerable: true,
               get: (): El<string, HTMLElement, any> => {
-                return current;
+                return child;
               },
               set: (newChild: El<string, HTMLElement, any>) => {
-                const oldChild = current;
+                const oldChild = child;
                 if (newChild === oldChild) return;
                 void throwErrorIfNotUsable(newChild);
-                current = newChild;
+                child = newChild;
                 void element.replaceChild(newChild.element, oldChild.element);
               }
             };
