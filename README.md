@@ -2,13 +2,13 @@
 
 [![Build Status](https://travis-ci.org/falsandtru/typed-dom.svg?branch=master)](https://travis-ci.org/falsandtru/typed-dom)
 
-Static typed dom component builder.
+Static typed DOM component builder.
 
-**Visualize** dom structures and **Assist** dom access by static types of TypeScript.
+**Visualize** DOM structures and **Assist** DOM access by static types of TypeScript.
 
 ## Usage
 
-Build a typed dom object.
+Build a typed DOM object.
 
 ```ts
 import TypedHTML from 'typed-dom';
@@ -33,7 +33,7 @@ TypedHTMLElement<"article", HTMLElement, {
   content: TypedHTMLElement<"ul", HTMLUListElement, TypedHTMLElement<"li", HTMLLIElement, string>[]>;
 }>;
 
-// Note: TypedHTMLElement type is defined as follows in index.d.ts.
+// Note: TypedHTMLElement type is defined as follows.
 export interface TypedHTMLElement<
   T extends string,
   E extends HTMLElement,
@@ -49,7 +49,7 @@ type TypedHTMLElementChildren
   | TypedHTMLElementChildren.Collection
   | TypedHTMLElementChildren.Struct;
 namespace TypedHTMLElementChildren {
-  export type Void = void;
+  export type Void = undefined;
   export type Text = string;
   export type Collection = TypedHTMLElement<string, HTMLElement, any>[];
   export type Struct = { [name: string]: TypedHTMLElement<string, HTMLElement, any>; };
@@ -93,7 +93,7 @@ component.element.outerHTML; // '<article id="id"><style>#id ul { width: 100px; 
 
 ### Micro DOM Components
 
-Use micro dom components to hide and manage the typed dom object.
+Use micro DOM components to hide and manage the typed DOM object.
 
 ```ts
 import TypedHTML from 'typed-dom';
@@ -114,7 +114,7 @@ class MicroComponent {
 
 ### DOM Components
 
-Use dom components to manage the micro dom components.
+Use DOM components to manage the micro DOM components.
 
 ```ts
 import TypedHTML from 'typed-dom';
@@ -134,3 +134,7 @@ class Component {
   }
 }
 ```
+
+## Dependency
+
+- unassert (in compiling source code)
