@@ -22,11 +22,11 @@ export namespace ElChildren {
   export type Struct = { [name: string]: El<string, HTMLElement, any>; };
 }
 
-const memory = new WeakSet<HTMLElement>();
+const memory = new WeakSet<Element>();
 
 export class El<
   T extends string,
-  E extends HTMLElement,
+  E extends Element,
   C extends ElChildren
   > {
   private tag: T;
@@ -81,7 +81,7 @@ export class El<
       }
     }
 
-    function observe<C extends ElChildren.Struct>(element: HTMLElement, children: C): C {
+    function observe<C extends ElChildren.Struct>(element: Element, children: C): C {
       return Object.defineProperties(
         children,
         Object.entries(children)
@@ -147,7 +147,7 @@ export class El<
         this.children_ = [] as ElChildren.Collection as C;
         void (children as ElChildren.Collection)
           .forEach((child, i) => {
-            child.element_.parentElement === this.element_ || void throwErrorIfNotUsable(child);
+            child.element_.parentElement as Element === this.element_ || void throwErrorIfNotUsable(child);
             this.children_![i] = child;
             void this.element_.appendChild(child.element);
           });
@@ -167,7 +167,7 @@ export class El<
   }
 }
 
-function throwErrorIfNotUsable({ element }: El<string, HTMLElement, any>): void {
+function throwErrorIfNotUsable({ element }: El<string, Element, any>): void {
   if (element.parentElement === null || !memory.has(element.parentElement)) return;
   throw new Error(`TypedDOM: Cannot add an element used in another typed dom.`);
 }

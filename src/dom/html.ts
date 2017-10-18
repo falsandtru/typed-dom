@@ -1,6 +1,6 @@
 import { El, ElChildren } from './builder';
 
-interface ElBuilder<T extends string, E extends HTMLElement = HTMLElement> {
+interface ElBuilder<T extends string, E extends Element> {
   (factory?: () => E): El<T, E, undefined>;                                           <C extends ElChildren>
   (children: C, factory?: () => E): El<T, E, C>;
   (attrs: { [name: string]: string; }, factory?: () => E): El<T, E, undefined>;       <C extends ElChildren>
@@ -8,55 +8,10 @@ interface ElBuilder<T extends string, E extends HTMLElement = HTMLElement> {
 }
 
 export const TypedHTML: {
-  // lib.dom.d.ts
   [K in keyof HTMLElementTagNameMap]: ElBuilder<K, HTMLElementTagNameMap[K]>;
 } & {
-  // other
-  abbr: ElBuilder<'abbr'>;
-  acronym: ElBuilder<'acronym'>;
-  address: ElBuilder<'address'>;
-  article: ElBuilder<'article'>;
-  aside: ElBuilder<'aside'>;
-  b: ElBuilder<'b'>;
-  bdo: ElBuilder<'bdo'>;
-  big: ElBuilder<'big'>;
-  center: ElBuilder<'center'>;
-  cite: ElBuilder<'cite'>;
-  code: ElBuilder<'code'>;
-  dd: ElBuilder<'dd'>;
-  dfn: ElBuilder<'dfn'>;
-  dt: ElBuilder<'dt'>;
-  em: ElBuilder<'em'>;
-  figcaption: ElBuilder<'figcaption'>;
-  figure: ElBuilder<'figure'>;
-  footer: ElBuilder<'footer'>;
-  header: ElBuilder<'header'>;
-  hgroup: ElBuilder<'hgroup'>;
-  i: ElBuilder<'i'>;
-  kbd: ElBuilder<'kbd'>;
-  keygen: ElBuilder<'keygen'>;
-  mark: ElBuilder<'mark'>;
-  nav: ElBuilder<'nav'>;
-  nobr: ElBuilder<'nobr'>;
-  noframes: ElBuilder<'noframes'>;
-  noscript: ElBuilder<'noscript'>;
-  plaintext: ElBuilder<'plaintext'>;
-  rt: ElBuilder<'rt'>;
-  ruby: ElBuilder<'ruby'>;
-  s: ElBuilder<'s'>;
-  samp: ElBuilder<'samp'>;
-  section: ElBuilder<'section'>;
-  small: ElBuilder<'small'>;
-  strike: ElBuilder<'strike'>;
-  strong: ElBuilder<'strong'>;
-  sub: ElBuilder<'sub'>;
-  sup: ElBuilder<'sup'>;
-  tt: ElBuilder<'tt'>;
-  u: ElBuilder<'u'>;
-  var: ElBuilder<'var'>;
-  wbr: ElBuilder<'wbr'>;
-
-  // create
+  [K in keyof ElementTagNameMap]: ElBuilder<K, ElementTagNameMap[K]>;
+} & {
   create: {                                                                                                                                   <T extends keyof HTMLElementTagNameMap>
     (tag: T, factory?: () => HTMLElementTagNameMap[T]): El<T, HTMLElementTagNameMap[T], undefined>;                                           <T extends keyof HTMLElementTagNameMap, C extends ElChildren = ElChildren>
     (tag: T, children: C, factory?: () => HTMLElementTagNameMap[T]): El<T, HTMLElementTagNameMap[T], C>;                                      <T extends keyof HTMLElementTagNameMap>
@@ -69,7 +24,7 @@ export const TypedHTML: {
     (tag: T, attrs: { [name: string]: string; }, children: C, factory?: () => E): El<T, E, C>;
   };
 } = [
-  // lib.dom.d.ts
+  // HTMLElement
   "a",
   "applet",
   "area",
@@ -153,50 +108,103 @@ export const TypedHTML: {
   "video",
   "x-ms-webview",
   "xmp",
-  // other
-  'abbr',
-  'acronym',
-  'address',
-  'article',
-  'aside',
-  'b',
-  'bdo',
-  'big',
-  'center',
-  'cite',
-  'code',
-  'dd',
-  'dfn',
-  'dt',
-  'em',
-  'figcaption',
-  'figure',
-  'footer',
-  'header',
-  'hgroup',
-  'i',
-  'kbd',
-  'keygen',
-  'mark',
-  'nav',
-  'nobr',
-  'noframes',
-  'noscript',
-  'plaintext',
-  'rt',
-  'ruby',
-  's',
-  'samp',
-  'section',
-  'small',
-  'strike',
-  'strong',
-  'sub',
-  'sup',
-  'tt',
-  'u',
-  'var',
-  'wbr',
+  // Element
+  "abbr",
+  "acronym",
+  "address",
+  "article",
+  "aside",
+  "b",
+  "bdo",
+  "big",
+  "center",
+  "circle",
+  "cite",
+  "clippath",
+  "code",
+  "dd",
+  "defs",
+  "desc",
+  "dfn",
+  "dt",
+  "ellipse",
+  "em",
+  "feblend",
+  "fecolormatrix",
+  "fecomponenttransfer",
+  "fecomposite",
+  "feconvolvematrix",
+  "fediffuselighting",
+  "fedisplacementmap",
+  "fedistantlight",
+  "feflood",
+  "fefunca",
+  "fefuncb",
+  "fefuncg",
+  "fefuncr",
+  "fegaussianblur",
+  "feimage",
+  "femerge",
+  "femergenode",
+  "femorphology",
+  "feoffset",
+  "fepointlight",
+  "fespecularlighting",
+  "fespotlight",
+  "fetile",
+  "feturbulence",
+  "figcaption",
+  "figure",
+  "filter",
+  "footer",
+  "foreignobject",
+  "g",
+  "header",
+  "hgroup",
+  "i",
+  "image",
+  "kbd",
+  "keygen",
+  "line",
+  "lineargradient",
+  "mark",
+  "marker",
+  "mask",
+  "metadata",
+  "nav",
+  "nobr",
+  "noframes",
+  "noscript",
+  "path",
+  "pattern",
+  "plaintext",
+  "polygon",
+  "polyline",
+  "radialgradient",
+  "rect",
+  "rt",
+  "ruby",
+  "s",
+  "samp",
+  "section",
+  "small",
+  "stop",
+  "strike",
+  "strong",
+  "sub",
+  "sup",
+  "svg",
+  "switch",
+  "symbol",
+  "text",
+  "textpath",
+  "tspan",
+  "tt",
+  "u",
+  "use",
+  "var",
+  "view",
+  "wbr",
   // create
   'create',
   'any',
