@@ -18,8 +18,8 @@ export type ElChildren =
 export namespace ElChildren {
   export type Void = undefined;
   export type Text = string;
-  export type Collection = ReadonlyArray<El<string, HTMLElement, any>>;
-  export type Struct = { [name: string]: El<string, HTMLElement, any>; };
+  export type Collection = El<string, HTMLElement, any>[];
+  export type Struct = Record<string, El<string, HTMLElement, any>>;
 }
 
 const memory = new WeakSet<Element>();
