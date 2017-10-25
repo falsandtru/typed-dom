@@ -1,4 +1,4 @@
-import def, { TypedHTML, bind, once, delegate, currentTargets } from '../../index';
+import def, { TypedHTML, listen, once, bind, delegate, currentTargets } from '../../index';
 
 describe('Interface: Package', function () {
   describe('default', function () {
@@ -16,12 +16,16 @@ describe('Interface: Package', function () {
   });
 
   describe('dom', function () {
-    it('bind', function () {
-      assert(typeof bind === 'function');
+    it('listen', function () {
+      assert(typeof listen === 'function');
     });
 
     it('once', function () {
       assert(typeof once === 'function');
+    });
+
+    it('bind', function () {
+      assert(typeof bind === 'function');
     });
 
     it('delegate', function () {
