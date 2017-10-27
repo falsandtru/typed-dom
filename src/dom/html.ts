@@ -220,18 +220,18 @@ export const TypedHTML: {
           tag = prop === 'any' ? tag : prop;
           switch (typeof attrs) {
             case 'undefined':
-              return new El(define(tag, () => document.createElement(tag)), void 0 as never);
+              return new El(define(tag, () => document.createElement(tag)), undefined as never);
             case 'function':
-              return new El(define(tag, attrs as any), void 0 as never);
+              return new El(define(tag, attrs as any), undefined as never);
             case 'string':
               return new El(define(tag, children as any || (() => document.createElement(tag))), attrs as never);
             case 'object':
               factory = typeof children === 'function'
                 ? children
                 : factory || (() => document.createElement(tag));
-              return Object.keys(attrs!).slice(-1).every(key => key === void 0 || typeof attrs![key] === 'object')
+              return Object.keys(attrs!).slice(-1).every(key => key === undefined || typeof attrs![key] === 'object')
                 ? new El(define(tag, factory), attrs as any)
-                : new El(define(tag, factory, attrs!), children as any === factory ? void 0 : children)
+                : new El(define(tag, factory, attrs!), children as any === factory ? undefined : children)
             default:
               throw new TypeError(`TypedDOM: Invalid arguments: [${attrs}, ${children}, ${factory}]`);
           }

@@ -9,7 +9,7 @@ describe('Integration: Typed DOM', function () {
     it('empty', function () {
       const dom = TypedHTML.p();
       assert(dom.element.outerHTML === '<p></p>');
-      assert(dom.children === void 0);
+      assert(dom.children === undefined);
     });
 
     it('factory', function () {
@@ -19,7 +19,7 @@ describe('Integration: Typed DOM', function () {
         return el;
       });
       assert(dom.element.id === 'test');
-      assert(dom.children === void 0);
+      assert(dom.children === undefined);
       assert.throws(() => TypedHTML.p(() => TypedHTML.div([TypedHTML.p()]).children[0].element));
     });
 
@@ -195,7 +195,7 @@ describe('Integration: Typed DOM', function () {
       const dom = TypedHTML.div({ id: 'test', class: 'test' });
       assert(dom.element.id === 'test');
       assert(dom.element.getAttribute('class') === 'test');
-      assert(dom.children === void 0);
+      assert(dom.children === undefined);
     });
 
     it('attr with factory', function () {
@@ -207,7 +207,7 @@ describe('Integration: Typed DOM', function () {
       });
       assert(dom.element.id === 'test');
       assert(dom.element.className === 'test');
-      assert(dom.children === void 0);
+      assert(dom.children === undefined);
     });
 
     it('attr with text', function () {
@@ -270,14 +270,14 @@ describe('Integration: Typed DOM', function () {
     it('create', function () {
       const dom = TypedHTML.create('any');
       assert(dom.element.outerHTML === '<any></any>');
-      assert(dom.children === void 0);
+      assert(dom.children === undefined);
     });
 
     it('create with factory', function () {
       const dom = TypedHTML.create('any', () =>
         document.createElement('any'));
       assert(dom.element.outerHTML === '<any></any>');
-      assert(dom.children === void 0);
+      assert(dom.children === undefined);
     });
 
     it('create with children', function () {
@@ -299,7 +299,7 @@ describe('Integration: Typed DOM', function () {
     it('create with attr', function () {
       const dom = TypedHTML.create('any', { id: 'test' });
       assert(dom.element.id === 'test');
-      assert(dom.children === void 0);
+      assert(dom.children === undefined);
     });
 
     it('create with attr and factory', function () {
@@ -311,7 +311,7 @@ describe('Integration: Typed DOM', function () {
       });
       assert(dom.element.id === 'test');
       assert(dom.element.className === 'test');
-      assert(dom.children === void 0);
+      assert(dom.children === undefined);
     });
 
     it('create with attr and children', function () {
@@ -360,7 +360,7 @@ describe('Integration: Typed DOM', function () {
 
     it('clear', function () {
       assert(TypedHTML.p(() => TypedHTML.p('a').element).element.innerHTML === 'a');
-      assert(TypedHTML.p(() => TypedHTML.p('a').element).children === void 0);
+      assert(TypedHTML.p(() => TypedHTML.p('a').element).children === undefined);
       assert(TypedHTML.p('', () => TypedHTML.p('a').element).element.innerHTML === '');
       assert(TypedHTML.p('', () => TypedHTML.p('a').element).children === '');
       assert(TypedHTML.p([], () => TypedHTML.p('a').element).element.childNodes.length === 0);

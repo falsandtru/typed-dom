@@ -107,7 +107,7 @@ export class El<
     }
   }
   private readonly type: ElChildrenType =
-    this.children_ === void 0
+    this.children_ === undefined
       ? ElChildrenType.Void
       : typeof this.children_ === 'string'
         ? ElChildrenType.Text
