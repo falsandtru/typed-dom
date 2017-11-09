@@ -42,19 +42,19 @@ export class El<
         return;
       case ElChildrenType.Text:
         void clear();
-        this.children_ = this.element_.appendChild(document.createTextNode('')) as any;
+        this.children_ = element_.appendChild(document.createTextNode('')) as any;
         this.children = children_;
         return;
       case ElChildrenType.Collection:
         void clear();
         this.children_ = [] as ElChildren.Collection as C;
         this.children = children_;
-        void scope(this.element_.id, this.children_ as ElChildren.Collection);
+        void scope(element_.id, this.children_ as ElChildren.Collection);
         return;
       case ElChildrenType.Struct:
         void clear();
-        this.children_ = observe(this.element_, { ...children_ as ElChildren.Struct }) as C;
-        void scope(this.element_.id, this.children_ as ElChildren.Struct);
+        this.children_ = observe(element_, { ...children_ as ElChildren.Struct }) as C;
+        void scope(element_.id, this.children_ as ElChildren.Struct);
         return;
     }
 
@@ -129,11 +129,9 @@ export class El<
     switch (this.type) {
       case ElChildrenType.Void:
         return;
-
       case ElChildrenType.Text:
         (this.children_ as any as Text).data = children as string;
         return;
-
       case ElChildrenType.Collection:
         void (this.children_ as ElChildren.Collection)
           .reduce((cs, c) => {
@@ -153,7 +151,6 @@ export class El<
         assert((this.children_ as ElChildren.Collection).every(({ element }, i) => element === this.element_.childNodes[i]));
         void Object.freeze(this.children_);
         return;
-
       case ElChildrenType.Struct:
         assert.deepStrictEqual(Object.keys(children as object), Object.keys(this.children_ as object));
         void Object.keys(this.children_ as ElChildren.Struct)
@@ -161,7 +158,6 @@ export class El<
             this.children_![k] = children![k]);
         assert(Object.entries(this.children_ as ElChildren.Struct).every(([k, v]) => children![k] === v));
         return;
-
     }
   }
 }
