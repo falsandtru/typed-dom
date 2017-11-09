@@ -42,8 +42,7 @@ export class El<
         return;
       case ElChildrenType.Text:
         void clear();
-        this.children_ = document.createTextNode('') as any;
-        void this.element_.appendChild(this.children_ as any as Text);
+        this.children_ = this.element_.appendChild(document.createTextNode('')) as any;
         this.children = children_;
         return;
       case ElChildrenType.Collection:
