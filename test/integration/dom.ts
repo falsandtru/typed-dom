@@ -373,6 +373,19 @@ describe('Integration: Typed DOM', function () {
       TypedHTML.div([TypedHTML.p(() => document.createDocumentFragment().appendChild(document.createElement('p')))]);
     });
 
+    it('parameter combination', function () {
+      Sequence.from([
+        [{ id: 'id' }],
+        [undefined, '', [], {}],
+        [() => document.createElement('div')]])
+        .mapM(v => Sequence.from(v))
+        .bind(v => Sequence.from(v).filterM(() => Sequence.from([false, true])))
+        .extract()
+        .forEach(params => {
+          TypedHTML.div(...params as any);
+        });
+    });
+
   });
 
   describe('usage', function () {

@@ -1,10 +1,10 @@
 import { El, ElChildren } from './builder';
 
 interface ElBuilder<T extends string, E extends Element> {
-  (factory?: () => E): El<T, E, ElChildren.Void>;                                       <C extends ElChildren>
+  (factory?: () => E): El<T, E, ElChildren.Void>;                                   <C extends ElChildren>
   (children: C, factory?: () => E): El<T, E, C>;
-  (attrs: { [name: string]: string; }, factory?: () => E): El<T, E, ElChildren.Void>;   <C extends ElChildren>
-  (attrs: { [name: string]: string; }, children: C, factory?: () => E): El<T, E, C>;
+  (attrs: Record<string, string>, factory?: () => E): El<T, E, ElChildren.Void>;    <C extends ElChildren>
+  (attrs: Record<string, string>, children: C, factory?: () => E): El<T, E, C>;
 }
 
 export const tags = {
@@ -194,16 +194,16 @@ export const tags = {
 export const TypedHTML: {
   [K in keyof ElementTagNameMap]: ElBuilder<K, ElementTagNameMap[K]>;
 } & {
-  create: {                                                                                                                             <T extends keyof ElementTagNameMap>
-    (tag: T, factory?: () => ElementTagNameMap[T]): El<T, ElementTagNameMap[T], ElChildren.Void>;                                       <T extends keyof ElementTagNameMap, C extends ElChildren = ElChildren>
-    (tag: T, children: C, factory?: () => ElementTagNameMap[T]): El<T, ElementTagNameMap[T], C>;                                        <T extends keyof ElementTagNameMap>
-    (tag: T, attrs: { [name: string]: string; }, factory?: () => ElementTagNameMap[T]): El<T, ElementTagNameMap[T], ElChildren.Void>;   <T extends keyof ElementTagNameMap, C extends ElChildren = ElChildren>
-    (tag: T, attrs: { [name: string]: string; }, children: C, factory?: () => ElementTagNameMap[T]): El<T, ElementTagNameMap[T], C>;
-                                                                                                                                        <T extends string, E extends Element>
-    (tag: T, factory?: () => E): El<T, E, ElChildren.Void>;                                                                             <T extends string, E extends Element, C extends ElChildren = ElChildren>
-    (tag: T, children: C, factory?: () => E): El<T, E, C>;                                                                              <T extends string, E extends Element>
-    (tag: T, attrs: { [name: string]: string; }, factory?: () => E): El<T, E, ElChildren.Void>;                                         <T extends string, E extends Element, C extends ElChildren = ElChildren>
-    (tag: T, attrs: { [name: string]: string; }, children: C, factory?: () => E): El<T, E, C>;
+  create: {                                                                                                                         <T extends keyof ElementTagNameMap>
+    (tag: T, factory?: () => ElementTagNameMap[T]): El<T, ElementTagNameMap[T], ElChildren.Void>;                                   <T extends keyof ElementTagNameMap, C extends ElChildren = ElChildren>
+    (tag: T, children: C, factory?: () => ElementTagNameMap[T]): El<T, ElementTagNameMap[T], C>;                                    <T extends keyof ElementTagNameMap>
+    (tag: T, attrs: Record<string, string>, factory?: () => ElementTagNameMap[T]): El<T, ElementTagNameMap[T], ElChildren.Void>;    <T extends keyof ElementTagNameMap, C extends ElChildren = ElChildren>
+    (tag: T, attrs: Record<string, string>, children: C, factory?: () => ElementTagNameMap[T]): El<T, ElementTagNameMap[T], C>;
+                                                                                                                                    <T extends string, E extends Element>
+    (tag: T, factory?: () => E): El<T, E, ElChildren.Void>;                                                                         <T extends string, E extends Element, C extends ElChildren = ElChildren>
+    (tag: T, children: C, factory?: () => E): El<T, E, C>;                                                                          <T extends string, E extends Element>
+    (tag: T, attrs: Record<string, string>, factory?: () => E): El<T, E, ElChildren.Void>;                                          <T extends string, E extends Element, C extends ElChildren = ElChildren>
+    (tag: T, attrs: Record<string, string>, children: C, factory?: () => E): El<T, E, C>;
   };
 } = [...Object.keys(tags), ...[
   // create
@@ -215,7 +215,7 @@ export const TypedHTML: {
       ? (tag: string, b: any = () => document.createElement(tag), c: any = () => document.createElement(tag), d: any = () => document.createElement(tag)) =>
           TypedHTML['any'](b, c, d, tag)
       : <C extends ElChildren>
-        (attrs?: { [name: string]: string; }, children?: C, factory?: () => Element, tag = prop)
+        (attrs?: Record<string, string>, children?: C, factory?: () => Element, tag = prop)
         : El<string, Element, C> => {
           tag = prop === 'any' ? tag : prop;
           switch (typeof attrs) {
@@ -239,7 +239,7 @@ export const TypedHTML: {
     obj
   ), {} as any);
 
-function define<E extends Element>(tag: string, factory: () => E, attrs?: { [name: string]: string; }): E {
+function define<E extends Element>(tag: string, factory: () => E, attrs?: Record<string, string>): E {
   const el = factory();
   if (tag !== el.tagName.toLowerCase()) throw new Error(`TypedDOM: Tag name must be "${tag}" but "${el.tagName.toLowerCase()}".`);
   if (!attrs) return el;
