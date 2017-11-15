@@ -6,6 +6,25 @@ Static typed DOM component builder.
 
 **Visualize** DOM structures and **Assist** DOM access by static types of TypeScript.
 
+## API
+
+### TypedHTML: { [K in keyof ElementTagNameMap]: (attrs?, children?, factory?) => TypedElement };
+
+- attrs: Record<string, string>
+- children: undefined | string | TypedElement[] | Record<string, TypedElement>
+- factory: () => Element
+
+```ts
+import TypedHTML from 'typed-dom';
+
+TypedHTML.p();
+TypedHTML.p('text');
+TypedHTML.p([TypedHTML.a()]);
+TypedHTML.p({ link: TypedHTML.a() }]);
+TypedHTML.p({ id: 'id' });
+TypedHTML.p(() => document.createElement('p'));
+```
+
 ## Usage
 
 Build a typed DOM object.
