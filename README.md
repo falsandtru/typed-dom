@@ -8,7 +8,7 @@ Static typed DOM component builder.
 
 ## API
 
-### TypedHTML: { [K in keyof ElementTagNameMap]: (attrs?, children?, factory?) => TypedElement };
+### TypedHTML: { [tagname]: (attrs?, children?, factory?) => TypedElement };
 
 - attrs: Record<string, string>
 - children: undefined | string | TypedElement[] | Record<string, TypedElement>
