@@ -18,8 +18,8 @@ export type ElChildren =
 export namespace ElChildren {
   export type Void = undefined;
   export type Text = string;
-  export type Collection = El<string, HTMLElement, any>[];
-  export type Struct = Record<string, El<string, HTMLElement, any>>;
+  export type Collection = El<string, Element, any>[];
+  export type Struct = Record<string, El<string, Element, any>>;
 }
 
 const memory = new WeakSet<Element>();
@@ -90,10 +90,10 @@ export class El<
             descs[name] = {
               configurable: true,
               enumerable: true,
-              get: (): El<string, HTMLElement, any> => {
+              get: (): El<string, Element, any> => {
                 return child;
               },
-              set: (newChild: El<string, HTMLElement, any>) => {
+              set: (newChild: El<string, Element, any>) => {
                 const oldChild = child;
                 if (newChild === oldChild) return;
                 newChild.element_.parentElement === element || void throwErrorIfNotUsable(newChild);
