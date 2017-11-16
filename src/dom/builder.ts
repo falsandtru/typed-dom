@@ -2,24 +2,24 @@ type ElChildrenType =
   | typeof ElChildrenType.Void
   | typeof ElChildrenType.Text
   | typeof ElChildrenType.Collection
-  | typeof ElChildrenType.Struct;
+  | typeof ElChildrenType.Record;
 namespace ElChildrenType {
   export const Void = 'void';
   export const Text = 'text';
   export const Collection = 'collection';
-  export const Struct = 'struct';
+  export const Record = 'record';
 }
 
 export type ElChildren =
   | ElChildren.Void
   | ElChildren.Text
   | ElChildren.Collection
-  | ElChildren.Struct;
+  | ElChildren.Record;
 export namespace ElChildren {
   export type Void = undefined;
   export type Text = string;
   export type Collection = El<string, Element, any>[];
-  export type Struct = Record<string, El<string, Element, any>>;
+  export type Record = { [field: string]: El<string, Element, any>; };
 }
 
 const memory = new WeakSet<Element>();
@@ -51,10 +51,10 @@ export class El<
         this.children = children_;
         void scope(element_.id, this.children_ as ElChildren.Collection);
         return;
-      case ElChildrenType.Struct:
+      case ElChildrenType.Record:
         void clear();
-        this.children_ = observe(element_, { ...children_ as ElChildren.Struct }) as C;
-        void scope(element_.id, this.children_ as ElChildren.Struct);
+        this.children_ = observe(element_, { ...children_ as ElChildren.Record }) as C;
+        void scope(element_.id, this.children_ as ElChildren.Record);
         return;
     }
 
@@ -64,7 +64,7 @@ export class El<
       }
     }
 
-    function scope(id: string, children: ElChildren.Collection | ElChildren.Struct): void {
+    function scope(id: string, children: ElChildren.Collection | ElChildren.Record): void {
       if (!id.match(/^[\w\-]+$/)) return;
       return void Object.values(children)
         .map(({ element }) => element)
@@ -80,7 +80,7 @@ export class El<
       }
     }
 
-    function observe<C extends ElChildren.Struct>(element: Element, children: C): C {
+    function observe<C extends ElChildren.Record>(element: Element, children: C): C {
       return Object.defineProperties(
         children,
         Object.entries(children)
@@ -112,7 +112,7 @@ export class El<
         ? ElChildrenType.Text
         : Array.isArray(this.children_)
           ? ElChildrenType.Collection
-          : ElChildrenType.Struct;
+          : ElChildrenType.Record;
   public get element(): E {
     return this.element_;
   }
@@ -151,12 +151,12 @@ export class El<
         assert((this.children_ as ElChildren.Collection).every(({ element }, i) => element === this.element_.childNodes[i]));
         void Object.freeze(this.children_);
         return;
-      case ElChildrenType.Struct:
+      case ElChildrenType.Record:
         assert.deepStrictEqual(Object.keys(children as object), Object.keys(this.children_ as object));
-        void Object.keys(this.children_ as ElChildren.Struct)
+        void Object.keys(this.children_ as ElChildren.Record)
           .forEach(k =>
             this.children_![k] = children![k]);
-        assert(Object.entries(this.children_ as ElChildren.Struct).every(([k, v]) => children![k] === v));
+        assert(Object.entries(this.children_ as ElChildren.Record).every(([k, v]) => children![k] === v));
         return;
     }
   }
