@@ -192,59 +192,44 @@ export const tags = {
 };
 
 export const TypedHTML: {
-  [K in keyof ElementTagNameMap]: ElBuilder<K, ElementTagNameMap[K]>;
+  readonly [K in keyof ElementTagNameMap]: ElBuilder<K, ElementTagNameMap[K]>;
 } & {
   create: {                                                                                                                         <T extends keyof ElementTagNameMap>
     (tag: T, factory?: () => ElementTagNameMap[T]): El<T, ElementTagNameMap[T], ElChildren.Void>;                                   <T extends keyof ElementTagNameMap, C extends ElChildren = ElChildren>
     (tag: T, children: C, factory?: () => ElementTagNameMap[T]): El<T, ElementTagNameMap[T], C>;                                    <T extends keyof ElementTagNameMap>
     (tag: T, attrs: Record<string, string>, factory?: () => ElementTagNameMap[T]): El<T, ElementTagNameMap[T], ElChildren.Void>;    <T extends keyof ElementTagNameMap, C extends ElChildren = ElChildren>
     (tag: T, attrs: Record<string, string>, children: C, factory?: () => ElementTagNameMap[T]): El<T, ElementTagNameMap[T], C>;
-                                                                                                                                    <T extends string, E extends Element>
-    (tag: T, factory?: () => E): El<T, E, ElChildren.Void>;                                                                         <T extends string, E extends Element, C extends ElChildren = ElChildren>
-    (tag: T, children: C, factory?: () => E): El<T, E, C>;                                                                          <T extends string, E extends Element>
-    (tag: T, attrs: Record<string, string>, factory?: () => E): El<T, E, ElChildren.Void>;                                          <T extends string, E extends Element, C extends ElChildren = ElChildren>
-    (tag: T, attrs: Record<string, string>, children: C, factory?: () => E): El<T, E, C>;
   };
-} = [...Object.keys(tags), ...[
-  // create
-  'create',
-  'any',
-]]
-  .reduce((obj, prop) => (
-    obj[prop] = prop === 'create'
-      ? (tag: string, b: any = () => document.createElement(tag), c: any = () => document.createElement(tag), d: any = () => document.createElement(tag)) =>
-          TypedHTML['any'](b, c, d, tag)
-      : <C extends ElChildren>
-        (attrs?: Record<string, string>, children?: C, factory?: () => Element, tag = prop)
-        : El<string, Element, C> => {
-          tag = prop === 'any' ? tag : prop;
-          switch (typeof attrs) {
-            case 'undefined':
-              return new El(define(tag, () => document.createElement(tag)), undefined as never);
-            case 'function':
-              return new El(define(tag, attrs as any), undefined as never);
-            case 'string':
-              return new El(define(tag, children as any || (() => document.createElement(tag))), attrs as never);
-            case 'object':
-              factory = typeof children === 'function'
-                ? children
-                : factory || (() => document.createElement(tag));
-              return Object.keys(attrs!).slice(-1).every(key => key === undefined || typeof attrs![key] === 'object')
-                ? new El(define(tag, factory), attrs as any)
-                : new El(define(tag, factory, attrs!), children as any === factory ? undefined : children)
-            default:
-              throw new TypeError(`TypedDOM: Invalid arguments: [${attrs}, ${children}, ${factory}]`);
-          }
-        },
-    obj
-  ), {} as any);
+} =
+  Object.keys(tags)
+    .reduce((obj, tag) => (
+      obj[tag] = builder(tag),
+      obj
+    ), {
+      create: (tag: string, a: any = () => document.createElement(tag), b: any = () => document.createElement(tag), c: any = () => document.createElement(tag)) =>
+        (TypedHTML[tag] = TypedHTML[tag] || builder(tag))(a, b, c),
+    }) as any;
 
-function define<E extends Element>(tag: string, factory: () => E, attrs?: Record<string, string>): E {
-  const el = factory();
-  if (tag !== el.tagName.toLowerCase()) throw new Error(`TypedDOM: Tag name must be "${tag}" but "${el.tagName.toLowerCase()}".`);
-  if (!attrs) return el;
-  void Object.keys(attrs)
-    .forEach(name =>
-      void el.setAttribute(name, attrs[name]));
-  return el;
+function builder<C extends ElChildren>(tag: string): (attrs?: Record<string, string>, children?: C, factory?: () => Element) => El<string, Element, C> {
+  return function build(attrs?: Record<string, string>, children?: C, factory?: () => Element): El<string, Element, C> {
+    if (typeof attrs === 'function') return build(undefined, undefined, attrs);
+    if (typeof children === 'function') return build(attrs, undefined, children);
+    if (attrs !== undefined && isChildren(attrs)) return build(undefined, attrs, factory);
+    return new El(define(tag, factory || (() => document.createElement(tag)), attrs), children!);
+  };
+
+  function isChildren(children: any): children is C {
+    return typeof children !== 'object'
+        || Object.values(children).slice(-1).every(val => typeof val === 'object');
+  }
+
+  function define<E extends Element>(tag: string, factory: () => E, attrs?: Record<string, string>): E {
+    const el = factory();
+    if (tag !== el.tagName.toLowerCase()) throw new Error(`TypedDOM: Tag name must be "${tag}" but "${el.tagName.toLowerCase()}".`);
+    if (!attrs) return el;
+    void Object.keys(attrs)
+      .forEach(name =>
+        void el.setAttribute(name, attrs[name]));
+    return el;
+  }
 }

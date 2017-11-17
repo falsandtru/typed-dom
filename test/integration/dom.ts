@@ -268,26 +268,26 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('create', function () {
-      const dom = TypedHTML.create('any');
+      const dom = TypedHTML.create('any' as any);
       assert(dom.element.outerHTML === '<any></any>');
       assert(dom.children === undefined);
     });
 
     it('create with factory', function () {
-      const dom = TypedHTML.create('any', () =>
+      const dom = TypedHTML.create('any' as any, () =>
         document.createElement('any'));
       assert(dom.element.outerHTML === '<any></any>');
       assert(dom.children === undefined);
     });
 
     it('create with children', function () {
-      const dom = TypedHTML.create('any', 'a');
+      const dom = TypedHTML.create('any' as any, 'a');
       assert(dom.element.outerHTML === '<any>a</any>');
       assert(dom.children === 'a');
     });
 
     it('create with children and factory', function () {
-      const dom = TypedHTML.create('any', 'a', () => {
+      const dom = TypedHTML.create('any' as any, 'a', () => {
         const el = document.createElement('any');
         el.textContent = 'b';
         return el;
@@ -297,13 +297,13 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('create with attr', function () {
-      const dom = TypedHTML.create('any', { id: 'test' });
+      const dom = TypedHTML.create('any' as any, { id: 'test' });
       assert(dom.element.id === 'test');
       assert(dom.children === undefined);
     });
 
     it('create with attr and factory', function () {
-      const dom = TypedHTML.create('any', { id: 'test' }, () => {
+      const dom = TypedHTML.create('any' as any, { id: 'test' }, () => {
         const el = document.createElement('any');
         el.id = 'id';
         el.className = 'test';
@@ -315,13 +315,13 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('create with attr and children', function () {
-      const dom = TypedHTML.create('any', { id: 'test' }, {});
+      const dom = TypedHTML.create('any' as any, { id: 'test' }, {});
       assert(dom.element.id === 'test');
       assert.deepStrictEqual(dom.children, {});
     });
 
     it('create with attr, children, and factory', function () {
-      const dom = TypedHTML.create('any', { id: 'test' }, {}, () => {
+      const dom = TypedHTML.create('any' as any, { id: 'test' }, {}, () => {
         const el = document.createElement('any');
         el.id = 'id';
         el.className = 'test';
@@ -336,8 +336,8 @@ describe('Integration: Typed DOM', function () {
       TypedHTML.create('div', [TypedHTML.create('p')]);
       TypedHTML.create('div', () => TypedHTML.div([TypedHTML.create('p')]).element);
       assert.throws(() => TypedHTML.section(() => document.createElement('any')));
-      assert.throws(() => TypedHTML.create('div', () => document.createElement('any')));
-      assert.throws(() => TypedHTML.create('any', () => document.createElement('div')));
+      assert.throws(() => TypedHTML.create('div', () => document.createElement('any') as HTMLDivElement));
+      assert.throws(() => TypedHTML.create('any' as any, () => document.createElement('div')));
     });
 
     it('sanitize', function () {
