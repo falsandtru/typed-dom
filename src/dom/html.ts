@@ -206,7 +206,7 @@ export const TypedHTML: {
       obj[tag] = builder(tag),
       obj
     ), {
-      create: (tag: string, a: any = () => document.createElement(tag), b: any = () => document.createElement(tag), c: any = () => document.createElement(tag)) =>
+      create: (tag: string, a?: any, b?: any, c?: any) =>
         (TypedHTML[tag] = TypedHTML[tag] || builder(tag))(a, b, c),
     }) as any;
 

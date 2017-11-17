@@ -267,6 +267,12 @@ describe('Integration: Typed DOM', function () {
       assert.deepStrictEqual(dom.children, {});
     });
 
+    it('extend', function () {
+      assert.throws(() => TypedHTML['any']());
+      assert(TypedHTML.create('any' as any).element.outerHTML === '<any></any>');
+      assert(TypedHTML['any']().element.outerHTML === '<any></any>');
+    });
+
     it('create', function () {
       const dom = TypedHTML.create('any' as any);
       assert(dom.element.outerHTML === '<any></any>');
