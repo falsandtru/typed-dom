@@ -6,7 +6,7 @@ Static typed DOM component builder.
 
 **Visualize** DOM structures and **Assist** DOM access by static types of TypeScript.
 
-## API
+## APIs
 
 ### TypedHTML: { [tagname]: (attrs?, children?, factory?) => TypedElement };
 
@@ -23,6 +23,22 @@ TypedHTML.p([TypedHTML.a()]);
 TypedHTML.p({ link: TypedHTML.a() }]);
 TypedHTML.p({ id: 'id' });
 TypedHTML.p(() => document.createElement('p'));
+```
+
+## Extend APIs
+
+You can define some custom elements by extending `HTMLElementTagNameMap` or `ElementTagNameMap` interface.
+
+```ts
+import TypedHTML from 'typed-dom';
+
+declare global {
+  interface ElementTagNameMap {
+    'any': HTMLElement;
+  }
+}
+
+TypedHTML.any().element.outerHTML; // '<any></any>'
 ```
 
 ## Usage
@@ -108,23 +124,7 @@ component.children.content = TypedHTML.ul([
 component.element.outerHTML; // '<article id="id"><style>#id ul { width: 100px; }</style><h1>Title!</h1><ul><li>Item!</li></ul></article>'
 ```
 
-## Example
-
-### Extend APIs
-
-You can define some custom elements by extending `HTMLElementTagNameMap` or `ElementTagNameMap` interface.
-
-```ts
-import TypedHTML from 'typed-dom';
-
-declare global {
-  interface ElementTagNameMap {
-    'any': HTMLElement;
-  }
-}
-
-TypedHTML.any().element.outerHTML; // '<any></any>'
-```
+## Examples
 
 ### Micro DOM Components
 
@@ -170,6 +170,6 @@ class Component {
 }
 ```
 
-## Dependency
+## Dependencies
 
 - unassert (in compiling source code)
