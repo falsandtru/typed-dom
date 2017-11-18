@@ -1,6 +1,6 @@
 import { Diff } from 'spica/data';
 
-type HTMLElementTagNameMap_ = HTMLElementTagNameMap & Diff<ElementTagNameMap, SVGElementTagNameMap>;
+type HTMLElementTagNameMap_ = Diff<ElementTagNameMap, Diff<SVGElementTagNameMap, HTMLElementTagNameMap>>;
 export { HTMLElementTagNameMap_ as HTMLElementTagNameMap }
 
 declare global {
