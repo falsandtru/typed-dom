@@ -3,7 +3,7 @@ import { Sequence } from 'spica/sequence';
 import { sqid } from 'spica/sqid';
 
 declare global {
-  interface ElementTagNameMap {
+  interface HTMLElementTagNameMap {
     'any': HTMLElement;
   }
 }

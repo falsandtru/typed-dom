@@ -33,7 +33,7 @@ You can define some custom elements by extending `HTMLElementTagNameMap` or `Ele
 import TypedHTML from 'typed-dom';
 
 declare global {
-  interface ElementTagNameMap {
+  interface HTMLElementTagNameMap {
     'any': HTMLElement;
   }
 }
