@@ -1,4 +1,4 @@
-import { HTMLElementTagNameMap, SVGElementTagNameMap } from '../types/dom';
+import { HTMLElementTagNameMap } from '../types/dom';
 import { El, ElChildren } from './builder';
 
 type NS =

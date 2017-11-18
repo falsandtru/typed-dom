@@ -6,6 +6,9 @@ declare global {
   interface HTMLElementTagNameMap {
     'any': HTMLElement;
   }
+  interface SVGElementTagNameMap {
+    'a': SVGAElement;
+  }
 }
 declare const _: { shuffle<T>(as: T[]): T[]; };
 
@@ -330,6 +333,7 @@ describe('Integration: Typed DOM', function () {
 
     it('extend', function () {
       assert(TypedHTML.any().element.outerHTML === '<any></any>');
+      assert(TypedSVG.a().element.outerHTML === '<a></a>');
     });
 
   });
