@@ -110,6 +110,22 @@ component.element.outerHTML; // '<article id="id"><style>#id ul { width: 100px; 
 
 ## Example
 
+### Extend APIs
+
+You can define some custom elements by extending `HTMLElementTagNameMap` or `ElementTagNameMap` interface.
+
+```ts
+import TypedHTML from 'typed-dom';
+
+declare global {
+  interface ElementTagNameMap {
+    'any': HTMLElement;
+  }
+}
+
+TypedHTML.any().element.outerHTML; // '<any></any>'
+```
+
 ### Micro DOM Components
 
 Use micro DOM components to hide and manage the typed DOM object.
