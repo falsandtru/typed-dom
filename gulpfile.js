@@ -18,7 +18,7 @@ const config = {
   browsers: ['Chrome', 'Firefox'].concat((os => {
     switch (os) {
       case 'Windows_NT':
-        return ['Edge'];
+        return [];
       case 'Darwin':
         return [];
      default:

@@ -25,9 +25,21 @@ TypedHTML.p({ id: 'id' });
 TypedHTML.p(() => document.createElement('p'));
 ```
 
+### TypedSVG: { [tagname]: (attrs?, children?, factory?) => TypedElement };
+
+- attrs: Record<string, string>
+- children: undefined | string | TypedElement[] | Record<string, TypedElement>
+- factory: () => Element
+
+```ts
+import { TypedSVG } from 'typed-dom';
+
+TypedHTML.svg();
+```
+
 ## Extend APIs
 
-You can define some custom elements by extending `HTMLElementTagNameMap` or `ElementTagNameMap` interface.
+You can define some custom elements by extending `HTMLElementTagNameMap` interface.
 
 ```ts
 import TypedHTML from 'typed-dom';

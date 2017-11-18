@@ -1,3 +1,4 @@
+import { HTMLElementTagNameMap, SVGElementTagNameMap } from '../types/dom';
 import { El, ElChildren } from './builder';
 
 type NS =
@@ -16,27 +17,24 @@ interface ElBuilder<T extends string, E extends Element> {
 }
 
 type TypedHTML = {
-  //readonly [K in keyof HTMLElementTagNameMap]: ElBuilder<K, HTMLElementTagNameMap[K]>;
-  readonly [K in keyof ElementTagNameMap]: ElBuilder<K, ElementTagNameMap[K]>;
+  readonly [K in keyof HTMLElementTagNameMap]: ElBuilder<K, HTMLElementTagNameMap[K]>;
 };
-export const TypedHTML: TypedHTML = new Proxy({} as TypedHTML, {
+export const TypedHTML: TypedHTML = new Proxy({} as any, {
   get: (obj, tag) =>
     obj[tag]
       ? obj[tag]
       : obj[tag] = builder(NS.HTML, `${tag}`),
 });
 
-/*
 type TypedSVG = {
   readonly [K in keyof SVGElementTagNameMap]: ElBuilder<K, SVGElementTagNameMap[K]>;
 };
-export const TypedSVG: TypedSVG = new Proxy({} as TypedSVG, {
+export const TypedSVG: TypedSVG = new Proxy({} as any, {
   get: (obj, tag) =>
     obj[tag]
       ? obj[tag]
       : obj[tag] = builder(NS.SVG, `${tag}`),
 });
-*/
 
 function builder<E extends Element, C extends ElChildren>(ns: NS, tag: string): (attrs?: Record<string, string>, children?: C, factory?: () => E) => El<string, E, C> {
   return function build(attrs?: Record<string, string>, children?: C, factory?: () => E): El<string, E, C> {

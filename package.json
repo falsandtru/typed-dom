@@ -57,9 +57,9 @@
     "power-assert": "^1.4.4",
     "pump": "^1.0.3",
     "run-sequence": "^2.2.0",
-    "spica": "0.0.129",
+    "spica": "0.0.132",
     "tsify": "^3.0.3",
-    "typescript": "2.7.0-dev.20171117",
+    "typescript": "2.7.0-dev.20171118",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.9.0"

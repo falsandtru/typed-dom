@@ -1,4 +1,4 @@
-import TypedHTML from '../../index';
+import TypedHTML, { TypedSVG } from '../../index';
 import { Sequence } from 'spica/sequence';
 import { sqid } from 'spica/sqid';
 
@@ -11,6 +11,16 @@ declare const _: { shuffle<T>(as: T[]): T[]; };
 
 describe('Integration: Typed DOM', function () {
   describe('spec', function () {
+    it('html', function () {
+      assert(TypedHTML.div().element instanceof HTMLElement);
+      assert(TypedHTML.div().element.outerHTML === '<div></div>');
+    });
+
+    it('svg', function () {
+      assert(TypedSVG.svg().element instanceof SVGElement);
+      assert(TypedSVG.svg().element.outerHTML === '<svg></svg>');
+    });
+
     it('empty', function () {
       const dom = TypedHTML.p();
       assert(dom.element.outerHTML === '<p></p>');
