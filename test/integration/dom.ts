@@ -15,8 +15,8 @@ declare const _: { shuffle<T>(as: T[]): T[]; };
 describe('Integration: Typed DOM', function () {
   describe('spec', function () {
     it('html', function () {
-      assert(TypedHTML.div().element instanceof HTMLElement);
-      assert(TypedHTML.div().element.outerHTML === '<div></div>');
+      assert(TypedHTML.html().element instanceof HTMLElement);
+      assert(TypedHTML.html().element.outerHTML === '<html></html>');
     });
 
     it('svg', function () {
