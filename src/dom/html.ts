@@ -1,4 +1,3 @@
-import { HTMLElementTagNameMap } from './types';
 import { El, ElChildren } from './builder';
 
 interface ElBuilder<T extends string, E extends Element> {
