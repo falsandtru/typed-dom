@@ -29,7 +29,7 @@ export class El<
   E extends Element,
   C extends ElChildren
   > {
-  private tag?: T;
+  private readonly tag!: T;
   constructor(
     private readonly element_: E,
     private children_: C
