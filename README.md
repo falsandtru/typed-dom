@@ -111,7 +111,7 @@ abstract class AbstractTypedHTMLElement<T extends string> {
 ```
 
 You can know the internal structure via this type which can be used as the visualization.
-And you can access and manipulate the internal structure safely guided by this type.
+And you can access and manipulate safely the internal structure guided by this type.
 
 ```ts
 // inspect
@@ -126,7 +126,7 @@ component.children.content.children[0].children; // 'item'
 component.children.title.children = 'Title';
 component.children.title.element.outerHTML; // '<h1>Title</h1>'
 
-// - struct
+// - collection
 component.children.content.children = [
   TypedHTML.li('Item')
 ];
