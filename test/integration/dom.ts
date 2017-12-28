@@ -285,6 +285,10 @@ describe('Integration: Typed DOM', function () {
       assert.deepStrictEqual(dom.children, {});
     });
 
+    it('listen', function (done) {
+      TypedHTML.a({ onclick: ev => assert(ev instanceof Event) || done() }).element.click();
+    });
+
     it('sanitize', function () {
       const dom = TypedHTML.div('<script>');
       assert(dom.element.innerHTML === '&lt;script&gt;');

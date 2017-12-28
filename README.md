@@ -10,7 +10,7 @@ Static typed DOM component builder.
 
 ### TypedHTML: { [tagname]: (attrs?, children?, factory?) => TypedElement };
 
-- attrs: Record<string, string>
+- attrs: Record<string, string | EventListener>
 - children: undefined | string | TypedElement[] | Record<string, TypedElement>
 - factory: () => Element
 
@@ -27,7 +27,7 @@ TypedHTML.p(() => document.createElement('p'));
 
 ### TypedSVG: { [tagname]: (attrs?, children?, factory?) => TypedElement };
 
-- attrs: Record<string, string>
+- attrs: Record<string, string | EventListener>
 - children: undefined | string | TypedElement[] | Record<string, TypedElement>
 - factory: () => Element
 

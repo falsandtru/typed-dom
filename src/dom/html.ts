@@ -1,10 +1,10 @@
 import { El, ElChildren } from './builder';
 
 interface ElBuilder<T extends string, E extends Element> {
-  (factory?: () => E): El<T, E, ElChildren.Void>;                                   <C extends ElChildren>
+  (factory?: () => E): El<T, E, ElChildren.Void>;                                                   <C extends ElChildren>
   (children: C, factory?: () => E): El<T, E, C>;
-  (attrs: Record<string, string>, factory?: () => E): El<T, E, ElChildren.Void>;    <C extends ElChildren>
-  (attrs: Record<string, string>, children: C, factory?: () => E): El<T, E, C>;
+  (attrs: Record<string, string | EventListener>, factory?: () => E): El<T, E, ElChildren.Void>;    <C extends ElChildren>
+  (attrs: Record<string, string | EventListener>, children: C, factory?: () => E): El<T, E, C>;
 }
 
 type NS =
@@ -33,26 +33,30 @@ function handle<T extends object>(ns: NS): ProxyHandler<T> {
         : obj[prop] = builder(ns, prop),
   };
 
-  function builder<E extends Element, C extends ElChildren>(ns: NS, tag: string): (attrs?: Record<string, string>, children?: C, factory?: () => E) => El<string, E, C> {
-    return function build(attrs?: Record<string, string>, children?: C, factory?: () => E): El<string, E, C> {
+  function builder<E extends Element, C extends ElChildren>(ns: NS, tag: string): (attrs?: Record<string, string | EventListener>, children?: C, factory?: () => E) => El<string, E, C> {
+    return function build(attrs?: Record<string, string | EventListener>, children?: C, factory?: () => E): El<string, E, C> {
       if (typeof attrs === 'function') return build(undefined, undefined, attrs);
       if (typeof children === 'function') return build(attrs, undefined, children);
       if (attrs !== undefined && isChildren(attrs)) return build(undefined, attrs, factory);
       return new El(elem(tag, factory, attrs), children!);
 
-      function isChildren(children: any): children is C {
+      function isChildren(children: C | Record<string, string | EventListener>): children is C {
         return typeof children !== 'object'
             || Object.values(children).slice(-1).every(val => typeof val === 'object');
       }
 
-      function elem(tag: string, factory?: () => E, attrs?: Record<string, string>): E {
+      function elem(tag: string, factory?: () => E, attrs?: Record<string, string | EventListener>): E {
         factory = factory || factory_;
         const el = factory();
         if (tag !== el.tagName.toLowerCase()) throw new Error(`TypedDOM: Tag name must be "${tag}", but got "${el.tagName.toLowerCase()}".`);
         if (!attrs) return el;
-        void Object.keys(attrs)
-          .forEach(name =>
-            void el.setAttribute(name, attrs[name]));
+        void Object.entries(attrs)
+          .forEach(([name, value]) =>
+            typeof value === 'string'
+              ? void el.setAttribute(name, value)
+              : void el.addEventListener(name.slice(2), value, {
+                  passive: ['wheel', 'mousewheel', 'touchstart', 'touchmove'].includes(name.slice(2)),
+                }));
         return el;
 
         function factory_(): E {
