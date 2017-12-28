@@ -55,7 +55,12 @@ function handle<T extends object>(ns: NS): ProxyHandler<T> {
             typeof value === 'string'
               ? void el.setAttribute(name, value)
               : void el.addEventListener(name.slice(2), value, {
-                  passive: ['wheel', 'mousewheel', 'touchstart', 'touchmove'].includes(name.slice(2)),
+                  passive: [
+                    'wheel',
+                    'mousewheel',
+                    'touchstart',
+                    'touchmove',
+                  ].includes(name.slice(2)),
                 }));
         return el;
 
