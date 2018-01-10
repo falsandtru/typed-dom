@@ -19,7 +19,7 @@ type TypedHTML = {
   readonly [K in keyof HTMLElementTagNameMap]: ElBuilder<K, HTMLElementTagNameMap[K]>;
 };
 type TypedSVG = {
-  readonly [K in keyof SVGElementTagNameMap]: ElBuilder<K, SVGElementTagNameMap[K]>;
+  readonly [K in keyof SVGElementTagNameMap_]: ElBuilder<K, SVGElementTagNameMap_[K]>;
 };
 
 export const TypedHTML: TypedHTML = new Proxy({} as TypedHTML, handle(NS.HTML));
@@ -42,7 +42,7 @@ function handle<T extends object>(ns: NS): ProxyHandler<T> {
 
       function isChildren(children: C | Record<string, string | EventListener>): children is C {
         return typeof children !== 'object'
-            || Object.values(children).slice(-1).every(val => typeof val === 'object');
+            || Object.values(children as object).slice(-1).every(val => typeof val === 'object');
       }
 
       function elem(tag: string, factory?: () => E, attrs?: Record<string, string | EventListener>): E {

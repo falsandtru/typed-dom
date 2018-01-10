@@ -6,7 +6,7 @@ declare global {
   interface HTMLElementTagNameMap {
     'any': HTMLElement;
   }
-  interface SVGElementTagNameMap {
+  interface SVGElementTagNameMap_ {
     'a': SVGAElement;
   }
 }

@@ -39,7 +39,7 @@ TypedHTML.svg();
 
 ## Extend APIs
 
-You can define some custom elements by extending `HTMLElementTagNameMap` or `SVGElementTagNameMap` interface.
+You can define some custom elements by extending `HTMLElementTagNameMap` or `SVGElementTagNameMap_` interface.
 
 ```ts
 import TypedHTML, { TypedSVG } from 'typed-dom';
@@ -48,7 +48,7 @@ declare global {
   interface HTMLElementTagNameMap {
     'custom': HTMLElement;
   }
-  interface SVGElementTagNameMap {
+  interface SVGElementTagNameMap_ {
     'a': SVGAElement;
   }
 }
