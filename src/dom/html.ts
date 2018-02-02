@@ -38,7 +38,7 @@ function handle<T extends object>(ns: NS): ProxyHandler<T> {
       if (typeof attrs === 'function') return build(undefined, undefined, attrs);
       if (typeof children === 'function') return build(attrs, undefined, children);
       if (attrs !== undefined && isChildren(attrs)) return build(undefined, attrs, factory);
-      return new El(elem(tag, factory, attrs), children!);
+      return new El(elem(tag, factory, attrs), children as C);
 
       function isChildren(children: C | Record<string, string | EventListener>): children is C {
         return typeof children !== 'object'
