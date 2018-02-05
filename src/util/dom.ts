@@ -1,5 +1,26 @@
 import { noop } from './noop';
 
+const cache = new Map<string, HTMLElement>();
+
+export function html<T extends keyof HTMLElementTagNameMap>(tag: T, children?: Array<Element | Text> | string): HTMLElementTagNameMap[T]
+export function html<T extends keyof HTMLElementTagNameMap>(tag: T, attrs?: Record<string, string>, children?: Array<Element | Text> | string): HTMLElementTagNameMap[T]
+export function html<T extends keyof HTMLElementTagNameMap>(tag: T, attrs: Record<string, string> | Array<Element | Text> | string = {}, children: Array<Element | Text> | string = []): HTMLElementTagNameMap[T] {
+  if (typeof children === 'string') return html(tag, attrs as {}, [document.createTextNode(children)]);
+  if (typeof attrs === 'string' || Array.isArray(attrs)) return html(tag, {}, attrs);
+  const el: HTMLElement = cache.has(tag)
+    ? cache.get(tag)!.cloneNode(true) as HTMLElement
+    : cache.set(tag, document.createElement(tag)).get(tag)!.cloneNode(true) as HTMLElement;
+  assert(el.attributes.length === 0);
+  assert(el.childNodes.length === 0);
+  for (const [name, value] of Object.entries(attrs)) {
+    void el.setAttribute(name, value);
+  }
+  for (const child of children) {
+    void el.appendChild(child);
+  }
+  return el;
+}
+
 export const currentTargets = new WeakMap<Event, EventTarget>();
 
 export function listen<T extends keyof WindowEventMap>(target: Window, type: T, listener: (ev: WindowEventMap[T]) => any, option?: boolean | AddEventListenerOptions): () => undefined;

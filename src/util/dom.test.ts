@@ -1,4 +1,5 @@
 import {
+  html,
   bind,
   delegate,
   once,
@@ -8,6 +9,16 @@ import {
 import { TypedHTML } from '../dom/builder';
 
 describe('Unit: util/dom', () => {
+  describe('html', () => {
+    it('click', () => {
+      assert(html('a').outerHTML === TypedHTML.a().element.outerHTML);
+      assert(html('a', { class: 'test' }).outerHTML === TypedHTML.a({ class: 'test' }).element.outerHTML);
+      assert(html('a', { class: 'test' }, 'b').outerHTML === TypedHTML.a({ class: 'test' }, 'b').element.outerHTML);
+      assert(html('a', 'b').outerHTML === TypedHTML.a('b').element.outerHTML);
+    });
+
+  });
+
   describe('bind', () => {
     it('click', done => {
       let cnt = 0;

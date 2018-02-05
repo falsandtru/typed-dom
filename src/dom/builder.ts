@@ -1,4 +1,5 @@
 import { El, ElChildren } from './manager';
+import { html } from '../util/dom';
 
 interface ElBuilder<T extends string, E extends Element> {
   (factory?: () => E): El<T, E, ElChildren.Void>;                                                   <C extends ElChildren>
@@ -46,22 +47,25 @@ function handle<T extends object>(ns: NS): ProxyHandler<T> {
       }
 
       function elem(tag: string, factory?: () => E, attrs?: Record<string, string | EventListener>): E {
-        factory = factory || factory_;
-        const el = factory();
+        const el = factory
+          ? factory()
+          : ns === NS.HTML
+            ? html(tag as keyof HTMLElementTagNameMap, {}, []) as Element as E
+            : factory_();
         if (tag !== el.tagName.toLowerCase()) throw new Error(`TypedDOM: Tag name must be "${tag}", but got "${el.tagName.toLowerCase()}".`);
         if (!attrs) return el;
-        void Object.entries(attrs)
-          .forEach(([name, value]) =>
-            typeof value === 'string'
-              ? void el.setAttribute(name, value)
-              : void el.addEventListener(name.slice(2), value, {
-                  passive: [
-                    'wheel',
-                    'mousewheel',
-                    'touchstart',
-                    'touchmove',
-                  ].includes(name.slice(2)),
-                }));
+        for (const [name, value] of Object.entries(attrs)) {
+          typeof value === 'string'
+            ? void el.setAttribute(name, value)
+            : void el.addEventListener(name.slice(2), value, {
+              passive: [
+                'wheel',
+                'mousewheel',
+                'touchstart',
+                'touchmove',
+              ].includes(name.slice(2)),
+            });
+        }
         return el;
 
         function factory_(): E {
