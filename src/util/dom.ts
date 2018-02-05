@@ -2,9 +2,9 @@ import { noop } from './noop';
 
 const cache = new Map<string, HTMLElement>();
 
-export function html<T extends keyof HTMLElementTagNameMap>(tag: T, children?: Array<Element | Text> | string): HTMLElementTagNameMap[T]
-export function html<T extends keyof HTMLElementTagNameMap>(tag: T, attrs?: Record<string, string>, children?: Array<Element | Text> | string): HTMLElementTagNameMap[T]
-export function html<T extends keyof HTMLElementTagNameMap>(tag: T, attrs: Record<string, string> | Array<Element | Text> | string = {}, children: Array<Element | Text> | string = []): HTMLElementTagNameMap[T] {
+export function html<T extends keyof HTMLElementTagNameMap>(tag: T, children?: Node[] | string): HTMLElementTagNameMap[T]
+export function html<T extends keyof HTMLElementTagNameMap>(tag: T, attrs?: Record<string, string>, children?: Node[] | string): HTMLElementTagNameMap[T]
+export function html<T extends keyof HTMLElementTagNameMap>(tag: T, attrs: Record<string, string> | Node[] | string = {}, children: Node[] | string = []): HTMLElementTagNameMap[T] {
   if (typeof children === 'string') return html(tag, attrs as {}, [document.createTextNode(children)]);
   if (typeof attrs === 'string' || Array.isArray(attrs)) return html(tag, {}, attrs);
   const el: HTMLElement = cache.has(tag)
