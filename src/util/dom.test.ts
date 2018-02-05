@@ -5,7 +5,7 @@ import {
   listen,
   currentTargets,
 } from './dom';
-import { TypedHTML } from '../dom/html';
+import { TypedHTML } from '../dom/builder';
 
 describe('Unit: util/dom', () => {
   describe('bind', () => {
