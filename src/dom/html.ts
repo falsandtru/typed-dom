@@ -1,4 +1,4 @@
-import { El, ElChildren } from './builder';
+import { El, ElChildren } from './manager';
 
 interface ElBuilder<T extends string, E extends Element> {
   (factory?: () => E): El<T, E, ElChildren.Void>;                                                   <C extends ElChildren>
