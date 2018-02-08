@@ -49,12 +49,12 @@ export class El<
         void clear();
         this.children_ = [] as ElChildren.Collection as C;
         this.children = children_;
-        void scope(element_.id, this.children_ as ElChildren.Collection);
+        void scope(element_, this.children_ as ElChildren.Collection);
         return;
       case ElChildrenType.Record:
         void clear();
         this.children_ = observe(element_, { ...children_ as ElChildren.Record }) as C;
-        void scope(element_.id, this.children_ as ElChildren.Record);
+        void scope(element_, this.children_ as ElChildren.Record);
         return;
     }
 
@@ -64,13 +64,12 @@ export class El<
       }
     }
 
-    function scope(id: string, children: ElChildren.Collection | ElChildren.Record): void {
-      if (!id.match(/^[\w\-]+$/)) return;
+    function scope(el: Element, children: ElChildren.Collection | ElChildren.Record): void {
+      if (!el.id.match(/^[\w\-]+$/)) return;
       return void Object.values(children)
-        .map(({ element }) => element)
-        .forEach(element =>
-          element instanceof HTMLStyleElement &&
-          void parse(element, id));
+        .forEach(child =>
+          child.element instanceof HTMLStyleElement &&
+          void parse(child.element, el.id));
 
       function parse(style: HTMLStyleElement, id: string): void {
         style.innerHTML = style.innerHTML.replace(/^\s*\$scope(?!\w)/gm, `#${id}`);
