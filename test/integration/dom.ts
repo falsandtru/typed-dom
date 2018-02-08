@@ -1,6 +1,5 @@
 import TypedHTML, { TypedSVG } from '../../index';
 import { Sequence } from 'spica/sequence';
-import { sqid } from 'spica/sqid';
 
 declare global {
   interface HTMLElementTagNameMap {
@@ -300,11 +299,11 @@ describe('Integration: Typed DOM', function () {
 
     it('scope', function () {
       const template = `$scope {}\n  $scope {}`;
-      const result = `#test {}\n#test {}`;
+      const result = `#test {}\n  #test {}`;
       assert(TypedHTML.div({ id: 'test' }, [TypedHTML.style(template)]).children[0].element.innerHTML === result);
       assert(TypedHTML.div({ id: 'test' }, { style: TypedHTML.style(template) }).children.style.element.innerHTML === result);
       assert(TypedHTML.div({ id: 'test' }, [TypedHTML.style(`<script>`)]).children[0].element.children.length === 0);
-      assert(TypedHTML.div({ id: '><script>' }, [TypedHTML.style(template)]).children[0].element.innerHTML === template);
+      assert(TypedHTML.div([TypedHTML.style(template)]).children[0].element.innerHTML.match(/\.[\w\-]+\s/gm)!.length === 2);
     });
 
     it('clear', function () {
@@ -347,7 +346,7 @@ describe('Integration: Typed DOM', function () {
       constructor(private readonly parent: HTMLElement) {
         this.parent.appendChild(this.dom.element);
       }
-      private readonly dom = TypedHTML.div({ id: `${this.parent.id}-list-${sqid()}` }, {
+      private readonly dom = TypedHTML.div({
         style: TypedHTML.style(`$scope ul { width: 100px; }`),
         content: TypedHTML.ul([
           TypedHTML.li(`item`)
@@ -358,7 +357,7 @@ describe('Integration: Typed DOM', function () {
       constructor(private readonly parent: HTMLElement) {
         this.parent.appendChild(this.element);
       }
-      private readonly element = TypedHTML.div({ id: 'id' }, [
+      private readonly element = TypedHTML.div([
         TypedHTML.style(`$scope { position: relative; }`)
       ]).element;
       private readonly children = Object.freeze({

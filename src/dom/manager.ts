@@ -1,3 +1,5 @@
+import { uid } from './identity';
+
 type ElChildrenType =
   | typeof ElChildrenType.Void
   | typeof ElChildrenType.Text
@@ -49,33 +51,17 @@ export class El<
         void clear();
         this.children_ = [] as ElChildren.Collection as C;
         this.children = children_;
-        void scope(element_, this.children_ as ElChildren.Collection);
         return;
       case ElChildrenType.Record:
         void clear();
         this.children_ = observe(element_, { ...children_ as ElChildren.Record }) as C;
-        void scope(element_, this.children_ as ElChildren.Record);
+        this.children = children_;
         return;
     }
 
     function clear(): void {
       while (element_.childNodes.length > 0) {
         void element_.removeChild(element_.firstChild!);
-      }
-    }
-
-    function scope(el: Element, children: ElChildren.Collection | ElChildren.Record): void {
-      if (!el.id.match(/^[\w\-]+$/)) return;
-      return void Object.values(children)
-        .forEach(child =>
-          child.element instanceof HTMLStyleElement &&
-          void parse(child.element, el.id));
-
-      function parse(style: HTMLStyleElement, id: string): void {
-        style.innerHTML = style.innerHTML.replace(/^\s*\$scope(?!\w)/gm, `#${id}`);
-        void [...style.querySelectorAll('*')]
-          .forEach(el =>
-            void el.remove());
       }
     }
 
@@ -104,6 +90,10 @@ export class El<
           }, {}));
     }
   }
+  private id_!: string;
+  private get id() {
+    return this.id_ = this.id_ || this.element_.id.trim() || uid();
+  }
   private readonly type: ElChildrenType =
     this.children_ === undefined
       ? ElChildrenType.Void
@@ -112,6 +102,30 @@ export class El<
         : Array.isArray(this.children_)
           ? ElChildrenType.Collection
           : ElChildrenType.Record;
+  private scope(children: El<string, Element, ElChildren>[]): void {
+    const syntax = /^(\s*)\$scope(?!\w)/gm;
+    const id = this.id;
+    const query = id === this.element_.id.trim() ? `#${id}` : `.${id}`;
+    return void children
+      .forEach(child =>
+        child.element instanceof HTMLStyleElement &&
+        void parse(child.element));
+
+    function parse(style: HTMLStyleElement): void {
+      if (style.innerHTML.search(syntax) === -1) return;
+      style.innerHTML = style.innerHTML.replace(syntax, (_, indent) => `${indent}${query}`);
+      switch (query[0]) {
+        case '.':
+          if (!(style.getAttribute('class') || '').split(' ').includes(id)) break;
+          void style.setAttribute('class', `${style.getAttribute('class')} ${id}`.trim());
+          break;
+      }
+      if (style.children.length === 0) return;
+      void [...style.querySelectorAll('*')]
+        .forEach(el =>
+          void el.remove());
+    }
+  }
   public get element(): E {
     return this.element_;
   }
@@ -149,6 +163,7 @@ export class El<
           });
         assert((this.children_ as ElChildren.Collection).every(({ element }, i) => element === this.element_.childNodes[i]));
         void Object.freeze(this.children_);
+        void this.scope(Object.values(this.children_ as ElChildren.Collection));
         return;
       case ElChildrenType.Record:
         assert.deepStrictEqual(Object.keys(children as object), Object.keys(this.children_ as object));
@@ -156,6 +171,7 @@ export class El<
           .forEach(k =>
             this.children_![k] = children![k]);
         assert(Object.entries(this.children_ as ElChildren.Record).every(([k, v]) => children![k] === v));
+        void this.scope(Object.values(this.children_ as ElChildren.Record));
         return;
     }
   }

@@ -59,12 +59,12 @@ TypedSVG.a().element; // SVGAElement
 
 ## Usage
 
-Build a typed DOM object.
+Build a typed DOM object with styling.
 
 ```ts
 import TypedHTML from 'typed-dom';
 
-const component = TypedHTML.article({ id: 'id' }, {
+const component = TypedHTML.article({
   style: TypedHTML.style(`$scope ul { width: 100px; }`),
   title: TypedHTML.h1(`title` as string),
   content: TypedHTML.ul([
@@ -115,7 +115,7 @@ And you can access and manipulate safely the internal structure guided by this t
 
 ```ts
 // inspect
-component.element.outerHTML; // '<article id="id"><style>#id ul { width: 100px; }</style><h1>title</h1><ul><li>item</li><li>item</li></ul></article>'
+component.element.outerHTML; // '<article class="RANDOM"><style>#RANDOM> ul { width: 100px; }</style><h1>title</h1><ul><li>item</li><li>item</li></ul></article>'
 component.children.title.element.outerHTML; // '<h1>title</h1>'
 component.children.title.children; // 'title'
 component.children.content.element.outerHTML; // '<ul><li>item</li><li>item</li></ul>'
@@ -137,7 +137,7 @@ component.children.title = TypedHTML.h1('Title!');
 component.children.content = TypedHTML.ul([
   TypedHTML.li('Item!')
 ]);
-component.element.outerHTML; // '<article id="id"><style>#id ul { width: 100px; }</style><h1>Title!</h1><ul><li>Item!</li></ul></article>'
+component.element.outerHTML; // '<article class="RANDOM>"><style>#RANDOM> ul { width: 100px; }</style><h1>Title!</h1><ul><li>Item!</li></ul></article>'
 ```
 
 ## Examples
@@ -148,13 +148,12 @@ Use micro DOM components to hide and manage the typed DOM object.
 
 ```ts
 import TypedHTML from 'typed-dom';
-import { sqid } from 'spica/sqid';
 
 class MicroComponent {
   constructor(private readonly parent: HTMLElement) {
     this.parent.appendChild(this.dom.element);
   }
-  private readonly dom = TypedHTML.div({ id: `${this.parent.id}-list-${sqid()}` }, {
+  private readonly dom = TypedHTML.div({
     style: TypedHTML.style(`$scope ul { width: 100px; }`),
     content: TypedHTML.ul([
       TypedHTML.li(`item` as string)
@@ -174,7 +173,7 @@ class Component {
   constructor(private readonly parent: HTMLElement) {
     this.parent.appendChild(this.element);
   }
-  private readonly element = TypedHTML.div({ id: 'id' }, [
+  private readonly element = TypedHTML.div([
     TypedHTML.style(`$scope { position: relative; }`)
   ]).element;
   private readonly children = Object.freeze({
