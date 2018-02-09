@@ -115,7 +115,7 @@ And you can access and manipulate safely the internal structure guided by this t
 
 ```ts
 // inspect
-component.element.outerHTML; // '<article class="RANDOM"><style>#RANDOM> ul { width: 100px; }</style><h1>title</h1><ul><li>item</li><li>item</li></ul></article>'
+component.element.outerHTML; // '<article class="RANDOM"><style>.RANDOM ul { width: 100px; }</style><h1>title</h1><ul><li>item</li><li>item</li></ul></article>'
 component.children.title.element.outerHTML; // '<h1>title</h1>'
 component.children.title.children; // 'title'
 component.children.content.element.outerHTML; // '<ul><li>item</li><li>item</li></ul>'
@@ -137,7 +137,7 @@ component.children.title = TypedHTML.h1('Title!');
 component.children.content = TypedHTML.ul([
   TypedHTML.li('Item!')
 ]);
-component.element.outerHTML; // '<article class="RANDOM>"><style>#RANDOM> ul { width: 100px; }</style><h1>Title!</h1><ul><li>Item!</li></ul></article>'
+component.element.outerHTML; // '<article class="RANDOM>"><style>.RANDOM ul { width: 100px; }</style><h1>Title!</h1><ul><li>Item!</li></ul></article>'
 ```
 
 ## Examples
