@@ -2,22 +2,23 @@ import { noop } from './noop';
 
 const cache = new Map<string, HTMLElement>();
 
-export function html<T extends keyof HTMLElementTagNameMap>(tag: T, children?: Node[] | string): HTMLElementTagNameMap[T]
-export function html<T extends keyof HTMLElementTagNameMap>(tag: T, attrs?: Record<string, string>, children?: Node[] | string): HTMLElementTagNameMap[T]
+export function html<T extends keyof HTMLElementTagNameMap>(tag: T, children?: Node[] | string): HTMLElementTagNameMap[T];
+export function html<T extends keyof HTMLElementTagNameMap>(tag: T, attrs?: Record<string, string>, children?: Node[] | string): HTMLElementTagNameMap[T];
 export function html<T extends keyof HTMLElementTagNameMap>(tag: T, attrs: Record<string, string> | Node[] | string = {}, children: Node[] | string = []): HTMLElementTagNameMap[T] {
   if (typeof children === 'string') return html(tag, attrs as {}, [document.createTextNode(children)]);
   if (typeof attrs === 'string' || Array.isArray(attrs)) return html(tag, {}, attrs);
   const el: HTMLElement = cache.has(tag)
     ? cache.get(tag)!.cloneNode(true) as HTMLElement
     : cache.set(tag, document.createElement(tag)).get(tag)!.cloneNode(true) as HTMLElement;
+  assert(el !== cache.get(tag));
   assert(el.attributes.length === 0);
   assert(el.childNodes.length === 0);
-  for (const [name, value] of Object.entries(attrs)) {
-    void el.setAttribute(name, value);
-  }
-  for (const child of children) {
-    void el.appendChild(child);
-  }
+  void Object.entries(attrs)
+    .forEach(([name, value]) =>
+      void el.setAttribute(name, value));
+  void children
+    .forEach(child =>
+      void el.appendChild(child));
   return el;
 }
 
