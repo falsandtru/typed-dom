@@ -89,8 +89,7 @@ export interface El<
   T extends string,
   E extends Element,
   C extends ElChildren
->
-  extends AbstractTypedHTMLElement<T> {
+  > {
   readonly element: E;
   children: C;
 }
@@ -104,9 +103,6 @@ namespace ElChildren {
   export type Text = string;
   export type Collection = El<string, Element, any>[];
   export type Record = { [field: string]: El<string, Element, any>; };
-}
-abstract class AbstractTypedHTMLElement<T extends string> {
-  private identifier: T;
 }
 ```
 
