@@ -1,16 +1,27 @@
 import { noop } from './noop';
 
-const cache = new Map<string, HTMLElement>();
+const cache = new Map<string, Element>();
 
 export function html<T extends keyof HTMLElementTagNameMap>(tag: T, children?: Node[] | string): HTMLElementTagNameMap[T];
 export function html<T extends keyof HTMLElementTagNameMap>(tag: T, attrs?: Record<string, string>, children?: Node[] | string): HTMLElementTagNameMap[T];
 export function html<T extends keyof HTMLElementTagNameMap>(tag: T, attrs: Record<string, string> | Node[] | string = {}, children: Node[] | string = []): HTMLElementTagNameMap[T] {
-  if (typeof children === 'string') return html(tag, attrs as {}, [document.createTextNode(children)]);
-  if (typeof attrs === 'string' || Array.isArray(attrs)) return html(tag, {}, attrs);
-  const el: HTMLElement = cache.has(tag)
-    ? cache.get(tag)!.cloneNode(true) as HTMLElement
-    : cache.set(tag, document.createElement(tag)).get(tag)!.cloneNode(true) as HTMLElement;
-  assert(el !== cache.get(tag));
+  return element('html', () => document.createElement(tag), tag, attrs, children) as HTMLElementTagNameMap[T];
+}
+
+export function svg<T extends keyof SVGElementTagNameMap_>(tag: T, children?: Node[] | string): SVGElementTagNameMap_[T];
+export function svg<T extends keyof SVGElementTagNameMap_>(tag: T, attrs?: Record<string, string>, children?: Node[] | string): SVGElementTagNameMap_[T];
+export function svg<T extends keyof SVGElementTagNameMap_>(tag: T, attrs: Record<string, string> | Node[] | string = {}, children: Node[] | string = []): SVGElementTagNameMap_[T] {
+  return element('svg', () => document.createElementNS("http://www.w3.org/2000/svg", tag), tag, attrs, children) as SVGElementTagNameMap_[T];
+}
+
+function element(ns: string, factory: () => Element, tag: string, attrs: Record<string, string> | Node[] | string = {}, children: Node[] | string = []): Element {
+  if (typeof children === 'string') return element(ns, factory, tag, attrs as {}, [document.createTextNode(children)]);
+  if (typeof attrs === 'string' || Array.isArray(attrs)) return element(ns, factory, tag, {}, attrs);
+  const key = `${ns}:${tag}`;
+  const el = cache.has(key)
+    ? cache.get(key)!.cloneNode(true) as Element
+    : cache.set(key, factory()).get(key)!.cloneNode(true) as Element;
+  assert(el !== cache.get(key));
   assert(el.attributes.length === 0);
   assert(el.childNodes.length === 0);
   void Object.entries(attrs)
