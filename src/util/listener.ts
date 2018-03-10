@@ -41,7 +41,8 @@ export function bind<T extends keyof WindowEventMap | keyof DocumentEventMap | k
         void unbind();
       }
     }
-    void currentTargets.set(ev, ev.currentTarget);
+    assert(ev.currentTarget);
+    void currentTargets.set(ev, ev.currentTarget!);
     void listener(ev);
   }
 
