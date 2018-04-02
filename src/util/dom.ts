@@ -27,9 +27,9 @@ function element(ns: string, tag: string, attrs: Record<string, string> | Iterab
   void Object.entries(attrs)
     .forEach(([name, value]) =>
       void el.setAttribute(name, value));
-  for (const child of children) {
-    void el.appendChild(child);
-  }
+  void [...children]
+    .forEach(child =>
+      void el.appendChild(child));
   return el;
 }
 
