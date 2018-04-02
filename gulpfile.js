@@ -146,6 +146,7 @@ gulp.task('update', function () {
 
 gulp.task('watch', ['clean'], function (done) {
   seq(
+    'ts:test',
     [
       'ts:watch',
       'karma:watch'
