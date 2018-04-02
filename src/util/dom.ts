@@ -1,22 +1,22 @@
 const cache = new Map<string, Element>();
 
-export function html<T extends keyof HTMLElementTagNameMap>(tag: T, children?: Node[] | string): HTMLElementTagNameMap[T];
-export function html<T extends keyof HTMLElementTagNameMap>(tag: T, attrs?: Record<string, string>, children?: Node[] | string): HTMLElementTagNameMap[T];
-export function html<T extends keyof HTMLElementTagNameMap>(tag: T, attrs: Record<string, string> | Node[] | string = {}, children: Node[] | string = []): HTMLElementTagNameMap[T] {
+export function html<T extends keyof HTMLElementTagNameMap>(tag: T, children?: Iterable<Node> | string): HTMLElementTagNameMap[T];
+export function html<T extends keyof HTMLElementTagNameMap>(tag: T, attrs?: Record<string, string>, children?: Iterable<Node> | string): HTMLElementTagNameMap[T];
+export function html<T extends keyof HTMLElementTagNameMap>(tag: T, attrs: Record<string, string> | Iterable<Node> | string = {}, children: Iterable<Node> | string = []): HTMLElementTagNameMap[T] {
   return element('html', tag, attrs, children);
 }
 
-export function svg<T extends keyof SVGElementTagNameMap_>(tag: T, children?: Node[] | string): SVGElementTagNameMap_[T];
-export function svg<T extends keyof SVGElementTagNameMap_>(tag: T, attrs?: Record<string, string>, children?: Node[] | string): SVGElementTagNameMap_[T];
-export function svg<T extends keyof SVGElementTagNameMap_>(tag: T, attrs: Record<string, string> | Node[] | string = {}, children: Node[] | string = []): SVGElementTagNameMap_[T] {
+export function svg<T extends keyof SVGElementTagNameMap_>(tag: T, children?: Iterable<Node> | string): SVGElementTagNameMap_[T];
+export function svg<T extends keyof SVGElementTagNameMap_>(tag: T, attrs?: Record<string, string>, children?: Iterable<Node> | string): SVGElementTagNameMap_[T];
+export function svg<T extends keyof SVGElementTagNameMap_>(tag: T, attrs: Record<string, string> | Iterable<Node> | string = {}, children: Iterable<Node> | string = []): SVGElementTagNameMap_[T] {
   return element('svg', tag, attrs, children);
 }
 
-function element<T extends keyof HTMLElementTagNameMap>(ns: 'html', tag: T, attrs?: Record<string, string> | Node[] | string, children?: Node[] | string): HTMLElementTagNameMap[T];
-function element<T extends keyof SVGElementTagNameMap_>(ns: 'svg', tag: T, attrs?: Record<string, string> | Node[] | string, children?: Node[] | string): SVGElementTagNameMap_[T];
-function element(ns: string, tag: string, attrs: Record<string, string> | Node[] | string = {}, children: Node[] | string = []): Element {
+function element<T extends keyof HTMLElementTagNameMap>(ns: 'html', tag: T, attrs?: Record<string, string> | Iterable<Node> | string, children?: Iterable<Node> | string): HTMLElementTagNameMap[T];
+function element<T extends keyof SVGElementTagNameMap_>(ns: 'svg', tag: T, attrs?: Record<string, string> | Iterable<Node> | string, children?: Iterable<Node> | string): SVGElementTagNameMap_[T];
+function element(ns: string, tag: string, attrs: Record<string, string> | Iterable<Node> | string = {}, children: Iterable<Node> | string = []): Element {
+  if (isChildren(attrs)) return element(ns as 'html', tag as 'html', {}, attrs);
   if (typeof children === 'string') return element(ns as 'html', tag as 'html', attrs as {}, [document.createTextNode(children)]);
-  if (typeof attrs === 'string' || Array.isArray(attrs)) return element(ns as 'html', tag as 'html', {}, attrs);
   const key = `${ns}:${tag}`;
   const el = cache.has(key)
     ? cache.get(key)!.cloneNode(true) as Element
@@ -27,9 +27,9 @@ function element(ns: string, tag: string, attrs: Record<string, string> | Node[]
   void Object.entries(attrs)
     .forEach(([name, value]) =>
       void el.setAttribute(name, value));
-  void children
-    .forEach(child =>
-      void el.appendChild(child));
+  for (const child of children) {
+    void el.appendChild(child);
+  }
   return el;
 }
 
@@ -42,4 +42,8 @@ function elem(ns: string, tag: string): Element {
     default:
       throw new Error(`TypedDOM: Unknown namespace: ${ns}`);
   }
+}
+
+function isChildren(o: object | string | Iterable<any>): o is string | Iterable<any> {
+  return !!o[Symbol.iterator];
 }
