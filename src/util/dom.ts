@@ -12,11 +12,15 @@ export function svg<T extends keyof SVGElementTagNameMap_>(tag: T, attrs: Record
   return element('svg', tag, attrs, children);
 }
 
+export function text(source: string): Text {
+  return document.createTextNode(source);
+}
+
 function element<T extends keyof HTMLElementTagNameMap>(ns: 'html', tag: T, attrs?: Record<string, string> | Iterable<Node> | string, children?: Iterable<Node> | string): HTMLElementTagNameMap[T];
 function element<T extends keyof SVGElementTagNameMap_>(ns: 'svg', tag: T, attrs?: Record<string, string> | Iterable<Node> | string, children?: Iterable<Node> | string): SVGElementTagNameMap_[T];
 function element(ns: string, tag: string, attrs: Record<string, string> | Iterable<Node> | string = {}, children: Iterable<Node> | string = []): Element {
   if (isChildren(attrs)) return element(ns as 'html', tag as 'html', {}, attrs);
-  if (typeof children === 'string') return element(ns as 'html', tag as 'html', attrs as {}, [document.createTextNode(children)]);
+  if (typeof children === 'string') return element(ns as 'html', tag as 'html', attrs as {}, [text(children)]);
   const key = `${ns}:${tag}`;
   const el = cache.has(key)
     ? cache.get(key)!.cloneNode(true) as Element
