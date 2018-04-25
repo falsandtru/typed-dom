@@ -1,8 +1,8 @@
 import { uuid } from 'spica/uuid';
 import { sqid } from 'spica/sqid';
 
-const id = uuid().split('-').slice(-1).join('-');
+const id = uuid().split('-').pop()!;
 
 export function uid(): string {
-  return `${id}-${String(Number(sqid())).padStart(6, '0')}`;
+  return `id-${id}-${String(+sqid()).padStart(6, '0')}`;
 }

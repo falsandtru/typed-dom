@@ -91,8 +91,14 @@ export class El<
     }
   }
   private id_!: string;
-  private get id() {
+  private get id(): string {
     return this.id_ = this.id_ || this.element_.id.trim() || uid();
+  }
+  private get query(): string {
+    assert(this.id.match(/^[a-z]/));
+    return this.id === this.element_.id.trim()
+      ? `#${this.id}`
+      : `.${this.id}`;
   }
   private readonly type: ElChildrenType =
     this.children_ === undefined
@@ -104,16 +110,15 @@ export class El<
           : ElChildrenType.Record;
   private scope(children: El<string, Element, ElChildren>[]): void {
     const syntax = /^(\s*)\$scope(?!\w)/gm;
-    const id = this.id;
-    const query = id === this.element_.id.trim() ? `#${id}` : `.${id}`;
     return void children
       .forEach(child =>
         child.element instanceof HTMLStyleElement &&
-        void parse(child.element));
+        void parse(child.element, this.query));
 
-    function parse(style: HTMLStyleElement): void {
+    function parse(style: HTMLStyleElement, query: string): void {
       if (style.innerHTML.search(syntax) === -1) return;
       style.innerHTML = style.innerHTML.replace(syntax, (_, indent) => `${indent}${query}`);
+      const id = query.slice(1);
       switch (query[0]) {
         case '.':
           if (!(style.getAttribute('class') || '').split(' ').includes(id)) break;
