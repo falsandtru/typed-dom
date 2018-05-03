@@ -4,9 +4,9 @@ matrix:
   - os: linux
     dist: trusty
     sudo: required
-    node_js: 9
+    node_js: 10
   - os: osx
-    node_js: 9
+    node_js: 10
 addons:
   chrome: stable
   firefox: latest
@@ -27,7 +27,7 @@ deploy:
     secure: Il+APcr6HRW18tabPceaUEg72g/H/YyFepbvsUbO64dqXjhBkFAokXonOhUlndFfd5ZWVmSc/hQvmMtQPeYfCtu64vJWi//YkGzMHxVsdU1YlkoK3cNUBWHV4EjcEHkV/fJL6B+Je8dTGd0cRBqkXmZoCmzbYcD3IX3OypbzslZY1KUUO0wW74WjuY8SrrO8Z+/RT40ocSNv9ofEfKQTGF/uqEDKVCfb2OLGn99zkuoKrpLpfxy1Emd4I7qKsEt07QSPBNqj+RCkVN5l4OyMQd17v6j/PxZKBRlu3wOpV/10U1e9oZG/3e+R0in3w+qlbIpLjFw92Jyao9iY+GcgYg6N4VgBwikoqLpReQn3CFhea0DY8lwq7qhksTVHElwSIm5OQxa6F0H0iiHVGbMVcF4Xykf05J4d6/KUAgoYRArXwNNULVdpFFIp2r4AI8dmSOaOF3Ek5kZLgCy+wBsF5fDnMTE3/ky9zqYmJlqfSoT4qMin1SKN5QTW2PCEfe+JcUBRiDz1oEWtlsBe0a+7KgYaDrOWvzlvPMcbR+g9GF9po8IQLbTc1uWoid26q/TTqDlqckQJdD50I3ZypHLJ+IUd/lFqRxfIFyP/bPfYir3zrZejopsQBXCCeemoA3Wg5p7WazyaI9FxLCkIULH4IRV6lIvgQLuG4SvSOnCEEes=
   on:
     branch: master
-    node: 9
+    node: 10
     condition: $TRAVIS_OS_NAME = linux
   skip_cleanup: true
 notifications:
