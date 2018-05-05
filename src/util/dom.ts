@@ -12,6 +12,15 @@ export function svg<T extends keyof SVGElementTagNameMap_>(tag: T, attrs: Record
   return element('svg', tag, attrs, children);
 }
 
+export function frag(children: Iterable<Node> | string = []): DocumentFragment {
+  children = typeof children === 'string' ? [text(children)] : children;
+  const frag = document.createDocumentFragment();
+  void [...children]
+    .forEach(child =>
+      void frag.appendChild(child));
+  return frag;
+}
+
 export function text(source: string): Text {
   return document.createTextNode(source);
 }

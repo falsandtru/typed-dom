@@ -1,4 +1,4 @@
-import { html, svg } from './dom';
+import { html, svg, frag } from './dom';
 import { TypedHTML, TypedSVG } from '../dom/builder';
 
 describe('Unit: util/dom', () => {
@@ -18,6 +18,17 @@ describe('Unit: util/dom', () => {
       assert(svg('a', { class: 'test' }).outerHTML === TypedSVG.a({ class: 'test' }).element.outerHTML);
       assert(svg('a', { class: 'test' }, 'b').outerHTML === TypedSVG.a({ class: 'test' }, 'b').element.outerHTML);
       assert(svg('a', 'b').outerHTML === TypedSVG.a('b').element.outerHTML);
+    });
+
+  });
+
+  describe('frag', () => {
+    function stringify(frag: DocumentFragment): string {
+      return [...frag.childNodes].reduce((acc, node) => acc + (node instanceof Element ? node.outerHTML : node.textContent), '');
+    }
+
+    it('', () => {
+      assert(stringify(frag('a')) === 'a');
     });
 
   });
