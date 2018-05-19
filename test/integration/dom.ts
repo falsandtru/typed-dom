@@ -30,14 +30,13 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('factory', function () {
-      const dom = TypedHTML.p(() => {
-        const el = document.createElement('div').appendChild(document.createElement('p'));
+      const dom = TypedHTML.p(f => {
+        const el = document.createElement('div').appendChild(f());
         el.id = 'test';
         return el;
       });
       assert(dom.element.id === 'test');
       assert(dom.children === undefined);
-      assert.throws(() => TypedHTML.p(() => TypedHTML.div([TypedHTML.p()]).children[0].element));
     });
 
     it('text', function () {
@@ -54,11 +53,8 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('text with factory', function () {
-      const dom = TypedHTML.p(`a`, () => {
-        const el = document.createElement('p');
-        el.id = 'test';
-        return el;
-      });
+      const dom = TypedHTML.p(`a`, el =>
+        el({ id: 'test' }));
       assert(dom.element.id === 'test');
       assert(dom.children === 'a');
     });
@@ -138,11 +134,8 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('collection with factory', function () {
-      const dom = TypedHTML.ul([], () => {
-        const el = document.createElement('ul');
-        el.id = 'test';
-        return el;
-      });
+      const dom = TypedHTML.ul([], el =>
+        el({ id: 'test' }));
       assert(dom.element.id === 'test');
       assert.deepStrictEqual(dom.children, []);
     });
@@ -199,11 +192,8 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('struct with factory', function () {
-      const dom = TypedHTML.article({}, () => {
-        const el = document.createElement('article');
-        el.id = 'test';
-        return el;
-      });
+      const dom = TypedHTML.article({}, el =>
+        el({ id: 'test' }));
       assert(dom.element.id === 'test');
       assert.deepStrictEqual(dom.children, {});
     });
@@ -216,12 +206,8 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('attr with factory', function () {
-      const dom = TypedHTML.div({ id: 'test' }, () => {
-        const el = document.createElement('div');
-        el.id = 'id';
-        el.className = 'test';
-        return el;
-      });
+      const dom = TypedHTML.div({ id: 'test' }, el =>
+        el({ id: 'id', class: 'test' }));
       assert(dom.element.id === 'test');
       assert(dom.element.className === 'test');
       assert(dom.children === undefined);
@@ -249,36 +235,24 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('attr with text and factory', function () {
-      const dom = TypedHTML.div({ id: 'test' }, '', () => {
-        const el = document.createElement('div');
-        el.id = 'id';
-        el.className = 'test';
-        return el;
-      });
+      const dom = TypedHTML.div({ id: 'test' }, '', el =>
+        el({ id: 'id', class: 'test' }));
       assert(dom.element.id === 'test');
       assert(dom.element.className === 'test');
       assert(dom.children === '');
     });
 
     it('attr with collection and factory', function () {
-      const dom = TypedHTML.div({ id: 'test' }, [], () => {
-        const el = document.createElement('div');
-        el.id = 'id';
-        el.className = 'test';
-        return el;
-      });
+      const dom = TypedHTML.div({ id: 'test' }, [], el =>
+        el({ id: 'id', class: 'test' }));
       assert(dom.element.id === 'test');
       assert(dom.element.className === 'test');
       assert.deepStrictEqual(dom.children, []);
     });
 
     it('attr with struct and factory', function () {
-      const dom = TypedHTML.div({ id: 'test' }, {}, () => {
-        const el = document.createElement('div');
-        el.id = 'id';
-        el.className = 'test';
-        return el;
-      });
+      const dom = TypedHTML.div({ id: 'test' }, {}, el =>
+        el({ id: 'id', class: 'test' }));
       assert(dom.element.id === 'test');
       assert(dom.element.className === 'test');
       assert.deepStrictEqual(dom.children, {});
