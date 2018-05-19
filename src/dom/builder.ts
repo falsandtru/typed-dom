@@ -1,5 +1,5 @@
 import { El, ElChildren } from './manager';
-import { html, svg } from '../util/dom';
+import { html, svg, define } from '../util/dom';
 
 interface ElBuilder<T extends string, E extends Element> {
   (factory?: (f: Factory<E>) => E): El<T, E, ElChildren.Void>;                                                   <C extends ElChildren>
@@ -9,11 +9,11 @@ interface ElBuilder<T extends string, E extends Element> {
 }
 interface Factory<E extends Element> {
   (children?: Iterable<Node> | string): E;
-  (attrs?: Record<string, string>, children?: Iterable<Node> | string): E;
+  (attrs?: Record<string, string | EventListener>, children?: Iterable<Node> | string): E;
 }
 interface DefaultFactory<E extends Element> {
   (tag: string, children?: Iterable<Node> | string): E;
-  (tag: string, attrs?: Record<string, string>, children?: Iterable<Node> | string): E;
+  (tag: string, attrs?: Record<string, string | EventListener>, children?: Iterable<Node> | string): E;
 }
 
 type TypedHTML = {
@@ -50,19 +50,7 @@ function handle<T extends object>(defaultFactory: DefaultFactory<Element>): Prox
     function elem(tag: string, factory: (f: Factory<E>) => E, attrs?: Record<string, string | EventListener>): E {
       const el = factory(defaultFactory);
       if (tag !== el.tagName.toLowerCase()) throw new Error(`TypedDOM: Tag name must be "${tag}", but got "${el.tagName.toLowerCase()}".`);
-      if (!attrs) return el;
-      for (const [name, value] of Object.entries(attrs)) {
-        typeof value === 'string'
-          ? void el.setAttribute(name, value)
-          : void el.addEventListener(name.slice(2), value, {
-              passive: [
-                'wheel',
-                'mousewheel',
-                'touchstart',
-                'touchmove',
-              ].includes(name.slice(2)),
-            });
-      }
+      attrs && void define(el, attrs);
       return el;
     }
   }
