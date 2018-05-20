@@ -23,6 +23,7 @@ export namespace ElChildren {
   export type Collection = El<string, Element, any>[];
   export type Record = { [field: string]: El<string, Element, any>; };
 }
+type LooseChildren<C extends ElChildren> = C extends string ? string : C;
 
 const memory = new WeakSet<Element>();
 
@@ -45,17 +46,17 @@ export class El<
       case ElChildrenType.Text:
         void clear();
         this.children_ = element_.appendChild(document.createTextNode('')) as any;
-        this.children = children_;
+        this.children = children_ as LooseChildren<C>;
         return;
       case ElChildrenType.Collection:
         void clear();
         this.children_ = [] as ElChildren.Collection as C;
-        this.children = children_;
+        this.children = children_ as LooseChildren<C>;
         return;
       case ElChildrenType.Record:
         void clear();
         this.children_ = observe(element_, { ...children_ as ElChildren.Record }) as C;
-        this.children = children_;
+        this.children = children_ as LooseChildren<C>;
         return;
     }
 
@@ -134,23 +135,23 @@ export class El<
   public get element(): E {
     return this.element_;
   }
-  public get children(): C {
+  public get children(): LooseChildren<C> {
     assert([ElChildrenType.Void, ElChildrenType.Collection].includes(this.type) ? Object.isFrozen(this.children_) : !Object.isFrozen(this.children_));
     switch (this.type) {
       case ElChildrenType.Text:
-        return (this.children_ as any as Text).data as C;
+        return (this.children_ as any as Text).data as LooseChildren<C>;
       default:
-        return this.children_;
+        return this.children_ as LooseChildren<C>;
     }
   }
-  public set children(children: C) {
+  public set children(children: LooseChildren<C>) {
     switch (this.type) {
       case ElChildrenType.Void:
         return;
       case ElChildrenType.Text:
         children = document.createTextNode(children as ElChildren.Text) as any;
         void this.element_.replaceChild(children as any, this.children_ as any);
-        this.children_ = children;
+        this.children_ = children as C;
         return;
       case ElChildrenType.Collection:
         void (this.children_ as ElChildren.Collection)

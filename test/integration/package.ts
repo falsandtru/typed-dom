@@ -322,7 +322,7 @@ describe('Integration: Typed DOM', function () {
       const t: API<HTMLElementTagNameMap> = API((tag: keyof typeof t, ...args: any[]) =>
         h(tag, ...args));
   
-      const el = t.span('a' as string);
+      const el = t.span('a');
       assert(el.children === 'a');
       assert(el.element.textContent === 'a');
       await 0;
