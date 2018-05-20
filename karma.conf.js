@@ -5,6 +5,7 @@ module.exports = function (config) {
     files: [
       { pattern: 'https://cdn.polyfill.io/v2/polyfill.js?flags=gated&features=default,NodeList.prototype.@@iterator', watched: false, served: false, included: true },
       { pattern: 'https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js', watched: false, served: false, included: true },
+      { pattern: 'https://cdnjs.cloudflare.com/ajax/libs/i18next/11.3.2/i18next.min.js', watched: false, served: false, included: true },
       { pattern: 'node_modules/power-assert/build/power-assert.js', watched: true, served: true, included: true },
       { pattern: 'dist/*.js', watched: true, served: true, included: true }
     ],

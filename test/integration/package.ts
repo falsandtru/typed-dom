@@ -314,12 +314,11 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('customize', async function () {
-      const h = observe(html, rs => rs.forEach(record =>
+      const t: API<HTMLElementTagNameMap> = API(observe(html, rs => rs.forEach(record =>
         void record.addedNodes.forEach(node =>
           node.parentNode &&
           node instanceof Text &&
-          (node.textContent = node.textContent!.toUpperCase()))));
-      const t: API<HTMLElementTagNameMap> = API(h);
+          (node.textContent = node.textContent!.toUpperCase())))));
   
       const el = t.span('a');
       assert(el.children === 'a');
@@ -371,6 +370,48 @@ describe('Integration: Typed DOM', function () {
 
     it('component', function () {
       new Component(document.createElement('div'));
+    });
+
+    it('trans', async function () {
+      const i18n = i18next.createInstance({
+        lng: 'en',
+        resources: {
+          en: {
+            translation: {
+              "a": "A",
+              "b": "{{data}}",
+            }
+          }
+        }
+      });
+      const store = new WeakMap<Node, object>();
+      const data = (data: object) => <T extends string, E extends Element>(factory: (tag: T) => E, tag: T): E => {
+        const el = factory(tag);
+        void store.set(el, data);
+        return el;
+      };
+      const trans: API<HTMLElementTagNameMap> = API(observe(html, rs => rs.forEach(record =>
+        void record.addedNodes.forEach(node =>
+          record.target === node.parentElement &&
+          node.parentElement &&
+          node instanceof Text &&
+          i18n.init((err, t) =>
+            node.textContent = err
+              ? 'Failed to init i18next.'
+              : t(node.textContent!, store.get(record.target)))))));
+  
+      const el = trans.span('a', data({ data: 'B' }));
+      assert(el.children === 'a');
+      assert(el.element.textContent === 'a');
+      await 0;
+      assert(el.children === 'A');
+      assert(el.element.textContent === 'A');
+      el.children = 'b';
+      assert(el.children === 'b');
+      assert(el.element.textContent === 'b');
+      await 0;
+      assert(el.children === 'B');
+      assert(el.element.textContent === 'B');
     });
 
   });
