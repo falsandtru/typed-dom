@@ -13,18 +13,15 @@ interface HelperFactory<E extends Element> {
   (attrs?: Record<string, string | EventListener>, children?: Iterable<Node> | string): E;
 }
 
-export type API<T> = {
+export type API<T extends object> = {
   readonly [P in Extract<keyof ExtractProp<T, Element>, string>]: T[P] extends Element ? ElBuilder<P, T[P]> : never;
 };
-export function API<T extends API<any>>(factory: Factory<Element>): T {
-  return new Proxy({} as T, handle(factory));
+export function API<T extends object>(factory: Factory<Element>): API<T> {
+  return new Proxy({} as API<T>, handle(factory));
 }
 
-type TypedHTML = API<HTMLElementTagNameMap>;
-export const TypedHTML: TypedHTML = API(html);
-
-type TypedSVG = API<SVGElementTagNameMap_>;
-export const TypedSVG: TypedSVG = API(svg);
+export const TypedHTML: API<HTMLElementTagNameMap> = API(html);
+export const TypedSVG: API<SVGElementTagNameMap_> = API(svg);
 
 function handle<T extends object>(factory: Factory<Element>): ProxyHandler<T> {
   return {
