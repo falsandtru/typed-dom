@@ -13,16 +13,17 @@ interface Factory<E extends Element> {
   (attrs?: Record<string, string | EventListener>, children?: Iterable<Node> | string): E;
 }
 
-type API<T> = {
+export type API<T> = {
   readonly [P in Extract<keyof ExtractProp<T, Element>, string>]: T[P] extends Element ? ElBuilder<P, T[P]> : never;
 };
+
 type TypedHTML = API<HTMLElementTagNameMap>;
 type TypedSVG = API<SVGElementTagNameMap_>;
 
-export const TypedHTML: TypedHTML = make(html);
-export const TypedSVG: TypedSVG = make(svg);
+export const TypedHTML: TypedHTML = API(html);
+export const TypedSVG: TypedSVG = API(svg);
 
-function make<T extends object>(factory: DefaultFactory<Element>): T {
+export function API<T extends object>(factory: DefaultFactory<Element>): T {
   return new Proxy({} as T, handle(factory));
 }
 

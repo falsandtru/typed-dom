@@ -1,4 +1,4 @@
-﻿export { TypedHTML as default, TypedHTML, TypedSVG } from './src/dom/builder';
+﻿export { TypedHTML as default, TypedHTML, TypedSVG, API } from './src/dom/builder';
 export { html, svg, text, frag, observe } from './src/util/dom';
 export * from './src/util/listener';
 

@@ -1,4 +1,4 @@
-import def, { TypedHTML, TypedSVG, html, svg, text, frag, observe, listen, once, bind, delegate, currentTargets } from '../../index';
+import def, { TypedHTML, TypedSVG, API, html, svg, text, frag, observe, listen, once, bind, delegate, currentTargets } from '../../index';
 
 describe('Interface: Package', function () {
   describe('default', function () {
@@ -15,6 +15,11 @@ describe('Interface: Package', function () {
 
     it('TypedSVG', function () {
       assert(typeof TypedSVG === 'object');
+    });
+
+    it('API', function () {
+      assert((): API<HTMLElementTagNameMap> => TypedHTML);
+      assert((): typeof TypedHTML => API(html));
     });
 
   });

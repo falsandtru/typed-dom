@@ -1,4 +1,4 @@
-import { TypedHTML, TypedSVG } from '../../index';
+import { TypedHTML, TypedSVG, API, observe, html } from '../../index';
 import { Sequence } from 'spica/sequence';
 
 declare global {
@@ -311,6 +311,29 @@ describe('Integration: Typed DOM', function () {
     it('extend', function () {
       assert(TypedHTML.any().element.outerHTML === '<any></any>');
       assert(TypedSVG.a().element.outerHTML === '<a></a>');
+    });
+
+    it('customize', async function () {
+      const h = observe(html, rs => rs.forEach(record =>
+        void record.addedNodes.forEach(node =>
+          node.parentNode &&
+          node instanceof Text &&
+          (node.textContent = node.textContent!.toUpperCase()))));
+      const t: API<HTMLElementTagNameMap> = API((tag: keyof typeof t, ...args: any[]) =>
+        h(tag, ...args));
+  
+      const el = t.span('a' as string);
+      assert(el.children === 'a');
+      assert(el.element.textContent === 'a');
+      await 0;
+      assert(el.children === 'A');
+      assert(el.element.textContent === 'A');
+      el.children = 'b';
+      assert(el.children === 'b');
+      assert(el.element.textContent === 'b');
+      await 0;
+      assert(el.children === 'B');
+      assert(el.element.textContent === 'B');
     });
 
   });
