@@ -23,7 +23,7 @@ export namespace ElChildren {
   export type Collection = El<string, Element, any>[];
   export type Record = { [field: string]: El<string, Element, any>; };
 }
-type LooseChildren<C extends ElChildren> = C extends string ? string : C;
+type LooseChildren<C extends ElChildren> = C extends ElChildren.Text ? ElChildren.Text : C;
 
 const memory = new WeakSet<Element>();
 

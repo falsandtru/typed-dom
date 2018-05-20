@@ -16,18 +16,17 @@ interface Factory<E extends Element> {
 export type API<T> = {
   readonly [P in Extract<keyof ExtractProp<T, Element>, string>]: T[P] extends Element ? ElBuilder<P, T[P]> : never;
 };
-
-type TypedHTML = API<HTMLElementTagNameMap>;
-type TypedSVG = API<SVGElementTagNameMap_>;
-
-export const TypedHTML: TypedHTML = API(html);
-export const TypedSVG: TypedSVG = API(svg);
-
-export function API<T extends object>(factory: DefaultFactory<Element>): T {
-  return new Proxy({} as T, handle(factory));
+export function API<T extends API<any>>(factory: DefaultFactory<Element>): T {
+  return new Proxy({} as T, handle(El, factory));
 }
 
-function handle<T extends object>(defaultFactory: DefaultFactory<Element>): ProxyHandler<T> {
+type TypedHTML = API<HTMLElementTagNameMap>;
+export const TypedHTML: TypedHTML = API(html);
+
+type TypedSVG = API<SVGElementTagNameMap_>;
+export const TypedSVG: TypedSVG = API(svg);
+
+function handle<T extends object>(Elem: typeof El, defaultFactory: DefaultFactory<Element>): ProxyHandler<T> {
   return {
     get: (obj, prop) =>
       obj[prop] || typeof prop !== 'string'
@@ -40,7 +39,7 @@ function handle<T extends object>(defaultFactory: DefaultFactory<Element>): Prox
       if (typeof attrs === 'function') return build(undefined, undefined, attrs);
       if (typeof children === 'function') return build(attrs, undefined, children);
       if (attrs !== undefined && isChildren(attrs)) return build(undefined, attrs, factory);
-      return new El(elem(tag, factory || (() => defaultFactory()), attrs), children as C);
+      return new Elem(elem(tag, factory || (() => defaultFactory()), attrs), children as C);
     };
 
     function isChildren(children: C | Record<string, string | EventListener>): children is C {
