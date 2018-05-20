@@ -148,7 +148,9 @@ export class El<
       case ElChildrenType.Void:
         return;
       case ElChildrenType.Text:
-        (this.children_ as any as Text).data = children as string;
+        children = document.createTextNode(children as ElChildren.Text) as any;
+        void this.element_.replaceChild(children as any, this.children_ as any);
+        this.children_ = children;
         return;
       case ElChildrenType.Collection:
         void (this.children_ as ElChildren.Collection)

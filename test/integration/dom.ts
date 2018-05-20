@@ -1,4 +1,4 @@
-import TypedHTML, { TypedSVG } from '../../index';
+import { TypedHTML, TypedSVG } from '../../index';
 import { Sequence } from 'spica/sequence';
 
 declare global {

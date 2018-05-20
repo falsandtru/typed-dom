@@ -1,4 +1,4 @@
-import { html, svg, frag } from './dom';
+import { html, svg, frag, observe } from './dom';
 import { TypedHTML, TypedSVG } from '../dom/builder';
 
 describe('Unit: util/dom', () => {
@@ -29,6 +29,26 @@ describe('Unit: util/dom', () => {
 
     it('', () => {
       assert(stringify(frag('a')) === 'a');
+    });
+
+  });
+
+  describe('observe', () => {
+    it('html', async function () {
+      const custom = observe(html, rs => rs.forEach(record =>
+        void record.addedNodes.forEach(node =>
+          node.parentNode &&
+          node instanceof Text &&
+          (node.textContent = node.textContent!.toUpperCase()))));
+
+      const el = custom('span', 'a');
+      assert(el.textContent === 'a');
+      await 0;
+      assert(el.textContent === 'A');
+      el.textContent = 'b';
+      assert(el.textContent === 'b');
+      await 0;
+      assert(el.textContent === 'B');
     });
 
   });

@@ -1,5 +1,6 @@
 import { El, ElChildren } from './manager';
-import { html, svg, define } from '../util/dom';
+import { Factory as DefaultFactory, html, svg, define } from '../util/dom';
+import { ExtractProp } from 'spica/type';
 
 interface ElBuilder<T extends string, E extends Element> {
   (factory?: (f: Factory<E>) => E): El<T, E, ElChildren.Void>;                                                   <C extends ElChildren>
@@ -11,20 +12,19 @@ interface Factory<E extends Element> {
   (children?: Iterable<Node> | string): E;
   (attrs?: Record<string, string | EventListener>, children?: Iterable<Node> | string): E;
 }
-interface DefaultFactory<E extends Element> {
-  (tag: string, children?: Iterable<Node> | string): E;
-  (tag: string, attrs?: Record<string, string | EventListener>, children?: Iterable<Node> | string): E;
+
+type API<T> = {
+  readonly [P in Extract<keyof ExtractProp<T, Element>, string>]: T[P] extends Element ? ElBuilder<P, T[P]> : never;
+};
+type TypedHTML = API<HTMLElementTagNameMap>;
+type TypedSVG = API<SVGElementTagNameMap_>;
+
+export const TypedHTML: TypedHTML = make(html);
+export const TypedSVG: TypedSVG = make(svg);
+
+function make<T extends object>(factory: DefaultFactory<Element>): T {
+  return new Proxy({} as T, handle(factory));
 }
-
-type TypedHTML = {
-  readonly [T in keyof HTMLElementTagNameMap]: ElBuilder<T, HTMLElementTagNameMap[T]>;
-};
-type TypedSVG = {
-  readonly [T in keyof SVGElementTagNameMap_]: ElBuilder<T, SVGElementTagNameMap_[T]>;
-};
-
-export const TypedHTML: TypedHTML = new Proxy({} as TypedHTML, handle(html));
-export const TypedSVG: TypedSVG = new Proxy({} as TypedSVG, handle(svg));
 
 function handle<T extends object>(defaultFactory: DefaultFactory<Element>): ProxyHandler<T> {
   return {
