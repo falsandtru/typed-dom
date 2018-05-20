@@ -30,8 +30,8 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('factory', function () {
-      const dom = TypedHTML.p(f => {
-        const el = document.createElement('div').appendChild(f());
+      const dom = TypedHTML.p((f, tag) => {
+        const el = document.createElement('div').appendChild(f(tag));
         el.id = 'test';
         return el;
       });
@@ -53,8 +53,8 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('text with factory', function () {
-      const dom = TypedHTML.p(`a`, el =>
-        el({ id: 'test' }));
+      const dom = TypedHTML.p(`a`, (el, tag) =>
+        el(tag, { id: 'test' }));
       assert(dom.element.id === 'test');
       assert(dom.children === 'a');
     });
@@ -134,8 +134,8 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('collection with factory', function () {
-      const dom = TypedHTML.ul([], el =>
-        el({ id: 'test' }));
+      const dom = TypedHTML.ul([], (el, tag) =>
+        el(tag, { id: 'test' }));
       assert(dom.element.id === 'test');
       assert.deepStrictEqual(dom.children, []);
     });
@@ -192,8 +192,8 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('struct with factory', function () {
-      const dom = TypedHTML.article({}, el =>
-        el({ id: 'test' }));
+      const dom = TypedHTML.article({}, (el, tag) =>
+        el(tag, { id: 'test' }));
       assert(dom.element.id === 'test');
       assert.deepStrictEqual(dom.children, {});
     });
@@ -206,8 +206,8 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('attr with factory', function () {
-      const dom = TypedHTML.div({ id: 'test' }, el =>
-        el({ id: 'id', class: 'test' }));
+      const dom = TypedHTML.div({ id: 'test' }, (el, tag) =>
+        el(tag, { id: 'id', class: 'test' }));
       assert(dom.element.id === 'test');
       assert(dom.element.className === 'test');
       assert(dom.children === undefined);
@@ -235,24 +235,24 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('attr with text and factory', function () {
-      const dom = TypedHTML.div({ id: 'test' }, '', el =>
-        el({ id: 'id', class: 'test' }));
+      const dom = TypedHTML.div({ id: 'test' }, '', (el, tag) =>
+        el(tag, { id: 'id', class: 'test' }));
       assert(dom.element.id === 'test');
       assert(dom.element.className === 'test');
       assert(dom.children === '');
     });
 
     it('attr with collection and factory', function () {
-      const dom = TypedHTML.div({ id: 'test' }, [], el =>
-        el({ id: 'id', class: 'test' }));
+      const dom = TypedHTML.div({ id: 'test' }, [], (el, tag) =>
+        el(tag, { id: 'id', class: 'test' }));
       assert(dom.element.id === 'test');
       assert(dom.element.className === 'test');
       assert.deepStrictEqual(dom.children, []);
     });
 
     it('attr with struct and factory', function () {
-      const dom = TypedHTML.div({ id: 'test' }, {}, el =>
-        el({ id: 'id', class: 'test' }));
+      const dom = TypedHTML.div({ id: 'test' }, {}, (el, tag) =>
+        el(tag, { id: 'id', class: 'test' }));
       assert(dom.element.id === 'test');
       assert(dom.element.className === 'test');
       assert.deepStrictEqual(dom.children, {});
@@ -319,8 +319,7 @@ describe('Integration: Typed DOM', function () {
           node.parentNode &&
           node instanceof Text &&
           (node.textContent = node.textContent!.toUpperCase()))));
-      const t: API<HTMLElementTagNameMap> = API((tag: keyof typeof t, ...args: any[]) =>
-        h(tag, ...args));
+      const t: API<HTMLElementTagNameMap> = API(h);
   
       const el = t.span('a');
       assert(el.children === 'a');
