@@ -19,7 +19,7 @@ interface ElBuilder<T extends string, E extends Element, F extends BaseFactory<T
   (attrs: Attrs, children: C, factory?: Factory<F, T, C, E>): El<T, E, C>;
 }
 
-type Factory<F extends BaseFactory<TagNameMap>, T extends string, C extends Children, E extends Element> = (baseFactory: F, tag: T, attrs: Attrs | undefined, children: C) => E;
+type Factory<F extends BaseFactory<TagNameMap>, T extends string, C extends Children, E extends Element> = (baseFactory: F, tag: T, attrs: Attrs, children: C) => E;
 
 function handle<M extends TagNameMap, F extends BaseFactory<M>>(baseFactory: F): ProxyHandler<API<M, F>> {
   return {
@@ -34,7 +34,7 @@ function handle<M extends TagNameMap, F extends BaseFactory<M>>(baseFactory: F):
       if (typeof attrs === 'function') return build(undefined, undefined, attrs);
       if (typeof children === 'function') return build(attrs, undefined, children);
       if (attrs !== undefined && isChildren(attrs)) return build(undefined, attrs, factory);
-      return new El(elem(factory || ((f, tag) => f(tag) as any as Element), attrs, children), children);
+      return new El(elem(factory || ((f, tag) => f(tag) as any as Element), attrs || {}, children), children);
     };
 
     function isChildren(children: Children | Attrs): children is Children {
@@ -42,10 +42,10 @@ function handle<M extends TagNameMap, F extends BaseFactory<M>>(baseFactory: F):
           || Object.values(children).slice(-1).every(val => typeof val === 'object');
     }
 
-    function elem(factory: Factory<F, Extract<keyof M, string>, Children, Element>, attrs: Attrs | undefined, children: Children): Element {
+    function elem(factory: Factory<F, Extract<keyof M, string>, Children, Element>, attrs: Attrs, children: Children): Element {
       const el = factory(baseFactory, tag, attrs, children);
       if (tag !== el.tagName.toLowerCase()) throw new Error(`TypedDOM: Tag name must be "${tag}", but got "${el.tagName.toLowerCase()}".`);
-      attrs && void define(el, attrs);
+      void define(el, attrs);
       return el;
     }
   }
