@@ -3,7 +3,7 @@ import { Factory as BaseFactory, TagNameMap, Attrs, html, svg, define } from '..
 import { ExtractProp } from 'spica/type';
 
 export type API<M extends TagNameMap, F extends BaseFactory<M>> = {
-  readonly [P in Extract<keyof ExtractProp<M, Element>, string>]: M[P] extends Element ? ElBuilder<P, M[P], F> : never;
+  readonly [P in Extract<keyof ExtractProp<M, Element>, string>]: ElBuilder<P, Extract<M[P], Element>, F>;
 };
 export function API<M extends TagNameMap, F extends BaseFactory<M>>(baseFactory: F): API<M, F> {
   return new Proxy({} as API<M, F>, handle(baseFactory));
