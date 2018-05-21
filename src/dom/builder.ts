@@ -13,10 +13,10 @@ export const TypedHTML: API<HTMLElementTagNameMap, typeof html> = API(html);
 export const TypedSVG: API<SVGElementTagNameMap_, typeof svg> = API(svg);
 
 interface ElBuilder<T extends string, E extends Element, F extends BaseFactory<TagNameMap>> {
-  (factory?: Factory<F, T, Children.Void, E>): El<T, E, Children.Void>;                       <C extends Children>
-  (children: C, factory?: Factory<F, T, C, E>): El<T, E, C>;
-  (attrs: Attrs, factory?: Factory<F, T, Children.Void, E>): El<T, E, Children.Void>;         <C extends Children>
-  (attrs: Attrs, children: C, factory?: Factory<F, T, C, E>): El<T, E, C>;
+                      (                           factory?: Factory<F, T, Children.Void, E>): El<T, E, Children.Void>;
+  <C extends Children>(              children: C, factory?: Factory<F, T, C, E>            ): El<T, E, C>;
+                      (attrs: Attrs,              factory?: Factory<F, T, Children.Void, E>): El<T, E, Children.Void>;
+  <C extends Children>(attrs: Attrs, children: C, factory?: Factory<F, T, C, E>            ): El<T, E, C>;
 }
 
 type Factory<F extends BaseFactory<TagNameMap>, T extends string, C extends Children, E extends Element> = (baseFactory: F, tag: T, attrs: Attrs, children: C) => E;
