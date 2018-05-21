@@ -24,7 +24,7 @@ type Factory<F extends BaseFactory<TagNameMap>, T extends string, C extends Chil
 function handle<M extends TagNameMap, F extends BaseFactory<M>>(baseFactory: F): ProxyHandler<API<M, F>> {
   return {
     get: (obj, prop) =>
-      obj[prop] || typeof prop !== 'string'
+      obj[prop] || prop in obj || typeof prop !== 'string'
         ? obj[prop]
         : obj[prop] = builder(prop as Extract<keyof M, string>, baseFactory),
   };
