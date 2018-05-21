@@ -23,13 +23,13 @@ const cache = new Map<string, Element>();
 export function html<T extends keyof HTMLElementTagNameMap>(tag: T, children?: Children): HTMLElementTagNameMap[T];
 export function html<T extends keyof HTMLElementTagNameMap>(tag: T, attrs?: Attrs, children?: Children): HTMLElementTagNameMap[T];
 export function html<T extends keyof HTMLElementTagNameMap>(tag: T, attrs: Attrs | Children = {}, children: Children = []): HTMLElementTagNameMap[T] {
-  return element('html', tag, attrs, children);
+  return element(NS.HTML, tag, attrs, children);
 }
 
 export function svg<T extends keyof SVGElementTagNameMap_>(tag: T, children?: Children): SVGElementTagNameMap_[T];
 export function svg<T extends keyof SVGElementTagNameMap_>(tag: T, attrs?: Attrs, children?: Children): SVGElementTagNameMap_[T];
 export function svg<T extends keyof SVGElementTagNameMap_>(tag: T, attrs: Attrs | Children = {}, children: Children = []): SVGElementTagNameMap_[T] {
-  return element('svg', tag, attrs, children);
+  return element(NS.SVG, tag, attrs, children);
 }
 
 export function frag(children: Children = []): DocumentFragment {
@@ -45,9 +45,14 @@ export function text(source: string): Text {
   return document.createTextNode(source);
 }
 
-function element<T extends keyof HTMLElementTagNameMap>(ns: 'html', tag: T, attrs?: Attrs | Children, children?: Children): HTMLElementTagNameMap[T];
-function element<T extends keyof SVGElementTagNameMap_>(ns: 'svg', tag: T, attrs?: Attrs | Children, children?: Children): SVGElementTagNameMap_[T];
-function element(ns: string, tag: string, attrs: Attrs | Children = {}, children: Children = []): Element {
+const enum NS {
+  HTML,
+  SVG,
+}
+
+function element<T extends keyof HTMLElementTagNameMap>(ns: NS.HTML, tag: T, attrs?: Attrs | Children, children?: Children): HTMLElementTagNameMap[T];
+function element<T extends keyof SVGElementTagNameMap_>(ns: NS.SVG, tag: T, attrs?: Attrs | Children, children?: Children): SVGElementTagNameMap_[T];
+function element(ns: NS, tag: string, attrs: Attrs | Children = {}, children: Children = []): Element {
   const key = `${ns}:${tag}`;
   const el = cache.has(key)
     ? cache.get(key)!.cloneNode(true) as Element
@@ -59,11 +64,11 @@ function element(ns: string, tag: string, attrs: Attrs | Children = {}, children
   return el;
 }
 
-function elem(ns: string, tag: string): Element {
+function elem(ns: NS, tag: string): Element {
   switch (ns) {
-    case 'html':
+    case NS.HTML:
       return document.createElement(tag);
-    case 'svg':
+    case NS.SVG:
       return document.createElementNS("http://www.w3.org/2000/svg", tag);
     default:
       throw new Error(`TypedDOM: Unknown namespace: ${ns}`);
