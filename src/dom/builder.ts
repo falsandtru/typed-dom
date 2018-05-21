@@ -3,12 +3,12 @@ import { TagNameMap, Factory as BaseFactory, html, svg, define } from '../util/d
 import { ExtractProp } from 'spica/type';
 
 interface ElBuilder<T extends string, E extends Element, F extends BaseFactory<TagNameMap>> {
-  (factory?: Factory<F, T, E>): El<T, E, ElChildren.Void>;                                                   <C extends ElChildren>
-  (children: C, factory?: Factory<F, T, E>): El<T, E, C>;
-  (attrs: Record<string, string | EventListener>, factory?: Factory<F, T, E>): El<T, E, ElChildren.Void>;    <C extends ElChildren>
-  (attrs: Record<string, string | EventListener>, children: C, factory?: Factory<F, T, E>): El<T, E, C>;
+  (factory?: Factory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;                                                   <C extends ElChildren>
+  (children: C, factory?: Factory<F, T, C, E>): El<T, E, C>;
+  (attrs: Record<string, string | EventListener>, factory?: Factory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;    <C extends ElChildren>
+  (attrs: Record<string, string | EventListener>, children: C, factory?: Factory<F, T, C, E>): El<T, E, C>;
 }
-type Factory<F extends BaseFactory<TagNameMap>, T extends string, E extends Element> = (baseFactory: F, tag: T) => E;
+type Factory<F extends BaseFactory<TagNameMap>, T extends string, C extends ElChildren, E extends Element> = (baseFactory: F, tag: T, attrs: Record<string, string | EventListener> | undefined, children: C) => E;
 
 export type API<M extends TagNameMap, F extends BaseFactory<M>> = {
   readonly [P in Extract<keyof ExtractProp<M, Element>, string>]: M[P] extends Element ? ElBuilder<P, M[P], F> : never;
@@ -29,11 +29,11 @@ function handle<M extends TagNameMap, F extends BaseFactory<M>>(baseFactory: F):
   };
 
   function builder(tag: Extract<keyof M, string>, baseFactory: F): (attrs?: Record<string, string | EventListener>, children?: ElChildren, factory?: () => Element) => El<string, Element, ElChildren> {
-    return function build(attrs?: Record<string, string | EventListener>, children?: ElChildren, factory?: Factory<F, string, Element>): El<string, Element, ElChildren> {
+    return function build(attrs?: Record<string, string | EventListener>, children?: ElChildren, factory?: Factory<F, string, ElChildren, Element>): El<string, Element, ElChildren> {
       if (typeof attrs === 'function') return build(undefined, undefined, attrs);
       if (typeof children === 'function') return build(attrs, undefined, children);
       if (attrs !== undefined && isChildren(attrs)) return build(undefined, attrs, factory);
-      return new El(elem(factory || ((f, tag) => f(tag) as any as Element), attrs), children!);
+      return new El(elem(factory || ((f, tag) => f(tag) as any as Element), attrs, children), children);
     };
 
     function isChildren(children: ElChildren | Record<string, string | EventListener>): children is ElChildren {
@@ -41,8 +41,8 @@ function handle<M extends TagNameMap, F extends BaseFactory<M>>(baseFactory: F):
           || Object.values(children).slice(-1).every(val => typeof val === 'object');
     }
 
-    function elem(factory: Factory<F, Extract<keyof M, string>, Element>, attrs?: Record<string, string | EventListener>): Element {
-      const el = factory(baseFactory, tag);
+    function elem(factory: Factory<F, Extract<keyof M, string>, ElChildren, Element>, attrs: Record<string, string | EventListener> | undefined, children: ElChildren): Element {
+      const el = factory(baseFactory, tag, attrs, children);
       if (tag !== el.tagName.toLowerCase()) throw new Error(`TypedDOM: Tag name must be "${tag}", but got "${el.tagName.toLowerCase()}".`);
       attrs && void define(el, attrs);
       return el;
