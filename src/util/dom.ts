@@ -1,8 +1,10 @@
 export type TagNameMap = object;
+export type Attrs = Record<string, string | EventListener>;
+type Children = Iterable<Node> | string;
 
 export interface Factory<M extends TagNameMap> {
-  <T extends keyof M>(tag: T, children?: Iterable<Node> | string): M[T];
-  <T extends keyof M>(tag: T, attrs?: Record<string, string | EventListener>, children?: Iterable<Node> | string): M[T];
+  <T extends keyof M>(tag: T, children?: Children): M[T];
+  <T extends keyof M>(tag: T, attrs?: Attrs, children?: Children): M[T];
 }
 
 export function observe<F extends Factory<TagNameMap>>(factory: F, callback: (record: MutationRecord[]) => void, opts?: MutationObserverInit): F;
@@ -18,19 +20,19 @@ export function observe<M extends TagNameMap>(factory: Factory<M>, callback: (re
 
 const cache = new Map<string, Element>();
 
-export function html<T extends keyof HTMLElementTagNameMap>(tag: T, children?: Iterable<Node> | string): HTMLElementTagNameMap[T];
-export function html<T extends keyof HTMLElementTagNameMap>(tag: T, attrs?: Record<string, string | EventListener>, children?: Iterable<Node> | string): HTMLElementTagNameMap[T];
-export function html<T extends keyof HTMLElementTagNameMap>(tag: T, attrs: Record<string, string | EventListener> | Iterable<Node> | string = {}, children: Iterable<Node> | string = []): HTMLElementTagNameMap[T] {
+export function html<T extends keyof HTMLElementTagNameMap>(tag: T, children?: Children): HTMLElementTagNameMap[T];
+export function html<T extends keyof HTMLElementTagNameMap>(tag: T, attrs?: Attrs, children?: Children): HTMLElementTagNameMap[T];
+export function html<T extends keyof HTMLElementTagNameMap>(tag: T, attrs: Attrs | Children = {}, children: Children = []): HTMLElementTagNameMap[T] {
   return element('html', tag, attrs, children);
 }
 
-export function svg<T extends keyof SVGElementTagNameMap_>(tag: T, children?: Iterable<Node> | string): SVGElementTagNameMap_[T];
-export function svg<T extends keyof SVGElementTagNameMap_>(tag: T, attrs?: Record<string, string | EventListener>, children?: Iterable<Node> | string): SVGElementTagNameMap_[T];
-export function svg<T extends keyof SVGElementTagNameMap_>(tag: T, attrs: Record<string, string | EventListener> | Iterable<Node> | string = {}, children: Iterable<Node> | string = []): SVGElementTagNameMap_[T] {
+export function svg<T extends keyof SVGElementTagNameMap_>(tag: T, children?: Children): SVGElementTagNameMap_[T];
+export function svg<T extends keyof SVGElementTagNameMap_>(tag: T, attrs?: Attrs, children?: Children): SVGElementTagNameMap_[T];
+export function svg<T extends keyof SVGElementTagNameMap_>(tag: T, attrs: Attrs | Children = {}, children: Children = []): SVGElementTagNameMap_[T] {
   return element('svg', tag, attrs, children);
 }
 
-export function frag(children: Iterable<Node> | string = []): DocumentFragment {
+export function frag(children: Children = []): DocumentFragment {
   children = typeof children === 'string' ? [text(children)] : children;
   const frag = document.createDocumentFragment();
   void [...children]
@@ -43,9 +45,9 @@ export function text(source: string): Text {
   return document.createTextNode(source);
 }
 
-function element<T extends keyof HTMLElementTagNameMap>(ns: 'html', tag: T, attrs?: Record<string, string | EventListener> | Iterable<Node> | string, children?: Iterable<Node> | string): HTMLElementTagNameMap[T];
-function element<T extends keyof SVGElementTagNameMap_>(ns: 'svg', tag: T, attrs?: Record<string, string | EventListener> | Iterable<Node> | string, children?: Iterable<Node> | string): SVGElementTagNameMap_[T];
-function element(ns: string, tag: string, attrs: Record<string, string | EventListener> | Iterable<Node> | string = {}, children: Iterable<Node> | string = []): Element {
+function element<T extends keyof HTMLElementTagNameMap>(ns: 'html', tag: T, attrs?: Attrs | Children, children?: Children): HTMLElementTagNameMap[T];
+function element<T extends keyof SVGElementTagNameMap_>(ns: 'svg', tag: T, attrs?: Attrs | Children, children?: Children): SVGElementTagNameMap_[T];
+function element(ns: string, tag: string, attrs: Attrs | Children = {}, children: Children = []): Element {
   const key = `${ns}:${tag}`;
   const el = cache.has(key)
     ? cache.get(key)!.cloneNode(true) as Element
@@ -68,9 +70,9 @@ function elem(ns: string, tag: string): Element {
   }
 }
 
-export function define(el: Element, children?: Iterable<Node> | string): void;
-export function define(el: Element, attrs?: Record<string, string | EventListener> | Iterable<Node> | string, children?: Iterable<Node> | string): void;
-export function define(el: Element, attrs: Record<string, string | EventListener> | Iterable<Node> | string = {}, children: Iterable<Node> | string = []): void {
+export function define(el: Element, children?: Children): void;
+export function define(el: Element, attrs?: Attrs | Children, children?: Children): void;
+export function define(el: Element, attrs: Attrs | Children = {}, children: Children = []): void {
   if (isChildren(attrs)) return define(el, {}, attrs);
   if (typeof children === 'string') return define(el, attrs, [text(children)]);
   void Object.entries(attrs)
@@ -90,6 +92,6 @@ export function define(el: Element, attrs: Record<string, string | EventListener
       void el.appendChild(child));
 }
 
-function isChildren(o: object | string | Iterable<any>): o is string | Iterable<any> {
+function isChildren(o: Attrs | Children): o is Children {
   return !!o[Symbol.iterator];
 }
