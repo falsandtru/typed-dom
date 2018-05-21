@@ -18,7 +18,7 @@ describe('Interface: Package', function () {
     });
 
     it('API', function () {
-      assert((): API<HTMLElementTagNameMap> => TypedHTML);
+      assert((): API<HTMLElementTagNameMap, typeof html> => TypedHTML);
       assert((): typeof TypedHTML => API(html));
     });
 
