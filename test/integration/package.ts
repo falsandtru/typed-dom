@@ -393,7 +393,6 @@ describe('Integration: Typed DOM', function () {
       const trans: API<HTMLElementTagNameMap> = API(observe(html, rs => rs.forEach(record =>
         void record.addedNodes.forEach(node =>
           record.target === node.parentElement &&
-          node.parentElement &&
           node instanceof Text &&
           i18n.init((err, t) =>
             node.textContent = err
