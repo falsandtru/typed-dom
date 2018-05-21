@@ -2,14 +2,6 @@ import { El, ElChildren as Children } from './manager';
 import { Factory as BaseFactory, TagNameMap, Attrs, html, svg, define } from '../util/dom';
 import { ExtractProp } from 'spica/type';
 
-interface ElBuilder<T extends string, E extends Element, F extends BaseFactory<TagNameMap>> {
-  (factory?: Factory<F, T, Children.Void, E>): El<T, E, Children.Void>;                       <C extends Children>
-  (children: C, factory?: Factory<F, T, C, E>): El<T, E, C>;
-  (attrs: Attrs, factory?: Factory<F, T, Children.Void, E>): El<T, E, Children.Void>;         <C extends Children>
-  (attrs: Attrs, children: C, factory?: Factory<F, T, C, E>): El<T, E, C>;
-}
-type Factory<F extends BaseFactory<TagNameMap>, T extends string, C extends Children, E extends Element> = (baseFactory: F, tag: T, attrs: Attrs | undefined, children: C) => E;
-
 export type API<M extends TagNameMap, F extends BaseFactory<M>> = {
   readonly [P in Extract<keyof ExtractProp<M, Element>, string>]: M[P] extends Element ? ElBuilder<P, M[P], F> : never;
 };
@@ -19,6 +11,15 @@ export function API<M extends TagNameMap, F extends BaseFactory<M>>(baseFactory:
 
 export const TypedHTML: API<HTMLElementTagNameMap, typeof html> = API(html);
 export const TypedSVG: API<SVGElementTagNameMap_, typeof svg> = API(svg);
+
+interface ElBuilder<T extends string, E extends Element, F extends BaseFactory<TagNameMap>> {
+  (factory?: Factory<F, T, Children.Void, E>): El<T, E, Children.Void>;                       <C extends Children>
+  (children: C, factory?: Factory<F, T, C, E>): El<T, E, C>;
+  (attrs: Attrs, factory?: Factory<F, T, Children.Void, E>): El<T, E, Children.Void>;         <C extends Children>
+  (attrs: Attrs, children: C, factory?: Factory<F, T, C, E>): El<T, E, C>;
+}
+
+type Factory<F extends BaseFactory<TagNameMap>, T extends string, C extends Children, E extends Element> = (baseFactory: F, tag: T, attrs: Attrs | undefined, children: C) => E;
 
 function handle<M extends TagNameMap, F extends BaseFactory<M>>(baseFactory: F): ProxyHandler<API<M, F>> {
   return {
