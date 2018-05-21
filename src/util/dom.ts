@@ -1,10 +1,10 @@
-export interface Factory<E extends Element> {
-  (tag: string, children?: Iterable<Node> | string): E;
-  (tag: string, attrs?: Record<string, string | EventListener>, children?: Iterable<Node> | string): E;
+export interface Factory<M extends object> {
+  <T extends keyof M>(tag: string, children?: Iterable<Node> | string): M[T];
+  <T extends keyof M>(tag: string, attrs?: Record<string, string | EventListener>, children?: Iterable<Node> | string): M[T];
 }
 
-export function observe<F extends Factory<Element>>(factory: F, callback: (record: MutationRecord[]) => void, opts?: MutationObserverInit): F;
-export function observe(factory: Factory<Element>, callback: (record: MutationRecord[]) => void, opts: MutationObserverInit = { childList: true }): typeof factory {
+export function observe<F extends Factory<object>>(factory: F, callback: (record: MutationRecord[]) => void, opts?: MutationObserverInit): F;
+export function observe(factory: Factory<object>, callback: (record: MutationRecord[]) => void, opts: MutationObserverInit = { childList: true }): typeof factory {
   return (tag: string, ...args: any[]) => {
     const obs = new MutationObserver(callback);
     const el = factory(tag);

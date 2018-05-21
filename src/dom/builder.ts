@@ -2,25 +2,25 @@ import { El, ElChildren } from './manager';
 import { Factory as BaseFactory, html, svg, define } from '../util/dom';
 import { ExtractProp } from 'spica/type';
 
-interface ElBuilder<T extends string, E extends Element, F extends BaseFactory<Element>> {
+interface ElBuilder<T extends string, E extends Element, F extends BaseFactory<object>> {
   (factory?: Factory<F, T, E>): El<T, E, ElChildren.Void>;                                                   <C extends ElChildren>
   (children: C, factory?: Factory<F, T, E>): El<T, E, C>;
   (attrs: Record<string, string | EventListener>, factory?: Factory<F, T, E>): El<T, E, ElChildren.Void>;    <C extends ElChildren>
   (attrs: Record<string, string | EventListener>, children: C, factory?: Factory<F, T, E>): El<T, E, C>;
 }
-type Factory<F extends BaseFactory<Element>, T extends string, E extends Element> = (baseFactory: F, tag: T) => E;
+type Factory<F extends BaseFactory<object>, T extends string, E extends Element> = (baseFactory: F, tag: T) => E;
 
-export type API<T extends object, F extends BaseFactory<Element>> = {
-  readonly [P in Extract<keyof ExtractProp<T, Element>, string>]: T[P] extends Element ? ElBuilder<P, T[P], F> : never;
+export type API<M extends object, F extends BaseFactory<M>> = {
+  readonly [P in Extract<keyof ExtractProp<M, Element>, string>]: M[P] extends Element ? ElBuilder<P, M[P], F> : never;
 };
-export function API<T extends object, F extends BaseFactory<Element>>(baseFactory: F): API<T, F> {
-  return new Proxy({} as API<T, F>, handle(baseFactory));
+export function API<M extends object, F extends BaseFactory<M>>(baseFactory: F): API<M, F> {
+  return new Proxy({} as API<M, F>, handle(baseFactory));
 }
 
 export const TypedHTML: API<HTMLElementTagNameMap, typeof html> = API(html);
 export const TypedSVG: API<SVGElementTagNameMap_, typeof svg> = API(svg);
 
-function handle<T extends object, F extends BaseFactory<Element>>(baseFactory: F): ProxyHandler<T> {
+function handle<T extends object, F extends BaseFactory<object>>(baseFactory: F): ProxyHandler<T> {
   return {
     get: (obj, prop) =>
       obj[prop] || typeof prop !== 'string'
