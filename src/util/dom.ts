@@ -1,16 +1,18 @@
-export interface Factory<M extends object> {
-  <T extends keyof M>(tag: string, children?: Iterable<Node> | string): M[T];
-  <T extends keyof M>(tag: string, attrs?: Record<string, string | EventListener>, children?: Iterable<Node> | string): M[T];
+export type TagNameMap = object;
+
+export interface Factory<M extends TagNameMap> {
+  <T extends keyof M>(tag: T, children?: Iterable<Node> | string): M[T];
+  <T extends keyof M>(tag: T, attrs?: Record<string, string | EventListener>, children?: Iterable<Node> | string): M[T];
 }
 
-export function observe<F extends Factory<object>>(factory: F, callback: (record: MutationRecord[]) => void, opts?: MutationObserverInit): F;
-export function observe(factory: Factory<object>, callback: (record: MutationRecord[]) => void, opts: MutationObserverInit = { childList: true }): typeof factory {
-  return (tag: string, ...args: any[]) => {
+export function observe<F extends Factory<TagNameMap>>(factory: F, callback: (record: MutationRecord[]) => void, opts?: MutationObserverInit): F;
+export function observe<M extends TagNameMap>(factory: Factory<M>, callback: (record: MutationRecord[]) => void, opts: MutationObserverInit = { childList: true }): Factory<M> {
+  return (tag: keyof M, ...args: any[]) => {
     const obs = new MutationObserver(callback);
-    const el = factory(tag);
+    const el = factory(tag) as any as Element;
     void obs.observe(el, opts);
     void define(el, ...args);
-    return el;
+    return el as any as M[keyof M];
   };
 }
 
