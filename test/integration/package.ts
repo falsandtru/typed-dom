@@ -398,7 +398,7 @@ describe('Integration: Typed DOM', function () {
             node.textContent = err
               ? 'Failed to init i18next.'
               : t(node.textContent!, store.get(record.target)))))));
-  
+
       const el = trans.span('a', data({ data: 'B' }));
       assert(el.children === 'a');
       assert(el.element.textContent === 'a');
