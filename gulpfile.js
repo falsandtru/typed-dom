@@ -113,6 +113,7 @@ gulp.task('karma:test', function (done) {
       'dist/*.js': ['coverage', 'espower']
     },
     reporters: ['dots', 'coverage'],
+    concurrency: 1,
     singleRun: true
   }, done).start();
 });
@@ -125,6 +126,7 @@ gulp.task('karma:ci', function (done) {
       'dist/*.js': ['coverage', 'espower']
     },
     reporters: ['dots', 'coverage', 'coveralls'],
+    concurrency: 1,
     singleRun: true
   }, done).start();
 });
