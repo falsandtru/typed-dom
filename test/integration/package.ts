@@ -378,18 +378,23 @@ describe('Integration: Typed DOM', function () {
         resources: {
           en: {
             translation: {
-              "a": "A",
-              "b": "{{data}}",
+              "a": "{{data}}",
+              "b": "B",
             }
           }
         }
       });
+      interface TransDataMap {
+        'a': { data: string; };
+      }
       const store = new WeakMap<Node, object>();
-      const data = (data: object) => <T extends string, E extends Element>(factory: (tag: T) => E, tag: T): E => {
-        const el = factory(tag);
-        void store.set(el, data);
-        return el;
-      };
+      const data = <K extends keyof TransDataMap>(data: TransDataMap[K]) =>
+        <T extends string, E extends Element>(factory: (tag: T) => E, tag: T, _: never, children: K): E => {
+          assert(typeof children === 'string');
+          const el = factory(tag);
+          void store.set(el, data);
+          return el;
+        };
       const trans: API<HTMLElementTagNameMap, typeof html> = API(observe(html, rs => rs.forEach(record =>
         void record.addedNodes.forEach(node =>
           record.target === node.parentElement &&
@@ -399,7 +404,7 @@ describe('Integration: Typed DOM', function () {
               ? 'Failed to init i18next.'
               : t(node.textContent!, store.get(record.target)))))));
 
-      const el = trans.span('a', data({ data: 'B' }));
+      const el = trans.span('a', data({ data: 'A' }));
       assert(el.children === 'a');
       assert(el.element.textContent === 'a');
       await 0;
@@ -411,6 +416,10 @@ describe('Integration: Typed DOM', function () {
       await 0;
       assert(el.children === 'B');
       assert(el.element.textContent === 'B');
+      el.children = 'a';
+      await 0;
+      assert(el.children === 'A');
+      assert(el.element.textContent === 'A');
     });
 
   });
