@@ -154,21 +154,18 @@ export class El<
         this.children_ = children as C;
         return;
       case ElChildrenType.Collection:
-        void (this.children_ as ElChildren.Collection)
-          .reduce((cs, c) => {
-            const i = cs.indexOf(c);
-            if (i > -1) return cs;
-            void cs.splice(i, 1);
-            void c.element.remove();
-            return cs;
-          }, [...children as ElChildren.Collection]);
         this.children_ = [] as ElChildren.Collection as C;
         void (children as ElChildren.Collection)
           .forEach((child, i) => {
             child.element_.parentElement as Element === this.element_ || void throwErrorIfNotUsable(child);
             this.children_![i] = child;
-            void this.element_.appendChild(child.element);
+            if (this.children_![i] === this.element_.childNodes[i]) return;
+            void this.element_.insertBefore(child.element, this.element_.childNodes[i]);
           });
+        while (this.element_.childNodes.length > (children as ElChildren.Collection).length) {
+          void this.element_.removeChild(this.element_.lastChild!);
+        }
+        assert(this.element_.childNodes.length === (children as ElChildren.Collection).length);
         assert((this.children_ as ElChildren.Collection).every(({ element }, i) => element === this.element_.childNodes[i]));
         void Object.freeze(this.children_);
         void this.scope(Object.values(this.children_ as ElChildren.Collection));
