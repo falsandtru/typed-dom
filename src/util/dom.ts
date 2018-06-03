@@ -78,7 +78,7 @@ function elem(ns: NS, tag: string): Element {
 export function define(el: Element, children?: Children): void;
 export function define(el: Element, attrs?: Attrs | Children, children?: Children): void;
 export function define(el: Element, attrs: Attrs | Children = {}, children: Children = []): void {
-  if (isChildren(attrs)) return define(el, {}, attrs);
+  if (isChildren(attrs)) return define(el, undefined, attrs);
   if (typeof children === 'string') return define(el, attrs, [text(children)]);
   void Object.entries(attrs)
     .forEach(([name, value]) =>
