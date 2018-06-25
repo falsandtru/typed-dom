@@ -1,4 +1,4 @@
-import { html, svg, frag, observe } from './dom';
+import { html, svg, frag, observer } from './dom';
 import { TypedHTML, TypedSVG } from '../dom/builder';
 
 describe('Unit: util/dom', () => {
@@ -33,9 +33,9 @@ describe('Unit: util/dom', () => {
 
   });
 
-  describe('observe', () => {
-    it('html', async function () {
-      const custom = observe(html, rs => rs.forEach(record =>
+  describe('observer', () => {
+    it('', async function () {
+      const custom = observer(html, rs => rs.forEach(record =>
         void record.addedNodes.forEach(node =>
           node.parentNode &&
           node instanceof Text &&

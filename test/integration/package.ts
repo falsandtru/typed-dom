@@ -1,4 +1,4 @@
-import { TypedHTML, TypedSVG, API, observe, html } from '../../index';
+import { TypedHTML, TypedSVG, API, observer, html } from '../../index';
 import { Sequence } from 'spica/sequence';
 
 declare global {
@@ -314,7 +314,7 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('customize', async function () {
-      const t: API<HTMLElementTagNameMap, typeof html> = API(observe(html, rs => rs.forEach(record =>
+      const t: API<HTMLElementTagNameMap, typeof html> = API(observer(html, rs => rs.forEach(record =>
         void record.addedNodes.forEach(node =>
           node.parentNode &&
           node instanceof Text &&
@@ -395,7 +395,7 @@ describe('Integration: Typed DOM', function () {
           void store.set(el, data);
           return el;
         };
-      const trans: API<HTMLElementTagNameMap, typeof html> = API(observe(html, rs => rs.forEach(record =>
+      const trans: API<HTMLElementTagNameMap, typeof html> = API(observer(html, rs => rs.forEach(record =>
         void record.addedNodes.forEach(node =>
           record.target === node.parentElement &&
           node instanceof Text &&
