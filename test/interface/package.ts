@@ -1,4 +1,4 @@
-import def, { TypedHTML, TypedSVG, API, html, svg, text, frag, observer, listen, once, bind, delegate, currentTargets } from '../../index';
+import def, { TypedHTML, TypedSVG, API, html, svg, text, frag, define, observer, listen, once, bind, delegate, currentTargets } from '../../index';
 
 describe('Interface: Package', function () {
   describe('default', function () {
@@ -39,6 +39,10 @@ describe('Interface: Package', function () {
 
     it('frag', function () {
       assert(typeof frag === 'function');
+    });
+
+    it('define', function () {
+      assert(typeof define === 'function');
     });
 
     it('observer', function () {
