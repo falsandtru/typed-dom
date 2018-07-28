@@ -61,9 +61,8 @@ export class El<
     }
 
     function clear(): void {
-      while (element_.childNodes.length > 0) {
-        void element_.removeChild(element_.firstChild!);
-      }
+      element_.innerHTML = '';
+      assert(element_.childNodes.length === 0);
     }
 
     function observe<C extends ElChildren.Record>(element: Element, children: C): C {
