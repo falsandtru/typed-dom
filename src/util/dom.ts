@@ -75,9 +75,9 @@ function elem(ns: NS, tag: string): Element {
   }
 }
 
-export function define(el: Element, children?: Children): void;
-export function define(el: Element, attrs?: Attrs | Children, children?: Children): void;
-export function define(el: Element, attrs: Attrs | Children = {}, children?: Children): void {
+export function define<T extends Element>(el: T, children?: Children): T;
+export function define<T extends Element>(el: T, attrs?: Attrs | Children, children?: Children): T;
+export function define<T extends Element>(el: T, attrs: Attrs | Children = {}, children?: Children): T {
   if (isChildren(attrs)) return define(el, undefined, attrs);
   if (typeof children === 'string') return define(el, attrs, [text(children)]);
   void Object.entries(attrs)
@@ -92,13 +92,15 @@ export function define(el: Element, attrs: Attrs | Children = {}, children?: Chi
               'touchmove',
             ].includes(name.slice(2)),
           }));
-  if (!children) return;
-  void el.childNodes
-    .forEach(child =>
-      void el.removeChild(child));
+  if (!children) return el;
+  el.innerHTML = '';
+  while (el.firstChild) {
+    void el.removeChild(el.firstChild);
+  }
   void [...children]
     .forEach(child =>
       void el.appendChild(child));
+  return el;
 }
 
 function isChildren(o: Attrs | Children): o is Children {

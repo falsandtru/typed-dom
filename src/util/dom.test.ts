@@ -1,4 +1,4 @@
-import { html, svg, frag, observer } from './dom';
+import { html, svg, frag, define, observer } from './dom';
 import { TypedHTML, TypedSVG } from '../dom/builder';
 
 describe('Unit: util/dom', () => {
@@ -8,7 +8,6 @@ describe('Unit: util/dom', () => {
       assert(html('a', { class: 'test' }).outerHTML === TypedHTML.a({ class: 'test' }).element.outerHTML);
       assert(html('a', { class: 'test' }, 'b').outerHTML === TypedHTML.a({ class: 'test' }, 'b').element.outerHTML);
       assert(html('a', 'b').outerHTML === TypedHTML.a('b').element.outerHTML);
-      assert(html('html', []).outerHTML === '<html></html>');
     });
 
   });
@@ -30,6 +29,13 @@ describe('Unit: util/dom', () => {
 
     it('', () => {
       assert(stringify(frag('a')) === 'a');
+    });
+
+  });
+
+  describe('define', () => {
+    it('', () => {
+      assert(define(html('html'), []).innerHTML === '');
     });
 
   });
