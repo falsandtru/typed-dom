@@ -92,14 +92,15 @@ export function define<T extends Element>(el: T, attrs: Attrs | Children = {}, c
               'touchmove',
             ].includes(name.slice(2)),
           }));
-  if (!children) return el;
-  el.innerHTML = '';
-  while (el.firstChild) {
-    void el.removeChild(el.firstChild);
+  if (children) {
+    el.innerHTML = '';
+    while (el.firstChild) {
+      void el.removeChild(el.firstChild);
+    }
+    void [...children]
+      .forEach(child =>
+        void el.appendChild(child));
   }
-  void [...children]
-    .forEach(child =>
-      void el.appendChild(child));
   return el;
 }
 
