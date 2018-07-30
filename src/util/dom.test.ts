@@ -8,6 +8,7 @@ describe('Unit: util/dom', () => {
       assert(html('a', { class: 'test' }).outerHTML === TypedHTML.a({ class: 'test' }).element.outerHTML);
       assert(html('a', { class: 'test' }, 'b').outerHTML === TypedHTML.a({ class: 'test' }, 'b').element.outerHTML);
       assert(html('a', 'b').outerHTML === TypedHTML.a('b').element.outerHTML);
+      assert(html('html', []).outerHTML === '<html></html>');
     });
 
   });
