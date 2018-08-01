@@ -18,7 +18,11 @@ export function observer<M extends TagNameMap>(factory: Factory<M>, callback: (r
   };
 }
 
-const cache = new Map<string, Element>();
+namespace cache {
+  export const elem = new Map<string, Element>();
+  export const text = document.createTextNode('');
+  export const frag = document.createDocumentFragment();
+}
 
 export function html<T extends keyof HTMLElementTagNameMap>(tag: T, children?: Children): HTMLElementTagNameMap[T];
 export function html<T extends keyof HTMLElementTagNameMap>(tag: T, attrs?: Attrs, children?: Children): HTMLElementTagNameMap[T];
@@ -34,7 +38,7 @@ export function svg<T extends keyof SVGElementTagNameMap_>(tag: T, attrs: Attrs 
 
 export function frag(children: Children = []): DocumentFragment {
   children = typeof children === 'string' ? [text(children)] : children;
-  const frag = document.createDocumentFragment();
+  const frag = cache.frag.cloneNode() as DocumentFragment;
   void [...children]
     .forEach(child =>
       void frag.appendChild(child));
@@ -42,7 +46,9 @@ export function frag(children: Children = []): DocumentFragment {
 }
 
 export function text(source: string): Text {
-  return document.createTextNode(source);
+  const text = cache.text.cloneNode() as Text;
+  text.data = source;
+  return text;
 }
 
 const enum NS {
@@ -54,10 +60,10 @@ function element<T extends keyof HTMLElementTagNameMap>(ns: NS.HTML, tag: T, att
 function element<T extends keyof SVGElementTagNameMap_>(ns: NS.SVG, tag: T, attrs?: Attrs | Children, children?: Children): SVGElementTagNameMap_[T];
 function element(ns: NS, tag: string, attrs: Attrs | Children = {}, children: Children = []): Element {
   const key = `${ns}:${tag}`;
-  const el = cache.has(key)
-    ? cache.get(key)!.cloneNode(true) as Element
-    : cache.set(key, elem(ns, tag)).get(key)!.cloneNode(true) as Element;
-  assert(el !== cache.get(key));
+  const el = cache.elem.has(key)
+    ? cache.elem.get(key)!.cloneNode(true) as Element
+    : cache.elem.set(key, elem(ns, tag)).get(key)!.cloneNode(true) as Element;
+  assert(el !== cache.elem.get(key));
   assert(el.attributes.length === 0);
   assert(el.childNodes.length === 0);
   void define(el, attrs, children);
