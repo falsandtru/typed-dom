@@ -1,4 +1,5 @@
 import { uid } from './identity';
+import { define } from '../util/dom';
 
 type ElChildrenType =
   | typeof ElChildrenType.Void
@@ -44,25 +45,20 @@ export class El<
       case ElChildrenType.Void:
         return;
       case ElChildrenType.Text:
-        void clear();
+        void define(element_, []);
         this.children_ = element_.appendChild(document.createTextNode('')) as any;
         this.children = children_ as LooseChildren<C>;
         return;
       case ElChildrenType.Collection:
-        void clear();
+        void define(element_, []);
         this.children_ = [] as ElChildren.Collection as C;
         this.children = children_ as LooseChildren<C>;
         return;
       case ElChildrenType.Record:
-        void clear();
+        void define(element_, []);
         this.children_ = observe(element_, { ...children_ as ElChildren.Record }) as C;
         this.children = children_ as LooseChildren<C>;
         return;
-    }
-
-    function clear(): void {
-      element_.innerHTML = '';
-      assert(element_.childNodes.length === 0);
     }
 
     function observe<C extends ElChildren.Record>(element: Element, children: C): C {
