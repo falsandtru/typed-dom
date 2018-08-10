@@ -10,7 +10,7 @@ describe('Unit: util/listener', () => {
         assert(ev instanceof Event);
         assert(currentTargets.get(ev) instanceof HTMLAnchorElement);
         ++cnt;
-        bind(a, 'click', () => assert(cnt === 2 && ++cnt) || done());
+        bind(a, 'click', () => void assert(cnt === 2 && ++cnt) || done());
       });
       document.createDocumentFragment().appendChild(a);
       a.click();
@@ -27,7 +27,7 @@ describe('Unit: util/listener', () => {
         assert(ev instanceof Event);
         assert(currentTargets.get(ev) instanceof HTMLAnchorElement);
         ++cnt;
-        delegate(dom.element, 'a', 'click', () => assert(cnt === 2 && ++cnt) || done());
+        delegate(dom.element, 'a', 'click', () => void assert(cnt === 2 && ++cnt) || done());
       });
       document.createDocumentFragment().appendChild(dom.element);
       dom.children = [TypedHTML.a()];
@@ -46,7 +46,7 @@ describe('Unit: util/listener', () => {
         assert(ev instanceof Event);
         assert(currentTargets.get(ev) instanceof HTMLAnchorElement);
         ++cnt;
-        listen(a, 'click', () => assert(cnt === 2 && ++cnt) || done());
+        listen(a, 'click', () => void assert(cnt === 2 && ++cnt) || done());
       });
       document.createDocumentFragment().appendChild(a);
       a.click();
@@ -60,7 +60,7 @@ describe('Unit: util/listener', () => {
         assert(ev instanceof Event);
         assert(currentTargets.get(ev) instanceof HTMLAnchorElement);
         ++cnt;
-        listen(dom.element, 'a', 'click', () => assert(cnt === 2 && ++cnt) || done());
+        listen(dom.element, 'a', 'click', () => void assert(cnt === 2 && ++cnt) || done());
       });
       document.createDocumentFragment().appendChild(dom.element);
       dom.children = [TypedHTML.a()];
@@ -79,7 +79,7 @@ describe('Unit: util/listener', () => {
         assert(ev instanceof Event);
         assert(currentTargets.get(ev) instanceof HTMLAnchorElement);
         assert(cnt === 0 && ++cnt);
-        once(a, 'click', () => assert(cnt === 1 && ++cnt) || done());
+        once(a, 'click', () => void assert(cnt === 1 && ++cnt) || done());
       });
       document.createDocumentFragment().appendChild(a);
       a.click();
@@ -93,7 +93,7 @@ describe('Unit: util/listener', () => {
         assert(ev instanceof Event);
         assert(currentTargets.get(ev) instanceof HTMLAnchorElement);
         assert(cnt === 0 && ++cnt);
-        once(dom.element, 'click', () => assert(cnt === 1 && ++cnt) || done());
+        once(dom.element, 'click', () => void assert(cnt === 1 && ++cnt) || done());
       });
       document.createDocumentFragment().appendChild(dom.element);
       dom.children[0].element.click();

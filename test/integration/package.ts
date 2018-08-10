@@ -259,7 +259,7 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('listen', function (done) {
-      TypedHTML.a({ onclick: ev => assert(ev instanceof Event) || done() }).element.click();
+      TypedHTML.a({ onclick: ev => void assert(ev instanceof Event) || done() }).element.click();
     });
 
     it('sanitize', function () {
