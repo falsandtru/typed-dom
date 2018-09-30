@@ -1,5 +1,5 @@
 export type TagNameMap = object;
-export type Attrs = Record<string, string | EventListener>;
+export type Attrs = Record<string, undefined | string | EventListener>;
 type Children = Iterable<Node> | string;
 
 export interface Factory<M extends TagNameMap> {
@@ -87,17 +87,23 @@ export function define<T extends Element>(el: T, attrs: Attrs | Children = {}, c
   if (isChildren(attrs)) return define(el, undefined, attrs);
   if (typeof children === 'string') return define(el, attrs, [text(children)]);
   void Object.entries(attrs)
-    .forEach(([name, value]) =>
-      typeof value === 'string'
-        ? void el.setAttribute(name, value)
-        : void el.addEventListener(name.slice(2), value, {
+    .forEach(([name, value]) => {
+      switch (typeof value) {
+        case 'function':
+          return void el.addEventListener(name.slice(2), value, {
             passive: [
               'wheel',
               'mousewheel',
               'touchstart',
               'touchmove',
             ].includes(name.slice(2)),
-          }));
+          });
+        case 'undefined':
+          return void el.removeAttribute(name);
+        default:
+          return void el.setAttribute(name, value);
+      }
+    });
   if (children) {
     el.innerHTML = '';
     while (el.firstChild) {

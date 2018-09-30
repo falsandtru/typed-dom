@@ -36,6 +36,7 @@ describe('Unit: util/dom', () => {
   describe('define', () => {
     it('', () => {
       assert(define(html('html'), []).innerHTML === '');
+      assert(define(define(html('a', { href: '' })), { href: undefined }).matches(':not([href])'));
     });
 
   });
