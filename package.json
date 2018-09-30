@@ -1,6 +1,6 @@
 {
   "name": "typed-dom",
-  "version": "0.0.107",
+  "version": "0.0.108",
   "description": "Static typed dom component builder.",
   "private": true,
   "homepage": "https://github.com/falsandtru/typed-dom",
