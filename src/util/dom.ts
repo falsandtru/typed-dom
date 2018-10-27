@@ -39,9 +39,7 @@ export function svg<T extends keyof SVGElementTagNameMap_>(tag: T, attrs: Attrs 
 export function frag(children: Children = []): DocumentFragment {
   children = typeof children === 'string' ? [text(children)] : children;
   const frag = cache.frag.cloneNode() as DocumentFragment;
-  void [...children]
-    .forEach(child =>
-      void frag.appendChild(child));
+  void frag.append(...children);
   return frag;
 }
 
@@ -109,9 +107,7 @@ export function define<T extends Element>(el: T, attrs: Attrs | Children = {}, c
     while (el.firstChild) {
       void el.removeChild(el.firstChild);
     }
-    void [...children]
-      .forEach(child =>
-        void el.appendChild(child));
+    void el.append(...children);
   }
   return el;
 }
