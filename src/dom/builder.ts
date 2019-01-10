@@ -3,9 +3,9 @@ import { Factory as BaseFactory, TagNameMap, Attrs, html, svg, define } from '..
 import { ExtractProp } from 'spica/type';
 
 export type API<M extends TagNameMap, F extends BaseFactory<M>> =
-  ElCreator<Extract<keyof ExtractProp<M, Element>, string>, Element, F>
+  BuilderFunction<Extract<keyof ExtractProp<M, Element>, string>, Element, F>
  & {
-  readonly [P in Extract<keyof ExtractProp<M, Element>, string>]: ElBuilder<P, Extract<M[P], Element>, F>;
+  readonly [P in Extract<keyof ExtractProp<M, Element>, string>]: BuilderMethod<P, Extract<M[P], Element>, F>;
 };
 export function API<M extends TagNameMap, F extends BaseFactory<M>>(baseFactory: F): API<M, F> {
   return new Proxy<API<M, F>>((() => undefined) as any, handle(baseFactory));
@@ -14,14 +14,14 @@ export function API<M extends TagNameMap, F extends BaseFactory<M>>(baseFactory:
 export const TypedHTML: API<HTMLElementTagNameMap, typeof html> = API(html);
 export const TypedSVG: API<SVGElementTagNameMap_, typeof svg> = API(svg);
 
-interface ElCreator<T extends string, E extends Element, F extends BaseFactory<TagNameMap>> {
+interface BuilderFunction<T extends string, E extends Element, F extends BaseFactory<TagNameMap>> {
                       (tag: T,                            factory?: Factory<F, T, Children.Void, E>): El<T, E, Children.Void>;
   <C extends Children>(tag: T,               children: C, factory?: Factory<F, T, C, E>            ): El<T, E, C>;
                       (tag: T, attrs: Attrs,              factory?: Factory<F, T, Children.Void, E>): El<T, E, Children.Void>;
   <C extends Children>(tag: T, attrs: Attrs, children: C, factory?: Factory<F, T, C, E>            ): El<T, E, C>;
 }
 
-interface ElBuilder<T extends string, E extends Element, F extends BaseFactory<TagNameMap>> {
+interface BuilderMethod<T extends string, E extends Element, F extends BaseFactory<TagNameMap>> {
                       (                           factory?: Factory<F, T, Children.Void, E>): El<T, E, Children.Void>;
   <C extends Children>(              children: C, factory?: Factory<F, T, C, E>            ): El<T, E, C>;
                       (attrs: Attrs,              factory?: Factory<F, T, Children.Void, E>): El<T, E, Children.Void>;
