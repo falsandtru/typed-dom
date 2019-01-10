@@ -13,6 +13,12 @@ declare const _: { shuffle<T>(as: T[]): T[]; };
 
 describe('Integration: Typed DOM', function () {
   describe('spec', function () {
+    it('call', function () {
+      assert(TypedHTML('p').element.outerHTML === '<p></p>');
+      assert(TypedHTML('p', 'a').element.outerHTML === '<p>a</p>');
+      assert(TypedHTML('p', { class: 'class' }, 'a', (f, t) => f(t, { id: 'id' })).element.outerHTML === '<p id="id" class="class">a</p>');
+    });
+
     it('html', function () {
       assert(TypedHTML.html().element instanceof HTMLElement);
       assert(TypedHTML.html().element.outerHTML === '<html></html>');
@@ -21,12 +27,6 @@ describe('Integration: Typed DOM', function () {
     it('svg', function () {
       assert(TypedSVG.svg().element instanceof SVGElement);
       assert(TypedSVG.svg().element.outerHTML === '<svg></svg>');
-    });
-
-    it('call', function () {
-      assert(TypedHTML('p').element.outerHTML === '<p></p>');
-      assert(TypedHTML('p', 'a').element.outerHTML === '<p>a</p>');
-      assert(TypedHTML('p', { class: 'class' }, 'a', (f, t) => f(t, { id: 'id' })).element.outerHTML === '<p id="id" class="class">a</p>');
     });
 
     it('empty', function () {
