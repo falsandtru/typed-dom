@@ -23,6 +23,12 @@ describe('Integration: Typed DOM', function () {
       assert(TypedSVG.svg().element.outerHTML === '<svg></svg>');
     });
 
+    it('call', function () {
+      assert(TypedHTML('p').element.outerHTML === '<p></p>');
+      assert(TypedHTML('p', 'a').element.outerHTML === '<p>a</p>');
+      assert(TypedHTML('p', { class: 'class' }, 'a', (f, t) => f(t, { id: 'id' })).element.outerHTML === '<p id="id" class="class">a</p>');
+    });
+
     it('empty', function () {
       const dom = TypedHTML.p();
       assert(dom.element.outerHTML === '<p></p>');

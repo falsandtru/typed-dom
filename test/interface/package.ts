@@ -10,11 +10,11 @@ describe('Interface: Package', function () {
 
   describe('TypedHTML', function () {
     it('TypedHTML', function () {
-      assert(typeof TypedHTML === 'object');
+      assert(typeof TypedHTML === 'function');
     });
 
     it('TypedSVG', function () {
-      assert(typeof TypedSVG === 'object');
+      assert(typeof TypedSVG === 'function');
     });
 
     it('API', function () {

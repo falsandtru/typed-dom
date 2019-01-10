@@ -2,15 +2,24 @@ import { El, ElChildren as Children } from './manager';
 import { Factory as BaseFactory, TagNameMap, Attrs, html, svg, define } from '../util/dom';
 import { ExtractProp } from 'spica/type';
 
-export type API<M extends TagNameMap, F extends BaseFactory<M>> = {
+export type API<M extends TagNameMap, F extends BaseFactory<M>> =
+  ElCreator<Extract<keyof ExtractProp<M, Element>, string>, Element, F>
+ & {
   readonly [P in Extract<keyof ExtractProp<M, Element>, string>]: ElBuilder<P, Extract<M[P], Element>, F>;
 };
 export function API<M extends TagNameMap, F extends BaseFactory<M>>(baseFactory: F): API<M, F> {
-  return new Proxy({} as API<M, F>, handle(baseFactory));
+  return new Proxy<API<M, F>>((() => undefined) as any, handle(baseFactory));
 }
 
 export const TypedHTML: API<HTMLElementTagNameMap, typeof html> = API(html);
 export const TypedSVG: API<SVGElementTagNameMap_, typeof svg> = API(svg);
+
+interface ElCreator<T extends string, E extends Element, F extends BaseFactory<TagNameMap>> {
+                      (tag: T,                            factory?: Factory<F, T, Children.Void, E>): El<T, E, Children.Void>;
+  <C extends Children>(tag: T,               children: C, factory?: Factory<F, T, C, E>            ): El<T, E, C>;
+                      (tag: T, attrs: Attrs,              factory?: Factory<F, T, Children.Void, E>): El<T, E, Children.Void>;
+  <C extends Children>(tag: T, attrs: Attrs, children: C, factory?: Factory<F, T, C, E>            ): El<T, E, C>;
+}
 
 interface ElBuilder<T extends string, E extends Element, F extends BaseFactory<TagNameMap>> {
                       (                           factory?: Factory<F, T, Children.Void, E>): El<T, E, Children.Void>;
@@ -23,6 +32,8 @@ type Factory<F extends BaseFactory<TagNameMap>, T extends string, C extends Chil
 
 function handle<M extends TagNameMap, F extends BaseFactory<M>>(baseFactory: F): ProxyHandler<API<M, F>> {
   return {
+    apply: (obj, _, args) =>
+      obj[args[0]](...args.slice(1)),
     get: (obj, prop) =>
       obj[prop] || prop in obj || typeof prop !== 'string'
         ? obj[prop]

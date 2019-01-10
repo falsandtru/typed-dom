@@ -58,10 +58,12 @@ function element<T extends keyof HTMLElementTagNameMap>(ns: NS.HTML, tag: T, att
 function element<T extends keyof SVGElementTagNameMap_>(ns: NS.SVG, tag: T, attrs?: Attrs | Children, children?: Children): SVGElementTagNameMap_[T];
 function element(ns: NS, tag: string, attrs: Attrs | Children = {}, children: Children = []): Element {
   const key = `${ns}:${tag}`;
-  const el = cache.elem.has(key)
-    ? cache.elem.get(key)!.cloneNode(true) as Element
-    : cache.elem.set(key, elem(ns, tag)).get(key)!.cloneNode(true) as Element;
-  assert(el !== cache.elem.get(key));
+  const el = tag.includes('-')
+    ? elem(ns, tag)
+    : cache.elem.has(key)
+      ? cache.elem.get(key)!.cloneNode(true) as Element
+      : cache.elem.set(key, elem(ns, tag)).get(key)!.cloneNode(true) as Element;
+  assert(tag.includes('-') || el !== cache.elem.get(key));
   assert(el.attributes.length === 0);
   assert(el.childNodes.length === 0);
   void define(el, attrs, children);
