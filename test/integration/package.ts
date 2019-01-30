@@ -369,7 +369,7 @@ describe('Integration: Typed DOM', function () {
       el.children = {
         a: el.children.a,
         b: el.children.c,
-        c: TypedHTML.li(listeners, 'd' as string),
+        c: TypedHTML.li(listeners, 'd'),
       };
       assert.deepStrictEqual(
         Object.entries(el.children).map(([k, v]) => [k, v.children]),
@@ -435,8 +435,7 @@ describe('Integration: Typed DOM', function () {
       }
       const memory = new WeakMap<Node, object>();
       const data = <K extends keyof TransDataMap>(data: TransDataMap[K]) =>
-        <T extends string, E extends Element>(factory: (tag: T) => E, tag: T, _: never, children: K): E => {
-          assert(typeof children === 'string');
+        <T extends string, E extends Element>(factory: (tag: T) => E, tag: T): E => {
           const el = factory(tag);
           void memory.set(el, data);
           return el;
