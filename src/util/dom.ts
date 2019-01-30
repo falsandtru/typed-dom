@@ -90,6 +90,7 @@ export function define<T extends Element>(el: T, attrs: Attrs | Children = {}, c
     .forEach(([name, value]) => {
       switch (typeof value) {
         case 'function':
+          assert(name.startsWith('on'));
           return void el.addEventListener(name.slice(2), value, {
             passive: [
               'wheel',

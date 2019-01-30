@@ -43,7 +43,7 @@ export function bind<T extends keyof WindowEventMap | keyof DocumentEventMap | k
     }
     assert(ev.currentTarget);
     void currentTargets.set(ev, ev.currentTarget!);
-    void listener(ev);
+    return listener(ev);
   }
 
   function adjustEventListenerOptions(option: boolean | AddEventListenerOptions): boolean | AddEventListenerOptions {
@@ -60,9 +60,7 @@ export function delegate<T extends keyof HTMLElementEventMap>(target: Document |
     void [...target.querySelectorAll<HTMLElement>(selector)]
       .filter(el => el === cx)
       .forEach(el =>
-        void once(el, type, ev => {
-          void listener(ev);
-        }, option));
+        void once(el, type, listener, option));
   }, { ...option, capture: true });
 }
 
