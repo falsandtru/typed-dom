@@ -1,4 +1,4 @@
-import { TypedHTML, TypedSVG, API, observer, html } from '../../index';
+import { TypedHTML, TypedSVG, API, html, define } from '../../index';
 import { Sequence } from 'spica/sequence';
 
 declare global {
@@ -319,25 +319,65 @@ describe('Integration: Typed DOM', function () {
       assert(TypedSVG.a().element.outerHTML === '<a></a>');
     });
 
-    it('customize', async function () {
-      const t: API<HTMLElementTagNameMap, typeof html> = API(observer(html, rs => rs.forEach(record =>
-        void record.addedNodes.forEach(node =>
-          node.parentNode &&
-          node instanceof Text &&
-          (node.textContent = node.textContent!.toUpperCase())))));
-  
-      const el = t.span('a');
-      assert(el.children === 'a');
-      assert(el.element.textContent === 'a');
-      await 0;
+    it('customize text', function () {
+      const el = TypedHTML.span(
+        {
+          onchange: (ev, el = ev.target as HTMLElement) =>
+            el.textContent = el.textContent!.toUpperCase(),
+        },
+        'a');
       assert(el.children === 'A');
-      assert(el.element.textContent === 'A');
       el.children = 'b';
-      assert(el.children === 'b');
-      assert(el.element.textContent === 'b');
-      await 0;
       assert(el.children === 'B');
-      assert(el.element.textContent === 'B');
+    });
+
+    it('customize collection', function () {
+      const listeners: Record<string, EventListener> = {
+        onconnect: (ev, el = ev.target as HTMLElement) =>
+          el.textContent = el.textContent!.toUpperCase(),
+        ondisconnect: (ev, el = ev.target as HTMLElement) =>
+          el.textContent += el.textContent,
+      };
+      const el = TypedHTML.ul([
+        TypedHTML.li(listeners, 'a' as string),
+        TypedHTML.li(listeners, 'b'),
+      ]);
+      el.children = [
+        el.children[1],
+        TypedHTML.li(listeners, 'c'),
+      ];
+      assert.deepStrictEqual(
+        el.children.map(el => el.children),
+        [
+          'B',
+          'C',
+        ]);
+    });
+
+    it('customize record', function () {
+      const listeners: Record<string, EventListener> = {
+        onconnect: (ev, el = ev.target as HTMLElement) =>
+          el.textContent = el.textContent!.toUpperCase(),
+        ondisconnect: (ev, el = ev.target as HTMLElement) =>
+          el.textContent += el.textContent,
+      };
+      const el = TypedHTML.ul({
+        a: TypedHTML.li(listeners, 'a' as string),
+        b: TypedHTML.li(listeners, 'b' as string),
+        c: TypedHTML.li(listeners, 'c' as string),
+      });
+      el.children = {
+        a: el.children.a,
+        b: el.children.c,
+        c: TypedHTML.li(listeners, 'd' as string),
+      };
+      assert.deepStrictEqual(
+        Object.entries(el.children).map(([k, v]) => [k, v.children]),
+        [
+          ['a', 'A'],
+          ['b', 'C'],
+          ['c', 'D'],
+        ]);
     });
 
   });
@@ -378,7 +418,7 @@ describe('Integration: Typed DOM', function () {
       new Component(document.createElement('div'));
     });
 
-    it('trans', async function () {
+    it('trans', function () {
       const i18n = i18next.createInstance({
         lng: 'en',
         resources: {
@@ -393,37 +433,30 @@ describe('Integration: Typed DOM', function () {
       interface TransDataMap {
         'a': { data: string; };
       }
-      const store = new WeakMap<Node, object>();
+      const memory = new WeakMap<Node, object>();
       const data = <K extends keyof TransDataMap>(data: TransDataMap[K]) =>
         <T extends string, E extends Element>(factory: (tag: T) => E, tag: T, _: never, children: K): E => {
           assert(typeof children === 'string');
           const el = factory(tag);
-          void store.set(el, data);
+          void memory.set(el, data);
           return el;
         };
-      const trans: API<HTMLElementTagNameMap, typeof html> = API(observer(html, rs => rs.forEach(record =>
-        void record.addedNodes.forEach(node =>
-          record.target === node.parentElement &&
-          node instanceof Text &&
-          i18n.init((err, t) =>
-            node.textContent = err
-              ? 'Failed to init i18next.'
-              : t(node.textContent!, store.get(record.target)))))));
+      const trans: API<HTMLElementTagNameMap, typeof html> = API((tag: keyof HTMLElementTagNameMap, ...args: any[]) =>
+        define(html(tag, {
+          onchange: (ev, el = ev.target as HTMLElement) =>
+            i18n.init((err, t) =>
+              el.textContent = err
+                ? 'Failed to init i18next.'
+                : t(el.textContent!, memory.get(el))),
+        }), ...args));
 
       const el = trans.span('a', data({ data: 'A' }));
-      assert(el.children === 'a');
-      assert(el.element.textContent === 'a');
-      await 0;
       assert(el.children === 'A');
       assert(el.element.textContent === 'A');
       el.children = 'b';
-      assert(el.children === 'b');
-      assert(el.element.textContent === 'b');
-      await 0;
       assert(el.children === 'B');
       assert(el.element.textContent === 'B');
       el.children = 'a';
-      await 0;
       assert(el.children === 'A');
       assert(el.element.textContent === 'A');
     });
