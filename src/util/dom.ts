@@ -1,5 +1,5 @@
 export type TagNameMap = object;
-export type Attrs = Record<string, undefined | string | EventListener>;
+export type Attrs = Record<string, string | EventListener | null | undefined>;
 type Children = Iterable<Node> | string;
 
 export interface Factory<M extends TagNameMap> {
@@ -89,6 +89,8 @@ export function define<T extends Element>(el: T, attrs: Attrs | Children = {}, c
   void Object.entries(attrs)
     .forEach(([name, value]) => {
       switch (typeof value) {
+        case 'string':
+          return void el.setAttribute(name, value);
         case 'function':
           assert(name.startsWith('on'));
           return void el.addEventListener(name.slice(2), value, {
@@ -99,10 +101,10 @@ export function define<T extends Element>(el: T, attrs: Attrs | Children = {}, c
               'touchmove',
             ].includes(name.slice(2)),
           });
-        case 'undefined':
+        case 'object':
           return void el.removeAttribute(name);
         default:
-          return void el.setAttribute(name, value);
+          return;
       }
     });
   if (children) {
