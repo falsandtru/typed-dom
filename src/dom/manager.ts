@@ -191,12 +191,18 @@ export class El<
         const mem = new WeakSet<Node>();
         void Object.keys(targetChildren)
           .forEach(k => {
-            if (mem.has(sourceChildren[k].element_)) throw new Error(`TypedDOM: Cannot use an element again used in the same record.`);
-            void mem.add(sourceChildren[k].element_);
-            if (targetChildren[k].element_ !== sourceChildren[k].element_ || this.initialChildren.has(targetChildren[k].element_)) {
-              void this.scope(sourceChildren[k]);
-              void addedNodes.add(sourceChildren[k].element_);
-              void removedNodes.add(targetChildren[k].element_);
+            const oldChild = targetChildren[k];
+            const newChild = sourceChildren[k];
+            if (!newChild) return;
+            if (newChild.element_.parentElement !== this.element_ as Element) {
+              void throwErrorIfNotUsable(newChild);
+            }
+            if (mem.has(newChild.element_)) throw new Error(`TypedDOM: Cannot use an element again used in the same record.`);
+            void mem.add(newChild.element_);
+            if (oldChild.element_ !== newChild.element_ || this.initialChildren.has(oldChild.element_)) {
+              void this.scope(newChild);
+              void addedNodes.add(newChild.element_);
+              void removedNodes.add(oldChild.element_);
             }
             targetChildren[k] = sourceChildren[k];
           });
