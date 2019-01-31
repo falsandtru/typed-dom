@@ -1,4 +1,4 @@
-import def, { TypedHTML, TypedSVG, API, html, svg, text, frag, define, observer, listen, once, bind, delegate, currentTargets } from '../../index';
+import def, { TypedHTML, TypedSVG, API, proxy, html, svg, text, frag, define, observer, listen, once, bind, delegate, currentTargets } from '../../index';
 
 describe('Interface: Package', function () {
   describe('default', function () {
@@ -20,6 +20,10 @@ describe('Interface: Package', function () {
     it('API', function () {
       assert((): API<HTMLElementTagNameMap, typeof html> => TypedHTML);
       assert((): typeof TypedHTML => API(html));
+    });
+
+    it('proxy', function () {
+      assert(typeof proxy === 'function');
     });
 
   });

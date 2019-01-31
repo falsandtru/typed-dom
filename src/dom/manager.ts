@@ -26,7 +26,14 @@ export namespace ElChildren {
 }
 type LooseChildren<C extends ElChildren> = C extends ElChildren.Text ? ElChildren.Text : C;
 
-const memory = new WeakSet<Element>();
+const memory = new WeakMap<Element, El<string, Element, ElChildren>>();
+
+export function proxy<E extends Element>(el: E): El<string, E, ElChildren>;
+export function proxy<C extends ElChildren>(el: Element): El<string, Element, C>;
+export function proxy<E extends Element, C extends ElChildren>(el: E): El<string, E, C>;
+export function proxy(el: Element): El<string, Element, ElChildren> {
+  return memory.get(el)!;
+}
 
 export class El<
   T extends string,
@@ -40,7 +47,7 @@ export class El<
   ) {
     this.tag;
     void throwErrorIfNotUsable(this);
-    void memory.add(element_);
+    void memory.set(element_, this);
     switch (this.type) {
       case ElChildrenType.Void:
         return;

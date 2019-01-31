@@ -1,4 +1,4 @@
-import { TypedHTML, TypedSVG, API, html, define } from '../../index';
+import { TypedHTML, TypedSVG, API, proxy, html, define } from '../../index';
 import { Sequence } from 'spica/sequence';
 
 declare global {
@@ -435,18 +435,20 @@ describe('Integration: Typed DOM', function () {
       }
       const memory = new WeakMap<Node, object>();
       const data = <K extends keyof TransDataMap>(data: TransDataMap[K]) =>
-        <T extends string, E extends Element>(factory: (tag: T) => E, tag: T): E => {
-          const el = factory(tag);
+        <T extends string, E extends Element>(factory: (tag: T, ...args: any[]) => E, tag: T, ...args: any[]): E => {
+          const el = factory(tag, ...args);
           void memory.set(el, data);
           return el;
         };
       const trans: API<HTMLElementTagNameMap, typeof html> = API((tag: keyof HTMLElementTagNameMap, ...args: any[]) =>
         define(html(tag, {
-          onchange: (ev, el = ev.target as HTMLElement) =>
-            i18n.init((err, t) =>
-              el.textContent = err
-                ? 'Failed to init i18next.'
-                : t(el.textContent!, memory.get(el))),
+          onchange: args.every(arg => typeof arg !== 'string')
+            ? undefined
+            : (ev, el = proxy<string>(ev.target as HTMLElement)) =>
+                i18n.init((err, t) =>
+                  el.children = err
+                    ? 'Failed to init i18next.'
+                    : t(el.children, memory.get(el.element))),
         }), ...args));
 
       const el = trans.span('a', data({ data: 'A' }));
