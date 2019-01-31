@@ -418,7 +418,7 @@ describe('Integration: Typed DOM', function () {
       new Component(document.createElement('div'));
     });
 
-    it('trans', function () {
+    it('translate', function () {
       const i18n = i18next.createInstance({
         lng: 'en',
         resources: {
