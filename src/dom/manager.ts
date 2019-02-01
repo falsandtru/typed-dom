@@ -24,7 +24,7 @@ export namespace ElChildren {
   export type Collection = El<string, Element, any>[];
   export type Record = { [field: string]: El<string, Element, any>; };
 }
-type LooseChildren<C extends ElChildren> = C extends ElChildren.Text ? ElChildren.Text : C;
+type LaxChildren<C extends ElChildren> = C extends ElChildren.Text ? ElChildren.Text : C;
 
 const relation = new WeakMap<Element, El<string, Element, ElChildren>>();
 
@@ -69,18 +69,18 @@ export class El<
       case ElChildrenType.Text:
         void define(element, []);
         status.children = element.appendChild(text('')) as any;
-        this.children = children as LooseChildren<C>;
+        this.children = children as LaxChildren<C>;
         return;
       case ElChildrenType.Collection:
         void define(element, []);
         status.children = [] as ElChildren.Collection as C;
-        this.children = children as LooseChildren<C>;
+        this.children = children as LaxChildren<C>;
         return;
       case ElChildrenType.Record:
         void define(element, []);
         status.children = observe(element, { ...children as ElChildren.Record }) as C;
         void Object.values(children as ElChildren.Record).forEach(child => void status.initialChildren.add(child.element));
-        this.children = children as LooseChildren<C>;
+        this.children = children as LaxChildren<C>;
         return;
     }
 
@@ -115,7 +115,7 @@ export class El<
   public get element(): E {
     return internal(this).element;
   }
-  public get children(): LooseChildren<C> {
+  public get children(): LaxChildren<C> {
     const status = internal(this);
     assert([ElChildrenType.Void, ElChildrenType.Collection].includes(status.type) ? Object.isFrozen(status.children) : !Object.isFrozen(status.children));
     switch (status.type) {
@@ -123,12 +123,12 @@ export class El<
         status.children = (status.children as any as Text).parentNode === this.element
           ? status.children
           : [...this.element.childNodes].find(node => node instanceof Text) as any || (status.children as any as Text).cloneNode();
-        return (status.children as any as Text).textContent as LooseChildren<C>;
+        return (status.children as any as Text).textContent as LaxChildren<C>;
       default:
-        return status.children as LooseChildren<C>;
+        return status.children as LaxChildren<C>;
     }
   }
-  public set children(children: LooseChildren<C>) {
+  public set children(children: LaxChildren<C>) {
     const status = internal(this);
     const removedNodes = new Set<Node>();
     const addedNodes = new Set<Node>();
