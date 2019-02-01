@@ -146,7 +146,7 @@ Create DOM components.
 import TypedHTML, { El } from 'typed-dom';
 
 class Component implements El {
-  public readonly tag = '';
+  public readonly _ = '';
   private readonly dom = TypedHTML.div({
     style: TypedHTML.style(`$scope ul { width: 100px; }`),
     content: TypedHTML.ul([
