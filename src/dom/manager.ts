@@ -126,7 +126,8 @@ export class El<
         const newText = children as ElChildren.Text;
         targetChildren.textContent = newText;
         if (newText === oldText) return;
-        break;
+        void this[internal].element.dispatchEvent(new Event('change', { bubbles: false, cancelable: true }));
+        return;
       }
       case ElChildrenType.Collection: {
         const sourceChildren = children as ElChildren.Collection;
@@ -183,6 +184,7 @@ export class El<
       void node.dispatchEvent(new Event('disconnect', { bubbles: false, cancelable: true })));
     void addedNodes.forEach(node =>
       void node.dispatchEvent(new Event('connect', { bubbles: false, cancelable: true })));
+    removedNodes.size + addedNodes.size > 0 &&
     void this[internal].element.dispatchEvent(new Event('change', { bubbles: false, cancelable: true }));
   }
 }
