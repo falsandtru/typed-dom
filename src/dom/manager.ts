@@ -24,7 +24,8 @@ export namespace ElChildren {
   export type Collection = ElInterface<string, Element, any>[];
   export type Record = { [field: string]: ElInterface<string, Element, any>; };
 }
-type LaxChildren<C extends ElChildren> = C extends ElChildren.Text ? ElChildren.Text : C;
+
+export type Relax<C extends ElChildren> = C extends ElChildren.Text ? ElChildren.Text : C;
 
 const memory = new WeakMap<Element, El<string, Element, ElChildren>>();
 
@@ -35,16 +36,16 @@ export function proxy(el: Element): El<string, Element, ElChildren> {
   return memory.get(el)!;
 }
 
-const state = Symbol();
+const tag = Symbol();
 
 export interface ElInterface<
   T extends string = string,
   E extends Element = Element,
   C extends ElChildren = ElChildren
   > {
-  readonly _?: T;
+  readonly [tag]?: T;
   readonly element: E;
-  children: LaxChildren<C>;
+  children: Relax<C>;
 }
 
 export class El<
@@ -52,32 +53,31 @@ export class El<
   E extends Element,
   C extends ElChildren
   >
-  implements ElInterface<T, E, C> {
+  implements Required<ElInterface<T, E, C>> {
   constructor(
     public readonly element: E,
-    children: C
+    private children_: Relax<C>,
   ) {
-    this[state] = new State(element, children as LaxChildren<C>);
     void throwErrorIfNotUsable(this);
     void memory.set(element, this);
-    switch (this[state].type) {
+    switch (this.type) {
       case ElChildrenType.Void:
         return;
       case ElChildrenType.Text:
         void define(element, []);
-        this[state].children = element.appendChild(text('')) as any;
-        this.children = children as LaxChildren<C>;
+        this.children_ = element.appendChild(text('')) as any;
+        this.children = children_ as Relax<C>;
         return;
       case ElChildrenType.Collection:
         void define(element, []);
-        this[state].children = [] as ElChildren.Collection as LaxChildren<C>;
-        this.children = children as LaxChildren<C>;
+        this.children_ = [] as ElChildren.Collection as Relax<C>;
+        this.children = children_ as Relax<C>;
         return;
       case ElChildrenType.Record:
         void define(element, []);
-        this[state].children = observe(element, { ...children as ElChildren.Record }) as LaxChildren<C>;
-        void Object.values(children as ElChildren.Record).forEach(child => void this[state].initialChildren.add(child.element));
-        this.children = children as LaxChildren<C>;
+        this.children_ = observe(element, { ...children_ as ElChildren.Record }) as Relax<C>;
+        void Object.values(children_ as ElChildren.Record).forEach(child => void this.initialChildren.add(child.element));
+        this.children = children_ as Relax<C>;
         return;
     }
 
@@ -108,108 +108,13 @@ export class El<
           }, {}));
     }
   }
-  private readonly [state]: State<E, LaxChildren<C>>;
-  public readonly _?: T;
-  public get children(): LaxChildren<C> {
-    assert([ElChildrenType.Void, ElChildrenType.Collection].includes(this[state].type) ? Object.isFrozen(this[state].children) : !Object.isFrozen(this[state].children));
-    switch (this[state].type) {
-      case ElChildrenType.Text:
-        this[state].children = (this[state].children as any as Text).parentNode === this.element
-          ? this[state].children
-          : [...this.element.childNodes].find(node => node instanceof Text) as any || (this[state].children as any as Text).cloneNode();
-        return (this[state].children as any as Text).textContent as LaxChildren<C>;
-      default:
-        return this[state].children;
-    }
-  }
-  public set children(children: LaxChildren<C>) {
-    const removedNodes = new Set<Node>();
-    const addedNodes = new Set<Node>();
-    switch (this[state].type) {
-      case ElChildrenType.Void:
-        return;
-      case ElChildrenType.Text: {
-        if (children === this.children && !this[state].initialChildren.has(this[state].children as any)) return;
-        const targetChildren = this[state].children as any as Text;
-        const oldText = targetChildren.textContent!;
-        const newText = children as ElChildren.Text;
-        targetChildren.textContent = newText;
-        if (newText === oldText) return;
-        void this.element.dispatchEvent(new Event('change', { bubbles: false, cancelable: true }));
-        return;
-      }
-      case ElChildrenType.Collection: {
-        const sourceChildren = children as ElChildren.Collection;
-        const targetChildren = [] as ElChildren.Collection;
-        this[state].children = targetChildren as LaxChildren<C>;
-        void (sourceChildren)
-          .forEach((child, i) => {
-            if (child.element.parentElement !== this.element as Element) {
-              void throwErrorIfNotUsable(child);
-            }
-            targetChildren[i] = child;
-            if (targetChildren[i].element === this.element.childNodes[i]) return;
-            if (child.element.parentNode !== this.element) {
-              void this[state].scope(child);
-              void addedNodes.add(child.element);
-            }
-            void this.element.insertBefore(child.element, this.element.childNodes[i]);
-          });
-        while (this.element.childNodes.length > sourceChildren.length) {
-          void removedNodes.add(this.element.removeChild(this.element.childNodes[sourceChildren.length]));
-        }
-        assert(this.element.childNodes.length === sourceChildren.length);
-        assert(targetChildren.every((child, i) => child.element === this.element.childNodes[i]));
-        void Object.freeze(targetChildren);
-        break;
-      }
-      case ElChildrenType.Record: {
-        const sourceChildren = children as ElChildren.Record;
-        const targetChildren = this[state].children as ElChildren.Record;
-        assert.deepStrictEqual(Object.keys(sourceChildren), Object.keys(targetChildren));
-        const mem = new WeakSet<Node>();
-        void Object.keys(targetChildren)
-          .forEach(k => {
-            const oldChild = targetChildren[k];
-            const newChild = sourceChildren[k];
-            if (!newChild) return;
-            if (newChild.element.parentElement !== this.element as Element) {
-              void throwErrorIfNotUsable(newChild);
-            }
-            if (mem.has(newChild.element)) throw new Error(`TypedDOM: Cannot use an element again used in the same record.`);
-            void mem.add(newChild.element);
-            if (oldChild.element !== newChild.element || this[state].initialChildren.has(oldChild.element)) {
-              void this[state].scope(newChild);
-              void addedNodes.add(newChild.element);
-              void removedNodes.add(oldChild.element);
-            }
-            targetChildren[k] = sourceChildren[k];
-          });
-        break;
-      }
-    }
-    void removedNodes.forEach(node =>
-      !this[state].initialChildren.has(node) &&
-      void node.dispatchEvent(new Event('disconnect', { bubbles: false, cancelable: true })));
-    void addedNodes.forEach(node =>
-      void node.dispatchEvent(new Event('connect', { bubbles: false, cancelable: true })));
-    removedNodes.size + addedNodes.size > 0 &&
-    void this.element.dispatchEvent(new Event('change', { bubbles: false, cancelable: true }));
-  }
-}
-
-class State<E extends Element, C extends ElChildren> {
-  constructor(
-    private readonly element: E,
-    public children: C
-  ) {
-  }
-  private id_!: string;
+  public readonly [tag]: T;
+  private id_: string = this.element.id.trim();
   private get id(): string {
     if (this.id_) return this.id_;
-    if (this.id_ = this.element.id.trim()) return this.id_;
-    void this.element.classList.add(this.id_ = uid());
-    return this.id;
+    this.id_ = uid();
+    void this.element.classList.add(this.id_);
+    return this.id_;
   }
   private get query(): string {
     assert(this.id.match(/^[a-z]/));
@@ -217,16 +122,15 @@ class State<E extends Element, C extends ElChildren> {
       ? `#${this.id}`
       : `.${this.id}`;
   }
-  public readonly type: ElChildrenType =
-    this.children === undefined
+  private readonly type: ElChildrenType =
+    this.children_ === undefined
       ? ElChildrenType.Void
-      : typeof this.children === 'string'
+      : typeof this.children_ === 'string'
         ? ElChildrenType.Text
-        : Array.isArray(this.children)
+        : Array.isArray(this.children_)
           ? ElChildrenType.Collection
           : ElChildrenType.Record;
-  public readonly initialChildren: WeakSet<Node> = new WeakSet();
-  public scope(child: ElInterface<string, Element, ElChildren>): void {
+  private scope(child: ElInterface<string, Element, ElChildren>): void {
     if (!(child.element instanceof HTMLStyleElement)) return;
     return void parse(child.element, this.query);
 
@@ -246,6 +150,93 @@ class State<E extends Element, C extends ElChildren> {
         .forEach(el =>
           void el.remove());
     }
+  }
+  private readonly initialChildren: WeakSet<Node> = new WeakSet();
+  public get children(): Relax<C> {
+    assert([ElChildrenType.Void, ElChildrenType.Collection].includes(this.type) ? Object.isFrozen(this.children_) : !Object.isFrozen(this.children_));
+    switch (this.type) {
+      case ElChildrenType.Text:
+        this.children_ = (this.children_ as any as Text).parentNode === this.element
+          ? this.children_
+          : [...this.element.childNodes].find(node => node instanceof Text) as any || (this.children_ as any as Text).cloneNode();
+        return (this.children_ as any as Text).textContent as Relax<C>;
+      default:
+        return this.children_;
+    }
+  }
+  public set children(children: Relax<C>) {
+    const removedNodes = new Set<Node>();
+    const addedNodes = new Set<Node>();
+    switch (this.type) {
+      case ElChildrenType.Void:
+        return;
+      case ElChildrenType.Text: {
+        if (children === this.children && !this.initialChildren.has(this.children_ as any)) return;
+        const targetChildren = this.children_ as any as Text;
+        const oldText = targetChildren.textContent!;
+        const newText = children as ElChildren.Text;
+        targetChildren.textContent = newText;
+        if (newText === oldText) return;
+        void this.element.dispatchEvent(new Event('change', { bubbles: false, cancelable: true }));
+        return;
+      }
+      case ElChildrenType.Collection: {
+        const sourceChildren = children as ElChildren.Collection;
+        const targetChildren = [] as ElChildren.Collection;
+        this.children_ = targetChildren as Relax<C>;
+        void (sourceChildren)
+          .forEach((child, i) => {
+            if (child.element.parentElement !== this.element as Element) {
+              void throwErrorIfNotUsable(child);
+            }
+            targetChildren[i] = child;
+            if (targetChildren[i].element === this.element.childNodes[i]) return;
+            if (child.element.parentNode !== this.element) {
+              void this.scope(child);
+              void addedNodes.add(child.element);
+            }
+            void this.element.insertBefore(child.element, this.element.childNodes[i]);
+          });
+        while (this.element.childNodes.length > sourceChildren.length) {
+          void removedNodes.add(this.element.removeChild(this.element.childNodes[sourceChildren.length]));
+        }
+        assert(this.element.childNodes.length === sourceChildren.length);
+        assert(targetChildren.every((child, i) => child.element === this.element.childNodes[i]));
+        void Object.freeze(targetChildren);
+        break;
+      }
+      case ElChildrenType.Record: {
+        const sourceChildren = children as ElChildren.Record;
+        const targetChildren = this.children_ as ElChildren.Record;
+        assert.deepStrictEqual(Object.keys(sourceChildren), Object.keys(targetChildren));
+        const mem = new WeakSet<Node>();
+        void Object.keys(targetChildren)
+          .forEach(k => {
+            const oldChild = targetChildren[k];
+            const newChild = sourceChildren[k];
+            if (!newChild) return;
+            if (newChild.element.parentElement !== this.element as Element) {
+              void throwErrorIfNotUsable(newChild);
+            }
+            if (mem.has(newChild.element)) throw new Error(`TypedDOM: Cannot use an element again used in the same record.`);
+            void mem.add(newChild.element);
+            if (oldChild.element !== newChild.element || this.initialChildren.has(oldChild.element)) {
+              void this.scope(newChild);
+              void addedNodes.add(newChild.element);
+              void removedNodes.add(oldChild.element);
+            }
+            targetChildren[k] = sourceChildren[k];
+          });
+        break;
+      }
+    }
+    void removedNodes.forEach(node =>
+      !this.initialChildren.has(node) &&
+      void node.dispatchEvent(new Event('disconnect', { bubbles: false, cancelable: true })));
+    void addedNodes.forEach(node =>
+      void node.dispatchEvent(new Event('connect', { bubbles: false, cancelable: true })));
+    removedNodes.size + addedNodes.size > 0 &&
+    void this.element.dispatchEvent(new Event('change', { bubbles: false, cancelable: true }));
   }
 }
 

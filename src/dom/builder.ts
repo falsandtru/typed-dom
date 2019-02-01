@@ -1,4 +1,4 @@
-import { El, ElChildren as Children } from './manager';
+import { El, ElChildren as Children, Relax } from './manager';
 import { Factory as BaseFactory, TagNameMap, Attrs, html, svg, define } from '../util/dom';
 import { ExtractProp } from 'spica/type';
 
@@ -43,7 +43,7 @@ function handle<M extends TagNameMap, F extends BaseFactory<M>>(baseFactory: F):
       if (typeof attrs === 'function') return build(undefined, undefined, attrs);
       if (typeof children === 'function') return build(attrs, undefined, children);
       if (attrs !== undefined && isChildren(attrs)) return build(undefined, attrs, factory);
-      return new El(elem(factory || ((f, tag) => f(tag) as any as Element), attrs || {}, children), children);
+      return new El(elem(factory || ((f, tag) => f(tag) as any as Element), attrs || {}, children), children as Relax<Children> as string);
     };
 
     function isChildren(children: Children | Attrs): children is Children {
