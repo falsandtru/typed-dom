@@ -152,9 +152,7 @@ class Component implements El {
       TypedHTML.li(`item`)
     ]),
   });
-  public get element() {
-    return this.dom.element;
-  }
+  public readonly element = this.dom.element;
   public get children() {
     return this.dom.children.content.children;
   }
