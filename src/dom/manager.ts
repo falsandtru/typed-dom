@@ -86,7 +86,7 @@ export class El<
               set: (newChild: El<string, Element, any>) => {
                 const oldChild = child;
                 if (newChild === oldChild) return;
-                if (newChild[internal].element.parentElement !== element) {
+                if (newChild.element.parentElement !== element) {
                   void throwErrorIfNotUsable(newChild);
                 }
                 child = newChild;
@@ -105,9 +105,9 @@ export class El<
     assert([ElChildrenType.Void, ElChildrenType.Collection].includes(this[internal].type) ? Object.isFrozen(this[internal].children) : !Object.isFrozen(this[internal].children));
     switch (this[internal].type) {
       case ElChildrenType.Text:
-        this[internal].children = (this[internal].children as any as Text).parentNode === this[internal].element
+        this[internal].children = (this[internal].children as any as Text).parentNode === this.element
           ? this[internal].children
-          : [...this[internal].element.childNodes].find(node => node instanceof Text) as any || (this[internal].children as any as Text).cloneNode();
+          : [...this.element.childNodes].find(node => node instanceof Text) as any || (this[internal].children as any as Text).cloneNode();
         return (this[internal].children as any as Text).textContent as LooseChildren<C>;
       default:
         return this[internal].children as LooseChildren<C>;
@@ -126,7 +126,7 @@ export class El<
         const newText = children as ElChildren.Text;
         targetChildren.textContent = newText;
         if (newText === oldText) return;
-        void this[internal].element.dispatchEvent(new Event('change', { bubbles: false, cancelable: true }));
+        void this.element.dispatchEvent(new Event('change', { bubbles: false, cancelable: true }));
         return;
       }
       case ElChildrenType.Collection: {
@@ -135,22 +135,22 @@ export class El<
         this[internal].children = targetChildren as C;
         void (sourceChildren)
           .forEach((child, i) => {
-            if (child[internal].element.parentElement !== this[internal].element as Element) {
+            if (child.element.parentElement !== this.element as Element) {
               void throwErrorIfNotUsable(child);
             }
             targetChildren[i] = child;
-            if (targetChildren[i][internal].element === this[internal].element.childNodes[i]) return;
-            if (child[internal].element.parentNode !== this[internal].element) {
+            if (targetChildren[i].element === this.element.childNodes[i]) return;
+            if (child.element.parentNode !== this.element) {
               void this[internal].scope(child);
-              void addedNodes.add(child[internal].element);
+              void addedNodes.add(child.element);
             }
-            void this[internal].element.insertBefore(child.element, this[internal].element.childNodes[i]);
+            void this.element.insertBefore(child.element, this.element.childNodes[i]);
           });
-        while (this[internal].element.childNodes.length > sourceChildren.length) {
-          void removedNodes.add(this[internal].element.removeChild(this[internal].element.childNodes[sourceChildren.length]));
+        while (this.element.childNodes.length > sourceChildren.length) {
+          void removedNodes.add(this.element.removeChild(this.element.childNodes[sourceChildren.length]));
         }
-        assert(this[internal].element.childNodes.length === sourceChildren.length);
-        assert(targetChildren.every(({ element }, i) => element === this[internal].element.childNodes[i]));
+        assert(this.element.childNodes.length === sourceChildren.length);
+        assert(targetChildren.every((child, i) => child.element === this.element.childNodes[i]));
         void Object.freeze(targetChildren);
         break;
       }
@@ -164,15 +164,15 @@ export class El<
             const oldChild = targetChildren[k];
             const newChild = sourceChildren[k];
             if (!newChild) return;
-            if (newChild[internal].element.parentElement !== this[internal].element as Element) {
+            if (newChild.element.parentElement !== this.element as Element) {
               void throwErrorIfNotUsable(newChild);
             }
-            if (mem.has(newChild[internal].element)) throw new Error(`TypedDOM: Cannot use an element again used in the same record.`);
-            void mem.add(newChild[internal].element);
-            if (oldChild[internal].element !== newChild[internal].element || this[internal].initialChildren.has(oldChild[internal].element)) {
+            if (mem.has(newChild.element)) throw new Error(`TypedDOM: Cannot use an element again used in the same record.`);
+            void mem.add(newChild.element);
+            if (oldChild.element !== newChild.element || this[internal].initialChildren.has(oldChild.element)) {
               void this[internal].scope(newChild);
-              void addedNodes.add(newChild[internal].element);
-              void removedNodes.add(oldChild[internal].element);
+              void addedNodes.add(newChild.element);
+              void removedNodes.add(oldChild.element);
             }
             targetChildren[k] = sourceChildren[k];
           });
@@ -185,7 +185,7 @@ export class El<
     void addedNodes.forEach(node =>
       void node.dispatchEvent(new Event('connect', { bubbles: false, cancelable: true })));
     removedNodes.size + addedNodes.size > 0 &&
-    void this[internal].element.dispatchEvent(new Event('change', { bubbles: false, cancelable: true }));
+    void this.element.dispatchEvent(new Event('change', { bubbles: false, cancelable: true }));
   }
 }
 
