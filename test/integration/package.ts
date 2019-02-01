@@ -386,7 +386,6 @@ describe('Integration: Typed DOM', function () {
   describe('usage', function () {
     it('component', function () {
       class Component implements El {
-        public readonly _ = '';
         private readonly dom = TypedHTML.div({
           style: TypedHTML.style(`$scope ul { width: 100px; }`),
           content: TypedHTML.ul([

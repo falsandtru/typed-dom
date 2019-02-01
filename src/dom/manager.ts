@@ -35,9 +35,9 @@ export function proxy(el: Element): El<string, Element, ElChildren> {
   return relation.get(el)!;
 }
 
-const memory = new WeakMap<El<string, Element, ElChildren>, Internal<string, Element, ElChildren>>();
-function internal<T extends string, E extends Element, C extends ElChildren>(el: El<T, E, C>): Internal<T, E, C> {
-  return memory.get(el) as Internal<T, E, C>;
+const memory = new WeakMap<El<string, Element, ElChildren>, Internal<Element, ElChildren>>();
+function internal<T extends string, E extends Element, C extends ElChildren>(el: El<T, E, C>): Internal<E, C> {
+  return memory.get(el) as Internal<E, C>;
 }
 
 export interface ElInterface<
@@ -45,7 +45,7 @@ export interface ElInterface<
   E extends Element = Element,
   C extends ElChildren = ElChildren
   > {
-  readonly _: T;
+  readonly _?: T;
   readonly element: E;
   children: C;
 }
@@ -59,7 +59,7 @@ export class El<
     element: E,
     children: C
   ) {
-    void memory.set(this, new Internal('' as T, element, children));
+    void memory.set(this, new Internal(element, children));
     void throwErrorIfNotUsable(this);
     void relation.set(element, this);
     const status = internal(this);
@@ -111,9 +111,7 @@ export class El<
           }, {}));
     }
   }
-  public get _(): T {
-    throw new Error(`TypedDOM: Don't touch "_" property.`);
-  }
+  public readonly _?: T;
   public get element(): E {
     return internal(this).element;
   }
@@ -207,13 +205,11 @@ export class El<
   }
 }
 
-class Internal<T extends string, E extends Element, C extends ElChildren> {
+class Internal<E extends Element, C extends ElChildren> {
   constructor(
-    private readonly tag: T,
     public readonly element: E,
     public children: C
   ) {
-    this.tag;
   }
   private id_!: string;
   private get id(): string {
