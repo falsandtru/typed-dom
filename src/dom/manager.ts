@@ -199,7 +199,10 @@ class Internal<T extends string, E extends Element, C extends ElChildren> {
   }
   private id_!: string;
   private get id(): string {
-    return this.id_ = this.id_ || this.element.id.trim() || uid();
+    if (this.id_) return this.id_;
+    if (this.id_ = this.element.id.trim()) return this.id_;
+    void this.element.classList.add(this.id_ = uid());
+    return this.id;
   }
   private get query(): string {
     assert(this.id.match(/^[a-z]/));
@@ -217,11 +220,11 @@ class Internal<T extends string, E extends Element, C extends ElChildren> {
           : ElChildrenType.Record;
   public readonly initialChildren: WeakSet<Node> = new WeakSet();
   public scope(child: El<string, Element, ElChildren>): void {
-    const syntax = /^(\s*)\$scope(?!\w)/gm;
     if (!(child.element instanceof HTMLStyleElement)) return;
     return void parse(child.element, this.query);
 
     function parse(style: HTMLStyleElement, query: string): void {
+      const syntax = /^(\s*)\$scope(?!\w)/gm;
       if (style.innerHTML.search(syntax) === -1) return;
       style.innerHTML = style.innerHTML.replace(syntax, (_, indent) => `${indent}${query}`);
       const id = query.slice(1);

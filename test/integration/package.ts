@@ -283,6 +283,7 @@ describe('Integration: Typed DOM', function () {
       assert(TypedHTML.div({ id: 'test' }, [TypedHTML.style(template)]).children[0].element.innerHTML === result);
       assert(TypedHTML.div({ id: 'test' }, { style: TypedHTML.style(template) }).children.style.element.innerHTML === result);
       assert(TypedHTML.div({ id: 'test' }, [TypedHTML.style(`<script>`)]).children[0].element.children.length === 0);
+      assert(TypedHTML.div([TypedHTML.style(template)]).element.className.startsWith('id-'));
       assert(TypedHTML.div([TypedHTML.style(template)]).children[0].element.innerHTML.match(/\.[\w\-]+\s/gm)!.length === 2);
     });
 
