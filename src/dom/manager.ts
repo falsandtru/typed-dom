@@ -21,24 +21,21 @@ export type ElChildren =
 export namespace ElChildren {
   export type Void = undefined;
   export type Text = string;
-  export type Collection = El<string, Element, any>[];
-  export type Record = { [field: string]: El<string, Element, any>; };
+  export type Collection = ElInterface<string, Element, any>[];
+  export type Record = { [field: string]: ElInterface<string, Element, any>; };
 }
 type LaxChildren<C extends ElChildren> = C extends ElChildren.Text ? ElChildren.Text : C;
 
-const relation = new WeakMap<Element, El<string, Element, ElChildren>>();
+const memory = new WeakMap<Element, El<string, Element, ElChildren>>();
 
 export function proxy<E extends Element>(el: E): El<string, E, ElChildren>;
 export function proxy<C extends ElChildren>(el: Element): El<string, Element, C>;
 export function proxy<E extends Element, C extends ElChildren>(el: E): El<string, E, C>;
 export function proxy(el: Element): El<string, Element, ElChildren> {
-  return relation.get(el)!;
+  return memory.get(el)!;
 }
 
-const memory = new WeakMap<El<string, Element, ElChildren>, Internal<Element, ElChildren>>();
-function internal<T extends string, E extends Element, C extends ElChildren>(el: El<T, E, C>): Internal<E, C> {
-  return memory.get(el) as Internal<E, C>;
-}
+const state = Symbol();
 
 export interface ElInterface<
   T extends string = string,
@@ -47,39 +44,39 @@ export interface ElInterface<
   > {
   readonly _?: T;
   readonly element: E;
-  children: C;
+  children: LaxChildren<C>;
 }
 
 export class El<
   T extends string,
   E extends Element,
   C extends ElChildren
-  > {
+  >
+  implements ElInterface<T, E, C> {
   constructor(
-    element: E,
+    public readonly element: E,
     children: C
   ) {
-    void memory.set(this, new Internal(element, children));
+    this[state] = new State(element, children as LaxChildren<C>);
     void throwErrorIfNotUsable(this);
-    void relation.set(element, this);
-    const status = internal(this);
-    switch (status.type) {
+    void memory.set(element, this);
+    switch (this[state].type) {
       case ElChildrenType.Void:
         return;
       case ElChildrenType.Text:
         void define(element, []);
-        status.children = element.appendChild(text('')) as any;
+        this[state].children = element.appendChild(text('')) as any;
         this.children = children as LaxChildren<C>;
         return;
       case ElChildrenType.Collection:
         void define(element, []);
-        status.children = [] as ElChildren.Collection as C;
+        this[state].children = [] as ElChildren.Collection as LaxChildren<C>;
         this.children = children as LaxChildren<C>;
         return;
       case ElChildrenType.Record:
         void define(element, []);
-        status.children = observe(element, { ...children as ElChildren.Record }) as C;
-        void Object.values(children as ElChildren.Record).forEach(child => void status.initialChildren.add(child.element));
+        this[state].children = observe(element, { ...children as ElChildren.Record }) as LaxChildren<C>;
+        void Object.values(children as ElChildren.Record).forEach(child => void this[state].initialChildren.add(child.element));
         this.children = children as LaxChildren<C>;
         return;
     }
@@ -94,10 +91,10 @@ export class El<
             descs[name] = {
               configurable: true,
               enumerable: true,
-              get: (): El<string, Element, any> => {
+              get: (): ElInterface<string, Element, any> => {
                 return child;
               },
-              set: (newChild: El<string, Element, any>) => {
+              set: (newChild: ElInterface<string, Element, any>) => {
                 const oldChild = child;
                 if (newChild === oldChild) return;
                 if (newChild.element.parentElement !== element) {
@@ -111,33 +108,29 @@ export class El<
           }, {}));
     }
   }
+  private readonly [state]: State<E, LaxChildren<C>>;
   public readonly _?: T;
-  public get element(): E {
-    return internal(this).element;
-  }
   public get children(): LaxChildren<C> {
-    const status = internal(this);
-    assert([ElChildrenType.Void, ElChildrenType.Collection].includes(status.type) ? Object.isFrozen(status.children) : !Object.isFrozen(status.children));
-    switch (status.type) {
+    assert([ElChildrenType.Void, ElChildrenType.Collection].includes(this[state].type) ? Object.isFrozen(this[state].children) : !Object.isFrozen(this[state].children));
+    switch (this[state].type) {
       case ElChildrenType.Text:
-        status.children = (status.children as any as Text).parentNode === this.element
-          ? status.children
-          : [...this.element.childNodes].find(node => node instanceof Text) as any || (status.children as any as Text).cloneNode();
-        return (status.children as any as Text).textContent as LaxChildren<C>;
+        this[state].children = (this[state].children as any as Text).parentNode === this.element
+          ? this[state].children
+          : [...this.element.childNodes].find(node => node instanceof Text) as any || (this[state].children as any as Text).cloneNode();
+        return (this[state].children as any as Text).textContent as LaxChildren<C>;
       default:
-        return status.children as LaxChildren<C>;
+        return this[state].children;
     }
   }
   public set children(children: LaxChildren<C>) {
-    const status = internal(this);
     const removedNodes = new Set<Node>();
     const addedNodes = new Set<Node>();
-    switch (status.type) {
+    switch (this[state].type) {
       case ElChildrenType.Void:
         return;
       case ElChildrenType.Text: {
-        if (children === this.children && !status.initialChildren.has(status.children as any)) return;
-        const targetChildren = status.children as any as Text;
+        if (children === this.children && !this[state].initialChildren.has(this[state].children as any)) return;
+        const targetChildren = this[state].children as any as Text;
         const oldText = targetChildren.textContent!;
         const newText = children as ElChildren.Text;
         targetChildren.textContent = newText;
@@ -148,7 +141,7 @@ export class El<
       case ElChildrenType.Collection: {
         const sourceChildren = children as ElChildren.Collection;
         const targetChildren = [] as ElChildren.Collection;
-        status.children = targetChildren as C;
+        this[state].children = targetChildren as LaxChildren<C>;
         void (sourceChildren)
           .forEach((child, i) => {
             if (child.element.parentElement !== this.element as Element) {
@@ -157,7 +150,7 @@ export class El<
             targetChildren[i] = child;
             if (targetChildren[i].element === this.element.childNodes[i]) return;
             if (child.element.parentNode !== this.element) {
-              void status.scope(child);
+              void this[state].scope(child);
               void addedNodes.add(child.element);
             }
             void this.element.insertBefore(child.element, this.element.childNodes[i]);
@@ -172,7 +165,7 @@ export class El<
       }
       case ElChildrenType.Record: {
         const sourceChildren = children as ElChildren.Record;
-        const targetChildren = status.children as ElChildren.Record;
+        const targetChildren = this[state].children as ElChildren.Record;
         assert.deepStrictEqual(Object.keys(sourceChildren), Object.keys(targetChildren));
         const mem = new WeakSet<Node>();
         void Object.keys(targetChildren)
@@ -185,8 +178,8 @@ export class El<
             }
             if (mem.has(newChild.element)) throw new Error(`TypedDOM: Cannot use an element again used in the same record.`);
             void mem.add(newChild.element);
-            if (oldChild.element !== newChild.element || status.initialChildren.has(oldChild.element)) {
-              void status.scope(newChild);
+            if (oldChild.element !== newChild.element || this[state].initialChildren.has(oldChild.element)) {
+              void this[state].scope(newChild);
               void addedNodes.add(newChild.element);
               void removedNodes.add(oldChild.element);
             }
@@ -196,7 +189,7 @@ export class El<
       }
     }
     void removedNodes.forEach(node =>
-      !status.initialChildren.has(node) &&
+      !this[state].initialChildren.has(node) &&
       void node.dispatchEvent(new Event('disconnect', { bubbles: false, cancelable: true })));
     void addedNodes.forEach(node =>
       void node.dispatchEvent(new Event('connect', { bubbles: false, cancelable: true })));
@@ -205,9 +198,9 @@ export class El<
   }
 }
 
-class Internal<E extends Element, C extends ElChildren> {
+class State<E extends Element, C extends ElChildren> {
   constructor(
-    public readonly element: E,
+    private readonly element: E,
     public children: C
   ) {
   }
@@ -233,7 +226,7 @@ class Internal<E extends Element, C extends ElChildren> {
           ? ElChildrenType.Collection
           : ElChildrenType.Record;
   public readonly initialChildren: WeakSet<Node> = new WeakSet();
-  public scope(child: El<string, Element, ElChildren>): void {
+  public scope(child: ElInterface<string, Element, ElChildren>): void {
     if (!(child.element instanceof HTMLStyleElement)) return;
     return void parse(child.element, this.query);
 
@@ -256,7 +249,7 @@ class Internal<E extends Element, C extends ElChildren> {
   }
 }
 
-function throwErrorIfNotUsable({ element }: El<string, Element, any>): void {
-  if (element.parentElement === null || !relation.has(element.parentElement)) return;
+function throwErrorIfNotUsable({ element }: ElInterface<string, Element, any>): void {
+  if (element.parentElement === null || !memory.has(element.parentElement)) return;
   throw new Error(`TypedDOM: Cannot add an element used in another typed dom.`);
 }
