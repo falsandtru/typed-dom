@@ -1,4 +1,4 @@
-import { TypedHTML, TypedSVG, API, proxy, html, define } from '../../index';
+import { TypedHTML, TypedSVG, El, API, proxy, html, define } from '../../index';
 import { Sequence } from 'spica/sequence';
 
 declare global {
@@ -364,8 +364,8 @@ describe('Integration: Typed DOM', function () {
       };
       const el = TypedHTML.ul({
         a: TypedHTML.li(listeners, 'a' as string),
-        b: TypedHTML.li(listeners, 'b' as string),
-        c: TypedHTML.li(listeners, 'c' as string),
+        b: TypedHTML.li(listeners, 'b'),
+        c: TypedHTML.li(listeners, 'c'),
       });
       el.children = {
         a: el.children.a,
@@ -384,39 +384,33 @@ describe('Integration: Typed DOM', function () {
   });
 
   describe('usage', function () {
-    class MicroComponent {
-      constructor(private readonly parent: HTMLElement) {
-        this.parent.appendChild(this.dom.element);
-      }
-      private readonly dom = TypedHTML.div({
-        style: TypedHTML.style(`$scope ul { width: 100px; }`),
-        content: TypedHTML.ul([
-          TypedHTML.li(`item`)
-        ])
-      });
-    }
-    class Component {
-      constructor(private readonly parent: HTMLElement) {
-        this.parent.appendChild(this.element);
-      }
-      private readonly element = TypedHTML.div([
-        TypedHTML.style(`$scope { position: relative; }`)
-      ]).element;
-      private readonly children = Object.freeze({
-        list: new MicroComponent(this.element)
-      });
-      destroy() {
-        this.children;
-        this.element.remove();
-      }
-    }
-
-    it('micro component', function () {
-      new MicroComponent(document.createElement('div'));
-    });
-
     it('component', function () {
-      new Component(document.createElement('div'));
+      class Component implements El {
+        public readonly _ = '';
+        private readonly dom = TypedHTML.div({
+          style: TypedHTML.style(`$scope ul { width: 100px; }`),
+          content: TypedHTML.ul([
+            TypedHTML.li(`item`)
+          ]),
+        });
+        public get element() {
+          return this.dom.element;
+        }
+        public get children() {
+          return this.dom.children.content.children;
+        }
+        public set children(children) {
+          this.dom.children.content.children = children;
+        }
+      }
+
+      const el = new Component();
+      assert(TypedHTML.div([el]));
+      assert(el.children[0].children === 'item');
+      el.children = [
+        TypedHTML.li('Item')
+      ];
+      assert(el.children[0].children === 'Item');
     });
 
     it('translate', function () {

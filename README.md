@@ -138,45 +138,29 @@ component.element.outerHTML; // '<article class="RANDOM>"><style>.RANDOM ul { wi
 
 ## Examples
 
-### Micro DOM Components
+### DOM Components
 
-Use micro DOM components to hide and manage the typed DOM object.
+Create DOM components.
 
 ```ts
-import TypedHTML from 'typed-dom';
+import TypedHTML, { El } from 'typed-dom';
 
-class MicroComponent {
-  constructor(private readonly parent: HTMLElement) {
-    this.parent.appendChild(this.dom.element);
-  }
+class Component implements El {
+  public readonly tag = '';
   private readonly dom = TypedHTML.div({
     style: TypedHTML.style(`$scope ul { width: 100px; }`),
     content: TypedHTML.ul([
-      TypedHTML.li(`item` as string)
-    ])
+      TypedHTML.li(`item`)
+    ]),
   });
-}
-```
-
-### DOM Components
-
-Use DOM components to manage the micro DOM components.
-
-```ts
-import TypedHTML from 'typed-dom';
-
-class Component {
-  constructor(private readonly parent: HTMLElement) {
-    this.parent.appendChild(this.element);
+  public get element() {
+    return this.dom.element;
   }
-  private readonly element = TypedHTML.div([
-    TypedHTML.style(`$scope { position: relative; }`)
-  ]).element;
-  private readonly children = Object.freeze({
-    list: new MicroComponent(this.element)
-  });
-  destroy() {
-    this.element.remove();
+  public get children() {
+    return this.dom.children.content.children;
+  }
+  public set children(children) {
+    this.dom.children.content.children = children;
   }
 }
 ```
