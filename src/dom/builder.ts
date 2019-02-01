@@ -3,10 +3,8 @@ import { Factory as BaseFactory, TagNameMap, Attrs, html, svg, define } from '..
 import { ExtractProp } from 'spica/type';
 
 export type API<M extends TagNameMap, F extends BaseFactory<M>> =
-  BuilderFunction<Extract<keyof ExtractProp<M, Element>, string>, Element, F>
- & {
-  readonly [P in Extract<keyof ExtractProp<M, Element>, string>]: BuilderMethod<P, Extract<M[P], Element>, F>;
-};
+  BuilderFunction<Extract<keyof ExtractProp<M, Element>, string>, Element, F> &
+  { readonly [P in Extract<keyof ExtractProp<M, Element>, string>]: BuilderMethod<P, Extract<M[P], Element>, F>; };
 export function API<M extends TagNameMap, F extends BaseFactory<M>>(baseFactory: F): API<M, F> {
   return new Proxy<API<M, F>>((() => undefined) as any, handle(baseFactory));
 }
