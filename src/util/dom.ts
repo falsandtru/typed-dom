@@ -7,17 +7,6 @@ export interface Factory<M extends TagNameMap> {
   <T extends keyof M>(tag: T, attrs?: Attrs, children?: Children): M[T];
 }
 
-export function observer<F extends Factory<TagNameMap>>(factory: F, callback: (record: MutationRecord[]) => void, opts?: MutationObserverInit): F;
-export function observer<M extends TagNameMap>(factory: Factory<M>, callback: (record: MutationRecord[]) => void, opts: MutationObserverInit = { childList: true }): Factory<M> {
-  return (tag: keyof M, ...args: any[]) => {
-    const obs = new MutationObserver(callback);
-    const el = factory(tag) as any as Element;
-    void obs.observe(el, opts);
-    void define(el, ...args);
-    return el as any as M[keyof M];
-  };
-}
-
 namespace cache {
   export const elem = new Map<string, Element>();
   export const text = document.createTextNode('');
