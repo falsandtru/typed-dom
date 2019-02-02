@@ -27,12 +27,13 @@ export namespace ElChildren {
 
 type Relax<C extends ElChildren> = C extends ElChildren.Text ? ElChildren.Text : C;
 
-const memory = new WeakMap<Element, El<string, Element, ElChildren>>();
+const memory = new WeakMap<Element, ElInterface<string, Element, ElChildren>>();
 
-export function proxy<E extends Element>(el: E): El<string, E, ElChildren>;
-export function proxy<C extends ElChildren>(el: Element): El<string, Element, C>;
-export function proxy<E extends Element, C extends ElChildren>(el: E): El<string, E, C>;
-export function proxy(el: Element): El<string, Element, ElChildren> {
+export function proxy<E extends Element>(el: E): ElInterface<string, E, ElChildren>;
+export function proxy<C extends ElChildren>(el: Element): ElInterface<string, Element, C>;
+export function proxy<E extends Element, C extends ElChildren>(el: E): ElInterface<string, E, C>;
+export function proxy(el: Element): ElInterface<string, Element, ElChildren> {
+  if (!memory.has(el)) throw new Error(`TypedDOM: This element has no proxy.`);
   return memory.get(el)!;
 }
 
@@ -155,7 +156,7 @@ export class El<
     assert([ElChildrenType.Void, ElChildrenType.Collection].includes(this.type) ? Object.isFrozen(this.children_) : !Object.isFrozen(this.children_));
     switch (this.type) {
       case ElChildrenType.Text:
-        this.children_ = (this.children_ as any as Text).parentNode === this.element
+        this.children_ = (this.children_ as any as Text).parentElement === this.element as Element
           ? this.children_
           : [...this.element.childNodes].find(node => node instanceof Text) as any || (this.children_ as any as Text).cloneNode();
         return (this.children_ as any as Text).textContent as C;
@@ -190,7 +191,7 @@ export class El<
             }
             targetChildren[i] = child;
             if (targetChildren[i].element === this.element.childNodes[i]) return;
-            if (child.element.parentNode !== this.element) {
+            if (child.element.parentElement !== this.element as Element) {
               void this.scope(child);
               void addedNodes.add(child.element);
             }
@@ -240,6 +241,6 @@ export class El<
 }
 
 function throwErrorIfNotUsable({ element }: ElInterface<string, Element, any>): void {
-  if (element.parentElement === null || !memory.has(element.parentElement)) return;
+  if (!element.parentElement || !memory.has(element.parentElement)) return;
   throw new Error(`TypedDOM: Cannot add an element used in another typed dom.`);
 }

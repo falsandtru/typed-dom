@@ -1,5 +1,6 @@
 import { TypedHTML, TypedSVG, El, API, proxy, html, define } from '../../index';
 import { Sequence } from 'spica/sequence';
+import { frag } from '../../src/util/dom';
 
 declare global {
   interface HTMLElementTagNameMap {
@@ -320,7 +321,16 @@ describe('Integration: Typed DOM', function () {
       assert(TypedSVG.a().element.outerHTML === '<a></a>');
     });
 
-    it('customize text', function () {
+    it('swap', function () {
+      assert.throws(() => TypedHTML.article(TypedHTML.article([TypedHTML.p()]).children));
+      const el = TypedHTML.article([TypedHTML.p()]);
+      const children = el.children;
+      el.children = [TypedHTML.p()];
+      frag(children.map(el => el.element));
+      assert(TypedHTML.article(children));
+    });
+
+    it('observe text', function () {
       const el = TypedHTML.span(
         {
           onchange: (ev, el = ev.target as HTMLElement) =>
@@ -332,7 +342,7 @@ describe('Integration: Typed DOM', function () {
       assert(el.children === 'B');
     });
 
-    it('customize collection', function () {
+    it('observe collection', function () {
       const listeners: Record<string, EventListener> = {
         onconnect: (ev, el = ev.target as HTMLElement) =>
           el.textContent = el.textContent!.toUpperCase(),
@@ -355,7 +365,7 @@ describe('Integration: Typed DOM', function () {
         ]);
     });
 
-    it('customize record', function () {
+    it('observe record', function () {
       const listeners: Record<string, EventListener> = {
         onconnect: (ev, el = ev.target as HTMLElement) =>
           el.textContent = el.textContent!.toUpperCase(),
