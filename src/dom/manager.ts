@@ -1,5 +1,6 @@
 import { uid } from './identity';
 import { define, text } from '../util/dom';
+import { Mutable } from 'spica/type';
 
 type ElChildrenType =
   | typeof ElChildrenType.Void
@@ -21,7 +22,7 @@ export type ElChildren =
 export namespace ElChildren {
   export type Void = undefined;
   export type Text = string;
-  export type Collection = ElInterface<string, Element, any>[];
+  export type Collection = readonly ElInterface<string, Element, any>[];
   export type Record = { [field: string]: ElInterface<string, Element, any>; };
 }
 
@@ -182,8 +183,8 @@ export class El<
       }
       case ElChildrenType.Collection: {
         const sourceChildren = children as ElChildren.Collection;
-        const targetChildren = [] as ElChildren.Collection;
-        this.children_ = targetChildren as C;
+        const targetChildren = [] as Mutable<ElChildren.Collection>;
+        this.children_ = targetChildren as any as C;
         void (sourceChildren)
           .forEach((child, i) => {
             if (child.element.parentElement !== this.element as Element) {
