@@ -106,8 +106,8 @@ export class El<
                 if (newChild.element.parentElement !== element) {
                   void throwErrorIfNotUsable(newChild);
                 }
-                child = newChild;
                 void element.replaceChild(newChild.element, oldChild.element);
+                child = newChild;
               }
             };
             return descs;
@@ -190,57 +190,63 @@ export class El<
         const sourceChildren = children as ElChildren.Collection;
         const targetChildren = [] as Mutable<ElChildren.Collection>;
         this.children_ = targetChildren as any as C;
-        void (sourceChildren)
-          .forEach((child, i) => {
-            if (child.element.parentElement !== this.element as Element) {
-              void throwErrorIfNotUsable(child);
+        for (let i = 0; i < sourceChildren.length; ++i) {
+          const newChild = sourceChildren[i];
+          if (newChild.element.parentElement !== this.element as Element) {
+            void throwErrorIfNotUsable(newChild);
+          }
+          if (newChild.element === this.element.children[i]) {
+            void targetChildren.push(newChild);
+          }
+          else {
+            if (newChild.element.parentElement !== this.element as Element) {
+              void this.scope(newChild);
+              void addedChildren.add(newChild);
             }
-            targetChildren[i] = child;
-            if (targetChildren[i].element === this.element.childNodes[i]) return;
-            if (child.element.parentElement !== this.element as Element) {
-              void this.scope(child);
-              void addedChildren.add(child);
-            }
-            void this.element.insertBefore(child.element, this.element.childNodes[i]);
-          });
-        while (this.element.children.length > sourceChildren.length && memory.has(this.element.children[sourceChildren.length])) {
-          void removedChildren.add(proxy(this.element.removeChild(this.element.children[sourceChildren.length])));
+            void this.element.insertBefore(newChild.element, this.element.children[i]);
+            void targetChildren.push(newChild);
+          }
         }
-        assert(this.element.childNodes.length === sourceChildren.length);
-        assert(targetChildren.every((child, i) => child.element === this.element.childNodes[i]));
         void Object.freeze(targetChildren);
+        for (let i = this.element.children.length; i >= sourceChildren.length; --i) {
+          if (!memory.has(this.element.children[i])) continue;
+          void removedChildren.add(proxy(this.element.removeChild(this.element.children[i])));
+        }
+        assert(this.element.children.length === sourceChildren.length);
+        assert(targetChildren.every((child, i) => child.element === this.element.children[i]));
         break;
       }
       case ElChildrenType.Record: {
         const sourceChildren = children as ElChildren.Record;
         const targetChildren = this.children_ as ElChildren.Record;
         assert.deepStrictEqual(Object.keys(sourceChildren), Object.keys(targetChildren));
-        const mem = new WeakSet<Node>();
-        void Object.keys(targetChildren)
-          .forEach(k => {
-            const oldChild = targetChildren[k];
-            const newChild = sourceChildren[k];
-            if (!newChild) return;
-            if (newChild.element.parentElement !== this.element as Element) {
-              void throwErrorIfNotUsable(newChild);
-            }
-            if (mem.has(newChild.element)) throw new Error(`TypedDOM: Cannot use an element again used in the same record.`);
-            void mem.add(newChild.element);
-            if (oldChild.element !== newChild.element || this.initialChildren.has(oldChild)) {
-              void this.scope(newChild);
-              void addedChildren.add(newChild);
-              void removedChildren.add(oldChild);
-            }
-            targetChildren[k] = sourceChildren[k];
-          });
+        const log = new WeakSet<ElInterface>();
+        for (const name in targetChildren) {
+          const oldChild = targetChildren[name];
+          const newChild = sourceChildren[name];
+          if (!newChild) continue;
+          if (newChild.element.parentElement !== this.element as Element) {
+            void throwErrorIfNotUsable(newChild);
+          }
+          if (log.has(newChild)) throw new Error(`TypedDOM: Cannot use an element again used in the same record.`);
+          void log.add(newChild);
+          if (oldChild.element !== newChild.element || this.initialChildren.has(oldChild)) {
+            void this.scope(newChild);
+            void addedChildren.add(newChild);
+            void removedChildren.add(oldChild);
+          }
+          targetChildren[name] = sourceChildren[name];
+        }
         break;
       }
     }
-    void removedChildren.forEach(child =>
-      !this.initialChildren.has(child) &&
-      void child.element.dispatchEvent(new Event('disconnect', { bubbles: false, cancelable: true })));
-    void addedChildren.forEach(child =>
-      void child.element.dispatchEvent(new Event('connect', { bubbles: false, cancelable: true })));
+    for (const child of removedChildren) {
+      if (this.initialChildren.has(child)) continue;
+      void child.element.dispatchEvent(new Event('disconnect', { bubbles: false, cancelable: true }));
+    }
+    for (const child of addedChildren) {
+      void child.element.dispatchEvent(new Event('connect', { bubbles: false, cancelable: true }));
+    }
     removedChildren.size + addedChildren.size > 0 &&
     void this.element.dispatchEvent(new Event('change', { bubbles: false, cancelable: true }));
   }
