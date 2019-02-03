@@ -63,23 +63,28 @@ export class El<
     void memory.set(element, this);
     switch (this.type) {
       case ElChildrenType.Void:
+        this.initialChildren = new WeakSet();
         return;
       case ElChildrenType.Text:
+        this.initialChildren = new WeakSet();
         void define(element, []);
         this.children_ = element.appendChild(text('')) as any;
         this.children = children_;
         return;
       case ElChildrenType.Collection:
+        this.initialChildren = new WeakSet(children_ as ElChildren.Collection);
         void define(element, []);
         this.children_ = [] as ElChildren.Collection as C;
         this.children = children_;
         return;
       case ElChildrenType.Record:
+        this.initialChildren = new WeakSet(Object.values(children_ as ElChildren.Record));
         void define(element, []);
         this.children_ = observe(element, { ...children_ as ElChildren.Record }) as C;
-        void Object.values(children_ as ElChildren.Record).forEach(child => void this.initialChildren.add(child.element));
         this.children = children_;
         return;
+      default:
+        throw new Error(`TypedDOM: Undefined type children.`);
     }
 
     function observe<C extends ElChildren.Record>(element: Element, children: C): C {
@@ -152,7 +157,7 @@ export class El<
           void el.remove());
     }
   }
-  private readonly initialChildren: WeakSet<Node> = new WeakSet();
+  private readonly initialChildren: WeakSet<ElInterface>;
   public get children(): C {
     assert([ElChildrenType.Void, ElChildrenType.Collection].includes(this.type) ? Object.isFrozen(this.children_) : !Object.isFrozen(this.children_));
     switch (this.type) {
@@ -166,8 +171,8 @@ export class El<
     }
   }
   public set children(children: C) {
-    const removedNodes = new Set<Node>();
-    const addedNodes = new Set<Node>();
+    const removedChildren = new Set<ElInterface>();
+    const addedChildren = new Set<ElInterface>();
     switch (this.type) {
       case ElChildrenType.Void:
         return;
@@ -194,12 +199,12 @@ export class El<
             if (targetChildren[i].element === this.element.childNodes[i]) return;
             if (child.element.parentElement !== this.element as Element) {
               void this.scope(child);
-              void addedNodes.add(child.element);
+              void addedChildren.add(child);
             }
             void this.element.insertBefore(child.element, this.element.childNodes[i]);
           });
-        while (this.element.childNodes.length > sourceChildren.length) {
-          void removedNodes.add(this.element.removeChild(this.element.childNodes[sourceChildren.length]));
+        while (this.element.children.length > sourceChildren.length && memory.has(this.element.children[sourceChildren.length])) {
+          void removedChildren.add(proxy(this.element.removeChild(this.element.children[sourceChildren.length])));
         }
         assert(this.element.childNodes.length === sourceChildren.length);
         assert(targetChildren.every((child, i) => child.element === this.element.childNodes[i]));
@@ -221,22 +226,22 @@ export class El<
             }
             if (mem.has(newChild.element)) throw new Error(`TypedDOM: Cannot use an element again used in the same record.`);
             void mem.add(newChild.element);
-            if (oldChild.element !== newChild.element || this.initialChildren.has(oldChild.element)) {
+            if (oldChild.element !== newChild.element || this.initialChildren.has(oldChild)) {
               void this.scope(newChild);
-              void addedNodes.add(newChild.element);
-              void removedNodes.add(oldChild.element);
+              void addedChildren.add(newChild);
+              void removedChildren.add(oldChild);
             }
             targetChildren[k] = sourceChildren[k];
           });
         break;
       }
     }
-    void removedNodes.forEach(node =>
-      !this.initialChildren.has(node) &&
-      void node.dispatchEvent(new Event('disconnect', { bubbles: false, cancelable: true })));
-    void addedNodes.forEach(node =>
-      void node.dispatchEvent(new Event('connect', { bubbles: false, cancelable: true })));
-    removedNodes.size + addedNodes.size > 0 &&
+    void removedChildren.forEach(child =>
+      !this.initialChildren.has(child) &&
+      void child.element.dispatchEvent(new Event('disconnect', { bubbles: false, cancelable: true })));
+    void addedChildren.forEach(child =>
+      void child.element.dispatchEvent(new Event('connect', { bubbles: false, cancelable: true })));
+    removedChildren.size + addedChildren.size > 0 &&
     void this.element.dispatchEvent(new Event('change', { bubbles: false, cancelable: true }));
   }
 }
