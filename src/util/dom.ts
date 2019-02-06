@@ -13,6 +13,13 @@ namespace cache {
   export const frag = document.createDocumentFragment();
 }
 
+export function frag(children: Children = []): DocumentFragment {
+  children = typeof children === 'string' ? [text(children)] : children;
+  const frag = cache.frag.cloneNode() as DocumentFragment;
+  void frag.append(...children);
+  return frag;
+}
+
 export function shadow(el: Element, opts?: ShadowRootInit): ShadowRoot;
 export function shadow(el: Element, children?: Children, opts?: ShadowRootInit): ShadowRoot;
 export function shadow(el: Element, children?: Children | ShadowRootInit, opts: ShadowRootInit = { mode: 'closed' }): ShadowRoot {
@@ -31,13 +38,6 @@ export function svg<T extends keyof SVGElementTagNameMap_>(tag: T, children?: Ch
 export function svg<T extends keyof SVGElementTagNameMap_>(tag: T, attrs?: Attrs, children?: Children): SVGElementTagNameMap_[T];
 export function svg<T extends keyof SVGElementTagNameMap_>(tag: T, attrs: Attrs | Children = {}, children: Children = []): SVGElementTagNameMap_[T] {
   return element(NS.SVG, tag, attrs, children);
-}
-
-export function frag(children: Children = []): DocumentFragment {
-  children = typeof children === 'string' ? [text(children)] : children;
-  const frag = cache.frag.cloneNode() as DocumentFragment;
-  void frag.append(...children);
-  return frag;
 }
 
 export function text(source: string): Text {

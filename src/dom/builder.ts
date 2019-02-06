@@ -9,6 +9,7 @@ export function API<M extends TagNameMap, F extends BaseFactory<M>>(baseFactory:
   return new Proxy<API<M, F>>((() => undefined) as any, handle(baseFactory));
 }
 
+export const TypedShadow: API<ShadowHostElementTagNameMap, typeof html> = new Proxy((() => undefined) as any, handle(html, { mode: 'open' }));
 export const TypedHTML: API<HTMLElementTagNameMap, typeof html> = API(html);
 export const TypedSVG: API<SVGElementTagNameMap_, typeof svg> = API(svg);
 
@@ -28,10 +29,12 @@ interface BuilderMethod<T extends string, E extends Element, F extends BaseFacto
 
 type Factory<F extends BaseFactory<TagNameMap>, T extends string, C extends Children, E extends Element> = (baseFactory: F, tag: T, attrs: Attrs, children: C) => E;
 
-function handle<M extends TagNameMap, F extends BaseFactory<M>>(baseFactory: F): ProxyHandler<API<M, F>> {
+function handle<M extends TagNameMap, F extends BaseFactory<M>>(baseFactory: F, opts?: ShadowRootInit): ProxyHandler<API<M, F>> {
   return {
-    apply: (obj, _, args) =>
-      obj[args[0]](...args.slice(1)),
+    apply: (obj, _, args, prop = args[0]) =>
+      (obj[prop] || prop in obj || typeof prop !== 'string'
+        ? obj[prop]
+        : obj[prop] = builder(prop as Extract<keyof M, string>, baseFactory))(...args.slice(1)),
     get: (obj, prop) =>
       obj[prop] || prop in obj || typeof prop !== 'string'
         ? obj[prop]
@@ -43,7 +46,7 @@ function handle<M extends TagNameMap, F extends BaseFactory<M>>(baseFactory: F):
       if (typeof attrs === 'function') return build(undefined, undefined, attrs);
       if (typeof children === 'function') return build(attrs, undefined, children);
       if (attrs !== undefined && isChildren(attrs)) return build(undefined, attrs, factory);
-      return new Elem(elem(factory || ((f, tag) => f(tag) as any as Element), attrs || {}, children), children);
+      return new Elem(elem(factory || ((f, tag) => f(tag) as any as Element), attrs || {}, children), children as string, opts);
     };
 
     function isChildren(children: Children | Attrs): children is Children {

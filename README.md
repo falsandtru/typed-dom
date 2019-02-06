@@ -15,7 +15,7 @@ Static typed DOM component builder.
 - factory: () => Element
 
 ```ts
-import TypedHTML from 'typed-dom';
+import { TypedHTML } from 'typed-dom';
 
 TypedHTML.p();
 TypedHTML.p('text');
@@ -34,7 +34,7 @@ TypedHTML.p(() => document.createElement('p'));
 ```ts
 import { TypedSVG } from 'typed-dom';
 
-TypedHTML.svg();
+TypedSVG.svg();
 ```
 
 ## Extend APIs
@@ -42,7 +42,7 @@ TypedHTML.svg();
 You can define some custom elements by extending `HTMLElementTagNameMap` or `SVGElementTagNameMap_` interface.
 
 ```ts
-import TypedHTML, { TypedSVG } from 'typed-dom';
+import { TypedHTML, TypedSVG } from 'typed-dom';
 
 declare global {
   interface HTMLElementTagNameMap {
@@ -62,7 +62,7 @@ TypedSVG.a().element; // SVGAElement
 Build a typed DOM object with styling.
 
 ```ts
-import TypedHTML from 'typed-dom';
+import { TypedHTML } from 'typed-dom';
 
 const component = TypedHTML.article({
   style: TypedHTML.style(`$scope ul { width: 100px; }`),
@@ -143,11 +143,26 @@ component.element.outerHTML; // '<article class="RANDOM>"><style>.RANDOM ul { wi
 Create DOM components.
 
 ```ts
-import TypedHTML, { El } from 'typed-dom';
+import { TypedShadow, TypedHTML, El } from 'typed-dom';
 
 class Component implements El {
   private readonly dom = TypedHTML.div({
     style: TypedHTML.style(`$scope ul { width: 100px; }`),
+    content: TypedHTML.ul([
+      TypedHTML.li(`item`)
+    ]),
+  });
+  public readonly element = this.dom.element;
+  public get children() {
+    return this.dom.children.content.children;
+  }
+  public set children(children) {
+    this.dom.children.content.children = children;
+  }
+}
+class ShadowComponent implements El {
+  private readonly dom = TypedShadow.section({
+    style: TypedHTML.style(`ul { width: 100px; }`),
     content: TypedHTML.ul([
       TypedHTML.li(`item`)
     ]),

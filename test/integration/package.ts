@@ -1,6 +1,6 @@
-import { TypedHTML, TypedSVG, El, API, proxy, html, define } from '../../index';
+import { TypedShadow, TypedHTML, TypedSVG, El, API, proxy, frag, html, define } from '../../index';
 import { Sequence } from 'spica/sequence';
-import { frag } from '../../src/util/dom';
+import { Coroutine } from 'spica/coroutine';
 
 declare global {
   interface HTMLElementTagNameMap {
@@ -280,12 +280,13 @@ describe('Integration: Typed DOM', function () {
 
     it('scope', function () {
       const template = `$scope {}\n  $scope {}`;
-      const result = `#test {}\n  #test {}`;
+      const result = template.replace(/\$scope/g, '#test');
       assert(TypedHTML.div({ id: 'test' }, [TypedHTML.style(template)]).children[0].element.innerHTML === result);
       assert(TypedHTML.div({ id: 'test' }, { style: TypedHTML.style(template) }).children.style.element.innerHTML === result);
       assert(TypedHTML.div({ id: 'test' }, [TypedHTML.style(`<script>`)]).children[0].element.children.length === 0);
       assert(TypedHTML.div([TypedHTML.style(template)]).element.className.startsWith('id-'));
       assert(TypedHTML.div([TypedHTML.style(template)]).children[0].element.innerHTML.match(/\.[\w\-]+\s/gm)!.length === 2);
+      assert(TypedShadow.div([TypedHTML.style(template)]).children[0].element.innerHTML === template.replace(/\$scope/g, ':host'));
     });
 
     it('clear', function () {
@@ -391,6 +392,13 @@ describe('Integration: Typed DOM', function () {
         ]);
     });
 
+    it('shadow', function () {
+      assert(TypedShadow('section', [TypedHTML.p()]).element.outerHTML === '<section></section>');
+      assert(TypedShadow.section([TypedHTML.p()]).element.outerHTML === '<section></section>');
+      assert(TypedShadow.section([TypedHTML.p()]).element.shadowRoot!.innerHTML === '<p></p>');
+      assert(TypedShadow.section([TypedHTML.p()]).children[0].element.outerHTML === '<p></p>');
+    });
+
   });
 
   describe('usage', function () {
@@ -411,13 +419,72 @@ describe('Integration: Typed DOM', function () {
         }
       }
 
-      const el = new Component();
-      assert(TypedHTML.div([el]));
-      assert(el.children[0].children === 'item');
-      el.children = [
+      const com = new Component();
+      assert(TypedHTML.div([com]));
+      assert(com.children[0].children === 'item');
+      com.children = [
         TypedHTML.li('Item')
       ];
-      assert(el.children[0].children === 'Item');
+      assert(com.children[0].children === 'Item');
+    });
+
+    it('component shadow', function () {
+      class Component implements El {
+        private readonly dom = TypedShadow.section({
+          style: TypedHTML.style(`ul { width: 100px; }`),
+          content: TypedHTML.ul([
+            TypedHTML.li(`item`)
+          ] as const),
+        });
+        public readonly element = this.dom.element;
+        public get children() {
+          return this.dom.children.content.children;
+        }
+        public set children(children) {
+          this.dom.children.content.children = children;
+        }
+      }
+
+      const com = new Component();
+      assert(TypedHTML.div([com]));
+      assert(com.children[0].children === 'item');
+      com.children = [
+        TypedHTML.li('Item')
+      ];
+      assert(com.children[0].children === 'Item');
+    });
+
+    it('component coroutine', function () {
+      class Component extends Coroutine<void> implements El {
+        constructor() {
+          super(async function* (this: Component) {
+            while (this.element.isConnected) {
+              yield;
+            }
+          }, { size: Infinity });
+        }
+        private readonly dom = TypedShadow.section({
+          style: TypedHTML.style(`ul { width: 100px; }`),
+          content: TypedHTML.ul([
+            TypedHTML.li(`item`)
+          ] as const),
+        });
+        public readonly element = this.dom.element;
+        public get children() {
+          return this.dom.children.content.children;
+        }
+        public set children(children) {
+          this.dom.children.content.children = children;
+        }
+      }
+
+      const com = new Component();
+      assert(TypedHTML.div([com]));
+      assert(com.children[0].children === 'item');
+      com.children = [
+        TypedHTML.li('Item')
+      ];
+      assert(com.children[0].children === 'Item');
     });
 
     it('translate', function () {
