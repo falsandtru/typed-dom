@@ -1,4 +1,4 @@
-﻿export { HTML as default, Shadow, HTML, SVG, API } from './src/dom/builder';
+﻿export { Shadow, HTML, SVG, API } from './src/dom/builder';
 export { ElInterface as El, proxy } from './src/dom/manager';
 export { frag, shadow, html, svg, text, define } from './src/util/dom';
 export * from './src/util/listener';

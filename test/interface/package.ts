@@ -1,14 +1,7 @@
-import def, { Shadow, HTML, SVG, API, proxy, shadow, html, svg, text, frag, define, listen, once, bind, delegate, currentTargets } from '../../index';
+import { Shadow, HTML, SVG, API, proxy, shadow, html, svg, text, frag, define, listen, once, bind, delegate, currentTargets } from '../../index';
 
 describe('Interface: Package', function () {
-  describe('default', function () {
-    it('default', function () {
-      assert(def === HTML);
-    });
-
-  });
-
-  describe('HTML', function () {
+  describe('Typed', function () {
     it('Shadow', function () {
       assert(typeof Shadow === 'function');
     });
@@ -32,7 +25,7 @@ describe('Interface: Package', function () {
 
   });
 
-  describe('dom', function () {
+  describe('Native', function () {
     it('shadow', function () {
       assert(typeof shadow === 'function');
     });
