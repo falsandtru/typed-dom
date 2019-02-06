@@ -13,6 +13,14 @@ namespace cache {
   export const frag = document.createDocumentFragment();
 }
 
+export function shadow(el: Element, opts?: ShadowRootInit): ShadowRoot;
+export function shadow(el: Element, children?: Children, opts?: ShadowRootInit): ShadowRoot;
+export function shadow(el: Element, children?: Children | ShadowRootInit, opts: ShadowRootInit = { mode: 'closed' }): ShadowRoot {
+  if (children !== undefined && !isChildren(children)) return shadow(el, undefined, children);
+  if (typeof children === 'string') return shadow(el, [text(children)]);
+  return define(el.attachShadow(opts), children);
+}
+
 export function html<T extends keyof HTMLElementTagNameMap>(tag: T, children?: Children): HTMLElementTagNameMap[T];
 export function html<T extends keyof HTMLElementTagNameMap>(tag: T, attrs?: Attrs, children?: Children): HTMLElementTagNameMap[T];
 export function html<T extends keyof HTMLElementTagNameMap>(tag: T, attrs: Attrs | Children = {}, children: Children = []): HTMLElementTagNameMap[T] {
@@ -70,7 +78,7 @@ function elem(ns: NS, tag: string): Element {
   }
 }
 
-export function define<T extends Element>(el: T, children?: Children): T;
+export function define<T extends Element | ShadowRoot>(el: T, children?: Children): T;
 export function define<T extends Element>(el: T, attrs?: Attrs | Children, children?: Children): T;
 export function define<T extends Element>(el: T, attrs: Attrs | Children = {}, children?: Children): T {
   if (isChildren(attrs)) return define(el, undefined, attrs);
@@ -106,6 +114,6 @@ export function define<T extends Element>(el: T, attrs: Attrs | Children = {}, c
   return el;
 }
 
-function isChildren(o: Attrs | Children): o is Children {
+function isChildren(o: Attrs | Children | ShadowRootInit): o is Children {
   return !!o[Symbol.iterator];
 }

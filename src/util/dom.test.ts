@@ -1,7 +1,18 @@
-import { html, svg, frag, define } from './dom';
+import { shadow, html, svg, frag, define } from './dom';
 import { TypedHTML, TypedSVG } from '../dom/builder';
 
 describe('Unit: util/dom', () => {
+  describe('shadow', () => {
+    it('', () => {
+      assert(shadow(html('section')).mode === 'closed');
+      assert(shadow(html('section'), { mode: 'open' }).mode === 'open');
+      assert(shadow(html('section')).innerHTML === '');
+      assert(shadow(html('section'), 'a').innerHTML === 'a');
+      assert(shadow(html('section'), [html('p', 'a')]).innerHTML === '<p>a</p>');
+    });
+
+  });
+
   describe('html', () => {
     it('', () => {
       assert(html('a').outerHTML === TypedHTML.a().element.outerHTML);
