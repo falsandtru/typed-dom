@@ -419,13 +419,13 @@ describe('Integration: Typed DOM', function () {
         }
       }
 
-      const com = new Component();
-      assert(HTML.div([com]));
-      assert(com.children[0].children === 'item');
-      com.children = [
+      const comp = new Component();
+      assert(HTML.div([comp]));
+      assert(comp.children[0].children === 'item');
+      comp.children = [
         HTML.li('Item')
       ];
-      assert(com.children[0].children === 'Item');
+      assert(comp.children[0].children === 'Item');
     });
 
     it('component shadow', function () {
@@ -445,19 +445,19 @@ describe('Integration: Typed DOM', function () {
         }
       }
 
-      const com = new Component();
-      assert(HTML.div([com]));
-      assert(com.children[0].children === 'item');
-      com.children = [
+      const comp = new Component();
+      assert(HTML.div([comp]));
+      assert(comp.children[0].children === 'item');
+      comp.children = [
         HTML.li('Item')
       ];
-      assert(com.children[0].children === 'Item');
+      assert(comp.children[0].children === 'Item');
     });
 
     it('component coroutine', function () {
       class Component extends Coroutine<void> implements El {
         constructor() {
-          super(async function* (this: Component) {
+          super(function* (this: Component) {
             while (this.element.isConnected) {
               yield;
             }
@@ -478,13 +478,13 @@ describe('Integration: Typed DOM', function () {
         }
       }
 
-      const com = new Component();
-      assert(HTML.div([com]));
-      assert(com.children[0].children === 'item');
-      com.children = [
+      const comp = new Component();
+      assert(HTML.div([comp]));
+      assert(comp.children[0].children === 'item');
+      comp.children = [
         HTML.li('Item')
       ];
-      assert(com.children[0].children === 'Item');
+      assert(comp.children[0].children === 'Item');
     });
 
     it('translate', function () {

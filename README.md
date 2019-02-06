@@ -101,7 +101,7 @@ type ElChildren
 namespace ElChildren {
   export type Void = undefined;
   export type Text = string;
-  export type Collection = El<string, Element, any>[];
+  export type Collection = readonly El<string, Element, any>[];
   export type Record = { [field: string]: El<string, Element, any>; };
 }
 ```
