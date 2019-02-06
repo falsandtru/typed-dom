@@ -1,29 +1,29 @@
-import def, { TypedShadow, TypedHTML, TypedSVG, API, proxy, shadow, html, svg, text, frag, define, listen, once, bind, delegate, currentTargets } from '../../index';
+import def, { Shadow, HTML, SVG, API, proxy, shadow, html, svg, text, frag, define, listen, once, bind, delegate, currentTargets } from '../../index';
 
 describe('Interface: Package', function () {
   describe('default', function () {
     it('default', function () {
-      assert(def === TypedHTML);
+      assert(def === HTML);
     });
 
   });
 
-  describe('TypedHTML', function () {
-    it('TypedShadow', function () {
-      assert(typeof TypedShadow === 'function');
+  describe('HTML', function () {
+    it('Shadow', function () {
+      assert(typeof Shadow === 'function');
     });
 
-    it('TypedHTML', function () {
-      assert(typeof TypedHTML === 'function');
+    it('HTML', function () {
+      assert(typeof HTML === 'function');
     });
 
-    it('TypedSVG', function () {
-      assert(typeof TypedSVG === 'function');
+    it('SVG', function () {
+      assert(typeof SVG === 'function');
     });
 
     it('API', function () {
-      assert((): API<HTMLElementTagNameMap, typeof html> => TypedHTML);
-      assert((): typeof TypedHTML => API(html));
+      assert((): API<HTMLElementTagNameMap, typeof html> => HTML);
+      assert((): typeof HTML => API(html));
     });
 
     it('proxy', function () {

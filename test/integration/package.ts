@@ -1,4 +1,4 @@
-import { TypedShadow, TypedHTML, TypedSVG, El, API, proxy, frag, html, define } from '../../index';
+import { Shadow, HTML, SVG, El, API, proxy, frag, html, define } from '../../index';
 import { Sequence } from 'spica/sequence';
 import { Coroutine } from 'spica/coroutine';
 
@@ -15,29 +15,29 @@ declare const _: { shuffle<T>(as: T[]): T[]; };
 describe('Integration: Typed DOM', function () {
   describe('spec', function () {
     it('call', function () {
-      assert(TypedHTML('p').element.outerHTML === '<p></p>');
-      assert(TypedHTML('p', 'a').element.outerHTML === '<p>a</p>');
-      assert(TypedHTML('p', { class: 'class' }, 'a', (f, t) => f(t, { id: 'id' })).element.outerHTML === '<p id="id" class="class">a</p>');
+      assert(HTML('p').element.outerHTML === '<p></p>');
+      assert(HTML('p', 'a').element.outerHTML === '<p>a</p>');
+      assert(HTML('p', { class: 'class' }, 'a', (f, t) => f(t, { id: 'id' })).element.outerHTML === '<p id="id" class="class">a</p>');
     });
 
     it('html', function () {
-      assert(TypedHTML.html().element instanceof HTMLElement);
-      assert(TypedHTML.html().element.outerHTML === '<html></html>');
+      assert(HTML.html().element instanceof HTMLElement);
+      assert(HTML.html().element.outerHTML === '<html></html>');
     });
 
     it('svg', function () {
-      assert(TypedSVG.svg().element instanceof SVGElement);
-      assert(TypedSVG.svg().element.outerHTML === '<svg></svg>');
+      assert(SVG.svg().element instanceof SVGElement);
+      assert(SVG.svg().element.outerHTML === '<svg></svg>');
     });
 
     it('empty', function () {
-      const dom = TypedHTML.p();
+      const dom = HTML.p();
       assert(dom.element.outerHTML === '<p></p>');
       assert(dom.children === undefined);
     });
 
     it('factory', function () {
-      const dom = TypedHTML.p((f, tag) => {
+      const dom = HTML.p((f, tag) => {
         const el = document.createElement('div').appendChild(f(tag));
         el.id = 'test';
         return el;
@@ -47,29 +47,29 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('text', function () {
-      const dom = TypedHTML.p(`a`);
+      const dom = HTML.p(`a`);
       assert(dom.element.outerHTML === '<p>a</p>');
       assert(dom.children === 'a');
     });
 
     it('text children update', function () {
-      const dom = TypedHTML.p(`a` as string);
+      const dom = HTML.p(`a` as string);
       dom.children = 'b';
       assert(dom.element.outerHTML === '<p>b</p>');
       assert(dom.children === 'b');
     });
 
     it('text with factory', function () {
-      const dom = TypedHTML.p(`a`, (el, tag) =>
+      const dom = HTML.p(`a`, (el, tag) =>
         el(tag, { id: 'test' }));
       assert(dom.element.id === 'test');
       assert(dom.children === 'a');
     });
 
     it('collection', function () {
-      const dom = TypedHTML.ul([
-        TypedHTML.li(`1` as string),
-        TypedHTML.li(`2`)
+      const dom = HTML.ul([
+        HTML.li(`1` as string),
+        HTML.li(`2`)
       ]);
       assert(dom.element.outerHTML === '<ul><li>1</li><li>2</li></ul>');
       assert(dom.children.length === 2);
@@ -79,30 +79,30 @@ describe('Integration: Typed DOM', function () {
     it('collection children update', function () {
       this.timeout(9 * 1e3);
 
-      const dom = TypedHTML.ul([
-        TypedHTML.li(`1` as string)
+      const dom = HTML.ul([
+        HTML.li(`1` as string)
       ]);
       assert.doesNotThrow(() => dom.children = dom.children);
-      assert.throws(() => dom.children = TypedHTML.ul([TypedHTML.li(`1`)]).children);
+      assert.throws(() => dom.children = HTML.ul([HTML.li(`1`)]).children);
       dom.children = [
-        TypedHTML.li('2'),
-        TypedHTML.li('3')
+        HTML.li('2'),
+        HTML.li('3')
       ];
       assert(dom.element.outerHTML === '<ul><li>2</li><li>3</li></ul>');
       assert(dom.children.length === 2);
       assert(dom.children.every(({element}, i) => element === dom.element.children[i]));
       dom.children = [
-        TypedHTML.li('4')
+        HTML.li('4')
       ];
       assert(dom.element.outerHTML === '<ul><li>4</li></ul>');
       assert(dom.children.length === 1);
       assert(dom.children.every(({element}, i) => element === dom.element.children[i]));
 
       // property test
-      const ss = Array(3).fill(0).map(() => TypedHTML.li(``));
+      const ss = Array(3).fill(0).map(() => HTML.li(``));
       void Sequence.zip(
-        Sequence.cycle([[...Array(3).fill(0).map(() => TypedHTML.li(``)), ...ss]]),
-        Sequence.cycle([[...Array(3).fill(0).map(() => TypedHTML.li(``)), ...ss]]))
+        Sequence.cycle([[...Array(3).fill(0).map(() => HTML.li(``)), ...ss]]),
+        Sequence.cycle([[...Array(3).fill(0).map(() => HTML.li(``)), ...ss]]))
         .take(1000)
         .map(lss =>
           lss
@@ -128,12 +128,12 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('collection children partial update', function () {
-      const dom = TypedHTML.ul([
-        TypedHTML.li()
+      const dom = HTML.ul([
+        HTML.li()
       ] as const);
       //assert.throws(() => dom.children[0] = dom.children[0]);
-      //assert.throws(() => dom.children[0] = TypedHTML.li());
-      //assert.throws(() => dom.children.push(TypedHTML.li()));
+      //assert.throws(() => dom.children[0] = HTML.li());
+      //assert.throws(() => dom.children.push(HTML.li()));
       //assert.throws(() => dom.children.pop());
       //assert.throws(() => dom.children.length = 0);
       assert(dom.children.length === 1);
@@ -141,16 +141,16 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('collection with factory', function () {
-      const dom = TypedHTML.ul([], (el, tag) =>
+      const dom = HTML.ul([], (el, tag) =>
         el(tag, { id: 'test' }));
       assert(dom.element.id === 'test');
       assert.deepStrictEqual(dom.children, []);
     });
 
     it('struct', function () {
-      const dom = TypedHTML.article({
-        title: TypedHTML.h1(`title`),
-        content: TypedHTML.p([TypedHTML.a()])
+      const dom = HTML.article({
+        title: HTML.h1(`title`),
+        content: HTML.p([HTML.a()])
       });
       assert(dom.element.outerHTML === '<article><h1>title</h1><p><a></a></p></article>');
       assert(dom.children.title.element === dom.element.firstChild);
@@ -158,21 +158,21 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('struct empty', function () {
-      const dom = TypedHTML.div({});
+      const dom = HTML.div({});
       assert.deepStrictEqual(dom.children, {});
     });
 
     it('struct children update', function () {
-      const dom = TypedHTML.article({
-        title: TypedHTML.h1(`a` as string)
+      const dom = HTML.article({
+        title: HTML.h1(`a` as string)
       });
       assert.doesNotThrow(() => dom.children = dom.children);
-      assert.throws(() => dom.children = TypedHTML.article({ title: TypedHTML.h1(`b`) }).children);
+      assert.throws(() => dom.children = HTML.article({ title: HTML.h1(`b`) }).children);
       assert(dom.children.title.element === dom.element.firstChild);
       assert(dom.children.title.element.textContent === 'a');
       assert(dom.children.title.children === 'a');
       dom.children = {
-        title: TypedHTML.h1(`b`)
+        title: HTML.h1(`b`)
       };
       assert(dom.children.title.element === dom.element.firstChild);
       assert(dom.children.title.element.textContent === 'b');
@@ -180,15 +180,15 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('struct children partial update', function () {
-      const dom = TypedHTML.article({
-        title: TypedHTML.h1(`a` as string)
+      const dom = HTML.article({
+        title: HTML.h1(`a` as string)
       });
       assert.doesNotThrow(() => dom.children.title = dom.children.title);
-      assert.throws(() => dom.children.title = TypedHTML.article({ title: TypedHTML.h1(`b`) }).children.title);
+      assert.throws(() => dom.children.title = HTML.article({ title: HTML.h1(`b`) }).children.title);
       assert(dom.children.title.element === dom.element.firstChild);
       assert(dom.children.title.element.textContent === 'a');
       assert(dom.children.title.children === 'a');
-      dom.children.title = TypedHTML.h1(`b`);
+      dom.children.title = HTML.h1(`b`);
       assert(dom.children.title.element === dom.element.firstChild);
       assert(dom.children.title.element.textContent === 'b');
       assert(dom.children.title.children === 'b');
@@ -199,21 +199,21 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('struct with factory', function () {
-      const dom = TypedHTML.article({}, (el, tag) =>
+      const dom = HTML.article({}, (el, tag) =>
         el(tag, { id: 'test' }));
       assert(dom.element.id === 'test');
       assert.deepStrictEqual(dom.children, {});
     });
 
     it('attr', function () {
-      const dom = TypedHTML.div({ id: 'test', class: 'test' });
+      const dom = HTML.div({ id: 'test', class: 'test' });
       assert(dom.element.id === 'test');
       assert(dom.element.getAttribute('class') === 'test');
       assert(dom.children === undefined);
     });
 
     it('attr with factory', function () {
-      const dom = TypedHTML.div({ id: 'test' }, (el, tag) =>
+      const dom = HTML.div({ id: 'test' }, (el, tag) =>
         el(tag, { id: 'id', class: 'test' }));
       assert(dom.element.id === 'test');
       assert(dom.element.className === 'test');
@@ -221,28 +221,28 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('attr with text', function () {
-      const dom = TypedHTML.div({ id: 'test', class: 'test' }, '');
+      const dom = HTML.div({ id: 'test', class: 'test' }, '');
       assert(dom.element.id === 'test');
       assert(dom.element.getAttribute('class') === 'test');
       assert(dom.children === '');
     });
 
     it('attr with collection', function () {
-      const dom = TypedHTML.div({ id: 'test', class: 'test' }, []);
+      const dom = HTML.div({ id: 'test', class: 'test' }, []);
       assert(dom.element.id === 'test');
       assert(dom.element.getAttribute('class') === 'test');
       assert.deepStrictEqual(dom.children, []);
     });
 
     it('attr with struct', function () {
-      const dom = TypedHTML.div({ id: 'test', class: 'test' }, {});
+      const dom = HTML.div({ id: 'test', class: 'test' }, {});
       assert(dom.element.id === 'test');
       assert(dom.element.getAttribute('class') === 'test');
       assert.deepStrictEqual(dom.children, {});
     });
 
     it('attr with text and factory', function () {
-      const dom = TypedHTML.div({ id: 'test' }, '', (el, tag) =>
+      const dom = HTML.div({ id: 'test' }, '', (el, tag) =>
         el(tag, { id: 'id', class: 'test' }));
       assert(dom.element.id === 'test');
       assert(dom.element.className === 'test');
@@ -250,7 +250,7 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('attr with collection and factory', function () {
-      const dom = TypedHTML.div({ id: 'test' }, [], (el, tag) =>
+      const dom = HTML.div({ id: 'test' }, [], (el, tag) =>
         el(tag, { id: 'id', class: 'test' }));
       assert(dom.element.id === 'test');
       assert(dom.element.className === 'test');
@@ -258,7 +258,7 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('attr with struct and factory', function () {
-      const dom = TypedHTML.div({ id: 'test' }, {}, (el, tag) =>
+      const dom = HTML.div({ id: 'test' }, {}, (el, tag) =>
         el(tag, { id: 'id', class: 'test' }));
       assert(dom.element.id === 'test');
       assert(dom.element.className === 'test');
@@ -266,11 +266,11 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('listen', function (done) {
-      TypedHTML.a({ onclick: ev => void assert(ev instanceof Event) || done() }).element.click();
+      HTML.a({ onclick: ev => void assert(ev instanceof Event) || done() }).element.click();
     });
 
     it('sanitize', function () {
-      const dom = TypedHTML.div('<script>');
+      const dom = HTML.div('<script>');
       assert(dom.element.innerHTML === '&lt;script&gt;');
       assert(dom.children === '<script>');
       dom.children = '<script>';
@@ -281,27 +281,27 @@ describe('Integration: Typed DOM', function () {
     it('scope', function () {
       const template = `$scope {}\n  $scope {}`;
       const result = template.replace(/\$scope/g, '#test');
-      assert(TypedHTML.div({ id: 'test' }, [TypedHTML.style(template)]).children[0].element.innerHTML === result);
-      assert(TypedHTML.div({ id: 'test' }, { style: TypedHTML.style(template) }).children.style.element.innerHTML === result);
-      assert(TypedHTML.div({ id: 'test' }, [TypedHTML.style(`<script>`)]).children[0].element.children.length === 0);
-      assert(TypedHTML.div([TypedHTML.style(template)]).element.className.startsWith('id-'));
-      assert(TypedHTML.div([TypedHTML.style(template)]).children[0].element.innerHTML.match(/\.[\w\-]+\s/gm)!.length === 2);
-      assert(TypedShadow.div([TypedHTML.style(template)]).children[0].element.innerHTML === template.replace(/\$scope/g, ':host'));
+      assert(HTML.div({ id: 'test' }, [HTML.style(template)]).children[0].element.innerHTML === result);
+      assert(HTML.div({ id: 'test' }, { style: HTML.style(template) }).children.style.element.innerHTML === result);
+      assert(HTML.div({ id: 'test' }, [HTML.style(`<script>`)]).children[0].element.children.length === 0);
+      assert(HTML.div([HTML.style(template)]).element.className.startsWith('id-'));
+      assert(HTML.div([HTML.style(template)]).children[0].element.innerHTML.match(/\.[\w\-]+\s/gm)!.length === 2);
+      assert(Shadow.div([HTML.style(template)]).children[0].element.innerHTML === template.replace(/\$scope/g, ':host'));
     });
 
     it('clear', function () {
-      assert(TypedHTML.p(() => TypedHTML.p('a').element).element.innerHTML === 'a');
-      assert(TypedHTML.p(() => TypedHTML.p('a').element).children === undefined);
-      assert(TypedHTML.p('', () => TypedHTML.p('a').element).element.innerHTML === '');
-      assert(TypedHTML.p('', () => TypedHTML.p('a').element).children === '');
-      assert(TypedHTML.p([], () => TypedHTML.p('a').element).element.childNodes.length === 0);
-      assert.deepStrictEqual(TypedHTML.p([], () => TypedHTML.p('a').element).children, []);
-      assert(TypedHTML.p({}, () => TypedHTML.p('a').element).element.childNodes.length === 0);
-      assert.deepStrictEqual(TypedHTML.p({}, () => TypedHTML.p('a').element).children, {});
+      assert(HTML.p(() => HTML.p('a').element).element.innerHTML === 'a');
+      assert(HTML.p(() => HTML.p('a').element).children === undefined);
+      assert(HTML.p('', () => HTML.p('a').element).element.innerHTML === '');
+      assert(HTML.p('', () => HTML.p('a').element).children === '');
+      assert(HTML.p([], () => HTML.p('a').element).element.childNodes.length === 0);
+      assert.deepStrictEqual(HTML.p([], () => HTML.p('a').element).children, []);
+      assert(HTML.p({}, () => HTML.p('a').element).element.childNodes.length === 0);
+      assert.deepStrictEqual(HTML.p({}, () => HTML.p('a').element).children, {});
     });
 
     it('fragment', function () {
-      TypedHTML.div([TypedHTML.p(() => document.createDocumentFragment().appendChild(document.createElement('p')))]);
+      HTML.div([HTML.p(() => document.createDocumentFragment().appendChild(document.createElement('p')))]);
     });
 
     it('parameter combination', function () {
@@ -313,26 +313,26 @@ describe('Integration: Typed DOM', function () {
         .bind(v => Sequence.from(v).filterM(() => Sequence.from([false, true])))
         .extract()
         .forEach(params => {
-          TypedHTML.div(...params as any);
+          HTML.div(...params as any);
         });
     });
 
     it('extend', function () {
-      assert(TypedHTML.any().element.outerHTML === '<any></any>');
-      assert(TypedSVG.a().element.outerHTML === '<a></a>');
+      assert(HTML.any().element.outerHTML === '<any></any>');
+      assert(SVG.a().element.outerHTML === '<a></a>');
     });
 
     it('swap', function () {
-      assert.throws(() => TypedHTML.article(TypedHTML.article([TypedHTML.p()]).children));
-      const el = TypedHTML.article([TypedHTML.p()]);
+      assert.throws(() => HTML.article(HTML.article([HTML.p()]).children));
+      const el = HTML.article([HTML.p()]);
       const children = el.children;
-      el.children = [TypedHTML.p()];
+      el.children = [HTML.p()];
       frag(children.map(el => el.element));
-      assert(TypedHTML.article(children));
+      assert(HTML.article(children));
     });
 
     it('observe text', function () {
-      const el = TypedHTML.span(
+      const el = HTML.span(
         {
           onchange: (ev, el = ev.target as HTMLElement) =>
             el.textContent = el.textContent!.toUpperCase(),
@@ -350,13 +350,13 @@ describe('Integration: Typed DOM', function () {
         ondisconnect: (ev, el = ev.target as HTMLElement) =>
           el.textContent += el.textContent,
       };
-      const el = TypedHTML.ul([
-        TypedHTML.li(listeners, 'a' as string),
-        TypedHTML.li(listeners, 'b'),
+      const el = HTML.ul([
+        HTML.li(listeners, 'a' as string),
+        HTML.li(listeners, 'b'),
       ]);
       el.children = [
         el.children[1],
-        TypedHTML.li(listeners, 'c'),
+        HTML.li(listeners, 'c'),
       ];
       assert.deepStrictEqual(
         el.children.map(el => el.children),
@@ -373,15 +373,15 @@ describe('Integration: Typed DOM', function () {
         ondisconnect: (ev, el = ev.target as HTMLElement) =>
           el.textContent += el.textContent,
       };
-      const el = TypedHTML.ul({
-        a: TypedHTML.li(listeners, 'a' as string),
-        b: TypedHTML.li(listeners, 'b'),
-        c: TypedHTML.li(listeners, 'c'),
+      const el = HTML.ul({
+        a: HTML.li(listeners, 'a' as string),
+        b: HTML.li(listeners, 'b'),
+        c: HTML.li(listeners, 'c'),
       });
       el.children = {
         a: el.children.a,
         b: el.children.c,
-        c: TypedHTML.li(listeners, 'd'),
+        c: HTML.li(listeners, 'd'),
       };
       assert.deepStrictEqual(
         Object.entries(el.children).map(([k, v]) => [k, v.children]),
@@ -393,10 +393,10 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('shadow', function () {
-      assert(TypedShadow('section', [TypedHTML.p()]).element.outerHTML === '<section></section>');
-      assert(TypedShadow.section([TypedHTML.p()]).element.outerHTML === '<section></section>');
-      assert(TypedShadow.section([TypedHTML.p()]).element.shadowRoot!.innerHTML === '<p></p>');
-      assert(TypedShadow.section([TypedHTML.p()]).children[0].element.outerHTML === '<p></p>');
+      assert(Shadow('section', [HTML.p()]).element.outerHTML === '<section></section>');
+      assert(Shadow.section([HTML.p()]).element.outerHTML === '<section></section>');
+      assert(Shadow.section([HTML.p()]).element.shadowRoot!.innerHTML === '<p></p>');
+      assert(Shadow.section([HTML.p()]).children[0].element.outerHTML === '<p></p>');
     });
 
   });
@@ -404,10 +404,10 @@ describe('Integration: Typed DOM', function () {
   describe('usage', function () {
     it('component', function () {
       class Component implements El {
-        private readonly dom = TypedHTML.div({
-          style: TypedHTML.style(`$scope ul { width: 100px; }`),
-          content: TypedHTML.ul([
-            TypedHTML.li(`item`)
+        private readonly dom = HTML.div({
+          style: HTML.style(`$scope ul { width: 100px; }`),
+          content: HTML.ul([
+            HTML.li(`item`)
           ] as const),
         });
         public readonly element = this.dom.element;
@@ -420,20 +420,20 @@ describe('Integration: Typed DOM', function () {
       }
 
       const com = new Component();
-      assert(TypedHTML.div([com]));
+      assert(HTML.div([com]));
       assert(com.children[0].children === 'item');
       com.children = [
-        TypedHTML.li('Item')
+        HTML.li('Item')
       ];
       assert(com.children[0].children === 'Item');
     });
 
     it('component shadow', function () {
       class Component implements El {
-        private readonly dom = TypedShadow.section({
-          style: TypedHTML.style(`ul { width: 100px; }`),
-          content: TypedHTML.ul([
-            TypedHTML.li(`item`)
+        private readonly dom = Shadow.section({
+          style: HTML.style(`ul { width: 100px; }`),
+          content: HTML.ul([
+            HTML.li(`item`)
           ] as const),
         });
         public readonly element = this.dom.element;
@@ -446,10 +446,10 @@ describe('Integration: Typed DOM', function () {
       }
 
       const com = new Component();
-      assert(TypedHTML.div([com]));
+      assert(HTML.div([com]));
       assert(com.children[0].children === 'item');
       com.children = [
-        TypedHTML.li('Item')
+        HTML.li('Item')
       ];
       assert(com.children[0].children === 'Item');
     });
@@ -463,10 +463,10 @@ describe('Integration: Typed DOM', function () {
             }
           }, { size: Infinity });
         }
-        private readonly dom = TypedShadow.section({
-          style: TypedHTML.style(`ul { width: 100px; }`),
-          content: TypedHTML.ul([
-            TypedHTML.li(`item`)
+        private readonly dom = Shadow.section({
+          style: HTML.style(`ul { width: 100px; }`),
+          content: HTML.ul([
+            HTML.li(`item`)
           ] as const),
         });
         public readonly element = this.dom.element;
@@ -479,10 +479,10 @@ describe('Integration: Typed DOM', function () {
       }
 
       const com = new Component();
-      assert(TypedHTML.div([com]));
+      assert(HTML.div([com]));
       assert(com.children[0].children === 'item');
       com.children = [
-        TypedHTML.li('Item')
+        HTML.li('Item')
       ];
       assert(com.children[0].children === 'Item');
     });

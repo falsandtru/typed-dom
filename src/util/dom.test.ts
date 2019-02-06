@@ -1,5 +1,5 @@
 import { shadow, html, svg, frag, define } from './dom';
-import { TypedHTML, TypedSVG } from '../dom/builder';
+import { HTML, SVG } from '../dom/builder';
 
 describe('Unit: util/dom', () => {
   describe('shadow', () => {
@@ -15,20 +15,20 @@ describe('Unit: util/dom', () => {
 
   describe('html', () => {
     it('', () => {
-      assert(html('a').outerHTML === TypedHTML.a().element.outerHTML);
-      assert(html('a', { class: 'test' }).outerHTML === TypedHTML.a({ class: 'test' }).element.outerHTML);
-      assert(html('a', { class: 'test' }, 'b').outerHTML === TypedHTML.a({ class: 'test' }, 'b').element.outerHTML);
-      assert(html('a', 'b').outerHTML === TypedHTML.a('b').element.outerHTML);
+      assert(html('a').outerHTML === HTML.a().element.outerHTML);
+      assert(html('a', { class: 'test' }).outerHTML === HTML.a({ class: 'test' }).element.outerHTML);
+      assert(html('a', { class: 'test' }, 'b').outerHTML === HTML.a({ class: 'test' }, 'b').element.outerHTML);
+      assert(html('a', 'b').outerHTML === HTML.a('b').element.outerHTML);
     });
 
   });
 
   describe('svg', () => {
     it('', () => {
-      assert(svg('a').outerHTML === TypedSVG.a().element.outerHTML);
-      assert(svg('a', { class: 'test' }).outerHTML === TypedSVG.a({ class: 'test' }).element.outerHTML);
-      assert(svg('a', { class: 'test' }, 'b').outerHTML === TypedSVG.a({ class: 'test' }, 'b').element.outerHTML);
-      assert(svg('a', 'b').outerHTML === TypedSVG.a('b').element.outerHTML);
+      assert(svg('a').outerHTML === SVG.a().element.outerHTML);
+      assert(svg('a', { class: 'test' }).outerHTML === SVG.a({ class: 'test' }).element.outerHTML);
+      assert(svg('a', { class: 'test' }, 'b').outerHTML === SVG.a({ class: 'test' }, 'b').element.outerHTML);
+      assert(svg('a', 'b').outerHTML === SVG.a('b').element.outerHTML);
     });
 
   });

@@ -9,9 +9,9 @@ export function API<M extends TagNameMap, F extends BaseFactory<M>>(baseFactory:
   return new Proxy<API<M, F>>((() => undefined) as any, handle(baseFactory));
 }
 
-export const TypedShadow: API<ShadowHostElementTagNameMap, typeof html> = new Proxy((() => undefined) as any, handle(html, { mode: 'open' }));
-export const TypedHTML: API<HTMLElementTagNameMap, typeof html> = API(html);
-export const TypedSVG: API<SVGElementTagNameMap_, typeof svg> = API(svg);
+export const Shadow: API<ShadowHostElementTagNameMap, typeof html> = new Proxy((() => undefined) as any, handle(html, { mode: 'open' }));
+export const HTML: API<HTMLElementTagNameMap, typeof html> = API(html);
+export const SVG: API<SVGElementTagNameMap_, typeof svg> = API(svg);
 
 interface BuilderFunction<T extends string, E extends Element, F extends BaseFactory<TagNameMap>> {
                       (tag: T,                            factory?: Factory<F, T, Children.Void, E>): El<T, E, Children.Void>;

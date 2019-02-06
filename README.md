@@ -8,33 +8,33 @@ Static typed DOM component builder.
 
 ## APIs
 
-### TypedHTML: { [tagname]: (attrs?, children?, factory?) => TypedElement };
+### HTML: { [tagname]: (attrs?, children?, factory?) => ProxyElement };
 
 - attrs: Record<string, string | EventListener>
-- children: undefined | string | TypedElement[] | Record<string, TypedElement>
+- children: undefined | string | ProxyElement[] | Record<string, ProxyElement>
 - factory: () => Element
 
 ```ts
-import { TypedHTML } from 'typed-dom';
+import { HTML } from 'typed-dom';
 
-TypedHTML.p();
-TypedHTML.p('text');
-TypedHTML.p([TypedHTML.a()]);
-TypedHTML.p({ link: TypedHTML.a() }]);
-TypedHTML.p({ id: 'id' });
-TypedHTML.p(() => document.createElement('p'));
+HTML.p();
+HTML.p('text');
+HTML.p([HTML.a()]);
+HTML.p({ link: HTML.a() }]);
+HTML.p({ id: 'id' });
+HTML.p(() => document.createElement('p'));
 ```
 
-### TypedSVG: { [tagname]: (attrs?, children?, factory?) => TypedElement };
+### SVG: { [tagname]: (attrs?, children?, factory?) => ProxyElement };
 
 - attrs: Record<string, string | EventListener>
-- children: undefined | string | TypedElement[] | Record<string, TypedElement>
+- children: undefined | string | ProxyElement[] | Record<string, ProxyElement>
 - factory: () => Element
 
 ```ts
-import { TypedSVG } from 'typed-dom';
+import { SVG } from 'typed-dom';
 
-TypedSVG.svg();
+SVG.svg();
 ```
 
 ## Extend APIs
@@ -42,7 +42,7 @@ TypedSVG.svg();
 You can define some custom elements by extending `HTMLElementTagNameMap` or `SVGElementTagNameMap_` interface.
 
 ```ts
-import { TypedHTML, TypedSVG } from 'typed-dom';
+import { HTML, SVG } from 'typed-dom';
 
 declare global {
   interface HTMLElementTagNameMap {
@@ -53,8 +53,8 @@ declare global {
   }
 }
 
-TypedHTML.custom().element.outerHTML; // '<custom></custom>'
-TypedSVG.a().element; // SVGAElement
+HTML.custom().element.outerHTML; // '<custom></custom>'
+SVG.a().element; // SVGAElement
 ```
 
 ## Usage
@@ -62,14 +62,14 @@ TypedSVG.a().element; // SVGAElement
 Build a typed DOM object with styling.
 
 ```ts
-import { TypedHTML } from 'typed-dom';
+import { HTML } from 'typed-dom';
 
-const component = TypedHTML.article({
-  style: TypedHTML.style(`$scope ul { width: 100px; }`),
-  title: TypedHTML.h1(`title` as string),
-  content: TypedHTML.ul([
-    TypedHTML.li(`item` as string),
-    TypedHTML.li(`item`),
+const component = HTML.article({
+  style: HTML.style(`$scope ul { width: 100px; }`),
+  title: HTML.h1(`title` as string),
+  content: HTML.ul([
+    HTML.li(`item` as string),
+    HTML.li(`item`),
   ])
 });
 ```
@@ -124,14 +124,14 @@ component.children.title.element.outerHTML; // '<h1>Title</h1>'
 
 // - collection
 component.children.content.children = [
-  TypedHTML.li('Item')
+  HTML.li('Item')
 ];
 component.children.content.element.outerHTML; // '<ul><li>Item</li></ul>'
 
-// - TypedHTML
-component.children.title = TypedHTML.h1('Title!');
-component.children.content = TypedHTML.ul([
-  TypedHTML.li('Item!')
+// - HTML
+component.children.title = HTML.h1('Title!');
+component.children.content = HTML.ul([
+  HTML.li('Item!')
 ]);
 component.element.outerHTML; // '<article class="RANDOM>"><style>.RANDOM ul { width: 100px; }</style><h1>Title!</h1><ul><li>Item!</li></ul></article>'
 ```
@@ -143,13 +143,13 @@ component.element.outerHTML; // '<article class="RANDOM>"><style>.RANDOM ul { wi
 Create DOM components.
 
 ```ts
-import { TypedShadow, TypedHTML, El } from 'typed-dom';
+import { Shadow, HTML, El } from 'typed-dom';
 
 class Component implements El {
-  private readonly dom = TypedHTML.div({
-    style: TypedHTML.style(`$scope ul { width: 100px; }`),
-    content: TypedHTML.ul([
-      TypedHTML.li(`item`)
+  private readonly dom = HTML.div({
+    style: HTML.style(`$scope ul { width: 100px; }`),
+    content: HTML.ul([
+      HTML.li(`item`)
     ]),
   });
   public readonly element = this.dom.element;
@@ -161,10 +161,10 @@ class Component implements El {
   }
 }
 class ShadowComponent implements El {
-  private readonly dom = TypedShadow.section({
-    style: TypedHTML.style(`ul { width: 100px; }`),
-    content: TypedHTML.ul([
-      TypedHTML.li(`item`)
+  private readonly dom = Shadow.section({
+    style: HTML.style(`ul { width: 100px; }`),
+    content: HTML.ul([
+      HTML.li(`item`)
     ]),
   });
   public readonly element = this.dom.element;

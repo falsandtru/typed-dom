@@ -1,11 +1,11 @@
 import { bind, delegate, once, listen, currentTargets } from './listener';
-import { TypedHTML } from '../dom/builder';
+import { HTML } from '../dom/builder';
 
 describe('Unit: util/listener', () => {
   describe('bind', () => {
     it('click', done => {
       let cnt = 0;
-      const a = TypedHTML.a().element;
+      const a = HTML.a().element;
       bind(a, 'click', ev => {
         assert(ev instanceof Event);
         assert(currentTargets.get(ev) instanceof HTMLAnchorElement);
@@ -22,7 +22,7 @@ describe('Unit: util/listener', () => {
   describe('delegate', () => {
     it('click', done => {
       let cnt = 0;
-      const dom = TypedHTML.p([TypedHTML.a()]);
+      const dom = HTML.p([HTML.a()]);
       delegate(dom.element, 'a', 'click', ev => {
         assert(ev instanceof Event);
         assert(currentTargets.get(ev) instanceof HTMLAnchorElement);
@@ -30,9 +30,9 @@ describe('Unit: util/listener', () => {
         delegate(dom.element, 'a', 'click', () => void assert(cnt === 2 && ++cnt) || done());
       });
       document.createDocumentFragment().appendChild(dom.element);
-      dom.children = [TypedHTML.a()];
+      dom.children = [HTML.a()];
       dom.children[0].element.click();
-      dom.children = [TypedHTML.a()];
+      dom.children = [HTML.a()];
       dom.children[0].element.click();
     });
 
@@ -41,7 +41,7 @@ describe('Unit: util/listener', () => {
   describe('listen', () => {
     it('bind', done => {
       let cnt = 0;
-      const a = TypedHTML.a().element;
+      const a = HTML.a().element;
       listen(a, 'click', ev => {
         assert(ev instanceof Event);
         assert(currentTargets.get(ev) instanceof HTMLAnchorElement);
@@ -55,7 +55,7 @@ describe('Unit: util/listener', () => {
 
     it('delegate', done => {
       let cnt = 0;
-      const dom = TypedHTML.p([TypedHTML.a()]);
+      const dom = HTML.p([HTML.a()]);
       listen(dom.element, 'a', 'click', ev => {
         assert(ev instanceof Event);
         assert(currentTargets.get(ev) instanceof HTMLAnchorElement);
@@ -63,9 +63,9 @@ describe('Unit: util/listener', () => {
         listen(dom.element, 'a', 'click', () => void assert(cnt === 2 && ++cnt) || done());
       });
       document.createDocumentFragment().appendChild(dom.element);
-      dom.children = [TypedHTML.a()];
+      dom.children = [HTML.a()];
       dom.children[0].element.click();
-      dom.children = [TypedHTML.a()];
+      dom.children = [HTML.a()];
       dom.children[0].element.click();
     });
 
@@ -74,7 +74,7 @@ describe('Unit: util/listener', () => {
   describe('once', () => {
     it('bind', done => {
       let cnt = 0;
-      const a = TypedHTML.a().element;
+      const a = HTML.a().element;
       once(a, 'click', ev => {
         assert(ev instanceof Event);
         assert(currentTargets.get(ev) instanceof HTMLAnchorElement);
@@ -88,7 +88,7 @@ describe('Unit: util/listener', () => {
 
     it('delegate', done => {
       let cnt = 0;
-      const dom = TypedHTML.p([TypedHTML.a()]);
+      const dom = HTML.p([HTML.a()]);
       once(dom.element, 'a', 'click', ev => {
         assert(ev instanceof Event);
         assert(currentTargets.get(ev) instanceof HTMLAnchorElement);
