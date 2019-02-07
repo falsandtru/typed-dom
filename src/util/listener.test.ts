@@ -1,5 +1,5 @@
 import { bind, delegate, once, listen, currentTargets } from './listener';
-import { HTML } from '../dom/builder';
+import { Shadow, HTML } from '../dom/builder';
 
 describe('Unit: util/listener', () => {
   describe('bind', () => {
@@ -55,7 +55,7 @@ describe('Unit: util/listener', () => {
 
     it('delegate', done => {
       let cnt = 0;
-      const dom = HTML.p([HTML.a()]);
+      const dom = Shadow.section([HTML.a()]);
       listen(dom.element, 'a', 'click', ev => {
         assert(ev instanceof Event);
         assert(currentTargets.get(ev) instanceof HTMLAnchorElement);
@@ -88,7 +88,7 @@ describe('Unit: util/listener', () => {
 
     it('delegate', done => {
       let cnt = 0;
-      const dom = HTML.p([HTML.a()]);
+      const dom = Shadow.section([HTML.a()]);
       once(dom.element, 'a', 'click', ev => {
         assert(ev instanceof Event);
         assert(currentTargets.get(ev) instanceof HTMLAnchorElement);

@@ -55,12 +55,9 @@ export function bind<T extends keyof WindowEventMap | keyof DocumentEventMap | k
 
 export function delegate<T extends keyof HTMLElementEventMap>(target: Document | HTMLElement, selector: string, type: T, listener: (ev: HTMLElementEventMap[T]) => any, option: AddEventListenerOptions = {}): () => undefined {
   return bind(target instanceof Document ? target.documentElement! : target, type, ev => {
-    const cx = (ev.target as HTMLElement).closest(selector);
-    if (!cx) return ev.returnValue;
-    void [...target.querySelectorAll<HTMLElement>(selector)]
-      .filter(el => el === cx)
-      .forEach(el =>
-        void once(el, type, listener, option));
+    const cx = (((ev.target as Element).shadowRoot ? ev.composedPath()[0] : ev.target) as HTMLElement).closest(selector);
+    if (!(cx instanceof HTMLElement)) return ev.returnValue;
+    void once(cx, type, listener, option);
     return ev.returnValue;
   }, { ...option, capture: true });
 }
