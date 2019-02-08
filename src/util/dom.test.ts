@@ -4,11 +4,12 @@ import { HTML, SVG } from '../dom/builder';
 describe('Unit: util/dom', () => {
   describe('shadow', () => {
     it('', () => {
+      assert(shadow(html('section')) instanceof ShadowRoot);
       assert(shadow(html('section')).mode === 'closed');
       assert(shadow(html('section'), { mode: 'open' }).mode === 'open');
-      assert(shadow(html('section')).innerHTML === '');
-      assert(shadow(html('section'), 'a').innerHTML === 'a');
-      assert(shadow(html('section'), [html('p', 'a')]).innerHTML === '<p>a</p>');
+      assert(shadow(html('section')).childNodes.length === 0);
+      assert(shadow(html('section'), 'a').textContent === 'a');
+      assert(shadow(html('section'), [html('p')]).firstElementChild!.outerHTML === '<p></p>');
     });
 
   });

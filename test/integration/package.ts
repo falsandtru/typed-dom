@@ -17,7 +17,7 @@ describe('Integration: Typed DOM', function () {
     it('call', function () {
       assert(HTML('p').element.outerHTML === '<p></p>');
       assert(HTML('p', 'a').element.outerHTML === '<p>a</p>');
-      assert(HTML('p', { class: 'class' }, 'a', (f, t) => f(t, { id: 'id' })).element.outerHTML === '<p id="id" class="class">a</p>');
+      assert(HTML('p', { class: 'class' }, 'a', (h, t) => h(t, { id: 'id' })).element.outerHTML === '<p id="id" class="class">a</p>');
     });
 
     it('html', function () {
@@ -37,8 +37,8 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('factory', function () {
-      const dom = HTML.p((f, tag) => {
-        const el = document.createElement('div').appendChild(f(tag));
+      const dom = HTML.p((h, tag) => {
+        const el = document.createElement('div').appendChild(h(tag));
         el.id = 'test';
         return el;
       });
@@ -395,7 +395,7 @@ describe('Integration: Typed DOM', function () {
     it('shadow', function () {
       assert(Shadow('section', [HTML.p()]).element.outerHTML === '<section></section>');
       assert(Shadow.section([HTML.p()]).element.outerHTML === '<section></section>');
-      assert(Shadow.section([HTML.p()]).element.shadowRoot!.innerHTML === '<p></p>');
+      assert(Shadow.section([HTML.p()]).element.shadowRoot!.firstElementChild!.outerHTML === '<p></p>');
       assert(Shadow.section([HTML.p()]).children[0].element.outerHTML === '<p></p>');
     });
 
