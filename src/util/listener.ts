@@ -22,6 +22,15 @@ export function once<T extends keyof WindowEventMap | keyof DocumentEventMap | k
     : bind(target as HTMLElement, a as keyof HTMLElementEventMap, b, { ...(typeof c === 'boolean' ? { capture: c } : c), once: true });
 }
 
+export function delegate<T extends keyof HTMLElementEventMap>(target: Document | HTMLElement, selector: string, type: T, listener: (ev: HTMLElementEventMap[T]) => any, option: AddEventListenerOptions = {}): () => undefined {
+  return bind(target instanceof Document ? target.documentElement! : target, type, ev => {
+    const cx = (((ev.target as Element).shadowRoot ? ev.composedPath()[0] : ev.target) as HTMLElement).closest(selector);
+    if (!(cx instanceof HTMLElement)) return ev.returnValue;
+    void once(cx, type, listener, option);
+    return ev.returnValue;
+  }, { ...option, capture: true });
+}
+
 export function bind<T extends keyof WindowEventMap>(target: Window, type: T, listener: (ev: WindowEventMap[T]) => any, option?: boolean | AddEventListenerOptions): () => undefined;
 export function bind<T extends keyof DocumentEventMap>(target: Document, type: T, listener: (ev: DocumentEventMap[T]) => any, option?: boolean | AddEventListenerOptions): () => undefined;
 export function bind<T extends keyof HTMLElementEventMap>(target: HTMLElement, type: T, listener: (ev: HTMLElementEventMap[T]) => any, option?: boolean | AddEventListenerOptions): () => undefined;
@@ -51,15 +60,6 @@ export function bind<T extends keyof WindowEventMap | keyof DocumentEventMap | k
       ? option
       : typeof option === 'boolean' ? option : !!option.capture;
   }
-}
-
-export function delegate<T extends keyof HTMLElementEventMap>(target: Document | HTMLElement, selector: string, type: T, listener: (ev: HTMLElementEventMap[T]) => any, option: AddEventListenerOptions = {}): () => undefined {
-  return bind(target instanceof Document ? target.documentElement! : target, type, ev => {
-    const cx = (((ev.target as Element).shadowRoot ? ev.composedPath()[0] : ev.target) as HTMLElement).closest(selector);
-    if (!(cx instanceof HTMLElement)) return ev.returnValue;
-    void once(cx, type, listener, option);
-    return ev.returnValue;
-  }, { ...option, capture: true });
 }
 
 let supportEventListenerOptions = false;

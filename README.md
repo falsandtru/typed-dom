@@ -10,6 +10,8 @@ Static typed DOM component builder.
 
 ### HTML: { [tagname]: (attrs?, children?, factory?) => ProxyElement };
 
+Create HTML element proxies.
+
 - attrs: Record<string, string | EventListener>
 - children: undefined | string | ProxyElement[] | Record<string, ProxyElement>
 - factory: () => Element
@@ -27,6 +29,8 @@ HTML.p(() => document.createElement('p'));
 
 ### SVG: { [tagname]: (attrs?, children?, factory?) => ProxyElement };
 
+Create SVG element proxies.
+
 - attrs: Record<string, string | EventListener>
 - children: undefined | string | ProxyElement[] | Record<string, ProxyElement>
 - factory: () => Element
@@ -36,6 +40,36 @@ import { SVG } from 'typed-dom';
 
 SVG.svg();
 ```
+
+### Shadow: { [tagname]: (attrs?, children?, factory?) => ProxyElement };
+
+Create HTML element proxies which make open shadow DOM to append children.
+
+- attrs: Record<string, string | EventListener>
+- children: undefined | string | ProxyElement[] | Record<string, ProxyElement>
+- factory: () => Element
+
+```ts
+import { Shadow } from 'typed-dom';
+
+Shadow.section();
+```
+
+### Others
+
+- El
+- proxy
+- frag
+- shadow
+- html
+- svg
+- text
+- define
+- listen
+- once
+- delegate
+- bind
+- currentTargets
 
 ## Extend APIs
 
@@ -81,7 +115,7 @@ type ComponentTypeIs =
 El<"article", Element, {
   style: El<"style", HTMLStyleElement, string>;
   title: El<"h1", HTMLHeadingElement, string>;
-  content: El<"ul", HTMLUListElement, El<"li", HTMLLIElement, string>[]>;
+  content: El<"ul", HTMLUListElement, readonly El<"li", HTMLLIElement, string>[]>;
 }>;
 
 // Note: El type is defined as follows.
@@ -160,6 +194,7 @@ class Component implements El {
     this.dom.children.content.children = children;
   }
 }
+
 class ShadowComponent implements El {
   private readonly dom = Shadow.section({
     style: HTML.style(`ul { width: 100px; }`),
