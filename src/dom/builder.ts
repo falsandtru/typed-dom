@@ -31,10 +31,9 @@ type Factory<F extends BaseFactory<TagNameMap>, T extends string, C extends Chil
 
 function handle<M extends TagNameMap, F extends BaseFactory<M>>(baseFactory: F, opts?: ShadowRootInit): ProxyHandler<API<M, F>> {
   return {
-    apply: (obj, _, args, prop = args[0]) =>
-      (obj[prop] || prop in obj || typeof prop !== 'string'
-        ? obj[prop]
-        : obj[prop] = builder(prop as Extract<keyof M, string>, baseFactory))(...args.slice(1)),
+    apply(obj, _, [prop, ...args]) {
+      return this.get!(obj, prop, undefined)(...args);
+    },
     get: (obj, prop) =>
       obj[prop] || prop in obj || typeof prop !== 'string'
         ? obj[prop]
