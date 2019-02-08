@@ -22,10 +22,11 @@ export function frag(children: Children = []): DocumentFragment {
 
 export function shadow(el: Element, opts?: ShadowRootInit): ShadowRoot;
 export function shadow(el: Element, children?: Children, opts?: ShadowRootInit): ShadowRoot;
-export function shadow(el: Element, children?: Children | ShadowRootInit, opts: ShadowRootInit = { mode: 'closed' }): ShadowRoot {
-  if (children !== undefined && !isChildren(children)) return shadow(el, undefined, children);
+export function shadow(el: Element, children?: Children | ShadowRootInit, opts: ShadowRootInit = { mode: 'open' }): ShadowRoot {
+  if (children && !isChildren(children)) return shadow(el, undefined, children);
   if (typeof children === 'string') return shadow(el, [text(children)]);
-  return define(el.attachShadow(opts), children);
+  if (children === undefined && !el.shadowRoot) return shadow(el, el.childNodes, opts);
+  return define(el.shadowRoot || el.attachShadow(opts), children);
 }
 
 export function html<T extends keyof HTMLElementTagNameMap>(tag: T, children?: Children): HTMLElementTagNameMap[T];

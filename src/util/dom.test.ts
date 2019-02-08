@@ -5,11 +5,14 @@ describe('Unit: util/dom', () => {
   describe('shadow', () => {
     it('', () => {
       assert(shadow(html('section')) instanceof ShadowRoot);
-      assert(shadow(html('section')).mode === 'closed');
-      assert(shadow(html('section'), { mode: 'open' }).mode === 'open');
+      assert(shadow(html('section')).mode === 'open');
+      assert(shadow(html('section'), { mode: 'closed' }).mode === 'closed');
       assert(shadow(html('section')).childNodes.length === 0);
       assert(shadow(html('section'), 'a').textContent === 'a');
       assert(shadow(html('section'), [html('p')]).firstElementChild!.outerHTML === '<p></p>');
+      assert(shadow(html('section', [html('p')])).firstElementChild!.outerHTML === '<p></p>');
+      assert(shadow(html('section', [html('p')]), { mode: 'closed' }).firstElementChild!.outerHTML === '<p></p>');
+      assert(shadow(shadow(html('section')).host));
     });
 
   });

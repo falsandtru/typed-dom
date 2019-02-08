@@ -397,6 +397,7 @@ describe('Integration: Typed DOM', function () {
       assert(Shadow.section([HTML.p()]).element.outerHTML === '<section></section>');
       assert(Shadow.section([HTML.p()]).element.shadowRoot!.firstElementChild!.outerHTML === '<p></p>');
       assert(Shadow.section([HTML.p()]).children[0].element.outerHTML === '<p></p>');
+      assert(Shadow.section((h, t) => h(t, [html('p')])).element.shadowRoot!.firstElementChild!.outerHTML === '<p></p>');
     });
 
   });
