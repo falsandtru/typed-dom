@@ -180,7 +180,7 @@ Create DOM components.
 import { Shadow, HTML, El } from 'typed-dom';
 
 class Component implements El {
-  private readonly dom = HTML.div({
+  private readonly dom = HTML.section({
     style: HTML.style(`$scope ul { width: 100px; }`),
     content: HTML.ul([
       HTML.li(`item`)

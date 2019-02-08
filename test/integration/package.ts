@@ -1,4 +1,4 @@
-import { Shadow, HTML, SVG, El, API, proxy, frag, html, define } from '../../index';
+import { Shadow, HTML, SVG, El, API, proxy, frag, shadow, html, define } from '../../index';
 import { Sequence } from 'spica/sequence';
 import { Coroutine } from 'spica/coroutine';
 
@@ -37,13 +37,15 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('factory', function () {
-      const dom = HTML.p((h, tag) => {
-        const el = document.createElement('div').appendChild(h(tag));
+      const dom = HTML.p([HTML.a()], (h, tag, _, children) => {
+        assert(children.every(child => child.element instanceof HTMLAnchorElement));
+        const el = html('div').appendChild(h(tag));
         el.id = 'test';
         return el;
       });
       assert(dom.element.id === 'test');
-      assert(dom.children === undefined);
+      assert(dom.children.length === 1);
+      assert(dom.children.every(child => child.element instanceof HTMLAnchorElement));
     });
 
     it('text', function () {
@@ -301,14 +303,14 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('fragment', function () {
-      HTML.div([HTML.p(() => document.createDocumentFragment().appendChild(document.createElement('p')))]);
+      HTML.div([HTML.p(() => document.createDocumentFragment().appendChild(html('p')))]);
     });
 
     it('parameter combination', function () {
       Sequence.from([
         [{ id: 'id' }],
         [undefined, '', [], {}],
-        [() => document.createElement('div')]])
+        [() => html('div')]])
         .mapM(v => Sequence.from(v))
         .bind(v => Sequence.from(v).filterM(() => Sequence.from([false, true])))
         .extract()
@@ -398,6 +400,7 @@ describe('Integration: Typed DOM', function () {
       assert(Shadow.section([HTML.p()]).element.shadowRoot!.firstElementChild!.outerHTML === '<p></p>');
       assert(Shadow.section([HTML.p()]).children[0].element.outerHTML === '<p></p>');
       assert(Shadow.section((h, t) => h(t, [html('p')])).element.shadowRoot!.firstElementChild!.outerHTML === '<p></p>');
+      assert(Shadow.section((h, t) => shadow(h(t, [html('p')])).host as HTMLElement).element.shadowRoot!.firstElementChild!.outerHTML === '<p></p>');
     });
 
   });
@@ -405,7 +408,7 @@ describe('Integration: Typed DOM', function () {
   describe('usage', function () {
     it('component', function () {
       class Component implements El {
-        private readonly dom = HTML.div({
+        private readonly dom = HTML.section({
           style: HTML.style(`$scope ul { width: 100px; }`),
           content: HTML.ul([
             HTML.li(`item`)

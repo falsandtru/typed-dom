@@ -24,7 +24,6 @@ export function shadow(el: Element, opts?: ShadowRootInit): ShadowRoot;
 export function shadow(el: Element, children?: Children, opts?: ShadowRootInit): ShadowRoot;
 export function shadow(el: Element, children?: Children | ShadowRootInit, opts: ShadowRootInit = { mode: 'open' }): ShadowRoot {
   if (children && !isChildren(children)) return shadow(el, undefined, children);
-  if (typeof children === 'string') return shadow(el, [text(children)]);
   if (children === undefined && !el.shadowRoot) return shadow(el, el.childNodes, opts);
   return define(el.shadowRoot || el.attachShadow(opts), children);
 }
@@ -74,8 +73,6 @@ function elem(ns: NS, tag: string): Element {
       return document.createElement(tag);
     case NS.SVG:
       return document.createElementNS("http://www.w3.org/2000/svg", tag);
-    default:
-      throw new Error(`TypedDOM: Unknown namespace: ${ns}`);
   }
 }
 
