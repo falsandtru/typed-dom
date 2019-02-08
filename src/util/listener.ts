@@ -36,38 +36,15 @@ export function bind<T extends keyof WindowEventMap>(target: Window, type: T, li
 export function bind<T extends keyof DocumentEventMap>(target: Document, type: T, listener: (ev: DocumentEventMap[T]) => any, option?: boolean | AddEventListenerOptions): () => undefined;
 export function bind<T extends keyof HTMLElementEventMap>(target: HTMLElement, type: T, listener: (ev: HTMLElementEventMap[T]) => any, option?: boolean | AddEventListenerOptions): () => undefined;
 export function bind<T extends keyof WindowEventMap | keyof DocumentEventMap | keyof HTMLElementEventMap>(target: Window | Document | HTMLElement, type: T, listener: (ev: Event) => any, option: boolean | AddEventListenerOptions = false): () => undefined {
-  void target.addEventListener(type, handler, adjustEventListenerOptions(option) as boolean);
+  void target.addEventListener(type, handler, option);
   let unbind: () => undefined = () => (
     unbind = noop,
-    void target.removeEventListener(type, handler, adjustEventListenerOptions(option) as boolean));
+    void target.removeEventListener(type, handler, option));
   return () => void unbind();
 
   function handler(ev: Event) {
-    if (typeof option === 'object') {
-      if (option.passive) {
-        ev.preventDefault = noop;
-      }
-      if (option.once) {
-        void unbind();
-      }
-    }
     assert(ev.currentTarget);
     void currentTargets.set(ev, ev.currentTarget!);
     return listener(ev);
   }
-
-  function adjustEventListenerOptions(option: boolean | AddEventListenerOptions): boolean | AddEventListenerOptions {
-    return supportEventListenerOptions
-      ? option
-      : typeof option === 'boolean' ? option : !!option.capture;
-  }
 }
-
-let supportEventListenerOptions = false;
-try {
-  document.createElement("div").addEventListener("test", function () { }, {
-    get capture() {
-      return supportEventListenerOptions = true;
-    }
-  } as any);
-} catch { }
