@@ -12,7 +12,7 @@ describe('Unit: util/dom', () => {
       assert(shadow(html('section'), [html('p')]).firstElementChild!.outerHTML === '<p></p>');
       assert(shadow(html('section', [html('p')])).firstElementChild!.outerHTML === '<p></p>');
       assert(shadow(html('section', [html('p')]), { mode: 'closed' }).firstElementChild!.outerHTML === '<p></p>');
-      assert(shadow(shadow(html('section')).host));
+      assert.throws(() => shadow(shadow(html('section')).host));
     });
 
   });

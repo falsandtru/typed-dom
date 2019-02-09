@@ -1,5 +1,5 @@
 import { uid } from './identity';
-import { define, shadow, text } from '../util/dom';
+import { define, shadow_, text } from '../util/dom';
 import { Mutable } from 'spica/type';
 
 type ElChildrenType =
@@ -58,11 +58,11 @@ export class El<
   constructor(
     public readonly element: E,
     private children_: Relax<C>,
-    opts?: ShadowRootInit,
+    shadowing: boolean = false,
   ) {
     void throwErrorIfNotUsable(this);
     void memory.set(this.element, this);
-    this.container = opts ? shadow(this.element, opts) : this.element;
+    this.container = shadowing ? shadow_(this.element) : this.element;
     switch (this.type) {
       case ElChildrenType.Void:
         this.initialChildren = new WeakSet();

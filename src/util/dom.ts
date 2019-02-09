@@ -13,6 +13,8 @@ namespace cache {
   export const frag = document.createDocumentFragment();
 }
 
+const shadows = new WeakMap<Element, ShadowRoot>();
+
 export function frag(children: Children = []): DocumentFragment {
   children = typeof children === 'string' ? [text(children)] : children;
   const frag = cache.frag.cloneNode() as DocumentFragment;
@@ -25,7 +27,25 @@ export function shadow(el: Element, children?: Children, opts?: ShadowRootInit):
 export function shadow(el: Element, children?: Children | ShadowRootInit, opts: ShadowRootInit = { mode: 'open' }): ShadowRoot {
   if (children && !isChildren(children)) return shadow(el, undefined, children);
   if (children === undefined && !el.shadowRoot) return shadow(el, el.childNodes, opts);
-  return define(el.shadowRoot || el.attachShadow(opts), children);
+  return define(
+    opts.mode === 'open'
+      ? el.attachShadow(opts)
+      : shadows.set(el, el.attachShadow(opts)).get(el)!,
+    children);
+}
+
+export function shadow_(el: Element, opts?: ShadowRootInit): ShadowRoot;
+export function shadow_(el: Element, children?: Children, opts?: ShadowRootInit): ShadowRoot;
+export function shadow_(el: Element, children?: Children | ShadowRootInit, opts?: ShadowRootInit): ShadowRoot {
+  if (children && !isChildren(children)) return shadow_(el, undefined, children);
+  if (children === undefined && !el.shadowRoot) return shadow_(el, el.childNodes, opts);
+  return define(
+    opts
+      ? opts.mode === 'open'
+        ? el.shadowRoot || el.attachShadow(opts)
+        : shadows.get(el) || shadows.set(el, el.attachShadow(opts)).get(el)!
+      : el.shadowRoot || shadows.get(el) || shadows.set(el, el.attachShadow({ mode: 'open' })).get(el)!,
+    children);
 }
 
 export function html<T extends keyof HTMLElementTagNameMap>(tag: T, children?: Children): HTMLElementTagNameMap[T];
