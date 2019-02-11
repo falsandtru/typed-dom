@@ -24,7 +24,7 @@ export function once<T extends keyof WindowEventMap | keyof DocumentEventMap | k
 
 export function delegate<T extends keyof HTMLElementEventMap>(target: Document | HTMLElement, selector: string, type: T, listener: (ev: HTMLElementEventMap[T]) => any, option: AddEventListenerOptions = {}): () => undefined {
   return bind(target instanceof Document ? target.documentElement! : target, type, ev => {
-    const cx = (((ev.target as Element).shadowRoot ? ev.composedPath()[0] : ev.target) as HTMLElement).closest(selector);
+    const cx = (((ev.target as Element).shadowRoot && ev.composedPath()[0] || ev.target) as HTMLElement).closest(selector);
     if (cx instanceof HTMLElement) {
       void once(cx, type, listener, option);
     }
