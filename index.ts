@@ -1,5 +1,5 @@
 ﻿export { Shadow, HTML, SVG, API } from './src/dom/builder';
-export { ElInterface as El, proxy } from './src/dom/manager';
+export { ElInterface as El, proxy } from './src/dom/proxy';
 export { frag, shadow, html, svg, text, define } from './src/util/dom';
 export { listen, once, delegate, bind, currentTargets } from './src/util/listener';
 
