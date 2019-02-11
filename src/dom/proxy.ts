@@ -1,6 +1,5 @@
 import { uid } from './identity';
 import { define, shadow, text } from '../util/dom';
-import { Mutable } from 'spica/type';
 
 type ElChildrenType =
   | typeof ElChildrenType.Void
@@ -22,8 +21,8 @@ export type ElChildren =
 export namespace ElChildren {
   export type Void = undefined;
   export type Text = string;
-  export type Collection = readonly ElInterface<string, Element, any>[];
-  export type Record = { [field: string]: ElInterface<string, Element, any>; };
+  export interface Collection extends ReadonlyArray<ElInterface> { }
+  export type Record = { [field: string]: ElInterface; };
 }
 
 type Relax<C extends ElChildren> = C extends ElChildren.Text ? ElChildren.Text : C;
@@ -99,10 +98,10 @@ export class El<
             descs[name] = {
               configurable: true,
               enumerable: true,
-              get: (): ElInterface<string, Element, any> => {
+              get: (): ElInterface<string, Element, ElChildren> => {
                 return child;
               },
-              set: (newChild: ElInterface<string, Element, any>) => {
+              set: (newChild: ElInterface<string, Element, ElChildren>) => {
                 const oldChild = child;
                 if (newChild === oldChild) return;
                 if (newChild.element.parentElement !== node) {
@@ -196,7 +195,7 @@ export class El<
       }
       case ElChildrenType.Collection: {
         const sourceChildren = children as ElChildren.Collection;
-        const targetChildren = [] as Mutable<ElChildren.Collection>;
+        const targetChildren: ElInterface<string, Element, ElChildren>[] = [];
         this.children_ = targetChildren as any as Relax<C>;
         for (let i = 0; i < sourceChildren.length; ++i) {
           const newChild = sourceChildren[i];
@@ -260,7 +259,7 @@ export class El<
   }
 }
 
-function throwErrorIfNotUsable({ element }: ElInterface<string, Element, any>): void {
+function throwErrorIfNotUsable({ element }: ElInterface<string, Element, ElChildren>): void {
   if (!element.parentElement || !memory.has(element.parentElement)) return;
   throw new Error(`TypedDOM: Cannot add an element used in another typed dom.`);
 }
