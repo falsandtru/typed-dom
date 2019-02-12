@@ -9,9 +9,9 @@ describe('Unit: util/dom', () => {
       assert(shadow(html('section'), { mode: 'closed' }).mode === 'closed');
       assert(shadow(html('section')).childNodes.length === 0);
       assert(shadow(html('section'), 'a').textContent === 'a');
-      assert(shadow(html('section'), [html('p')]).firstElementChild!.outerHTML === '<p></p>');
-      assert(shadow(html('section', [html('p')])).firstElementChild!.outerHTML === '<p></p>');
-      assert(shadow(html('section', [html('p')]), { mode: 'closed' }).firstElementChild!.outerHTML === '<p></p>');
+      assert(shadow(html('section'), [html('p')]).innerHTML === '<p></p>');
+      assert(shadow(html('section', [html('p')])).innerHTML === '<p></p>');
+      assert(shadow(html('section', [html('p')]), { mode: 'closed' }).innerHTML === '<p></p>');
       assert(shadow(shadow(html('section')).host));
       assert(shadow(shadow(html('section'), { mode: 'open' }).host));
       assert(shadow(shadow(html('section'), { mode: 'closed' }).host));

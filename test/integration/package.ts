@@ -397,10 +397,10 @@ describe('Integration: Typed DOM', function () {
     it('shadow', function () {
       assert(Shadow('section', [HTML.p()]).element.outerHTML === '<section></section>');
       assert(Shadow.section([HTML.p()]).element.outerHTML === '<section></section>');
-      assert(Shadow.section([HTML.p()]).element.shadowRoot!.firstElementChild!.outerHTML === '<p></p>');
+      assert(Shadow.section([HTML.p()]).element.shadowRoot!.innerHTML === '<p></p>');
       assert(Shadow.section([HTML.p()]).children[0].element.outerHTML === '<p></p>');
-      assert(Shadow.section((h, t) => h(t, [html('p')])).element.shadowRoot!.firstElementChild!.outerHTML === '<p></p>');
-      assert(Shadow.section((h, t) => shadow(h(t, [html('p')])).host as HTMLElement).element.shadowRoot!.firstElementChild!.outerHTML === '<p></p>');
+      assert(Shadow.section((h, t) => h(t, [html('p')])).element.shadowRoot!.innerHTML === '<p></p>');
+      assert(Shadow.section((h, t) => shadow(h(t, [html('p')])).host as HTMLElement).element.shadowRoot!.innerHTML === '<p></p>');
       assert(Shadow.section((h, t) => shadow(h(t, [html('p')]), { mode: 'closed' }).host as HTMLElement).element.shadowRoot === null);
       assert(Shadow.section([HTML.p()], (h, t) => shadow(h(t), { mode: 'closed' }).host as HTMLElement).element.shadowRoot === null);
       assert(Shadow.section([HTML.p()], (h, t) => shadow(h(t), { mode: 'closed' }).host as HTMLElement).children[0].element.outerHTML === '<p></p>');
