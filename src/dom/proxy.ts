@@ -1,5 +1,6 @@
 import { uid } from './identity';
 import { define, shadow, text } from '../util/dom';
+import { Mutable } from 'spica/type';
 
 type ElChildrenType =
   | typeof ElChildrenType.Void
@@ -195,7 +196,7 @@ export class El<
       }
       case ElChildrenType.Collection: {
         const sourceChildren = children as ElChildren.Collection;
-        const targetChildren: ElInterface<string, Element, ElChildren>[] = [];
+        const targetChildren = [] as Mutable<ElChildren.Collection>;
         this.children_ = targetChildren as any as Relax<C>;
         for (let i = 0; i < sourceChildren.length; ++i) {
           const newChild = sourceChildren[i];
