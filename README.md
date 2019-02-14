@@ -249,6 +249,8 @@ class Component extends Coroutine<void> implements El {
 Create a custom API for translation.
 
 ```ts
+import { API, html, define } from 'typed-dom';
+
 const i18n = i18next.createInstance({
   lng: 'en',
   resources: {
