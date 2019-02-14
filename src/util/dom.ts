@@ -32,7 +32,7 @@ export function shadow(el: Element, children?: Children | ShadowRootInit, opts?:
         ? opts.mode === 'open'
           ? el.shadowRoot || el.attachShadow(opts)
           : shadows.get(el) || shadows.set(el, el.attachShadow(opts)).get(el)!
-        : el.shadowRoot || shadows.get(el) || el.attachShadow({ mode: 'open' }),
+        : el.shadowRoot || shadows.get(el)!,
       children);
   }
   else {
