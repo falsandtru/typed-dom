@@ -57,6 +57,7 @@ Shadow.section();
 
 ### Others
 
+- API
 - El
 - proxy
 - frag
@@ -174,7 +175,7 @@ component.element.outerHTML; // '<article class="RANDOM>"><style>.RANDOM ul { wi
 
 ### DOM Components
 
-Create DOM components.
+Define composable DOM components.
 
 ```ts
 import { Shadow, HTML, El } from 'typed-dom';
@@ -210,6 +211,82 @@ class ShadowComponent implements El {
     this.dom.children.content.children = children;
   }
 }
+```
+
+Define autonomous DOM components which orient choreography, not orchestration.
+This coroutine supports the actor model and the supervisor/worker pattern (using spica/supervisor).
+
+```ts
+import { Shadow, HTML, El } from 'typed-dom';
+import { Coroutine } from 'spica/coroutine';
+
+class Component extends Coroutine<void> implements El {
+  constructor() {
+    super(function* (this: Component) {
+      while (this.element.isConnected) {
+        yield;
+      }
+    }, { size: Infinity });
+  }
+  private readonly dom = Shadow.section({
+    style: HTML.style(`ul { width: 100px; }`),
+    content: HTML.ul([
+      HTML.li(`item`)
+    ] as const),
+  });
+  public readonly element = this.dom.element;
+  public get children() {
+    return this.dom.children.content.children;
+  }
+  public set children(children) {
+    this.dom.children.content.children = children;
+  }
+}
+```
+
+### Translation
+
+Create a custom API for translation.
+
+```ts
+const i18n = i18next.createInstance({
+  lng: 'en',
+  resources: {
+    en: {
+      translation: {
+        "a": "{{data}}",
+        "b": "B",
+      }
+    }
+  }
+});
+interface TransDataMap {
+  'a': { data: string; };
+}
+const memory = new WeakMap<Node, object>();
+const data = <K extends keyof TransDataMap>(data: TransDataMap[K]) =>
+  <T extends string, E extends Element>(factory: (tag: T, ...args: any[]) => E, tag: T, ...args: any[]): E => {
+    const el = factory(tag, ...args);
+    void memory.set(el, data);
+    return el;
+  };
+const trans: API<HTMLElementTagNameMap, typeof html> = API((tag: keyof HTMLElementTagNameMap, ...args: any[]) =>
+  define(html(tag, {
+    onchange: args.every(arg => typeof arg !== 'string')
+      ? undefined
+      : (ev, el = proxy<string>(ev.target as HTMLElement)) =>
+          i18n.init((err, t) =>
+            el.children = err
+              ? 'Failed to init i18next.'
+              : t(el.children, memory.get(el.element))),
+  }), ...args));
+
+const el = trans.span('a', data({ data: 'A' }));
+assert(el.children === 'A');
+assert(el.element.textContent === 'A');
+el.children = 'b';
+assert(el.children === 'B');
+assert(el.element.textContent === 'B');
 ```
 
 ## Dependencies
