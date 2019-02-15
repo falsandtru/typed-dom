@@ -1,4 +1,4 @@
-import { El as Elem, ElChildren as Children, ElInterface as El } from './proxy';
+import { Elem, El, ElChildren as Children } from './proxy';
 import { Factory as BaseFactory, TagNameMap, Attrs, html, svg, define } from '../util/dom';
 import { ExtractProp } from 'spica/type';
 

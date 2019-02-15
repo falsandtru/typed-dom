@@ -22,25 +22,25 @@ export type ElChildren =
 export namespace ElChildren {
   export type Void = undefined;
   export type Text = string;
-  export interface Collection extends ReadonlyArray<ElInterface> { }
-  export type Record = { [field: string]: ElInterface; };
+  export interface Collection extends ReadonlyArray<El> { }
+  export type Record = { [field: string]: El; };
 }
 
 type Relax<C extends ElChildren> = C extends ElChildren.Text ? ElChildren.Text : C;
 
-const memory = new WeakMap<Element, ElInterface<string, Element, ElChildren>>();
+const memory = new WeakMap<Element, El<string, Element, ElChildren>>();
 
-export function proxy<E extends Element>(el: E): ElInterface<string, E, ElChildren>;
-export function proxy<C extends ElChildren>(el: Element): ElInterface<string, Element, C>;
-export function proxy<E extends Element, C extends ElChildren>(el: E): ElInterface<string, E, C>;
-export function proxy(el: Element): ElInterface<string, Element, ElChildren> {
+export function proxy<E extends Element>(el: E): El<string, E, ElChildren>;
+export function proxy<C extends ElChildren>(el: Element): El<string, Element, C>;
+export function proxy<E extends Element, C extends ElChildren>(el: E): El<string, E, C>;
+export function proxy(el: Element): El<string, Element, ElChildren> {
   if (!memory.has(el)) throw new Error(`TypedDOM: This element has no proxy.`);
   return memory.get(el)!;
 }
 
 const tag = Symbol();
 
-export interface ElInterface<
+export interface El<
   T extends string = string,
   E extends Element = Element,
   C extends ElChildren = ElChildren
@@ -50,7 +50,7 @@ export interface ElInterface<
   children: Relax<C>;
 }
 
-export class El<
+export class Elem<
   T extends string,
   E extends Element,
   C extends ElChildren
@@ -99,10 +99,10 @@ export class El<
             descs[name] = {
               configurable: true,
               enumerable: true,
-              get: (): ElInterface<string, Element, ElChildren> => {
+              get: (): El<string, Element, ElChildren> => {
                 return child;
               },
-              set: (newChild: ElInterface<string, Element, ElChildren>) => {
+              set: (newChild: El<string, Element, ElChildren>) => {
                 const oldChild = child;
                 if (newChild === oldChild) return;
                 if (newChild.element.parentElement !== node) {
@@ -144,7 +144,7 @@ export class El<
         : Array.isArray(this.children_)
           ? ElChildrenType.Collection
           : ElChildrenType.Record;
-  private scope(child: ElInterface<string, Element, ElChildren>): void {
+  private scope(child: El<string, Element, ElChildren>): void {
     if (!(child.element instanceof HTMLStyleElement)) return;
     return void parse(child.element, this.query);
 
@@ -165,7 +165,7 @@ export class El<
           void el.remove());
     }
   }
-  private readonly initialChildren: WeakSet<ElInterface>;
+  private readonly initialChildren: WeakSet<El>;
   public get children(): Relax<C> {
     assert([ElChildrenType.Void, ElChildrenType.Collection].includes(this.type) ? Object.isFrozen(this.children_) : !Object.isFrozen(this.children_));
     switch (this.type) {
@@ -179,8 +179,8 @@ export class El<
     }
   }
   public set children(children: Relax<C>) {
-    const removedChildren = new Set<ElInterface>();
-    const addedChildren = new Set<ElInterface>();
+    const removedChildren = new Set<El>();
+    const addedChildren = new Set<El>();
     switch (this.type) {
       case ElChildrenType.Void:
         return;
@@ -228,7 +228,7 @@ export class El<
         const sourceChildren = children as ElChildren.Record;
         const targetChildren = this.children_ as ElChildren.Record;
         assert.deepStrictEqual(Object.keys(sourceChildren), Object.keys(targetChildren));
-        const log = new WeakSet<ElInterface>();
+        const log = new WeakSet<El>();
         for (const name in targetChildren) {
           const oldChild = targetChildren[name];
           const newChild = sourceChildren[name];
@@ -260,7 +260,7 @@ export class El<
   }
 }
 
-function throwErrorIfNotUsable({ element }: ElInterface<string, Element, ElChildren>): void {
+function throwErrorIfNotUsable({ element }: El<string, Element, ElChildren>): void {
   if (!element.parentElement || !memory.has(element.parentElement)) return;
   throw new Error(`TypedDOM: Cannot add an element used in another typed dom.`);
 }
