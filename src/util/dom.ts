@@ -7,13 +7,13 @@ export interface Factory<M extends TagNameMap> {
   <T extends Extract<keyof M, string>>(tag: T, attrs?: Attrs, children?: Children): M[T];
 }
 
+const shadows = new WeakMap<Element, ShadowRoot>();
+
 namespace cache {
   export const elem = new Map<string, Element>();
   export const text = document.createTextNode('');
   export const frag = document.createDocumentFragment();
 }
-
-const shadows = new WeakMap<Element, ShadowRoot>();
 
 export function frag(children: Children = []): DocumentFragment {
   children = typeof children === 'string' ? [text(children)] : children;
