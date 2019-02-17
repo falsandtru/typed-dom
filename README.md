@@ -272,7 +272,7 @@ const data = <K extends keyof TransDataMap>(data: TransDataMap[K]) =>
     void memory.set(el, data);
     return el;
   };
-const trans: API<HTMLElementTagNameMap, typeof html> = API((tag: keyof HTMLElementTagNameMap, ...args: any[]) =>
+const trans: API<HTMLElementTagNameMap> = API((tag: keyof HTMLElementTagNameMap, ...args: any[]) =>
   define(html(tag, {
     onchange: args.every(arg => typeof arg !== 'string')
       ? undefined

@@ -2,7 +2,7 @@ import { Elem, El, ElChildren } from './proxy';
 import { Factory as BaseFactory, TagNameMap, Attrs, shadow, html, svg, define } from '../util/dom';
 import { ExtractProp } from 'spica/type';
 
-export type API<M extends TagNameMap, F extends BaseFactory<M>> =
+export type API<M extends TagNameMap, F extends BaseFactory<M> = BaseFactory<M>> =
   BuilderFunction<Extract<keyof ExtractProp<M, Element>, string>, Element, F> &
   { readonly [P in Extract<keyof ExtractProp<M, Element>, string>]: BuilderMethod<P, Extract<M[P], Element>, F>; };
 export function API
@@ -12,9 +12,9 @@ export function API
   return new Proxy<API<M, F>>((() => undefined) as any, handle(baseFactory, formatter));
 }
 
-export const Shadow: API<ShadowHostElementTagNameMap, typeof html> = API(html, shadow);
-export const HTML: API<HTMLElementTagNameMap, typeof html> = API(html);
-export const SVG: API<SVGElementTagNameMap_, typeof svg> = API(svg);
+export const Shadow: API<ShadowHostElementTagNameMap> = API(html, shadow);
+export const HTML: API<HTMLElementTagNameMap> = API(html);
+export const SVG: API<SVGElementTagNameMap_> = API(svg);
 
 interface BuilderFunction<T extends string, E extends Element, F extends BaseFactory<TagNameMap>> {
                         (tag: T,                            factory?: Factory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
