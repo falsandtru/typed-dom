@@ -43,7 +43,7 @@ const tag = Symbol();
 export interface El<
   T extends string = string,
   E extends Element = Element,
-  C extends ElChildren = ElChildren
+  C extends ElChildren = ElChildren,
   > {
   readonly [tag]?: T;
   readonly element: E;
@@ -53,7 +53,7 @@ export interface El<
 export class Elem<
   T extends string,
   E extends Element,
-  C extends ElChildren
+  C extends ElChildren,
   > {
   constructor(
     public readonly element: E,

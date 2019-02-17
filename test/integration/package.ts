@@ -3,13 +3,18 @@ import { Sequence } from 'spica/sequence';
 import { Coroutine } from 'spica/coroutine';
 
 declare global {
+  interface ShadowHostElementTagNameMap {
+    'custom-tag': HTMLElement;
+  }
   interface HTMLElementTagNameMap {
-    'any': HTMLElement;
+    'custom': HTMLElement;
   }
   interface SVGElementTagNameMap_ {
     'a': SVGAElement;
   }
 }
+window.customElements.define('custom-tag', class extends HTMLElement { });
+
 declare const _: { shuffle<T>(as: T[]): T[]; };
 
 describe('Integration: Typed DOM', function () {
@@ -319,8 +324,9 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('extend', function () {
-      assert(HTML.any().element.outerHTML === '<any></any>');
-      assert(SVG.a().element.outerHTML === '<a></a>');
+      assert(Shadow('custom-tag').element.outerHTML === '<custom-tag></custom-tag>');
+      assert(HTML.custom().element.outerHTML === '<custom></custom>');
+      assert(SVG.a().element instanceof SVGAElement);
     });
 
     it('swap', function () {

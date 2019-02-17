@@ -8,12 +8,12 @@ Static typed DOM component builder.
 
 ## APIs
 
-### HTML: { [tagname]: (attrs?, children?, factory?) => ProxyElement };
+### HTML: { [tagname]: (attrs?, children?, factory?) => El; };
 
-Create HTML element proxies.
+Create HTML an element proxy.
 
-- attrs: Record<string, string | EventListener>
-- children: undefined | string | ProxyElement[] | Record<string, ProxyElement>
+- attrs: Record<string, string | EventListener | null | undefined>
+- children: undefined | string | El[] | Record<string, El>
 - factory: () => Element
 
 ```ts
@@ -27,12 +27,12 @@ HTML.p({ id: 'id' });
 HTML.p(() => document.createElement('p'));
 ```
 
-### SVG: { [tagname]: (attrs?, children?, factory?) => ProxyElement };
+### SVG: { [tagname]: (attrs?, children?, factory?) => El; };
 
-Create SVG element proxies.
+Create SVG an element proxy.
 
-- attrs: Record<string, string | EventListener>
-- children: undefined | string | ProxyElement[] | Record<string, ProxyElement>
+- attrs: Record<string, string | EventListener | null | undefined>
+- children: undefined | string | El[] | Record<string, El>
 - factory: () => Element
 
 ```ts
@@ -41,12 +41,12 @@ import { SVG } from 'typed-dom';
 SVG.svg();
 ```
 
-### Shadow: { [tagname]: (attrs?, children?, factory?) => ProxyElement };
+### Shadow: { [tagname]: (attrs?, children?, factory?) => El; };
 
-Create HTML element proxies which make open shadow DOM to append children.
+Create HTML an element proxy which makes open shadow DOM to append children.
 
-- attrs: Record<string, string | EventListener>
-- children: undefined | string | ProxyElement[] | Record<string, ProxyElement>
+- attrs: Record<string, string | EventListener | null | undefined>
+- children: undefined | string | El[] | Record<string, El>
 - factory: () => Element
 
 ```ts
@@ -74,12 +74,15 @@ Shadow.section();
 
 ## Extend APIs
 
-You can define some custom elements by extending `HTMLElementTagNameMap` or `SVGElementTagNameMap_` interface.
+Custom elements will be defined by extending `ShadowHostElementTagNameMap`, `HTMLElementTagNameMap`, or `SVGElementTagNameMap_` interface.
 
 ```ts
-import { HTML, SVG } from 'typed-dom';
+import { Shadow, HTML, SVG } from 'typed-dom';
 
 declare global {
+  interface ShadowHostElementTagNameMap {
+    'custom-tag': HTMLElement;
+  }
   interface HTMLElementTagNameMap {
     'custom': HTMLElement;
   }
@@ -88,13 +91,26 @@ declare global {
   }
 }
 
+Shadow('custom-tag').element.outerHTML; // '<custom-tag></custom-tag>'
 HTML.custom().element.outerHTML; // '<custom></custom>'
 SVG.a().element; // SVGAElement
 ```
 
+## Create APIs
+
+All the exposed APIs to create proxies can be reproduced as follows:
+
+```ts
+import { API, shadow, html, svg } from 'typed-dom';
+
+const Shadow: API<ShadowHostElementTagNameMap> = API(html, shadow);
+const HTML: API<HTMLElementTagNameMap> = API(html);
+const SVG: API<SVGElementTagNameMap_> = API(svg);
+```
+
 ## Usage
 
-Build a typed DOM object with styling.
+Build a typed DOM component with styling.
 
 ```ts
 import { HTML } from 'typed-dom';
@@ -121,9 +137,9 @@ El<"article", Element, {
 
 // Note: El type is defined as follows.
 export interface El<
-  T extends string,
-  E extends Element,
-  C extends ElChildren
+  T extends string = string,
+  E extends Element = Element,
+  C extends ElChildren = ElChildren,
   > {
   readonly element: E;
   children: C;
@@ -136,8 +152,8 @@ type ElChildren
 namespace ElChildren {
   export type Void = undefined;
   export type Text = string;
-  export type Collection = readonly El<string, Element, any>[];
-  export type Record = { [field: string]: El<string, Element, any>; };
+  export type Collection = readonly El[];
+  export type Record = { [field: string]: El; };
 }
 ```
 
@@ -159,14 +175,14 @@ component.children.title.element.outerHTML; // '<h1>Title</h1>'
 
 // - collection
 component.children.content.children = [
-  HTML.li('Item')
+  HTML.li('Item'),
 ];
 component.children.content.element.outerHTML; // '<ul><li>Item</li></ul>'
 
 // - HTML
 component.children.title = HTML.h1('Title!');
 component.children.content = HTML.ul([
-  HTML.li('Item!')
+  HTML.li('Item!'),
 ]);
 component.element.outerHTML; // '<article class="RANDOM>"><style>.RANDOM ul { width: 100px; }</style><h1>Title!</h1><ul><li>Item!</li></ul></article>'
 ```
@@ -184,7 +200,7 @@ class Component implements El {
   private readonly dom = HTML.section({
     style: HTML.style(`$scope ul { width: 100px; }`),
     content: HTML.ul([
-      HTML.li(`item`)
+      HTML.li(`item`),
     ]),
   });
   public readonly element = this.dom.element;
@@ -200,7 +216,7 @@ class ShadowComponent implements El {
   private readonly dom = Shadow.section({
     style: HTML.style(`ul { width: 100px; }`),
     content: HTML.ul([
-      HTML.li(`item`)
+      HTML.li(`item`),
     ]),
   });
   public readonly element = this.dom.element;
@@ -231,7 +247,7 @@ class Component extends Coroutine<void> implements El {
   private readonly dom = Shadow.section({
     style: HTML.style(`ul { width: 100px; }`),
     content: HTML.ul([
-      HTML.li(`item`)
+      HTML.li(`item`),
     ] as const),
   });
   public readonly element = this.dom.element;
