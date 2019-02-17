@@ -55,24 +55,21 @@ import { Shadow } from 'typed-dom';
 Shadow.section();
 ```
 
-### Others
+### API
 
-- API
-- El
-- proxy
-- frag
-- shadow
-- html
-- svg
-- text
-- define
-- listen
-- once
-- delegate
-- bind
-- currentTargets
+#### Create APIs
 
-## Extend APIs
+All the exposed APIs to create proxies can be redefined as follows:
+
+```ts
+import { API, shadow, html, svg } from 'typed-dom';
+
+const Shadow: API<ShadowHostElementTagNameMap> = API(html, shadow);
+const HTML: API<HTMLElementTagNameMap> = API(html);
+const SVG: API<SVGElementTagNameMap_> = API(svg);
+```
+
+#### Extend APIs
 
 Custom elements will be defined by extending `ShadowHostElementTagNameMap`, `HTMLElementTagNameMap`, or `SVGElementTagNameMap_` interface.
 
@@ -96,17 +93,21 @@ HTML.custom().element.outerHTML; // '<custom></custom>'
 SVG.a().element; // SVGAElement
 ```
 
-## Create APIs
+### Others
 
-All the exposed APIs to create proxies can be reproduced as follows:
-
-```ts
-import { API, shadow, html, svg } from 'typed-dom';
-
-const Shadow: API<ShadowHostElementTagNameMap> = API(html, shadow);
-const HTML: API<HTMLElementTagNameMap> = API(html);
-const SVG: API<SVGElementTagNameMap_> = API(svg);
-```
+- El
+- proxy
+- frag
+- shadow
+- html
+- svg
+- text
+- define
+- listen
+- once
+- delegate
+- bind
+- currentTargets
 
 ## Usage
 
