@@ -59,7 +59,7 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('text children update', function () {
-      const dom = HTML.p(`a` as string);
+      const dom = HTML.p(`a`);
       dom.children = 'b';
       assert(dom.element.outerHTML === '<p>b</p>');
       assert(dom.children === 'b');
@@ -74,7 +74,7 @@ describe('Integration: Typed DOM', function () {
 
     it('collection', function () {
       const dom = HTML.ul([
-        HTML.li(`1` as string),
+        HTML.li(`1`),
         HTML.li(`2`)
       ]);
       assert(dom.element.outerHTML === '<ul><li>1</li><li>2</li></ul>');
@@ -86,7 +86,7 @@ describe('Integration: Typed DOM', function () {
       this.timeout(9 * 1e3);
 
       const dom = HTML.ul([
-        HTML.li(`1` as string)
+        HTML.li(`1`)
       ]);
       assert.doesNotThrow(() => dom.children = dom.children);
       assert.throws(() => dom.children = HTML.ul([HTML.li(`1`)]).children);
@@ -170,7 +170,7 @@ describe('Integration: Typed DOM', function () {
 
     it('struct children update', function () {
       const dom = HTML.article({
-        title: HTML.h1(`a` as string)
+        title: HTML.h1(`a`)
       });
       assert.doesNotThrow(() => dom.children = dom.children);
       assert.throws(() => dom.children = HTML.article({ title: HTML.h1(`b`) }).children);
@@ -187,7 +187,7 @@ describe('Integration: Typed DOM', function () {
 
     it('struct children partial update', function () {
       const dom = HTML.article({
-        title: HTML.h1(`a` as string)
+        title: HTML.h1(`a`)
       });
       assert.doesNotThrow(() => dom.children.title = dom.children.title);
       assert.throws(() => dom.children.title = HTML.article({ title: HTML.h1(`b`) }).children.title);
@@ -358,7 +358,7 @@ describe('Integration: Typed DOM', function () {
           el.textContent += el.textContent,
       };
       const el = HTML.ul([
-        HTML.li(listeners, 'a' as string),
+        HTML.li(listeners, 'a'),
         HTML.li(listeners, 'b'),
       ]);
       el.children = [
@@ -381,7 +381,7 @@ describe('Integration: Typed DOM', function () {
           el.textContent += el.textContent,
       };
       const el = HTML.ul({
-        a: HTML.li(listeners, 'a' as string),
+        a: HTML.li(listeners, 'a'),
         b: HTML.li(listeners, 'b'),
         c: HTML.li(listeners, 'c'),
       });

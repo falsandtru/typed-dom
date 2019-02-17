@@ -117,9 +117,9 @@ import { HTML } from 'typed-dom';
 
 const component = HTML.article({
   style: HTML.style(`$scope ul { width: 100px; }`),
-  title: HTML.h1(`title` as string),
+  title: HTML.h1(`title`),
   content: HTML.ul([
-    HTML.li(`item` as string),
+    HTML.li(`item`),
     HTML.li(`item`),
   ])
 });
