@@ -79,7 +79,7 @@ describe('Integration: Typed DOM', function () {
       ]);
       assert(dom.element.outerHTML === '<ul><li>1</li><li>2</li></ul>');
       assert(dom.children.length === 2);
-      assert(dom.children.every(({element}, i) => element === dom.element.children[i]));
+      assert(dom.children.every(({ element }, i) => element === dom.element.children[i]));
     });
 
     it('collection children update', function () {
@@ -96,13 +96,13 @@ describe('Integration: Typed DOM', function () {
       ];
       assert(dom.element.outerHTML === '<ul><li>2</li><li>3</li></ul>');
       assert(dom.children.length === 2);
-      assert(dom.children.every(({element}, i) => element === dom.element.children[i]));
+      assert(dom.children.every(({ element }, i) => element === dom.element.children[i]));
       dom.children = [
         HTML.li('4')
       ];
       assert(dom.element.outerHTML === '<ul><li>4</li></ul>');
       assert(dom.children.length === 1);
-      assert(dom.children.every(({element}, i) => element === dom.element.children[i]));
+      assert(dom.children.every(({ element }, i) => element === dom.element.children[i]));
 
       // property test
       const ss = Array(3).fill(0).map(() => HTML.li(``));
@@ -143,7 +143,7 @@ describe('Integration: Typed DOM', function () {
       //assert.throws(() => dom.children.pop());
       //assert.throws(() => dom.children.length = 0);
       assert(dom.children.length === 1);
-      assert(dom.children.every(({element}, i) => element === dom.element.children[i]));
+      assert(dom.children.every(({ element }, i) => element === dom.element.children[i]));
     });
 
     it('collection with factory', function () {
