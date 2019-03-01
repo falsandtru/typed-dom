@@ -314,7 +314,7 @@ describe('Integration: Typed DOM', function () {
       Sequence.from([
         [{ id: 'id' }],
         [undefined, '', [], {}],
-        [() => html('div')]])
+        [() => html('div')]] as const)
         .mapM(v => Sequence.from(v))
         .bind(v => Sequence.from(v).filterM(() => Sequence.from([false, true])))
         .extract()
