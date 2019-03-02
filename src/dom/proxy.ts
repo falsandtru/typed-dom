@@ -144,23 +144,22 @@ export class Elem<
           : ElChildrenType.Record;
   private scope(child: El<string, Element, ElChildren>): void {
     if (!(child.element instanceof HTMLStyleElement)) return;
-    return void parse(child.element, this.query);
-
-    function parse(style: HTMLStyleElement, query: string): void {
-      const syntax = /^(\s*)\$scope(?!\w)/gm;
-      if (style.innerHTML.search(syntax) === -1) return;
-      style.innerHTML = style.innerHTML.replace(syntax, (_, indent) => `${indent}${query}`);
-      const id = query.slice(1);
-      switch (query[0]) {
-        case '.':
-          if (!(style.getAttribute('class') || '').split(' ').includes(id)) break;
-          void style.setAttribute('class', `${style.getAttribute('class')} ${id}`.trim());
-          break;
+    const syntax = /^(\s*)\$scope(?!\w)/gm;
+    const style = child.element;
+    const query = this.query;
+    if (style.innerHTML.search(syntax) === -1) return;
+    style.innerHTML = style.innerHTML.replace(syntax, (_, indent) => `${indent}${query}`);
+    switch (query[0]) {
+      case '.': {
+        const id = query.slice(1);
+        if (!(style.getAttribute('class') || '').split(' ').includes(id)) break;
+        void style.setAttribute('class', `${style.getAttribute('class')} ${id}`.trim());
+        break;
       }
-      if (style.children.length === 0) return;
-      void [...style.querySelectorAll('*')]
-        .forEach(el =>
-          void el.remove());
+    }
+    if (style.children.length === 0) return;
+    for (const el of style.querySelectorAll('*')) {
+      void el.remove();
     }
   }
   private readonly initialChildren: WeakSet<El>;
