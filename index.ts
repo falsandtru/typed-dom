@@ -32,4 +32,8 @@ declare global {
   }
   interface SVGElementTagNameMap_ extends SVGElementTagNameMap {
   }
+  interface ElementEventMap {
+    'connect': Event;
+    'disconnect': Event;
+  }
 }
