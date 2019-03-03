@@ -53,8 +53,8 @@ function handle
       if (attrs !== undefined && isChildren(attrs)) return build(undefined, attrs, factory);
       const node = formatter(elem(factory || defaultFactory, attrs || {}, children));
       return node instanceof Element
-        ? new Elem(node, children as string)
-        : new Elem(node.host, children as string, node);
+        ? new Elem(node, children)
+        : new Elem(node.host, children, node);
     };
 
     function isChildren(children: ElChildren | Attrs): children is ElChildren {
