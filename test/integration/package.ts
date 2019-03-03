@@ -433,12 +433,12 @@ describe('Integration: Typed DOM', function () {
       }
 
       const comp = new Component();
-      assert(HTML.div([comp]));
       assert(comp.children[0].children === 'item');
       comp.children = [
         HTML.li('Item')
       ];
       assert(comp.children[0].children === 'Item');
+      assert(HTML.div([comp]));
     });
 
     it('component shadow', function () {
@@ -459,12 +459,12 @@ describe('Integration: Typed DOM', function () {
       }
 
       const comp = new Component();
-      assert(HTML.div([comp]));
       assert(comp.children[0].children === 'item');
       comp.children = [
         HTML.li('Item')
       ];
       assert(comp.children[0].children === 'Item');
+      assert(HTML.div([comp]));
     });
 
     it('component coroutine', function () {
@@ -492,12 +492,12 @@ describe('Integration: Typed DOM', function () {
       }
 
       const comp = new Component();
-      assert(HTML.div([comp]));
       assert(comp.children[0].children === 'item');
       comp.children = [
         HTML.li('Item')
       ];
       assert(comp.children[0].children === 'Item');
+      assert(HTML.div([comp]));
     });
 
     it('translate', function () {
