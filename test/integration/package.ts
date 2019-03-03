@@ -1,6 +1,5 @@
-import { Shadow, HTML, SVG, El, API, proxy, frag, shadow, html, define } from '../../index';
+import { Shadow, HTML, SVG, API, El, proxy, Coroutine, frag, shadow, html, define } from '../../index';
 import { Sequence } from 'spica/sequence';
-import { Coroutine } from 'spica/coroutine';
 
 declare global {
   interface ShadowHostElementTagNameMap {
@@ -471,10 +470,14 @@ describe('Integration: Typed DOM', function () {
       class Component extends Coroutine<void> implements El {
         constructor() {
           super(function* (this: Component) {
-            while (this.element.isConnected) {
+            assert(this.element);
+            assert(this.children);
+            this.children = [HTML.li(this.children[0].children.toUpperCase())];
+            while (true) {
               yield;
             }
           }, { size: Infinity });
+          assert(this.children[0].children === 'ITEM');
         }
         private readonly dom = Shadow.section({
           style: HTML.style(`ul { width: 100px; }`),
@@ -492,11 +495,11 @@ describe('Integration: Typed DOM', function () {
       }
 
       const comp = new Component();
-      assert(comp.children[0].children === 'item');
+      assert(comp.children[0].children === 'ITEM');
       comp.children = [
-        HTML.li('Item')
+        HTML.li('item')
       ];
-      assert(comp.children[0].children === 'Item');
+      assert(comp.children[0].children === 'item');
       assert(HTML.div([comp]));
     });
 
