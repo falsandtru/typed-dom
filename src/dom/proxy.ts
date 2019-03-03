@@ -124,7 +124,6 @@ export class Elem<
     return this.id_;
   }
   private get query(): string {
-    assert(this.id.match(/^[a-z]/));
     switch (true) {
       case this.element !== this.container:
         return ':host';

@@ -292,6 +292,7 @@ describe('Integration: Typed DOM', function () {
       assert(HTML.div({ id: 'test' }, [HTML.style(`<script>`)]).children[0].element.children.length === 0);
       assert(HTML.div([HTML.style(template)]).element.className.startsWith('id-'));
       assert(HTML.div([HTML.style(template)]).children[0].element.innerHTML.match(/\.[\w\-]+\s/gm)!.length === 2);
+      assert(Shadow.div([HTML.style(template)]).element.className === '');
       assert(Shadow.div([HTML.style(template)]).children[0].element.innerHTML === template.replace(/\$scope/g, ':host'));
     });
 
