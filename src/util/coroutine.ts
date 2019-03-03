@@ -11,9 +11,10 @@ export abstract class Coroutine<T = unknown, R = unknown, S = unknown> extends C
     opts: CoroutineOptions = {},
   ) {
     super(gen, { ...opts, syncrun: false });
-    void Object.defineProperty(this, opts.trigger || 'element', {
+    const prop = opts.trigger || 'element';
+    void Object.defineProperty(this, prop, {
       set: (el: Element) => {
-        void Object.defineProperty(this, opts.trigger || 'element', {
+        void Object.defineProperty(this, prop, {
           value: el,
           enumerable: true,
           configurable: true,
