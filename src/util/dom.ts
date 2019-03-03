@@ -22,9 +22,9 @@ export function frag(children: Children = []): DocumentFragment {
   return frag;
 }
 
-export function shadow(el: Element, opts?: ShadowRootInit): ShadowRoot;
-export function shadow(el: Element, children?: Children, opts?: ShadowRootInit): ShadowRoot;
-export function shadow(el: Element, children?: Children | ShadowRootInit, opts?: ShadowRootInit): ShadowRoot {
+export function shadow(el: HTMLElement, opts?: ShadowRootInit): ShadowRoot;
+export function shadow(el: HTMLElement, children?: Children, opts?: ShadowRootInit): ShadowRoot;
+export function shadow(el: HTMLElement, children?: Children | ShadowRootInit, opts?: ShadowRootInit): ShadowRoot {
   if (children && !isChildren(children)) return shadow(el, undefined, children);
   if (el.shadowRoot || shadows.has(el)) {
     return define(

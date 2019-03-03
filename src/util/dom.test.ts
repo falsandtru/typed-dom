@@ -12,11 +12,11 @@ describe('Unit: util/dom', () => {
       assert(shadow(html('section'), [html('p')]).innerHTML === '<p></p>');
       assert(shadow(html('section', [html('p')])).innerHTML === '<p></p>');
       assert(shadow(html('section', [html('p')]), { mode: 'closed' }).innerHTML === '<p></p>');
-      assert(shadow(shadow(html('section')).host));
-      assert(shadow(shadow(html('section'), { mode: 'open' }).host));
-      assert(shadow(shadow(html('section'), { mode: 'closed' }).host));
-      assert.throws(() => shadow(shadow(html('section'), { mode: 'open' }).host, { mode: 'closed' }));
-      assert.throws(() => shadow(shadow(html('section'), { mode: 'closed' }).host, { mode: 'open' }));
+      assert(shadow(shadow(html('section')).host as HTMLElement));
+      assert(shadow(shadow(html('section'), { mode: 'open' }).host as HTMLElement));
+      assert(shadow(shadow(html('section'), { mode: 'closed' }).host as HTMLElement));
+      assert.throws(() => shadow(shadow(html('section'), { mode: 'open' }).host as HTMLElement, { mode: 'closed' }));
+      assert.throws(() => shadow(shadow(html('section'), { mode: 'closed' }).host as HTMLElement, { mode: 'open' }));
     });
 
   });
