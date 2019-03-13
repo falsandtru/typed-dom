@@ -234,7 +234,8 @@ Define autonomous DOM components which orient choreography, not orchestration.
 This coroutine supports the actor model and the supervisor/worker pattern (using spica/supervisor).
 
 ```ts
-import { Shadow, HTML, El, Coroutine } from 'typed-dom';
+import { Shadow, HTML, El } from 'typed-dom';
+import { Coroutine } from 'typed-dom/coroutine';
 
 class Component extends Coroutine<void> implements El {
   constructor() {

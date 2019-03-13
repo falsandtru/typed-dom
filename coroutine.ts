@@ -1,5 +1,5 @@
 import { Coroutine as Co, CoroutineOptions as Options } from 'spica/coroutine';
-import { El, ElChildren } from '../dom/proxy';
+import { El, ElChildren } from './src/dom/proxy';
 
 export interface CoroutineOptions extends Options {
   trigger?: string | symbol;

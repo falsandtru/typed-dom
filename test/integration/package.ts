@@ -1,4 +1,5 @@
-import { Shadow, HTML, SVG, API, El, proxy, Coroutine, frag, shadow, html, define } from '../../index';
+import { Shadow, HTML, SVG, API, El, proxy, frag, shadow, html, define } from '../../index';
+import { Coroutine } from '../../coroutine';
 import { Sequence } from 'spica/sequence';
 
 declare global {
