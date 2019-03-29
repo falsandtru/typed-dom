@@ -1,4 +1,4 @@
-import { bind, delegate, once, listen, currentTargets } from './listener';
+import { bind, delegate, listen, once, wait, currentTargets } from './listener';
 import { Shadow, HTML } from '../dom/builder';
 
 describe('Unit: util/listener', () => {
@@ -97,6 +97,31 @@ describe('Unit: util/listener', () => {
       });
       document.createDocumentFragment().appendChild(dom.element);
       dom.children[0].element.click();
+      dom.children[0].element.click();
+    });
+
+  });
+
+  describe('wait', () => {
+    it('bind', done => {
+      const a = HTML.a().element;
+      wait(a, 'click').then(ev => {
+        assert(ev instanceof Event);
+        assert(currentTargets.get(ev) instanceof HTMLAnchorElement);
+        done();
+      });
+      document.createDocumentFragment().appendChild(a);
+      a.click();
+    });
+
+    it('delegate', done => {
+      const dom = Shadow.section([HTML.a()]);
+      wait(dom.element, 'a', 'click').then(ev => {
+        assert(ev instanceof Event);
+        assert(currentTargets.get(ev) instanceof HTMLAnchorElement);
+        done();
+      });
+      document.createDocumentFragment().appendChild(dom.element);
       dom.children[0].element.click();
     });
 
