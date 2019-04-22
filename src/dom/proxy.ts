@@ -60,6 +60,22 @@ export class Elem<
     private children_: Relax<C>,
     private readonly container: Element | ShadowRoot = element,
   ) {
+    switch (true) {
+      case children_ === undefined:
+        this.type = ElChildrenType.Void;
+        break;
+      case typeof children_ === 'string':
+        this.type = ElChildrenType.Text
+        break;
+      case Array.isArray(children_):
+        this.type = ElChildrenType.Collection;
+        break;
+      case children_ && typeof children_ === 'object':
+        this.type = ElChildrenType.Record;
+        break;
+      default:
+        throw new Error(`TypedDOM: Invalid type children.`);
+    }
     void throwErrorIfNotUsable(this);
     void memory.set(this.element, this);
     switch (this.type) {
@@ -133,14 +149,7 @@ export class Elem<
         return `.${this.id}`;
     }
   }
-  private readonly type: ElChildrenType =
-    this.children_ === undefined
-      ? ElChildrenType.Void
-      : typeof this.children_ === 'string'
-        ? ElChildrenType.Text
-        : Array.isArray(this.children_)
-          ? ElChildrenType.Collection
-          : ElChildrenType.Record;
+  private readonly type: ElChildrenType;
   private scope(child: El<string, Element, ElChildren>): void {
     if (!(child.element instanceof HTMLStyleElement)) return;
     const syntax = /^(\s*)\$scope(?!\w)/gm;
