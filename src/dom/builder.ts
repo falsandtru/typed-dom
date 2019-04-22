@@ -64,7 +64,7 @@ function handle
 
     function elem(factory: Factory<F, Extract<keyof M, string>, ElChildren, Element>, attrs: Attrs, children: ElChildren): Element {
       const el = factory(baseFactory, tag, attrs, children);
-      if (tag !== el.tagName.toLowerCase()) throw new Error(`TypedDOM: Tag name must be "${tag}", but got "${el.tagName.toLowerCase()}".`);
+      if (tag !== el.tagName.toLowerCase()) throw new Error(`TypedDOM: Expected tag name is "${tag}" but actually "${el.tagName.toLowerCase()}".`);
       if (factory !== defaultFactory) {
         for (const [k, v] of Object.entries(attrs)) {
           if (typeof v !== 'function') continue;

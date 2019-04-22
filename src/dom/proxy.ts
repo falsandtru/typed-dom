@@ -85,7 +85,7 @@ export class Elem<
         this.children = children_;
         return;
       default:
-        throw new Error(`TypedDOM: Undefined type children.`);
+        throw new Error(`TypedDOM: Unreachable code.`);
     }
 
     function observe<C extends ElChildren.Record>(node: Node, children: C): C {
@@ -194,8 +194,11 @@ export class Elem<
         const sourceChildren = children as ElChildren.Collection;
         const targetChildren = [] as Mutable<ElChildren.Collection>;
         this.children_ = targetChildren as any as Relax<C>;
+        const mem = new WeakSet<El>();
         for (let i = 0; i < sourceChildren.length; ++i) {
           const newChild = sourceChildren[i];
+          if (mem.has(newChild)) throw new Error(`TypedDOM: Typed DOM children can't repeatedly be used to the same object.`);
+          void mem.add(newChild);
           if (newChild.element.parentNode !== this.container as Element) {
             void throwErrorIfNotUsable(newChild);
           }
@@ -224,16 +227,16 @@ export class Elem<
         const sourceChildren = children as ElChildren.Record;
         const targetChildren = this.children_ as ElChildren.Record;
         assert.deepStrictEqual(Object.keys(sourceChildren), Object.keys(targetChildren));
-        const log = new WeakSet<El>();
+        const mem = new WeakSet<El>();
         for (const name in targetChildren) {
           const oldChild = targetChildren[name];
           const newChild = sourceChildren[name];
           if (!newChild) continue;
+          if (mem.has(newChild)) throw new Error(`TypedDOM: Typed DOM children can't repeatedly be used to the same object.`);
+          void mem.add(newChild);
           if (newChild.element.parentNode !== this.container as Element) {
             void throwErrorIfNotUsable(newChild);
           }
-          if (log.has(newChild)) throw new Error(`TypedDOM: Cannot use an element again used in the same record.`);
-          void log.add(newChild);
           if (oldChild.element !== newChild.element || this.initialChildren.has(oldChild)) {
             void this.scope(newChild);
             void addedChildren.add(newChild);
@@ -258,5 +261,5 @@ export class Elem<
 
 function throwErrorIfNotUsable({ element }: El<string, Element, ElChildren>): void {
   if (!element.parentElement || !memory.has(element.parentElement)) return;
-  throw new Error(`TypedDOM: Cannot add an element used in another typed dom.`);
+  throw new Error(`TypedDOM: Typed DOM children can't be used to another typed DOM.`);
 }
