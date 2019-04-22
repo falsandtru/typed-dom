@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/falsandtru/typed-dom.svg?branch=master)](https://travis-ci.org/falsandtru/typed-dom)
 
-Static typed DOM component builder.
+Statically typed DOM component builder.
 
 **Visualize** DOM structures and **Assist** DOM access by static types of TypeScript.
 
