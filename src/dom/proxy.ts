@@ -151,8 +151,8 @@ export class Elem<
     switch (query[0]) {
       case '.': {
         const id = query.slice(1);
-        if (!(style.getAttribute('class') || '').split(' ').includes(id)) break;
-        void style.setAttribute('class', `${style.getAttribute('class')} ${id}`.trim());
+        if (!style.classList.contains(id)) break;
+        void style.classList.add(id);
         break;
       }
     }
