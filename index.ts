@@ -1,4 +1,4 @@
-﻿export { Shadow, HTML, SVG, API } from './src/dom/builder';
+export { Shadow, HTML, SVG, API } from './src/dom/builder';
 export { El, proxy } from './src/dom/proxy';
 export { frag, shadow, html, svg, text, define } from './src/util/dom';
 export { listen, once, wait, delegate, bind, currentTargets } from './src/util/listener';
