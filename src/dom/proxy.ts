@@ -26,8 +26,6 @@ export namespace ElChildren {
   export type Record = { [field: string]: El; };
 }
 
-type Relax<C extends ElChildren> = C extends ElChildren.Text ? ElChildren.Text : C;
-
 const memory = new WeakMap<Element, El<string, Element, ElChildren>>();
 
 export function proxy<E extends Element>(el: E): El<string, E, ElChildren>;
@@ -47,7 +45,7 @@ export interface El<
   > {
   readonly [tag]?: T;
   readonly element: E;
-  children: Relax<C>;
+  children: C;
 }
 
 export class Elem<
@@ -57,7 +55,7 @@ export class Elem<
   > {
   constructor(
     public readonly element: E,
-    private children_: Relax<C>,
+    private children_: C,
     private readonly container: Element | ShadowRoot = element,
   ) {
     switch (true) {
@@ -86,18 +84,18 @@ export class Elem<
         this.initialChildren = new WeakSet();
         void define(this.container, []);
         this.children_ = this.container.appendChild(text('')) as any;
-        this.children = children_ as Relax<C>;
+        this.children = children_ as C;
         return;
       case ElChildrenType.Collection:
         this.initialChildren = new WeakSet(children_ as ElChildren.Collection);
         void define(this.container, []);
-        this.children_ = [] as ElChildren.Collection as Relax<C>;
+        this.children_ = [] as ElChildren.Collection as C;
         this.children = children_;
         return;
       case ElChildrenType.Record:
         this.initialChildren = new WeakSet(Object.values(children_ as ElChildren.Record));
         void define(this.container, []);
-        this.children_ = observe(this.container, { ...children_ as ElChildren.Record }) as Relax<C>;
+        this.children_ = observe(this.container, { ...children_ as ElChildren.Record }) as C;
         this.children = children_;
         return;
       default:
@@ -171,19 +169,19 @@ export class Elem<
     }
   }
   private readonly initialChildren: WeakSet<El>;
-  public get children(): Relax<C> {
+  public get children(): C {
     assert([ElChildrenType.Void, ElChildrenType.Collection].includes(this.type) ? Object.isFrozen(this.children_) : !Object.isFrozen(this.children_));
     switch (this.type) {
       case ElChildrenType.Text:
         this.children_ = (this.children_ as any as Text).parentNode === this.container
           ? this.children_
           : [...this.container.childNodes].find(node => node instanceof Text) as any || (this.children_ as any as Text).cloneNode();
-        return (this.children_ as any as Text).textContent as Relax<C>;
+        return (this.children_ as any as Text).textContent as C;
       default:
-        return this.children_ as Relax<C>;
+        return this.children_ as C;
     }
   }
-  public set children(children: Relax<C>) {
+  public set children(children: C) {
     const removedChildren = new Set<El>();
     const addedChildren = new Set<El>();
     switch (this.type) {
@@ -202,7 +200,7 @@ export class Elem<
       case ElChildrenType.Collection: {
         const sourceChildren = children as ElChildren.Collection;
         const targetChildren = [] as Mutable<ElChildren.Collection>;
-        this.children_ = targetChildren as any as Relax<C>;
+        this.children_ = targetChildren as any as C;
         const mem = new WeakSet<El>();
         for (let i = 0; i < sourceChildren.length; ++i) {
           const newChild = sourceChildren[i];
