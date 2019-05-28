@@ -521,7 +521,7 @@ describe('Integration: Typed DOM', function () {
       }
       const memory = new WeakMap<Node, object>();
       const data = <K extends keyof TransDataMap>(data: TransDataMap[K]) =>
-        <T extends string, E extends Element>(factory: (tag: T, ...args: any[]) => E, tag: T, ...args: any[]): E => {
+        <T extends string, E extends Element, R extends any[]>(factory: (tag: T, ...args: R) => E, tag: T, ...args: R): E => {
           const el = factory(tag, ...args);
           void memory.set(el, data);
           return el;
