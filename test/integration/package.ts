@@ -1,6 +1,7 @@
 import { Shadow, HTML, SVG, API, El, proxy, frag, shadow, html, define } from '../../index';
 import { Coroutine } from '../../coroutine';
 import { Sequence } from 'spica/sequence';
+import { Attrs } from '../../internal';
 
 declare global {
   interface ShadowHostElementTagNameMap {
@@ -511,7 +512,6 @@ describe('Integration: Typed DOM', function () {
           en: {
             translation: {
               "a": "{{data}}",
-              "b": "B",
             }
           }
         }
@@ -521,8 +521,8 @@ describe('Integration: Typed DOM', function () {
       }
       const memory = new WeakMap<Node, object>();
       const data = <K extends keyof TransDataMap>(data: TransDataMap[K]) =>
-        <T extends string, E extends Element, R extends any[]>(factory: (tag: T, ...args: R) => E, tag: T, ...args: R): E => {
-          const el = factory(tag, ...args);
+        <T extends string, E extends Element>(factory: (tag: T, attrs: Attrs, children: K) => E, tag: T, attrs: Attrs, children: K): E => {
+          const el = factory(tag, attrs, children);
           void memory.set(el, data);
           return el;
         };
@@ -538,12 +538,6 @@ describe('Integration: Typed DOM', function () {
         }), ...args));
 
       const el = trans.span('a', data({ data: 'A' }));
-      assert(el.children === 'A');
-      assert(el.element.textContent === 'A');
-      el.children = 'b';
-      assert(el.children === 'B');
-      assert(el.element.textContent === 'B');
-      el.children = 'a';
       assert(el.children === 'A');
       assert(el.element.textContent === 'A');
     });

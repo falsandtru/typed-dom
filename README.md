@@ -267,6 +267,7 @@ Create a custom API for translation.
 
 ```ts
 import { API, html, define } from 'typed-dom';
+import { Attrs } from 'typed-dom/internal';
 
 const i18n = i18next.createInstance({
   lng: 'en',
@@ -274,7 +275,6 @@ const i18n = i18next.createInstance({
     en: {
       translation: {
         "a": "{{data}}",
-        "b": "B",
       }
     }
   }
@@ -284,8 +284,8 @@ interface TransDataMap {
 }
 const memory = new WeakMap<Node, object>();
 const data = <K extends keyof TransDataMap>(data: TransDataMap[K]) =>
-  <T extends string, E extends Element, R extends any[]>(factory: (tag: T, ...args: R) => E, tag: T, ...args: R): E => {
-    const el = factory(tag, ...args);
+  <T extends string, E extends Element>(factory: (tag: T, attrs: Attrs, children: K) => E, tag: T, attrs: Attrs, children: K): E => {
+    const el = factory(tag, attrs, children);
     void memory.set(el, data);
     return el;
   };
@@ -303,9 +303,6 @@ const trans: API<HTMLElementTagNameMap> = API((tag: keyof HTMLElementTagNameMap,
 const el = trans.span('a', data({ data: 'A' }));
 assert(el.children === 'A');
 assert(el.element.textContent === 'A');
-el.children = 'b';
-assert(el.children === 'B');
-assert(el.element.textContent === 'B');
 ```
 
 ## Dependencies

@@ -20,16 +20,16 @@ type Relax<C extends ElChildren> = C extends ElChildren.Text ? string : C;
 
 interface BuilderFunction<T extends string, E extends Element, F extends BaseFactory<TagNameMap>> {
                         (tag: T,                            factory?: Factory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
-  <C extends ElChildren>(tag: T,               children: C, factory?: Factory<F, T, Relax<C>, E>       ): El<T, E, Relax<C>>;
+  <C extends ElChildren>(tag: T,               children: C, factory?: Factory<F, T, C, E>              ): El<T, E, Relax<C>>;
                         (tag: T, attrs: Attrs,              factory?: Factory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
-  <C extends ElChildren>(tag: T, attrs: Attrs, children: C, factory?: Factory<F, T, Relax<C>, E>       ): El<T, E, Relax<C>>;
+  <C extends ElChildren>(tag: T, attrs: Attrs, children: C, factory?: Factory<F, T, C, E>              ): El<T, E, Relax<C>>;
 }
 
 interface BuilderMethod<T extends string, E extends Element, F extends BaseFactory<TagNameMap>> {
                         (                           factory?: Factory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
-  <C extends ElChildren>(              children: C, factory?: Factory<F, T, Relax<C>, E>       ): El<T, E, Relax<C>>;
+  <C extends ElChildren>(              children: C, factory?: Factory<F, T, C, E>              ): El<T, E, Relax<C>>;
                         (attrs: Attrs,              factory?: Factory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
-  <C extends ElChildren>(attrs: Attrs, children: C, factory?: Factory<F, T, Relax<C>, E>       ): El<T, E, Relax<C>>;
+  <C extends ElChildren>(attrs: Attrs, children: C, factory?: Factory<F, T, C, E>              ): El<T, E, Relax<C>>;
 }
 
 type Factory<F extends BaseFactory<TagNameMap>, T extends string, C extends ElChildren, E extends Element> = (baseFactory: F, tag: T, attrs: Attrs, children: C) => E;
