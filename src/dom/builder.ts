@@ -78,7 +78,7 @@ function handle
     }
     
     function defaultFactory(factory: typeof baseFactory, tag: Extract<keyof M, string>, attrs: Attrs): Element {
-      return factory(tag, attrs) as any as Element;
+      return factory(tag, attrs) as unknown as Element;
     }
   }
 }

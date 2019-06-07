@@ -173,10 +173,10 @@ export class Elem<
     assert([ElChildrenType.Void, ElChildrenType.Collection].includes(this.type) ? Object.isFrozen(this.children_) : !Object.isFrozen(this.children_));
     switch (this.type) {
       case ElChildrenType.Text:
-        this.children_ = (this.children_ as any as Text).parentNode === this.container
+        this.children_ = (this.children_ as unknown as Text).parentNode === this.container
           ? this.children_
-          : [...this.container.childNodes].find(node => node instanceof Text) as any || (this.children_ as any as Text).cloneNode();
-        return (this.children_ as any as Text).textContent as C;
+          : [...this.container.childNodes].find(node => node instanceof Text) as any || (this.children_ as unknown as Text).cloneNode();
+        return (this.children_ as unknown as Text).textContent as C;
       default:
         return this.children_ as C;
     }
@@ -189,7 +189,7 @@ export class Elem<
         return;
       case ElChildrenType.Text: {
         if (children === this.children && !this.initialChildren.has(this.children_ as any)) return;
-        const targetChildren = this.children_ as any as Text;
+        const targetChildren = this.children_ as unknown as Text;
         const oldText = targetChildren.textContent!;
         const newText = children as ElChildren.Text;
         targetChildren.textContent = newText;
@@ -200,7 +200,7 @@ export class Elem<
       case ElChildrenType.Collection: {
         const sourceChildren = children as ElChildren.Collection;
         const targetChildren = [] as Mutable<ElChildren.Collection>;
-        this.children_ = targetChildren as any as C;
+        this.children_ = targetChildren as unknown as C;
         const mem = new WeakSet<El>();
         for (let i = 0; i < sourceChildren.length; ++i) {
           const newChild = sourceChildren[i];
