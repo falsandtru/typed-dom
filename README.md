@@ -284,7 +284,7 @@ interface TransDataMap {
 }
 const memory = new WeakMap<Node, object>();
 const data = <K extends keyof TransDataMap>(data: TransDataMap[K]) =>
-  <T extends string, E extends Element>(factory: (tag: T, attrs: Attrs, children: K) => E, tag: T, attrs: Attrs, children: K): E => {
+  <T extends string, E extends Element>(factory: (tag: T, attrs: Attrs, children: string) => E, tag: T, attrs: Attrs, children: K): E => {
     const el = factory(tag, attrs, children);
     void memory.set(el, data);
     return el;
