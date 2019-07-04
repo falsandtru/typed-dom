@@ -7,7 +7,7 @@ export interface CoroutineOptions extends Options {
 
 export abstract class Coroutine<T = unknown, R = unknown, S = unknown> extends Co<T, R, S> implements El {
   constructor(
-    gen: (this: Coroutine<T, R, S>) => Iterator<T | R> | AsyncIterator<T | R>,
+    gen: (this: Coroutine<T, R, S>) => Generator<R, T> | AsyncGenerator<R, T>,
     opts: CoroutineOptions = {},
   ) {
     super(gen, { ...opts, syncrun: false });
