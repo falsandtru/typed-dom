@@ -249,7 +249,7 @@ class Component extends Coroutine<void> implements El {
     style: HTML.style(`ul { width: 100px; }`),
     content: HTML.ul([
       HTML.li(`item`),
-    ] as const),
+    ]),
   });
   public readonly element = this.dom.element;
   public get children() {

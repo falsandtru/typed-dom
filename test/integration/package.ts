@@ -474,7 +474,10 @@ describe('Integration: Typed DOM', function () {
           super(function* (this: Component) {
             assert(this.element);
             assert(this.children);
-            this.children = [HTML.li(this.children[0].children.toUpperCase())];
+            this.children = this.children.map(el => {
+              el.children = el.children.toUpperCase();
+              return el;
+            });
             while (true) {
               yield;
             }
@@ -485,7 +488,7 @@ describe('Integration: Typed DOM', function () {
           style: HTML.style(`ul { width: 100px; }`),
           content: HTML.ul([
             HTML.li(`item`)
-          ] as const),
+          ]),
         });
         public readonly element = this.dom.element;
         public get children() {
