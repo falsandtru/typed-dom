@@ -1,5 +1,5 @@
 import { Shadow, HTML, SVG, API, El, proxy, frag, shadow, html, define } from '../../index';
-import { Coroutine } from '../../coroutine';
+import { Coroutine } from 'spica/coroutine';
 import { Sequence } from 'spica/sequence';
 import { Attrs } from '../../internal';
 
@@ -478,7 +478,7 @@ describe('Integration: Typed DOM', function () {
             while (true) {
               yield;
             }
-          }, { size: Infinity });
+          }, { trigger: 'element', size: Infinity });
           assert(this.children[0].children === 'ITEM');
         }
         private readonly dom = Shadow.section({

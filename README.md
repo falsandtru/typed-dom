@@ -235,7 +235,7 @@ This coroutine supports the actor model and the supervisor/worker pattern (using
 
 ```ts
 import { Shadow, HTML, El } from 'typed-dom';
-import { Coroutine } from 'typed-dom/coroutine';
+import { Coroutine } from 'spica/coroutine';
 
 class Component extends Coroutine<void> implements El {
   constructor() {
@@ -243,7 +243,7 @@ class Component extends Coroutine<void> implements El {
       while (true) {
         yield;
       }
-    }, { size: Infinity });
+    }, { trigger: 'element', size: Infinity });
   }
   private readonly dom = Shadow.section({
     style: HTML.style(`ul { width: 100px; }`),
