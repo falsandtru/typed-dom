@@ -1,4 +1,4 @@
-import { Shadow, HTML, SVG, API, proxy, shadow, html, svg, text, frag, define, listen, once, wait, bind, delegate, currentTargets } from '../../index';
+import { Shadow, HTML, SVG, API, proxy, shadow, html, svg, text, frag, define, listen, once, wait, bind, delegate, currentTargets, apply } from '../../index';
 
 describe('Interface: Package', function () {
   describe('Typed', function () {
@@ -72,6 +72,10 @@ describe('Interface: Package', function () {
 
     it('currentTargets', function () {
       assert(currentTargets instanceof WeakMap);
+    });
+
+    it('apply', function () {
+      assert(typeof apply === 'function');
     });
 
   });

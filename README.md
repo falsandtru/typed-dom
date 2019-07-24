@@ -108,6 +108,7 @@ SVG.a().element; // SVGAElement
 - delegate
 - bind
 - currentTargets
+- apply
 
 ## Usage
 
