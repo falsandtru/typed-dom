@@ -238,7 +238,7 @@ This coroutine supports the actor model and the supervisor/worker pattern (using
 import { Shadow, HTML, El } from 'typed-dom';
 import { Coroutine } from 'spica/coroutine';
 
-class Component extends Coroutine<void> implements El {
+class Component extends Coroutine implements El {
   constructor() {
     super(function* (this: Component) {
       while (true) {

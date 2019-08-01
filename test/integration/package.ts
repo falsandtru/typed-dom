@@ -469,7 +469,7 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('component coroutine', function () {
-      class Component extends Coroutine<void> implements El {
+      class Component extends Coroutine implements El {
         constructor() {
           super(function* (this: Component) {
             assert(this.element);
