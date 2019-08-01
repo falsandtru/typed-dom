@@ -10,7 +10,7 @@ Statically typed DOM component builder.
 
 ### HTML: { [tagname]: (attrs?, children?, factory?) => El; };
 
-Create HTML an element proxy.
+Create HTML element proxies.
 
 - attrs: Record<string, string | EventListener | null | undefined>
 - children: undefined | string | El[] | Record<string, El>
@@ -29,7 +29,7 @@ HTML.p(() => document.createElement('p'));
 
 ### SVG: { [tagname]: (attrs?, children?, factory?) => El; };
 
-Create SVG an element proxy.
+Create SVG element proxies.
 
 - attrs: Record<string, string | EventListener | null | undefined>
 - children: undefined | string | El[] | Record<string, El>
@@ -43,7 +43,7 @@ SVG.svg();
 
 ### Shadow: { [tagname]: (attrs?, children?, factory?) => El; };
 
-Create HTML an element proxy which makes open shadow DOM to append children.
+Create HTML element proxies which make open shadow DOM to append children.
 
 - attrs: Record<string, string | EventListener | null | undefined>
 - children: undefined | string | El[] | Record<string, El>
