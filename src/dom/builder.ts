@@ -16,7 +16,7 @@ export const Shadow: API<ShadowHostElementTagNameMap> = API(html, shadow);
 export const HTML: API<HTMLElementTagNameMap> = API(html);
 export const SVG: API<SVGElementTagNameMap_> = API(svg);
 
-type Relax<C extends ElChildren> = C extends ElChildren.Text ? string : C;
+type Relax<C extends ElChildren> = C extends ElChildren.Text ? ElChildren.Text : C;
 
 interface BuilderFunction<T extends string, E extends Element, F extends BaseFactory<TagNameMap>> {
                         (tag: T,                            factory?: Factory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
