@@ -149,12 +149,12 @@ export interface El<
 type ElChildren
   = ElChildren.Void
   | ElChildren.Text
-  | ElChildren.Collection
+  | ElChildren.Array
   | ElChildren.Record;
 namespace ElChildren {
   export type Void = undefined;
   export type Text = string;
-  export type Collection = readonly El[];
+  export interface Array extends ReadonlyArray<El> { }
   export type Record = { [field: string]: El; };
 }
 ```

@@ -5,24 +5,24 @@ import { Mutable } from 'spica/type';
 type ElChildrenType =
   | typeof ElChildrenType.Void
   | typeof ElChildrenType.Text
-  | typeof ElChildrenType.Collection
+  | typeof ElChildrenType.Array
   | typeof ElChildrenType.Record;
 namespace ElChildrenType {
   export const Void = 'void';
   export const Text = 'text';
-  export const Collection = 'collection';
+  export const Array = 'array';
   export const Record = 'record';
 }
 
 export type ElChildren =
   | ElChildren.Void
   | ElChildren.Text
-  | ElChildren.Collection
+  | ElChildren.Array
   | ElChildren.Record;
 export namespace ElChildren {
   export type Void = undefined;
   export type Text = string;
-  export interface Collection extends ReadonlyArray<El> { }
+  export interface Array extends ReadonlyArray<El> { }
   export type Record = { [field: string]: El; };
 }
 
@@ -66,7 +66,7 @@ export class Elem<
         this.type = ElChildrenType.Text
         break;
       case Array.isArray(children_):
-        this.type = ElChildrenType.Collection;
+        this.type = ElChildrenType.Array;
         break;
       case children_ && typeof children_ === 'object':
         this.type = ElChildrenType.Record;
@@ -86,10 +86,10 @@ export class Elem<
         this.children_ = this.container.appendChild(text('')) as any;
         this.children = children_ as C;
         return;
-      case ElChildrenType.Collection:
-        this.initialChildren = new WeakSet(children_ as ElChildren.Collection);
+      case ElChildrenType.Array:
+        this.initialChildren = new WeakSet(children_ as ElChildren.Array);
         void define(this.container, []);
-        this.children_ = [] as ElChildren.Collection as C;
+        this.children_ = [] as ElChildren.Array as C;
         this.children = children_;
         return;
       case ElChildrenType.Record:
@@ -170,7 +170,7 @@ export class Elem<
   }
   private readonly initialChildren: WeakSet<El>;
   public get children(): C {
-    assert([ElChildrenType.Void, ElChildrenType.Collection].includes(this.type) ? Object.isFrozen(this.children_) : !Object.isFrozen(this.children_));
+    assert([ElChildrenType.Void, ElChildrenType.Array].includes(this.type) ? Object.isFrozen(this.children_) : !Object.isFrozen(this.children_));
     switch (this.type) {
       case ElChildrenType.Text:
         this.children_ = (this.children_ as unknown as Text).parentNode === this.container
@@ -197,9 +197,9 @@ export class Elem<
         void this.element.dispatchEvent(new Event('change', { bubbles: false, cancelable: true }));
         return;
       }
-      case ElChildrenType.Collection: {
-        const sourceChildren = children as ElChildren.Collection;
-        const targetChildren = [] as Mutable<ElChildren.Collection>;
+      case ElChildrenType.Array: {
+        const sourceChildren = children as ElChildren.Array;
+        const targetChildren = [] as Mutable<ElChildren.Array>;
         this.children_ = targetChildren as unknown as C;
         const mem = new WeakSet<El>();
         for (let i = 0; i < sourceChildren.length; ++i) {
