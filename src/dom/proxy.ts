@@ -22,7 +22,7 @@ export type ElChildren =
 export namespace ElChildren {
   export type Void = undefined;
   export type Text = string;
-  export interface Array extends ReadonlyArray<El> { }
+  export type Array = readonly El[];
   export type Record = { [field: string]: El; };
 }
 
