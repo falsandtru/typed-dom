@@ -150,11 +150,11 @@ export class Elem<
   private readonly type: ElChildrenType;
   private scope(child: El<string, Element, ElChildren>): void {
     if (!(child.element instanceof HTMLStyleElement)) return;
-    const syntax = /^(\s*)\$scope(?!\w)/gm;
+    const syntax = /(^|[,}])(\s*)\$scope(?![\w-])(?=[^;{}]*{)/g;
     const style = child.element;
     const query = this.query;
     if (style.innerHTML.search(syntax) === -1) return;
-    style.innerHTML = style.innerHTML.replace(syntax, (_, indent) => `${indent}${query}`);
+    style.innerHTML = style.innerHTML.replace(syntax, (_, frag, space) => `${frag}${space}${query}`);
     switch (query[0]) {
       case '.': {
         const id = query.slice(1);
