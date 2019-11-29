@@ -58,9 +58,9 @@
     "mocha": "^6.2.2",
     "npm-check-updates": "3.1.13",
     "power-assert": "^1.6.1",
-    "spica": "0.0.278",
+    "spica": "0.0.284",
     "tsify": "^4.0.1",
-    "typescript": "3.8.0-dev.20191031",
+    "typescript": "3.8.0-dev.20191126",
     "uglify-es": "^3.3.9",
     "vinyl-buffer": "^1.0.1",
     "vinyl-source-stream": "^2.0.0"
