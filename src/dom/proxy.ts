@@ -1,6 +1,9 @@
 import { uid } from './identity';
 import { text, define } from '../util/dom';
+import 'spica/global';
 import { Mutable } from 'spica/type';
+
+const { Array, Set, WeakMap, WeakSet, Event } = global;
 
 type ElChildrenType =
   | typeof ElChildrenType.Void

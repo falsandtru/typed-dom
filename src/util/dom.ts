@@ -1,3 +1,7 @@
+import 'spica/global';
+
+const { document } = global;
+
 export type TagNameMap = object;
 export type Attrs = Record<string, string | EventListener | null | undefined>;
 type Children = Iterable<Node> | string;
