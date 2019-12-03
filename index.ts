@@ -1,3 +1,5 @@
+import 'spica/global';
+
 export { Shadow, HTML, SVG, API } from './src/dom/builder';
 export { El, proxy } from './src/dom/proxy';
 export { frag, shadow, html, svg, text, define } from './src/util/dom';

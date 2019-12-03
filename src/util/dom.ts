@@ -1,6 +1,4 @@
-import 'spica/global';
-
-const { document } = global;
+const { Object: Obj, document } = global;
 
 export type TagNameMap = object;
 export type Attrs = Record<string, string | EventListener | null | undefined>;
@@ -103,7 +101,7 @@ export function define<T extends Element>(el: T, attrs?: Attrs | Children, child
 export function define<T extends Element>(el: T, attrs: Attrs | Children = {}, children?: Children): T {
   if (isChildren(attrs)) return define(el, undefined, attrs);
   if (typeof children === 'string') return define(el, attrs, [text(children)]);
-  void Object.entries(attrs)
+  void Obj.entries(attrs)
     .forEach(([name, value]) => {
       switch (typeof value) {
         case 'string':

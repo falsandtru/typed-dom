@@ -1,9 +1,8 @@
 import { uid } from './identity';
 import { text, define } from '../util/dom';
-import 'spica/global';
 import { Mutable } from 'spica/type';
 
-const { Array, Set, WeakMap, WeakSet, Event } = global;
+const { Array, Object: Obj, Set, WeakMap, WeakSet, Event } = global;
 
 type ElChildrenType =
   | typeof ElChildrenType.Void
@@ -96,7 +95,7 @@ export class Elem<
         this.children = children_;
         return;
       case ElChildrenType.Record:
-        this.initialChildren = new WeakSet(Object.values(children_ as ElChildren.Record));
+        this.initialChildren = new WeakSet(Obj.values(children_ as ElChildren.Record));
         void define(this.container, []);
         this.children_ = observe(this.container, { ...children_ as ElChildren.Record }) as C;
         this.children = children_;
@@ -106,9 +105,9 @@ export class Elem<
     }
 
     function observe<C extends ElChildren.Record>(node: Node, children: C): C {
-      return Object.defineProperties(
+      return Obj.defineProperties(
         children,
-        Object.entries(children)
+        Obj.entries(children)
           .reduce<PropertyDescriptorMap>((descs, [name, child]) => {
             void throwErrorIfNotUsable(child);
             void node.appendChild(child.element);
@@ -173,7 +172,7 @@ export class Elem<
   }
   private readonly initialChildren: WeakSet<El>;
   public get children(): C {
-    assert([ElChildrenType.Void, ElChildrenType.Array].includes(this.type) ? Object.isFrozen(this.children_) : !Object.isFrozen(this.children_));
+    assert([ElChildrenType.Void, ElChildrenType.Array].includes(this.type) ? Obj.isFrozen(this.children_) : !Obj.isFrozen(this.children_));
     switch (this.type) {
       case ElChildrenType.Text:
         this.children_ = (this.children_ as unknown as Text).parentNode === this.container
@@ -224,7 +223,7 @@ export class Elem<
             void targetChildren.push(newChild);
           }
         }
-        void Object.freeze(targetChildren);
+        void Obj.freeze(targetChildren);
         for (let i = this.container.children.length; i >= sourceChildren.length; --i) {
           if (!memory.has(this.container.children[i])) continue;
           void removedChildren.add(proxy(this.container.removeChild(this.container.children[i])));
@@ -236,7 +235,7 @@ export class Elem<
       case ElChildrenType.Record: {
         const sourceChildren = children as ElChildren.Record;
         const targetChildren = this.children_ as ElChildren.Record;
-        assert.deepStrictEqual(Object.keys(sourceChildren), Object.keys(targetChildren));
+        assert.deepStrictEqual(Obj.keys(sourceChildren), Obj.keys(targetChildren));
         const mem = new WeakSet<El>();
         for (const name in targetChildren) {
           const oldChild = targetChildren[name];

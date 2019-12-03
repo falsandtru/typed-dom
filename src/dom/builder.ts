@@ -2,6 +2,8 @@ import { Elem, El, ElChildren } from './proxy';
 import { Factory as BaseFactory, TagNameMap, Attrs, shadow, html, svg, define } from '../util/dom';
 import { ExtractProp } from 'spica/type';
 
+const { Object: Obj } = global;
+
 export type API<M extends TagNameMap, F extends BaseFactory<M> = BaseFactory<M>> =
   BuilderFunction<Extract<keyof ExtractProp<M, Element>, string>, Element, F> &
   { readonly [P in Extract<keyof ExtractProp<M, Element>, string>]: BuilderMethod<P, Extract<M[P], Element>, F>; };
@@ -61,14 +63,14 @@ function handle
 
     function isChildren(children: ElChildren | Attrs): children is ElChildren {
       return typeof children !== 'object'
-          || Object.values(children).slice(-1).every(val => typeof val === 'object');
+          || Obj.values(children).slice(-1).every(val => typeof val === 'object');
     }
 
     function elem(factory: Factory<F, Extract<keyof M, string>, ElChildren, Element>, attrs: Attrs, children: ElChildren): Element {
       const el = factory(baseFactory, tag, attrs, children);
       if (tag !== el.tagName.toLowerCase()) throw new Error(`TypedDOM: Expected tag name is "${tag}" but actually "${el.tagName.toLowerCase()}".`);
       if (factory !== defaultFactory) {
-        for (const [k, v] of Object.entries(attrs)) {
+        for (const [k, v] of Obj.entries(attrs)) {
           if (typeof v !== 'function') continue;
           void el.removeEventListener(k, v);
         }
