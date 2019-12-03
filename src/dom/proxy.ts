@@ -152,7 +152,7 @@ export class Elem<
   }
   private readonly type: ElChildrenType;
   private scope(child: El<string, Element, ElChildren>): void {
-    if (!(child.element instanceof HTMLStyleElement)) return;
+    if (child.element.nodeName !== 'STYLE') return;
     const syntax = /(^|[,}])(\s*)\$scope(?![\w-])(?=[^;{}]*{)/g;
     const style = child.element;
     const query = this.query;
@@ -178,7 +178,7 @@ export class Elem<
       case ElChildrenType.Text:
         this.children_ = (this.children_ as unknown as Text).parentNode === this.container
           ? this.children_
-          : [...this.container.childNodes].find(node => node instanceof Text) as any || (this.children_ as unknown as Text).cloneNode();
+          : [...this.container.childNodes].find(node => node.nodeType === 3) as any || (this.children_ as unknown as Text).cloneNode();
         return (this.children_ as unknown as Text).textContent as C;
       default:
         return this.children_ as C;

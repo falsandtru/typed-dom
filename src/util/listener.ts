@@ -49,11 +49,9 @@ export function delegate<T extends keyof HTMLElementEventMap>(target: Document |
 export function delegate<T extends keyof SVGElementEventMap>(target: Document | SVGElement, selector: string, type: T, listener: (ev: SVGElementEventMap[T]) => unknown, option?: AddEventListenerOptions): () => undefined;
 export function delegate<T extends keyof ElementEventMap>(target: Document | Element, selector: string, type: T, listener: (ev: ElementEventMap[T]) => unknown, option?: AddEventListenerOptions): () => undefined;
 export function delegate<T extends keyof ElementEventMap>(target: Document | Element, selector: string, type: T, listener: (ev: ElementEventMap[T]) => unknown, option: AddEventListenerOptions = {}): () => undefined {
-  return bind(target instanceof Document ? target.documentElement! : target, type, ev => {
+  return bind(target.nodeType === 9 ? (target as Document).documentElement! : target as Element, type, ev => {
     const cx = (((ev.target as Element).shadowRoot && ev.composedPath()[0] || ev.target) as Element).closest(selector);
-    if (cx instanceof Element) {
-      void once(cx, type, listener, option);
-    }
+    cx && void once(cx, type, listener, option);
     return ev.returnValue;
   }, { ...option, capture: true });
 }

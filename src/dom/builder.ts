@@ -54,9 +54,9 @@ function handle
       if (typeof children === 'function') return build(attrs, undefined, children);
       if (attrs !== undefined && isChildren(attrs)) return build(undefined, attrs, factory);
       const node = formatter(elem(factory || defaultFactory, attrs || {}, children));
-      return node instanceof Element
-        ? new Elem(node, children)
-        : new Elem(node.host, children, node);
+      return node.nodeType === 1
+        ? new Elem(node as Element, children)
+        : new Elem((node as ShadowRoot).host, children, node);
     };
 
     function isChildren(children: ElChildren | Attrs): children is ElChildren {
