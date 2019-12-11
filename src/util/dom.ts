@@ -1,4 +1,4 @@
-const { Object: Obj, document } = global;
+const { document } = global;
 
 export type TagNameMap = object;
 export type Attrs = Record<string, string | EventListener | null | undefined>;
@@ -101,27 +101,31 @@ export function define<T extends Element>(el: T, attrs?: Attrs | Children, child
 export function define<T extends Element>(el: T, attrs: Attrs | Children = {}, children?: Children): T {
   if (isChildren(attrs)) return define(el, undefined, attrs);
   if (typeof children === 'string') return define(el, attrs, [text(children)]);
-  void Obj.entries(attrs)
-    .forEach(([name, value]) => {
-      switch (typeof value) {
-        case 'string':
-          return void el.setAttribute(name, value);
-        case 'function':
-          assert(name.startsWith('on'));
-          return void el.addEventListener(name.slice(2), value, {
-            passive: [
-              'wheel',
-              'mousewheel',
-              'touchstart',
-              'touchmove',
-            ].includes(name.slice(2)),
-          });
-        case 'object':
-          return void el.removeAttribute(name);
-        default:
-          return;
-      }
-    });
+  for (const name in attrs) {
+    if (!attrs.hasOwnProperty(name)) continue;
+    const value = attrs[name];
+    switch (typeof value) {
+      case 'string':
+        void el.setAttribute(name, value);
+        break;
+      case 'function':
+        assert(name.startsWith('on'));
+        void el.addEventListener(name.slice(2), value, {
+          passive: [
+            'wheel',
+            'mousewheel',
+            'touchstart',
+            'touchmove',
+          ].includes(name.slice(2)),
+        });
+        break;
+      case 'object':
+        void el.removeAttribute(name);
+        break;
+      default:
+        break;
+    }
+  }
   if (children) {
     el.innerHTML = '';
     while (el.firstChild) {

@@ -105,30 +105,30 @@ export class Elem<
     }
 
     function observe<C extends ElChildren.Record>(node: Node, children: C): C {
-      return Obj.defineProperties(
-        children,
-        Obj.entries(children)
-          .reduce<PropertyDescriptorMap>((descs, [name, child]) => {
-            void throwErrorIfNotUsable(child);
-            void node.appendChild(child.element);
-            descs[name] = {
-              configurable: true,
-              enumerable: true,
-              get: (): El<string, Element, ElChildren> => {
-                return child;
-              },
-              set: (newChild: El<string, Element, ElChildren>) => {
-                const oldChild = child;
-                if (newChild === oldChild) return;
-                if (newChild.element.parentElement !== node) {
-                  void throwErrorIfNotUsable(newChild);
-                }
-                void node.replaceChild(newChild.element, oldChild.element);
-                child = newChild;
-              }
-            };
-            return descs;
-          }, {}));
+      const descs: PropertyDescriptorMap = {};
+      for (const name in children) {
+        if (!children.hasOwnProperty(name)) continue;
+        let child: El<string, Element, ElChildren> = children[name];
+        void throwErrorIfNotUsable(child);
+        void node.appendChild(child.element);
+        descs[name] = {
+          configurable: true,
+          enumerable: true,
+          get: (): El<string, Element, ElChildren> => {
+            return child;
+          },
+          set: (newChild: El<string, Element, ElChildren>) => {
+            const oldChild = child;
+            if (newChild === oldChild) return;
+            if (newChild.element.parentElement !== node) {
+              void throwErrorIfNotUsable(newChild);
+            }
+            void node.replaceChild(newChild.element, oldChild.element);
+            child = newChild;
+          },
+        };
+      }
+      return Obj.defineProperties(children, descs);
     }
   }
   public readonly [tag]: T;
