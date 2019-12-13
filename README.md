@@ -10,7 +10,7 @@ Statically typed DOM component builder.
 
 ### HTML: { [tagname]: (attrs?, children?, factory?) => El; };
 
-Create HTML element proxies.
+Create an HTML element proxy.
 
 - attrs: Record<string, string | EventListener | null | undefined>
 - children: undefined | string | El[] | Record<string, El>
@@ -29,7 +29,7 @@ HTML.p(() => document.createElement('p'));
 
 ### SVG: { [tagname]: (attrs?, children?, factory?) => El; };
 
-Create SVG element proxies.
+Create an SVG element proxy.
 
 - attrs: Record<string, string | EventListener | null | undefined>
 - children: undefined | string | El[] | Record<string, El>
@@ -43,7 +43,7 @@ SVG.svg();
 
 ### Shadow: { [tagname]: (attrs?, children?, factory?) => El; };
 
-Create HTML element proxies which make open shadow DOM to append children.
+Create an HTML element proxy which make open shadow DOM to append children.
 
 - attrs: Record<string, string | EventListener | null | undefined>
 - children: undefined | string | El[] | Record<string, El>
@@ -59,7 +59,7 @@ Shadow.section();
 
 #### Create APIs
 
-All the exposed APIs to create proxies can be redefined as follows:
+All exposed APIs to create a proxy can be redefined as follows:
 
 ```ts
 import { API, shadow, html, svg } from 'typed-dom';
