@@ -1,4 +1,5 @@
 import { noop } from './noop';
+import { AtomicPromise } from 'spica/promise';
 
 export const currentTargets = new WeakMap<Event, EventTarget>();
 
@@ -30,16 +31,16 @@ export function once<T extends keyof WindowEventMap | keyof DocumentEventMap | k
     : bind(target as Element, a as keyof ElementEventMap, b, { ...(typeof c === 'boolean' ? { capture: c } : c), once: true });
 }
 
-export function wait<T extends keyof WindowEventMap>(target: Window, type: T, option?: boolean | AddEventListenerOptions): Promise<WindowEventMap[T]>;
-export function wait<T extends keyof DocumentEventMap>(target: Document, type: T, option?: boolean | AddEventListenerOptions): Promise<DocumentEventMap[T]>;
-export function wait<T extends keyof HTMLElementEventMap>(target: HTMLElement, type: T, option?: boolean | AddEventListenerOptions): Promise<HTMLElementEventMap[T]>;
-export function wait<T extends keyof SVGElementEventMap>(target: SVGElement, type: T, option?: boolean | AddEventListenerOptions): Promise<SVGElementEventMap[T]>;
-export function wait<T extends keyof ElementEventMap>(target: Element, type: T, option?: boolean | AddEventListenerOptions): Promise<ElementEventMap[T]>;
-export function wait<T extends keyof HTMLElementEventMap>(target: Document | HTMLElement, selector: string, type: T, option?: AddEventListenerOptions): Promise<HTMLElementEventMap[T]>;
-export function wait<T extends keyof SVGElementEventMap>(target: Document | SVGElement, selector: string, type: T, option?: AddEventListenerOptions): Promise<SVGElementEventMap[T]>;
-export function wait<T extends keyof ElementEventMap>(target: Document | Element, selector: string, type: T, option?: AddEventListenerOptions): Promise<ElementEventMap[T]>;
-export function wait<T extends keyof WindowEventMap | keyof DocumentEventMap | keyof ElementEventMap>(target: Window | Document | Element, a: T | string, b: T | boolean | AddEventListenerOptions = false, c: AddEventListenerOptions = {}): Promise<Event> {
-  return new Promise(resolve =>
+export function wait<T extends keyof WindowEventMap>(target: Window, type: T, option?: boolean | AddEventListenerOptions): AtomicPromise<WindowEventMap[T]>;
+export function wait<T extends keyof DocumentEventMap>(target: Document, type: T, option?: boolean | AddEventListenerOptions): AtomicPromise<DocumentEventMap[T]>;
+export function wait<T extends keyof HTMLElementEventMap>(target: HTMLElement, type: T, option?: boolean | AddEventListenerOptions): AtomicPromise<HTMLElementEventMap[T]>;
+export function wait<T extends keyof SVGElementEventMap>(target: SVGElement, type: T, option?: boolean | AddEventListenerOptions): AtomicPromise<SVGElementEventMap[T]>;
+export function wait<T extends keyof ElementEventMap>(target: Element, type: T, option?: boolean | AddEventListenerOptions): AtomicPromise<ElementEventMap[T]>;
+export function wait<T extends keyof HTMLElementEventMap>(target: Document | HTMLElement, selector: string, type: T, option?: AddEventListenerOptions): AtomicPromise<HTMLElementEventMap[T]>;
+export function wait<T extends keyof SVGElementEventMap>(target: Document | SVGElement, selector: string, type: T, option?: AddEventListenerOptions): AtomicPromise<SVGElementEventMap[T]>;
+export function wait<T extends keyof ElementEventMap>(target: Document | Element, selector: string, type: T, option?: AddEventListenerOptions): AtomicPromise<ElementEventMap[T]>;
+export function wait<T extends keyof WindowEventMap | keyof DocumentEventMap | keyof ElementEventMap>(target: Window | Document | Element, a: T | string, b: T | boolean | AddEventListenerOptions = false, c: AddEventListenerOptions = {}): AtomicPromise<Event> {
+  return new AtomicPromise(resolve =>
     typeof b === 'string'
       ? void once(target as Document, a, b as keyof ElementEventMap, resolve, c)
       : void once(target as Element, a as keyof ElementEventMap, resolve, b as boolean));
