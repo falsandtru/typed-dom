@@ -24,9 +24,10 @@ export function frag(children: Children = []): DocumentFragment {
   return frag;
 }
 
-export function shadow(el: HTMLElement, opts?: ShadowRootInit): ShadowRoot;
-export function shadow(el: HTMLElement, children?: Children, opts?: ShadowRootInit): ShadowRoot;
-export function shadow(el: HTMLElement, children?: Children | ShadowRootInit, opts?: ShadowRootInit): ShadowRoot {
+export function shadow(el: keyof ShadowHostElementTagNameMap | HTMLElement, opts?: ShadowRootInit): ShadowRoot;
+export function shadow(el: keyof ShadowHostElementTagNameMap | HTMLElement, children?: Children, opts?: ShadowRootInit): ShadowRoot;
+export function shadow(el: keyof ShadowHostElementTagNameMap | HTMLElement, children?: Children | ShadowRootInit, opts?: ShadowRootInit): ShadowRoot {
+  if (typeof el === 'string') return shadow(html(el), children as Children, opts);
   if (children && !isChildren(children)) return shadow(el, undefined, children);
   if (el.shadowRoot || shadows.has(el)) {
     return define(

@@ -4,19 +4,19 @@ import { HTML, SVG } from '../dom/builder';
 describe('Unit: util/dom', () => {
   describe('shadow', () => {
     it('', () => {
-      assert(shadow(html('section')) instanceof ShadowRoot);
-      assert(shadow(html('section')).mode === 'open');
-      assert(shadow(html('section'), { mode: 'closed' }).mode === 'closed');
-      assert(shadow(html('section')).childNodes.length === 0);
-      assert(shadow(html('section'), 'a').textContent === 'a');
-      assert(shadow(html('section'), [html('p')]).innerHTML === '<p></p>');
+      assert(shadow('section') instanceof ShadowRoot);
+      assert(shadow('section').mode === 'open');
+      assert(shadow('section', { mode: 'closed' }).mode === 'closed');
+      assert(shadow('section').childNodes.length === 0);
+      assert(shadow('section', 'a').textContent === 'a');
+      assert(shadow('section', [html('p')]).innerHTML === '<p></p>');
       assert(shadow(html('section', [html('p')])).innerHTML === '<p></p>');
       assert(shadow(html('section', [html('p')]), { mode: 'closed' }).innerHTML === '<p></p>');
-      assert(shadow(shadow(html('section')).host as HTMLElement));
-      assert(shadow(shadow(html('section'), { mode: 'open' }).host as HTMLElement));
-      assert(shadow(shadow(html('section'), { mode: 'closed' }).host as HTMLElement));
-      assert.throws(() => shadow(shadow(html('section'), { mode: 'open' }).host as HTMLElement, { mode: 'closed' }));
-      assert.throws(() => shadow(shadow(html('section'), { mode: 'closed' }).host as HTMLElement, { mode: 'open' }));
+      assert(shadow(shadow('section').host as HTMLElement));
+      assert(shadow(shadow('section', { mode: 'open' }).host as HTMLElement));
+      assert(shadow(shadow('section', { mode: 'closed' }).host as HTMLElement));
+      assert.throws(() => shadow(shadow('section', { mode: 'open' }).host as HTMLElement, { mode: 'closed' }));
+      assert.throws(() => shadow(shadow('section', { mode: 'closed' }).host as HTMLElement, { mode: 'open' }));
     });
 
   });

@@ -32,6 +32,8 @@ type ShadowRootElementTagNameMap_ = {
 declare global {
   interface ShadowHostElementTagNameMap extends ShadowRootElementTagNameMap_ {
   }
+  interface HTMLElementTagNameMap extends ShadowHostElementTagNameMap {
+  }
   interface SVGElementTagNameMap_ extends SVGElementTagNameMap {
   }
   interface ElementEventMap {
