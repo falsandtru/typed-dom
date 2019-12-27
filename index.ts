@@ -34,8 +34,6 @@ declare global {
   }
   interface HTMLElementTagNameMap extends ShadowHostElementTagNameMap {
   }
-  interface SVGElementTagNameMap_ extends SVGElementTagNameMap {
-  }
   interface ElementEventMap {
     'connect': Event;
     'disconnect': Event;

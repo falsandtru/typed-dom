@@ -66,12 +66,12 @@ import { API, shadow, html, svg } from 'typed-dom';
 
 const Shadow: API<ShadowHostElementTagNameMap> = API(html, shadow);
 const HTML: API<HTMLElementTagNameMap> = API(html);
-const SVG: API<SVGElementTagNameMap_> = API(svg);
+const SVG: API<SVGElementTagNameMap> = API(svg);
 ```
 
 #### Extend APIs
 
-Custom elements will be defined by extending `ShadowHostElementTagNameMap`, `HTMLElementTagNameMap`, or `SVGElementTagNameMap_` interface.
+Custom elements will be defined by extending `ShadowHostElementTagNameMap`, `HTMLElementTagNameMap`, or `SVGElementTagNameMap` interface.
 
 ```ts
 import { Shadow, HTML, SVG } from 'typed-dom';
@@ -83,7 +83,7 @@ declare global {
   interface HTMLElementTagNameMap {
     'custom': HTMLElement;
   }
-  interface SVGElementTagNameMap_ {
+  interface SVGElementTagNameMap {
     'a': SVGAElement;
   }
 }

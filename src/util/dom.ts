@@ -55,9 +55,9 @@ export function html<T extends keyof HTMLElementTagNameMap>(tag: T, attrs: Attrs
   return element(NS.HTML, tag, attrs, children);
 }
 
-export function svg<T extends keyof SVGElementTagNameMap_>(tag: T, children?: Children): SVGElementTagNameMap_[T];
-export function svg<T extends keyof SVGElementTagNameMap_>(tag: T, attrs?: Attrs, children?: Children): SVGElementTagNameMap_[T];
-export function svg<T extends keyof SVGElementTagNameMap_>(tag: T, attrs: Attrs | Children = {}, children: Children = []): SVGElementTagNameMap_[T] {
+export function svg<T extends keyof SVGElementTagNameMap>(tag: T, children?: Children): SVGElementTagNameMap[T];
+export function svg<T extends keyof SVGElementTagNameMap>(tag: T, attrs?: Attrs, children?: Children): SVGElementTagNameMap[T];
+export function svg<T extends keyof SVGElementTagNameMap>(tag: T, attrs: Attrs | Children = {}, children: Children = []): SVGElementTagNameMap[T] {
   return element(NS.SVG, tag, attrs, children);
 }
 
@@ -73,7 +73,7 @@ const enum NS {
 }
 
 function element<T extends keyof HTMLElementTagNameMap>(ns: NS.HTML, tag: T, attrs?: Attrs | Children, children?: Children): HTMLElementTagNameMap[T];
-function element<T extends keyof SVGElementTagNameMap_>(ns: NS.SVG, tag: T, attrs?: Attrs | Children, children?: Children): SVGElementTagNameMap_[T];
+function element<T extends keyof SVGElementTagNameMap>(ns: NS.SVG, tag: T, attrs?: Attrs | Children, children?: Children): SVGElementTagNameMap[T];
 function element(ns: NS, tag: string, attrs: Attrs | Children = {}, children: Children = []): Element {
   const key = `${ns}:${tag}`;
   const el = tag.includes('-')

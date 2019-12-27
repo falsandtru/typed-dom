@@ -16,7 +16,7 @@ export function API
 
 export const Shadow: API<ShadowHostElementTagNameMap> = API(html, shadow);
 export const HTML: API<HTMLElementTagNameMap> = API(html);
-export const SVG: API<SVGElementTagNameMap_> = API(svg);
+export const SVG: API<SVGElementTagNameMap> = API(svg);
 
 type Relax<C extends ElChildren> = C extends ElChildren.Text ? ElChildren.Text : C;
 
