@@ -103,33 +103,6 @@ export class Elem<
       default:
         throw new Error(`TypedDOM: Unreachable code.`);
     }
-
-    function observe<C extends ElChildren.Record>(node: Node, children: C): C {
-      const descs: PropertyDescriptorMap = {};
-      for (const name in children) {
-        if (!children.hasOwnProperty(name)) continue;
-        let child: El<string, Element, ElChildren> = children[name];
-        void throwErrorIfNotUsable(child);
-        void node.appendChild(child.element);
-        descs[name] = {
-          configurable: true,
-          enumerable: true,
-          get: (): El<string, Element, ElChildren> => {
-            return child;
-          },
-          set: (newChild: El<string, Element, ElChildren>) => {
-            const oldChild = child;
-            if (newChild === oldChild) return;
-            if (newChild.element.parentElement !== node) {
-              void throwErrorIfNotUsable(newChild);
-            }
-            void node.replaceChild(newChild.element, oldChild.element);
-            child = newChild;
-          },
-        };
-      }
-      return Obj.defineProperties(children, descs);
-    }
   }
   public readonly [tag]: T;
   private readonly type: ElChildrenType;
@@ -266,6 +239,33 @@ export class Elem<
     removedChildren.size + addedChildren.size > 0 &&
     void this.element.dispatchEvent(new Event('change', { bubbles: false, cancelable: true }));
   }
+}
+
+function observe<C extends ElChildren.Record>(node: Node, children: C): C {
+  const descs: PropertyDescriptorMap = {};
+  for (const name in children) {
+    if (!children.hasOwnProperty(name)) continue;
+    let child: El<string, Element, ElChildren> = children[name];
+    void throwErrorIfNotUsable(child);
+    void node.appendChild(child.element);
+    descs[name] = {
+      configurable: true,
+      enumerable: true,
+      get: (): El<string, Element, ElChildren> => {
+        return child;
+      },
+      set: (newChild: El<string, Element, ElChildren>) => {
+        const oldChild = child;
+        if (newChild === oldChild) return;
+        if (newChild.element.parentElement !== node) {
+          void throwErrorIfNotUsable(newChild);
+        }
+        void node.replaceChild(newChild.element, oldChild.element);
+        child = newChild;
+      },
+    };
+  }
+  return Obj.defineProperties(children, descs);
 }
 
 function throwErrorIfNotUsable({ element }: El<string, Element, ElChildren>): void {
