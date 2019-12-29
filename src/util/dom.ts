@@ -29,24 +29,21 @@ export function shadow(el: keyof ShadowHostElementTagNameMap | HTMLElement, chil
 export function shadow(el: keyof ShadowHostElementTagNameMap | HTMLElement, children?: Children | ShadowRootInit, opts?: ShadowRootInit): ShadowRoot {
   if (typeof el === 'string') return shadow(html(el), children as Children, opts);
   if (children && !isChildren(children)) return shadow(el, undefined, children);
-  if (el.shadowRoot || shadows.has(el)) {
-    return define(
-      opts
-        ? opts.mode === 'open'
-          ? el.shadowRoot || el.attachShadow(opts)
-          : shadows.get(el) || shadows.set(el, el.attachShadow(opts)).get(el)!
-        : el.shadowRoot || shadows.get(el)!,
-      children);
-  }
-  else {
-    return define(
-      !opts || opts.mode === 'open'
-        ? el.attachShadow({ mode: 'open' })
-        : shadows.set(el, el.attachShadow(opts)).get(el)!,
-      children === undefined
-        ? el.childNodes
-        : children);
-  }
+  return el.shadowRoot || shadows.has(el)
+    ? define(
+        opts
+          ? opts.mode === 'open'
+            ? el.shadowRoot || el.attachShadow(opts)
+            : shadows.get(el) || shadows.set(el, el.attachShadow(opts)).get(el)!
+          : el.shadowRoot || shadows.get(el)!,
+        children)
+    : define(
+        !opts || opts.mode === 'open'
+          ? el.attachShadow({ mode: 'open' })
+          : shadows.set(el, el.attachShadow(opts)).get(el)!,
+        children === undefined
+          ? el.childNodes
+          : children);
 }
 
 export function html<T extends keyof HTMLElementTagNameMap>(tag: T, children?: Children): HTMLElementTagNameMap[T];
