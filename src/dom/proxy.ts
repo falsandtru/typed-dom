@@ -132,6 +132,7 @@ export class Elem<
     }
   }
   public readonly [tag]: T;
+  private readonly type: ElChildrenType;
   private id_: string = this.element.id.trim();
   private get id(): string {
     if (this.id_) return this.id_;
@@ -149,7 +150,6 @@ export class Elem<
         return `.${this.id}`;
     }
   }
-  private readonly type: ElChildrenType;
   private scope(child: El<string, Element, ElChildren>): void {
     if (child.element.nodeName !== 'STYLE') return;
     const syntax = /(^|[,}])(\s*)\$scope(?![\w-])(?=[^;{}]*{)/g;
