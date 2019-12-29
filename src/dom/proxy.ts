@@ -38,7 +38,7 @@ export function proxy(el: Element): El<string, Element, ElChildren> {
   return memory.get(el)!;
 }
 
-const tag = Symbol();
+const tag = Symbol.for('TagName');
 
 export interface El<
   T extends string = string,
