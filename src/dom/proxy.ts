@@ -28,14 +28,14 @@ export namespace ElChildren {
   export type Record = { [field: string]: El; };
 }
 
-const memory = new WeakMap<Element, El<string, Element, ElChildren>>();
+const proxies = new WeakMap<Element, El<string, Element, ElChildren>>();
 
 export function proxy<E extends Element>(el: E): El<string, E, ElChildren>;
 export function proxy<C extends ElChildren>(el: Element): El<string, Element, C>;
 export function proxy<E extends Element, C extends ElChildren>(el: E): El<string, E, C>;
 export function proxy(el: Element): El<string, Element, ElChildren> {
-  if (!memory.has(el)) throw new Error(`TypedDOM: This element has no proxy.`);
-  return memory.get(el)!;
+  if (!proxies.has(el)) throw new Error(`TypedDOM: This element has no proxy.`);
+  return proxies.get(el)!;
 }
 
 const tag = Symbol.for('TagName');
@@ -77,7 +77,7 @@ export class Elem<
         throw new Error(`TypedDOM: Invalid type children.`);
     }
     void throwErrorIfNotUsable(this);
-    void memory.set(this.element, this);
+    void proxies.set(this.element, this);
     switch (this.type) {
       case ElChildrenType.Void:
         this.initialChildren = new WeakSet();
@@ -176,11 +176,11 @@ export class Elem<
         const sourceChildren = children as ElChildren.Array;
         const targetChildren = [] as Mutable<ElChildren.Array>;
         this.children_ = targetChildren as unknown as C;
-        const mem = new WeakSet<El>();
+        const log = new WeakSet<El>();
         for (let i = 0; i < sourceChildren.length; ++i) {
           const newChild = sourceChildren[i];
-          if (mem.has(newChild)) throw new Error(`TypedDOM: Typed DOM children can't repeatedly be used to the same object.`);
-          void mem.add(newChild);
+          if (log.has(newChild)) throw new Error(`TypedDOM: Typed DOM children can't repeatedly be used to the same object.`);
+          void log.add(newChild);
           if (newChild.element.parentNode !== this.container as Element) {
             void throwErrorIfNotUsable(newChild);
           }
@@ -198,7 +198,7 @@ export class Elem<
         }
         void Obj.freeze(targetChildren);
         for (let i = this.container.children.length; i >= sourceChildren.length; --i) {
-          if (!memory.has(this.container.children[i])) continue;
+          if (!proxies.has(this.container.children[i])) continue;
           void removedChildren.push(proxy(this.container.removeChild(this.container.children[i])));
         }
         assert(this.container.children.length === sourceChildren.length);
@@ -209,13 +209,13 @@ export class Elem<
         const sourceChildren = children as ElChildren.Record;
         const targetChildren = this.children_ as ElChildren.Record;
         assert.deepStrictEqual(Obj.keys(sourceChildren), Obj.keys(targetChildren));
-        const mem = new WeakSet<El>();
+        const log = new WeakSet<El>();
         for (const name in targetChildren) {
           if (!sourceChildren.hasOwnProperty(name)) continue;
           const oldChild = targetChildren[name];
           const newChild = sourceChildren[name];
-          if (mem.has(newChild)) throw new Error(`TypedDOM: Typed DOM children can't repeatedly be used to the same object.`);
-          void mem.add(newChild);
+          if (log.has(newChild)) throw new Error(`TypedDOM: Typed DOM children can't repeatedly be used to the same object.`);
+          void log.add(newChild);
           if (newChild.element.parentNode !== this.container as Element) {
             void throwErrorIfNotUsable(newChild);
           }
@@ -270,6 +270,6 @@ function observe<C extends ElChildren.Record>(node: Node, children: C): C {
 }
 
 function throwErrorIfNotUsable({ element }: El<string, Element, ElChildren>): void {
-  if (!element.parentElement || !memory.has(element.parentElement)) return;
+  if (!element.parentElement || !proxies.has(element.parentElement)) return;
   throw new Error(`TypedDOM: Typed DOM children can't be used to another typed DOM.`);
 }
