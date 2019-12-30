@@ -2,7 +2,7 @@ import { uid } from './identity';
 import { text, define } from '../util/dom';
 import { Mutable } from 'spica/type';
 
-const { Array, Object: Obj, Set, WeakMap, WeakSet, Event } = global;
+const { Array, Object: Obj, WeakMap, WeakSet, Event } = global;
 
 type ElChildrenType =
   | typeof ElChildrenType.Void
@@ -157,8 +157,8 @@ export class Elem<
     }
   }
   public set children(children: C) {
-    const removedChildren = new Set<El>();
-    const addedChildren = new Set<El>();
+    const removedChildren: El[] = [];
+    const addedChildren: El[] = [];
     switch (this.type) {
       case ElChildrenType.Void:
         return;
@@ -190,7 +190,7 @@ export class Elem<
           else {
             if (newChild.element.parentNode !== this.container as Element) {
               void this.scope(newChild);
-              void addedChildren.add(newChild);
+              void addedChildren.push(newChild);
             }
             void this.container.insertBefore(newChild.element, this.container.children[i]);
             void targetChildren.push(newChild);
@@ -199,7 +199,7 @@ export class Elem<
         void Obj.freeze(targetChildren);
         for (let i = this.container.children.length; i >= sourceChildren.length; --i) {
           if (!memory.has(this.container.children[i])) continue;
-          void removedChildren.add(proxy(this.container.removeChild(this.container.children[i])));
+          void removedChildren.push(proxy(this.container.removeChild(this.container.children[i])));
         }
         assert(this.container.children.length === sourceChildren.length);
         assert(targetChildren.every((child, i) => child.element === this.container.children[i]));
@@ -211,9 +211,9 @@ export class Elem<
         assert.deepStrictEqual(Obj.keys(sourceChildren), Obj.keys(targetChildren));
         const mem = new WeakSet<El>();
         for (const name in targetChildren) {
+          if (!sourceChildren.hasOwnProperty(name)) continue;
           const oldChild = targetChildren[name];
           const newChild = sourceChildren[name];
-          if (!newChild) continue;
           if (mem.has(newChild)) throw new Error(`TypedDOM: Typed DOM children can't repeatedly be used to the same object.`);
           void mem.add(newChild);
           if (newChild.element.parentNode !== this.container as Element) {
@@ -221,8 +221,8 @@ export class Elem<
           }
           if (oldChild.element !== newChild.element || this.initialChildren.has(oldChild)) {
             void this.scope(newChild);
-            void addedChildren.add(newChild);
-            void removedChildren.add(oldChild);
+            void addedChildren.push(newChild);
+            void removedChildren.push(oldChild);
           }
           targetChildren[name] = sourceChildren[name];
         }
@@ -236,8 +236,9 @@ export class Elem<
     for (const child of addedChildren) {
       void child.element.dispatchEvent(new Event('connect', { bubbles: false, cancelable: true }));
     }
-    removedChildren.size + addedChildren.size > 0 &&
-    void this.element.dispatchEvent(new Event('change', { bubbles: false, cancelable: true }));
+    if (removedChildren.length + addedChildren.length > 0) {
+      void this.element.dispatchEvent(new Event('change', { bubbles: false, cancelable: true }));
+    }
   }
 }
 
