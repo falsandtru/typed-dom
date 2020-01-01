@@ -58,7 +58,7 @@
     "mocha": "^6.2.2",
     "npm-check-updates": "^4.0.1",
     "power-assert": "^1.6.1",
-    "spica": "0.0.293",
+    "spica": "0.0.294",
     "tsify": "^4.0.1",
     "typescript": "3.8.0-dev.20191228",
     "uglify-es": "^3.3.9",
