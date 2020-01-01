@@ -1,7 +1,13 @@
 import { noop } from './noop';
 import { AtomicPromise } from 'spica/promise';
 
-export const currentTargets = new WeakMap<Event, EventTarget>();
+export const currentTarget = Symbol();
+
+declare global {
+  interface Event {
+    readonly [currentTarget]?: Event['currentTarget'];
+  }
+}
 
 export function listen<T extends keyof WindowEventMap>(target: Window, type: T, listener: (ev: WindowEventMap[T]) => unknown, option?: boolean | AddEventListenerOptions): () => undefined;
 export function listen<T extends keyof DocumentEventMap>(target: Document, type: T, listener: (ev: DocumentEventMap[T]) => unknown, option?: boolean | AddEventListenerOptions): () => undefined;
@@ -69,9 +75,13 @@ export function bind<T extends keyof WindowEventMap | keyof DocumentEventMap | k
     void target.removeEventListener(type, handler, option));
   return () => void unbind();
 
-  function handler(ev: Event) {
+  interface Event extends global.Event {
+    [currentTarget]?: Event['currentTarget'];
+  }
+
+  function handler(ev: Event): unknown {
     assert(ev.currentTarget);
-    void currentTargets.set(ev, ev.currentTarget!);
+    ev[currentTarget] = ev.currentTarget;
     return listener(ev);
   }
 }

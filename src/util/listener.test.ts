@@ -1,4 +1,4 @@
-import { bind, delegate, listen, once, wait, currentTargets } from './listener';
+import { bind, delegate, listen, once, wait, currentTarget } from './listener';
 import { Shadow, HTML } from '../dom/builder';
 
 describe('Unit: util/listener', () => {
@@ -8,7 +8,7 @@ describe('Unit: util/listener', () => {
       const a = HTML.a().element;
       bind(a, 'click', ev => {
         assert(ev instanceof Event);
-        assert(currentTargets.get(ev) instanceof HTMLAnchorElement);
+        assert(ev[currentTarget] === ev.currentTarget);
         ++cnt;
         bind(a, 'click', () => void assert(cnt === 2 && ++cnt) || done());
       });
@@ -25,7 +25,7 @@ describe('Unit: util/listener', () => {
       const dom = HTML.p([HTML.a()]);
       delegate(dom.element, 'a', 'click', ev => {
         assert(ev instanceof Event);
-        assert(currentTargets.get(ev) instanceof HTMLAnchorElement);
+        assert(ev[currentTarget] === ev.currentTarget);
         ++cnt;
         delegate(dom.element, 'a', 'click', () => void assert(cnt === 2 && ++cnt) || done());
       });
@@ -44,7 +44,7 @@ describe('Unit: util/listener', () => {
       const a = HTML.a().element;
       listen(a, 'click', ev => {
         assert(ev instanceof Event);
-        assert(currentTargets.get(ev) instanceof HTMLAnchorElement);
+        assert(ev[currentTarget] === ev.currentTarget);
         ++cnt;
         listen(a, 'click', () => void assert(cnt === 2 && ++cnt) || done());
       });
@@ -58,7 +58,7 @@ describe('Unit: util/listener', () => {
       const dom = Shadow.section([HTML.a()]);
       listen(dom.element, 'a', 'click', ev => {
         assert(ev instanceof Event);
-        assert(currentTargets.get(ev) instanceof HTMLAnchorElement);
+        assert(ev[currentTarget] === ev.currentTarget);
         ++cnt;
         listen(dom.element, 'a', 'click', () => void assert(cnt === 2 && ++cnt) || done());
       });
@@ -77,7 +77,7 @@ describe('Unit: util/listener', () => {
       const a = HTML.a().element;
       once(a, 'click', ev => {
         assert(ev instanceof Event);
-        assert(currentTargets.get(ev) instanceof HTMLAnchorElement);
+        assert(ev[currentTarget] === ev.currentTarget);
         assert(cnt === 0 && ++cnt);
         once(a, 'click', () => void assert(cnt === 1 && ++cnt) || done());
       });
@@ -91,7 +91,7 @@ describe('Unit: util/listener', () => {
       const dom = Shadow.section([HTML.a()]);
       once(dom.element, 'a', 'click', ev => {
         assert(ev instanceof Event);
-        assert(currentTargets.get(ev) instanceof HTMLAnchorElement);
+        assert(ev[currentTarget] === ev.currentTarget);
         assert(cnt === 0 && ++cnt);
         once(dom.element, 'click', () => void assert(cnt === 1 && ++cnt) || done());
       });
@@ -107,7 +107,7 @@ describe('Unit: util/listener', () => {
       const a = HTML.a().element;
       wait(a, 'click').then(ev => {
         assert(ev instanceof Event);
-        assert(currentTargets.get(ev) instanceof HTMLAnchorElement);
+        assert(ev[currentTarget] === ev.currentTarget);
         done();
       });
       document.createDocumentFragment().appendChild(a);
@@ -118,7 +118,7 @@ describe('Unit: util/listener', () => {
       const dom = Shadow.section([HTML.a()]);
       wait(dom.element, 'a', 'click').then(ev => {
         assert(ev instanceof Event);
-        assert(currentTargets.get(ev) instanceof HTMLAnchorElement);
+        assert(ev[currentTarget] === ev.currentTarget);
         done();
       });
       document.createDocumentFragment().appendChild(dom.element);
