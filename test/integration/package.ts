@@ -14,7 +14,6 @@ declare global {
     'a': SVGAElement;
   }
 }
-window.customElements.define('custom-tag', class extends HTMLElement { });
 
 declare const _: { shuffle<T>(as: T[]): T[]; };
 
@@ -326,6 +325,7 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('extend', function () {
+      window.customElements.define('custom-tag', class extends HTMLElement { });
       assert(Shadow('custom-tag').element.outerHTML === '<custom-tag></custom-tag>');
       assert(HTML.custom().element.outerHTML === '<custom></custom>');
       assert(SVG.a().element instanceof SVGAElement);
