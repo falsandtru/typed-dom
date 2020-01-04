@@ -74,7 +74,7 @@ const SVG: API<SVGElementTagNameMap> = API(svg);
 Custom elements will be defined by extending `ShadowHostElementTagNameMap`, `HTMLElementTagNameMap`, or `SVGElementTagNameMap` interface.
 
 ```ts
-import { Shadow, HTML, SVG } from 'typed-dom';
+import { Shadow, HTML } from 'typed-dom';
 
 declare global {
   interface ShadowHostElementTagNameMap {
@@ -83,14 +83,12 @@ declare global {
   interface HTMLElementTagNameMap {
     'custom': HTMLElement;
   }
-  interface SVGElementTagNameMap {
-    'a': SVGAElement;
-  }
 }
 
+window.customElements.define('custom-tag', class extends HTMLElement { });
 Shadow('custom-tag').element.outerHTML; // '<custom-tag></custom-tag>'
+HTML('custom-tag').element.outerHTML; // '<custom-tag></custom-tag>'
 HTML.custom().element.outerHTML; // '<custom></custom>'
-SVG.a().element; // SVGAElement
 ```
 
 ### Others
