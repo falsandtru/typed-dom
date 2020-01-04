@@ -67,8 +67,8 @@ export function text(source: string): Text {
 }
 
 const enum NS {
-  HTML,
-  SVG,
+  HTML = 'HTML',
+  SVG = 'SVG',
 }
 
 function element<T extends keyof HTMLElementTagNameMap>(context: Document, ns: NS.HTML, tag: T, attrs?: Attrs | Children, children?: Children): HTMLElementTagNameMap[T];
