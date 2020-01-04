@@ -49,13 +49,13 @@ export function shadow(el: keyof ShadowHostElementTagNameMap | HTMLElement, chil
 export function html<T extends keyof HTMLElementTagNameMap>(tag: T, children?: Children): HTMLElementTagNameMap[T];
 export function html<T extends keyof HTMLElementTagNameMap>(tag: T, attrs?: Attrs, children?: Children): HTMLElementTagNameMap[T];
 export function html<T extends keyof HTMLElementTagNameMap>(tag: T, attrs: Attrs | Children = {}, children: Children = []): HTMLElementTagNameMap[T] {
-  return element(NS.HTML, tag, attrs, children);
+  return element(document, NS.HTML, tag, attrs, children);
 }
 
 export function svg<T extends keyof SVGElementTagNameMap>(tag: T, children?: Children): SVGElementTagNameMap[T];
 export function svg<T extends keyof SVGElementTagNameMap>(tag: T, attrs?: Attrs, children?: Children): SVGElementTagNameMap[T];
 export function svg<T extends keyof SVGElementTagNameMap>(tag: T, attrs: Attrs | Children = {}, children: Children = []): SVGElementTagNameMap[T] {
-  return element(NS.SVG, tag, attrs, children);
+  return element(document, NS.SVG, tag, attrs, children);
 }
 
 export function text(source: string): Text {
@@ -69,15 +69,15 @@ const enum NS {
   SVG,
 }
 
-function element<T extends keyof HTMLElementTagNameMap>(ns: NS.HTML, tag: T, attrs?: Attrs | Children, children?: Children): HTMLElementTagNameMap[T];
-function element<T extends keyof SVGElementTagNameMap>(ns: NS.SVG, tag: T, attrs?: Attrs | Children, children?: Children): SVGElementTagNameMap[T];
-function element(ns: NS, tag: string, attrs: Attrs | Children = {}, children: Children = []): Element {
+function element<T extends keyof HTMLElementTagNameMap>(context: Document, ns: NS.HTML, tag: T, attrs?: Attrs | Children, children?: Children): HTMLElementTagNameMap[T];
+function element<T extends keyof SVGElementTagNameMap>(context: Document, ns: NS.SVG, tag: T, attrs?: Attrs | Children, children?: Children): SVGElementTagNameMap[T];
+function element(context: Document, ns: NS, tag: string, attrs: Attrs | Children = {}, children: Children = []): Element {
   const key = `${ns}:${tag}`;
   const el = tag.includes('-')
-    ? elem(ns, tag)
+    ? elem(context, ns, tag)
     : cache.elem.has(key)
       ? cache.elem.get(key)!.cloneNode(true) as Element
-      : cache.elem.set(key, elem(ns, tag)).get(key)!.cloneNode(true) as Element;
+      : cache.elem.set(key, elem(context, ns, tag)).get(key)!.cloneNode(true) as Element;
   assert(tag.includes('-') || el !== cache.elem.get(key));
   assert(el.attributes.length === 0);
   assert(el.childNodes.length === 0);
@@ -85,12 +85,12 @@ function element(ns: NS, tag: string, attrs: Attrs | Children = {}, children: Ch
   return el;
 }
 
-function elem(ns: NS, tag: string): Element {
+function elem(context: Document, ns: NS, tag: string): Element {
   switch (ns) {
     case NS.HTML:
-      return document.createElement(tag);
+      return context.createElement(tag);
     case NS.SVG:
-      return document.createElementNS("http://www.w3.org/2000/svg", tag);
+      return context.createElementNS("http://www.w3.org/2000/svg", tag);
   }
 }
 
