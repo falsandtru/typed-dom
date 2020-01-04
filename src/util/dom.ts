@@ -107,7 +107,7 @@ export function define<T extends Element>(el: T, attrs?: Attrs | Children, child
     switch (typeof value) {
       case 'string':
         void el.setAttribute(name, value);
-        break;
+        continue;
       case 'function':
         assert(name.startsWith('on'));
         void el.addEventListener(name.slice(2), value, {
@@ -118,12 +118,12 @@ export function define<T extends Element>(el: T, attrs?: Attrs | Children, child
             'touchmove',
           ].includes(name.slice(2)),
         });
-        break;
+        continue;
       case 'object':
         void el.removeAttribute(name);
-        break;
+        continue;
       default:
-        break;
+        continue;
     }
   }
   if (children) {
