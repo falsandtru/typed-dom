@@ -41,13 +41,13 @@ function handle
   (baseFactory: F, formatter: <E extends Element>(el: E) => E | ShadowRoot)
   : ProxyHandler<API<M, F>> {
   return {
-    apply(obj, _, [prop, ...args]) {
-      return this.get!(obj, prop, undefined)(...args);
+    apply(target, _, [prop, ...args]) {
+      return this.get!(target, prop, target)(...args);
     },
-    get: (obj, prop) =>
-      obj[prop] || prop in obj || typeof prop !== 'string'
-        ? obj[prop]
-        : obj[prop] = builder(prop as Extract<keyof M, string>, baseFactory),
+    get: (target, prop) =>
+      target[prop] || prop in target || typeof prop !== 'string'
+        ? target[prop]
+        : target[prop] = builder(prop as Extract<keyof M, string>, baseFactory),
   };
 
   function builder(tag: Extract<keyof M, string>, baseFactory: F): (attrs?: Attrs, children?: ElChildren, factory?: () => Element) => El<string, Element, ElChildren> {
