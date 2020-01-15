@@ -58,13 +58,13 @@ export function shadow(el: keyof ShadowHostElementTagNameMap | HTMLElement, chil
 export function html<T extends keyof HTMLElementTagNameMap>(tag: T, children?: Children): HTMLElementTagNameMap[T];
 export function html<T extends keyof HTMLElementTagNameMap>(tag: T, attrs?: Attrs, children?: Children): HTMLElementTagNameMap[T];
 export function html<T extends keyof HTMLElementTagNameMap>(tag: T, attrs?: Attrs | Children, children?: Children): HTMLElementTagNameMap[T] {
-  return element(document, NS.HTML, tag, attrs, children);
+  return element(document, NS.HTML, tag, attrs as Attrs, children);
 }
 
 export function svg<T extends keyof SVGElementTagNameMap>(tag: T, children?: Children): SVGElementTagNameMap[T];
 export function svg<T extends keyof SVGElementTagNameMap>(tag: T, attrs?: Attrs, children?: Children): SVGElementTagNameMap[T];
 export function svg<T extends keyof SVGElementTagNameMap>(tag: T, attrs?: Attrs | Children, children?: Children): SVGElementTagNameMap[T] {
-  return element(document, NS.SVG, tag, attrs, children);
+  return element(document, NS.SVG, tag, attrs as Attrs, children);
 }
 
 export function text(source: string): Text {
@@ -73,9 +73,12 @@ export function text(source: string): Text {
   return text;
 }
 
-export function element<T extends keyof HTMLElementTagNameMap>(context: Document, ns: NS.HTML, tag: T, attrs?: Attrs | Children, children?: Children): HTMLElementTagNameMap[T];
-export function element<T extends keyof SVGElementTagNameMap>(context: Document, ns: NS.SVG, tag: T, attrs?: Attrs | Children, children?: Children): SVGElementTagNameMap[T];
-export function element(context: Document | Element, ns: NS, tag: string, attrs?: Attrs | Children, children?: Children): Element;
+export function element<T extends keyof HTMLElementTagNameMap>(context: Document, ns: NS.HTML, tag: T, children?: Children): HTMLElementTagNameMap[T];
+export function element<T extends keyof HTMLElementTagNameMap>(context: Document, ns: NS.HTML, tag: T, attrs?: Attrs, children?: Children): HTMLElementTagNameMap[T];
+export function element<T extends keyof SVGElementTagNameMap>(context: Document, ns: NS.SVG, tag: T, children?: Children): SVGElementTagNameMap[T];
+export function element<T extends keyof SVGElementTagNameMap>(context: Document, ns: NS.SVG, tag: T, attrs?: Attrs, children?: Children): SVGElementTagNameMap[T];
+export function element(context: Document | Element, ns: NS, tag: string, children?: Children): Element;
+export function element(context: Document | Element, ns: NS, tag: string, attrs?: Attrs, children?: Children): Element;
 export function element(context: Document | Element, ns: NS, tag: string, attrs?: Attrs | Children, children?: Children): Element {
   const cache = caches.elem(context);
   const key = `${ns}:${tag}`;
@@ -87,7 +90,7 @@ export function element(context: Document | Element, ns: NS, tag: string, attrs?
   assert(tag.includes('-') || el !== cache.get(key));
   assert(el.attributes.length === 0);
   assert(el.childNodes.length === 0);
-  void define(el, attrs, children);
+  void define(el, attrs as Attrs, children);
   return el;
 }
 
@@ -102,7 +105,7 @@ function elem(context: Document | Element, ns: NS, tag: string): Element {
 }
 
 export function define<T extends Element | ShadowRoot>(el: T, children?: Children): T;
-export function define<T extends Element>(el: T, attrs?: Attrs | Children, children?: Children): T;
+export function define<T extends Element>(el: T, attrs?: Attrs, children?: Children): T;
 export function define<T extends Element>(el: T, attrs?: Attrs | Children, children?: Children): T {
   if (isChildren(attrs)) return define(el, undefined, attrs);
   if (typeof children === 'string') return define(el, attrs, [text(children)]);
