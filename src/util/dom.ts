@@ -9,7 +9,7 @@ const enum NS {
 
 export type TagNameMap = object;
 export type Attrs = Record<string, string | EventListener | null | undefined>;
-type Children = Iterable<Node> | string;
+export type Children = Iterable<Node> | string;
 
 export interface Factory<M extends TagNameMap> {
   <T extends Extract<keyof M, string>>(tag: T, children?: Children): M[T];
