@@ -2,6 +2,11 @@ import { memoize } from 'spica/memoize';
 
 const { document } = global;
 
+const enum NS {
+  HTML = 'HTML',
+  SVG = 'SVG',
+}
+
 export type TagNameMap = object;
 export type Attrs = Record<string, string | EventListener | null | undefined>;
 type Children = Iterable<Node> | string;
@@ -66,11 +71,6 @@ export function text(source: string): Text {
   const text = caches.text.cloneNode() as Text;
   text.data = source;
   return text;
-}
-
-const enum NS {
-  HTML = 'HTML',
-  SVG = 'SVG',
 }
 
 export function element<T extends keyof HTMLElementTagNameMap>(context: Document, ns: NS.HTML, tag: T, attrs?: Attrs | Children, children?: Children): HTMLElementTagNameMap[T];
