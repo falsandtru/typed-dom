@@ -25,12 +25,10 @@ namespace caches {
 }
 
 export function frag(children?: Children): DocumentFragment {
-  children = typeof children === 'string'
-    ? [text(children)]
-    : children;
-  const frag = caches.frag.cloneNode() as DocumentFragment;
-  children && void frag.append(...children);
-  return frag;
+  if (typeof children === 'string') return frag([text(children)]);
+  const node = caches.frag.cloneNode() as DocumentFragment;
+  children && void node.append(...children);
+  return node;
 }
 
 export function shadow(el: keyof ShadowHostElementTagNameMap | HTMLElement, opts?: ShadowRootInit): ShadowRoot;
