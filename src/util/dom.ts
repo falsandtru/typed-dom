@@ -143,5 +143,5 @@ export function define<T extends Element>(el: T, attrs?: Attrs | Children, child
 }
 
 function isChildren(o: Attrs | Children | ShadowRootInit | undefined): o is Children {
-  return !!o && !!o[Symbol.iterator];
+  return !!o?.[Symbol.iterator];
 }
