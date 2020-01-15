@@ -1,4 +1,4 @@
-import { Shadow, HTML, SVG, API, proxy, frag, shadow, html, svg, text, define, listen, once, wait, bind, delegate, currentTarget, apply } from '../../index';
+import { Shadow, HTML, SVG, API, proxy, frag, shadow, html, svg, text, element, define, listen, once, wait, bind, delegate, currentTarget, apply } from '../../index';
 
 describe('Interface: Package', function () {
   describe('Typed', function () {
@@ -44,6 +44,10 @@ describe('Interface: Package', function () {
 
     it('text', function () {
       assert(typeof text === 'function');
+    });
+
+    it('element', function () {
+      assert(typeof element === 'function');
     });
 
     it('define', function () {

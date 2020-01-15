@@ -1,3 +1,5 @@
+import { memoize } from 'spica/memoize';
+
 const { document } = global;
 
 export type TagNameMap = object;
@@ -11,8 +13,8 @@ export interface Factory<M extends TagNameMap> {
 
 const shadows = new WeakMap<Element, ShadowRoot>();
 
-namespace cache {
-  export const elem = new Map<string, Element>();
+namespace caches {
+  export const elem = memoize<Document | Element, Map<string, Element>>(() => new Map(), new WeakMap());
   export const text = document.createTextNode('');
   export const frag = document.createDocumentFragment();
 }
@@ -21,7 +23,7 @@ export function frag(children?: Children): DocumentFragment {
   children = typeof children === 'string'
     ? [text(children)]
     : children;
-  const frag = cache.frag.cloneNode() as DocumentFragment;
+  const frag = caches.frag.cloneNode() as DocumentFragment;
   children && void frag.append(...children);
   return frag;
 }
@@ -61,7 +63,7 @@ export function svg<T extends keyof SVGElementTagNameMap>(tag: T, attrs?: Attrs 
 }
 
 export function text(source: string): Text {
-  const text = cache.text.cloneNode() as Text;
+  const text = caches.text.cloneNode() as Text;
   text.data = source;
   return text;
 }
@@ -71,28 +73,31 @@ const enum NS {
   SVG = 'SVG',
 }
 
-function element<T extends keyof HTMLElementTagNameMap>(context: Document, ns: NS.HTML, tag: T, attrs?: Attrs | Children, children?: Children): HTMLElementTagNameMap[T];
-function element<T extends keyof SVGElementTagNameMap>(context: Document, ns: NS.SVG, tag: T, attrs?: Attrs | Children, children?: Children): SVGElementTagNameMap[T];
-function element(context: Document, ns: NS, tag: string, attrs?: Attrs | Children, children?: Children): Element {
+export function element<T extends keyof HTMLElementTagNameMap>(context: Document, ns: NS.HTML, tag: T, attrs?: Attrs | Children, children?: Children): HTMLElementTagNameMap[T];
+export function element<T extends keyof SVGElementTagNameMap>(context: Document, ns: NS.SVG, tag: T, attrs?: Attrs | Children, children?: Children): SVGElementTagNameMap[T];
+export function element(context: Document | Element, ns: NS, tag: string, attrs?: Attrs | Children, children?: Children): Element;
+export function element(context: Document | Element, ns: NS, tag: string, attrs?: Attrs | Children, children?: Children): Element {
+  const cache = caches.elem(context);
   const key = `${ns}:${tag}`;
   const el = tag.includes('-')
     ? elem(context, ns, tag)
-    : cache.elem.has(key)
-      ? cache.elem.get(key)!.cloneNode(true) as Element
-      : cache.elem.set(key, elem(context, ns, tag)).get(key)!.cloneNode(true) as Element;
-  assert(tag.includes('-') || el !== cache.elem.get(key));
+    : cache.has(key)
+      ? cache.get(key)!.cloneNode(true) as Element
+      : cache.set(key, elem(context, ns, tag)).get(key)!.cloneNode(true) as Element;
+  assert(tag.includes('-') || el !== cache.get(key));
   assert(el.attributes.length === 0);
   assert(el.childNodes.length === 0);
   void define(el, attrs, children);
   return el;
 }
 
-function elem(context: Document, ns: NS, tag: string): Element {
+function elem(context: Document | Element, ns: NS, tag: string): Element {
+  if (context.nodeType === 1) throw new Error(`TypedDOM: Scoped custom elements are not supported.`);
   switch (ns) {
     case NS.HTML:
-      return context.createElement(tag);
+      return (context as Document).createElement(tag);
     case NS.SVG:
-      return context.createElementNS("http://www.w3.org/2000/svg", tag);
+      return (context as Document).createElementNS("http://www.w3.org/2000/svg", tag);
   }
 }
 
