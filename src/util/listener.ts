@@ -1,7 +1,7 @@
 import { AtomicPromise } from 'spica/promise';
 import { noop } from 'spica/noop';
 
-export const currentTarget = Symbol();
+export const currentTarget = Symbol.for('currentTarget');
 
 declare global {
   interface Event {
