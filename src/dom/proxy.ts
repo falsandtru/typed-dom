@@ -61,7 +61,7 @@ export class Elem<
     private readonly container: Element | ShadowRoot = element,
   ) {
     switch (true) {
-      case children_ === undefined:
+      case children_ === void 0:
         this.type = ElChildrenType.Void;
         break;
       case typeof children_ === 'string':

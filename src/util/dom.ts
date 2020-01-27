@@ -35,7 +35,7 @@ export function shadow(el: keyof ShadowHostElementTagNameMap | HTMLElement, opts
 export function shadow(el: keyof ShadowHostElementTagNameMap | HTMLElement, children?: Children, opts?: ShadowRootInit): ShadowRoot;
 export function shadow(el: keyof ShadowHostElementTagNameMap | HTMLElement, children?: Children | ShadowRootInit, opts?: ShadowRootInit): ShadowRoot {
   if (typeof el === 'string') return shadow(html(el), children as Children, opts);
-  if (children && !isChildren(children)) return shadow(el, undefined, children);
+  if (children && !isChildren(children)) return shadow(el, void 0, children);
   return el.shadowRoot || shadows.has(el)
     ? define(
         opts
@@ -48,7 +48,7 @@ export function shadow(el: keyof ShadowHostElementTagNameMap | HTMLElement, chil
         !opts || opts.mode === 'open'
           ? el.attachShadow({ mode: 'open' })
           : shadows.set(el, el.attachShadow(opts)).get(el)!,
-        children === undefined
+        children === void 0
           ? el.childNodes
           : children);
 }
@@ -105,7 +105,7 @@ function elem(context: Document | Element, ns: NS, tag: string): Element {
 export function define<T extends Element | ShadowRoot>(el: T, children?: Children): T;
 export function define<T extends Element>(el: T, attrs?: Attrs, children?: Children): T;
 export function define<T extends Element>(el: T, attrs?: Attrs | Children, children?: Children): T {
-  if (isChildren(attrs)) return define(el, undefined, attrs);
+  if (isChildren(attrs)) return define(el, void 0, attrs);
   if (typeof children === 'string') return define(el, attrs, [text(children)]);
   if (attrs) for (const name in attrs) {
     if (!attrs.hasOwnProperty(name)) continue;

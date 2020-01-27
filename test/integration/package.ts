@@ -529,7 +529,7 @@ describe('Integration: Typed DOM', function () {
       const trans: API<HTMLElementTagNameMap> = API((tag: keyof HTMLElementTagNameMap, ...args: any[]) =>
         define(html(tag, {
           onchange: args.every(arg => typeof arg !== 'string')
-            ? undefined
+            ? void 0
             : (ev, el = proxy<string>(ev.target as HTMLElement)) =>
                 i18n.init((err, t) =>
                   el.children = err
