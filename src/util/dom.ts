@@ -1,6 +1,6 @@
+import { document } from 'spica/global';
+import { hasOwnProperty } from 'spica/alias';
 import { memoize } from 'spica/memoize';
-
-const { document } = global;
 
 const enum NS {
   HTML = 'HTML',
@@ -108,7 +108,7 @@ export function define<T extends Element>(el: T, attrs?: Attrs | Children, child
   if (isChildren(attrs)) return define(el, void 0, attrs);
   if (typeof children === 'string') return define(el, attrs, [text(children)]);
   if (attrs) for (const name in attrs) {
-    if (!attrs.hasOwnProperty(name)) continue;
+    if (!hasOwnProperty(attrs, name)) continue;
     const value = attrs[name];
     switch (typeof value) {
       case 'string':

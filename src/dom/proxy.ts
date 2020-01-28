@@ -1,8 +1,8 @@
+import { Array, WeakMap, WeakSet, Event, Object } from 'spica/global';
+import { hasOwnProperty, ObjectDefineProperties, ObjectFreeze, ObjectValues } from 'spica/alias';
 import { uid } from './identity';
 import { text, define } from '../util/dom';
 import { Mutable } from 'spica/type';
-
-const { Array, Object: Obj, WeakMap, WeakSet, Event } = global;
 
 type ElChildrenType =
   | typeof ElChildrenType.Void
@@ -95,7 +95,7 @@ export class Elem<
         this.children = children_;
         return;
       case ElChildrenType.Record:
-        this.initialChildren = new WeakSet(Obj.values(children_ as ElChildren.Record));
+        this.initialChildren = new WeakSet(ObjectValues(children_ as ElChildren.Record));
         void define(this.container, []);
         this.children_ = observe(this.container, { ...children_ as ElChildren.Record }) as C;
         this.children = children_;
@@ -145,7 +145,7 @@ export class Elem<
   }
   private readonly initialChildren: WeakSet<El>;
   public get children(): C {
-    assert([ElChildrenType.Void, ElChildrenType.Array].includes(this.type) ? Obj.isFrozen(this.children_) : !Obj.isFrozen(this.children_));
+    assert([ElChildrenType.Void, ElChildrenType.Array].includes(this.type) ? Object.isFrozen(this.children_) : !Object.isFrozen(this.children_));
     switch (this.type) {
       case ElChildrenType.Text:
         this.children_ = (this.children_ as unknown as Text).parentNode === this.container
@@ -196,7 +196,7 @@ export class Elem<
             void targetChildren.push(newChild);
           }
         }
-        void Obj.freeze(targetChildren);
+        void ObjectFreeze(targetChildren);
         for (let i = this.container.children.length; i >= sourceChildren.length; --i) {
           if (!proxies.has(this.container.children[i])) continue;
           void removedChildren.push(proxy(this.container.removeChild(this.container.children[i])));
@@ -208,10 +208,10 @@ export class Elem<
       case ElChildrenType.Record: {
         const sourceChildren = children as ElChildren.Record;
         const targetChildren = this.children_ as ElChildren.Record;
-        assert.deepStrictEqual(Obj.keys(sourceChildren), Obj.keys(targetChildren));
+        assert.deepStrictEqual(Object.keys(sourceChildren), Object.keys(targetChildren));
         const log = new WeakSet<El>();
         for (const name in targetChildren) {
-          if (!sourceChildren.hasOwnProperty(name)) continue;
+          if (!hasOwnProperty(sourceChildren, name)) continue;
           const oldChild = targetChildren[name];
           const newChild = sourceChildren[name];
           if (log.has(newChild)) throw new Error(`TypedDOM: Typed DOM children can't repeatedly be used to the same object.`);
@@ -245,7 +245,7 @@ export class Elem<
 function observe<C extends ElChildren.Record>(node: Node, children: C): C {
   const descs: PropertyDescriptorMap = {};
   for (const name in children) {
-    if (!children.hasOwnProperty(name)) continue;
+    if (!hasOwnProperty(children, name)) continue;
     let child: El<string, Element, ElChildren> = children[name];
     void throwErrorIfNotUsable(child);
     void node.appendChild(child.element);
@@ -266,7 +266,7 @@ function observe<C extends ElChildren.Record>(node: Node, children: C): C {
       },
     };
   }
-  return Obj.defineProperties(children, descs);
+  return ObjectDefineProperties(children, descs);
 }
 
 function throwErrorIfNotUsable({ element }: El<string, Element, ElChildren>): void {

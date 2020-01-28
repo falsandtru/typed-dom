@@ -1,3 +1,4 @@
+import { global } from 'spica/global';
 import { AtomicPromise } from 'spica/promise';
 import { noop } from 'spica/noop';
 
