@@ -134,11 +134,21 @@ export function define<T extends Element>(el: T, attrs?: Attrs | Children, child
     }
   }
   if (children) {
-    el.innerHTML = '';
-    while (el.firstChild) {
-      void el.removeChild(el.firstChild);
+    const { childNodes } = el;
+    if (childNodes.length === 0) {
+      void el.append(...children);
     }
-    void el.append(...children);
+    else {
+      let cnt = 0;
+      for (const child of children) {
+        void ++cnt;
+        if (childNodes.length <= cnt && child === childNodes[cnt - 1]) continue;
+        void el.insertBefore(child, childNodes[cnt - 1] || null);
+      }
+      while (childNodes.length > cnt) {
+        void el.removeChild(childNodes[cnt]);
+      }
+    }
   }
   return el;
 }
