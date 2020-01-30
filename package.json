@@ -32,7 +32,7 @@
   "dependencies": {},
   "devDependencies": {
     "@types/i18next": "^13.0.0",
-    "@types/mocha": "^5.2.7",
+    "@types/mocha": "^7.0.1",
     "@types/power-assert": "1.5.3",
     "browserify": "^16.5.0",
     "del": "4.1.0",
@@ -57,9 +57,9 @@
     "mocha": "^7.0.1",
     "npm-check-updates": "^4.0.1",
     "power-assert": "^1.6.1",
-    "spica": "0.0.319",
+    "spica": "0.0.324",
     "tsify": "^4.0.1",
-    "typescript": "3.8.0-dev.20200128",
+    "typescript": "3.8.0-dev.20200130",
     "vinyl-buffer": "^1.0.1",
     "vinyl-source-stream": "^2.0.0"
   },
