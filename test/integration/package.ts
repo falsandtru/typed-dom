@@ -341,12 +341,12 @@ describe('Integration: Typed DOM', function () {
       const el = HTML.span(
         {
           onchange: (ev, el = ev.target as HTMLElement) =>
-            el.textContent = el.textContent!.toUpperCase(),
+            el.textContent += el.textContent,
         },
         'a');
-      assert(el.children === 'A');
+      assert(el.children === 'aa');
       el.children = 'b';
-      assert(el.children === 'B');
+      assert(el.children === 'bb');
     });
 
     it('observe collection', function () {
@@ -370,32 +370,45 @@ describe('Integration: Typed DOM', function () {
           'B',
           'C',
         ]);
+      assert.deepStrictEqual(
+        el.children.map(v => v.element),
+        [...el.element.children]);
     });
 
     it('observe record', function () {
       const listeners: Record<string, EventListener> = {
         onconnect: (ev, el = ev.target as HTMLElement) =>
-          el.textContent = el.textContent!.toUpperCase(),
+          el.textContent += el.textContent[0].toUpperCase(),
         ondisconnect: (ev, el = ev.target as HTMLElement) =>
-          el.textContent += el.textContent,
+          el.textContent += el.textContent[0].toLowerCase(),
       };
       const el = HTML.ul({
         a: HTML.li(listeners, 'a'),
         b: HTML.li(listeners, 'b'),
         c: HTML.li(listeners, 'c'),
+        d: HTML.li(listeners, 'd'),
+        e: HTML.li(listeners, 'e'),
       });
       el.children = {
         a: el.children.a,
         b: el.children.c,
-        c: HTML.li(listeners, 'd'),
+        c: el.children.b,
+        d: HTML.li(listeners, 'f'),
+        e: el.children.e,
       };
+      el.children.e = HTML.li(listeners, 'g');
       assert.deepStrictEqual(
         Object.entries(el.children).map(([k, v]) => [k, v.children]),
         [
-          ['a', 'A'],
-          ['b', 'C'],
-          ['c', 'D'],
+          ['a', 'aA'],
+          ['b', 'cC'],
+          ['c', 'bB'],
+          ['d', 'fF'],
+          ['e', 'gG'],
         ]);
+      assert.deepStrictEqual(
+        [...Object.values(el.children)].map(v => v.element),
+        [...el.element.children]);
     });
 
     it('shadow', function () {

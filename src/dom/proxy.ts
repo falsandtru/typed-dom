@@ -1,5 +1,5 @@
 import { Array, WeakMap, WeakSet, Event, Object } from 'spica/global';
-import { hasOwnProperty, ObjectDefineProperties, ObjectFreeze, ObjectValues } from 'spica/alias';
+import { hasOwnProperty, ObjectDefineProperties, ObjectFreeze } from 'spica/alias';
 import { uid } from './identity';
 import { text, define } from '../util/dom';
 import { Mutable } from 'spica/type';
@@ -80,25 +80,25 @@ export class Elem<
     void proxies.set(this.element, this);
     switch (this.type) {
       case ElChildrenType.Void:
-        this.initialChildren = new WeakSet();
+        this.isInitialization = false;
         return;
       case ElChildrenType.Text:
-        this.initialChildren = new WeakSet();
         void define(this.container, []);
         this.children_ = this.container.appendChild(text('')) as any;
         this.children = children_ as C;
+        this.isInitialization = false;
         return;
       case ElChildrenType.Array:
-        this.initialChildren = new WeakSet(children_ as ElChildren.Array);
         void define(this.container, []);
         this.children_ = [] as ElChildren.Array as C;
         this.children = children_;
+        this.isInitialization = false;
         return;
       case ElChildrenType.Record:
-        this.initialChildren = new WeakSet(ObjectValues(children_ as ElChildren.Record));
         void define(this.container, []);
-        this.children_ = observe(this.container, { ...children_ as ElChildren.Record }) as C;
+        this.children_ = this.observe({ ...children_ as ElChildren.Record }) as C;
         this.children = children_;
+        this.isInitialization = false;
         return;
       default:
         throw new Error(`TypedDOM: Unreachable code.`);
@@ -123,6 +123,48 @@ export class Elem<
         return `.${this.id}`;
     }
   }
+  private isPartialUpdate = false;
+  private observe(children: ElChildren.Record): C {
+    const descs: PropertyDescriptorMap = {};
+    for (const name in children) {
+      if (!hasOwnProperty(children, name)) continue;
+      let child: El<string, Element, ElChildren> = children[name];
+      void throwErrorIfNotUsable(child);
+      void this.container.appendChild(child.element);
+      descs[name] = {
+        configurable: true,
+        enumerable: true,
+        get: (): El<string, Element, ElChildren> => {
+          return child;
+        },
+        set: (newChild: El<string, Element, ElChildren>) => {
+          const oldChild = child;
+          if (newChild === oldChild) return;
+          if (this.isPartialUpdate) {
+            child = newChild;
+            if (newChild.element.parentNode === oldChild.element.parentNode) {
+              const ref = newChild.element.nextSibling !== oldChild.element
+                ? newChild.element.nextSibling
+                : oldChild.element.nextSibling;
+              void this.container.replaceChild(newChild.element, oldChild.element);
+              void this.container.insertBefore(oldChild.element, ref);
+            }
+            else {
+              void this.container.insertBefore(newChild.element, oldChild.element);
+              void this.container.removeChild(oldChild.element);
+            }
+          }
+          else {
+            this.children = {
+              ...this.children_ as typeof children,
+              [name]: newChild,
+            } as C;
+          }
+        },
+      };
+    }
+    return ObjectDefineProperties(children, descs);
+  }
   private scope(child: El<string, Element, ElChildren>): void {
     if (child.element.nodeName !== 'STYLE') return;
     const syntax = /(^|[,}])(\s*)\$scope(?![\w-])(?=[^;{}]*{)/g;
@@ -143,7 +185,7 @@ export class Elem<
       void el.remove();
     }
   }
-  private readonly initialChildren: WeakSet<El>;
+  private isInitialization = true;
   public get children(): C {
     assert([ElChildrenType.Void, ElChildrenType.Array].includes(this.type) ? Object.isFrozen(this.children_) : !Object.isFrozen(this.children_));
     switch (this.type) {
@@ -159,11 +201,12 @@ export class Elem<
   public set children(children: C) {
     const removedChildren: El[] = [];
     const addedChildren: El[] = [];
+    let isChanged = false;
     switch (this.type) {
       case ElChildrenType.Void:
         return;
       case ElChildrenType.Text: {
-        if (children === this.children && !this.initialChildren.has(this.children_ as any)) return;
+        if (!this.isInitialization && children === this.children) return;
         const targetChildren = this.children_ as unknown as Text;
         const oldText = targetChildren.textContent!;
         const newText = children as ElChildren.Text;
@@ -181,25 +224,25 @@ export class Elem<
           const newChild = sourceChildren[i];
           if (log.has(newChild)) throw new Error(`TypedDOM: Typed DOM children can't repeatedly be used to the same object.`);
           void log.add(newChild);
-          if (newChild.element.parentNode !== this.container as Element) {
+          if (newChild.element.parentNode !== this.container) {
             void throwErrorIfNotUsable(newChild);
           }
-          if (newChild.element === this.container.children[i]) {
-            void targetChildren.push(newChild);
-          }
-          else {
-            if (newChild.element.parentNode !== this.container as Element) {
+          if (newChild.element !== this.container.children[i]) {
+            if (newChild.element.parentNode !== this.container) {
               void this.scope(newChild);
               void addedChildren.push(newChild);
             }
             void this.container.insertBefore(newChild.element, this.container.children[i]);
-            void targetChildren.push(newChild);
+            isChanged = true;
           }
+          void targetChildren.push(newChild);
         }
         void ObjectFreeze(targetChildren);
-        for (let i = this.container.children.length; i >= sourceChildren.length; --i) {
+        for (let i = sourceChildren.length; i < this.container.children.length; ++i) {
           if (!proxies.has(this.container.children[i])) continue;
           void removedChildren.push(proxy(this.container.removeChild(this.container.children[i])));
+          isChanged = true;
+          void --i;
         }
         assert(this.container.children.length === sourceChildren.length);
         assert(targetChildren.every((child, i) => child.element === this.container.children[i]));
@@ -216,57 +259,41 @@ export class Elem<
           const newChild = sourceChildren[name];
           if (log.has(newChild)) throw new Error(`TypedDOM: Typed DOM children can't repeatedly be used to the same object.`);
           void log.add(newChild);
-          if (newChild.element.parentNode !== this.container as Element) {
+          if (!this.isInitialization && newChild === oldChild) continue;
+          if (newChild.element.parentNode !== this.container) {
             void throwErrorIfNotUsable(newChild);
           }
-          if (oldChild.element !== newChild.element || this.initialChildren.has(oldChild)) {
+          if (this.isInitialization || newChild !== oldChild && newChild.element.parentNode !== oldChild.element.parentNode) {
             void this.scope(newChild);
             void addedChildren.push(newChild);
-            void removedChildren.push(oldChild);
+            if (!this.isInitialization) {
+              let i = 0;
+              i = removedChildren.lastIndexOf(newChild);
+              i > -1 && removedChildren.splice(i, 1);
+              void removedChildren.push(oldChild);
+              i = addedChildren.lastIndexOf(oldChild);
+              i > -1 && addedChildren.splice(i, 1);
+            }
           }
+          this.isPartialUpdate = true;
           targetChildren[name] = sourceChildren[name];
+          this.isPartialUpdate = false;
+          isChanged = true;
         }
         break;
       }
     }
     for (const child of removedChildren) {
-      if (this.initialChildren.has(child)) continue;
       void child.element.dispatchEvent(new Event('disconnect', { bubbles: false, cancelable: true }));
     }
     for (const child of addedChildren) {
       void child.element.dispatchEvent(new Event('connect', { bubbles: false, cancelable: true }));
     }
-    if (removedChildren.length + addedChildren.length > 0) {
+    assert(isChanged || removedChildren.length + addedChildren.length === 0);
+    if (isChanged) {
       void this.element.dispatchEvent(new Event('change', { bubbles: false, cancelable: true }));
     }
   }
-}
-
-function observe<C extends ElChildren.Record>(node: Node, children: C): C {
-  const descs: PropertyDescriptorMap = {};
-  for (const name in children) {
-    if (!hasOwnProperty(children, name)) continue;
-    let child: El<string, Element, ElChildren> = children[name];
-    void throwErrorIfNotUsable(child);
-    void node.appendChild(child.element);
-    descs[name] = {
-      configurable: true,
-      enumerable: true,
-      get: (): El<string, Element, ElChildren> => {
-        return child;
-      },
-      set: (newChild: El<string, Element, ElChildren>) => {
-        const oldChild = child;
-        if (newChild === oldChild) return;
-        if (newChild.element.parentElement !== node) {
-          void throwErrorIfNotUsable(newChild);
-        }
-        void node.replaceChild(newChild.element, oldChild.element);
-        child = newChild;
-      },
-    };
-  }
-  return ObjectDefineProperties(children, descs);
 }
 
 function throwErrorIfNotUsable({ element }: El<string, Element, ElChildren>): void {
