@@ -1,5 +1,5 @@
 import { document } from 'spica/global';
-import { hasOwnProperty } from 'spica/alias';
+import { isArray, hasOwnProperty } from 'spica/alias';
 import { memoize } from 'spica/memoize';
 
 const enum NS {
@@ -137,6 +137,22 @@ export function define<T extends Element>(el: T, attrs?: Attrs | Children, child
     const { childNodes } = el;
     if (childNodes.length === 0) {
       void el.append(...children);
+    }
+    else if (isArray(children)) {
+      let cnt = 0;
+      I:
+      for (const child of children as Node[]) {
+        void ++cnt;
+        while (el.childNodes.length > children.length) {
+          if (el.childNodes[cnt - 1] === child) continue I;
+          void el.removeChild(el.childNodes[cnt - 1]);
+        }
+        if (el.childNodes.length >= cnt && el.childNodes[cnt - 1] === child) continue;
+        void el.insertBefore(child, el.childNodes[cnt - 1] || null);
+      }
+      while (el.childNodes.length > children.length) {
+        void el.removeChild(el.childNodes[children.length]);
+      }
     }
     else {
       let cnt = 0;
