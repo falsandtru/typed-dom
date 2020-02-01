@@ -116,7 +116,7 @@ export function define<T extends Element>(el: T, attrs?: Attrs | Children, child
         continue;
       case 'function':
         if (name.length < 3) throw new Error(`TypedDOM: Attribute names for event listeners must have an event name but got "${name}".`);
-        if (!name.startsWith('on')) throw new Error(`TypedDOM: Attribute names for event listeners must start with "on" but got "${name}".`);
+        if (name.slice(0, 2) !== 'on') throw new Error(`TypedDOM: Attribute names for event listeners must start with "on" but got "${name}".`);
         void el.addEventListener(name.slice(2), value, {
           passive: [
             'wheel',
