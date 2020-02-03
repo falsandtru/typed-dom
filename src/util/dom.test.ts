@@ -1,4 +1,4 @@
-import { shadow, html, svg, frag, define } from './dom';
+import { shadow, html, svg, text, frag, define } from './dom';
 import { HTML, SVG } from '../dom/builder';
 
 describe('Unit: util/dom', () => {
@@ -56,6 +56,8 @@ describe('Unit: util/dom', () => {
     it('', () => {
       assert(define(html('html'), []).innerHTML === '');
       assert(define(define(html('a', { href: '' })), { href: null }).matches(':not([href])'));
+      assert(define(html('html', 'a'), [frag([text('b'), text('c')])]).innerHTML === 'bc');
+      assert(define(html('html', [frag([text('a'), text('b')])]), 'c').innerHTML === 'c');
     });
 
   });

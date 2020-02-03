@@ -142,21 +142,31 @@ export function define<T extends Element>(el: T, attrs?: Attrs | Children, child
       let cnt = 0;
       I:
       for (const child of children as Node[]) {
+        if (child.nodeType === 11) {
+          cnt += child.childNodes.length;
+          void el.insertBefore(child, el.childNodes[cnt - child.childNodes.length] || null);
+          continue;
+        }
         void ++cnt;
-        while (el.childNodes.length > children.length) {
+        while (el.childNodes.length > cnt) {
           if (el.childNodes[cnt - 1] === child) continue I;
           void el.removeChild(el.childNodes[cnt - 1]);
         }
         if (el.childNodes.length >= cnt && el.childNodes[cnt - 1] === child) continue;
         void el.insertBefore(child, el.childNodes[cnt - 1] || null);
       }
-      while (el.childNodes.length > children.length) {
-        void el.removeChild(el.childNodes[children.length]);
+      while (el.childNodes.length > cnt) {
+        void el.removeChild(el.childNodes[cnt]);
       }
     }
     else {
       let cnt = 0;
       for (const child of children) {
+        if (child.nodeType === 11) {
+          cnt += child.childNodes.length;
+          void el.insertBefore(child, el.childNodes[cnt - child.childNodes.length] || null);
+          continue;
+        }
         void ++cnt;
         if (childNodes.length <= cnt && child === childNodes[cnt - 1]) continue;
         void el.insertBefore(child, childNodes[cnt - 1] || null);
