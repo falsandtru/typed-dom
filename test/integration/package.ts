@@ -341,7 +341,7 @@ describe('Integration: Typed DOM', function () {
       const el = HTML.span(
         {
           onchange: (ev, el = ev.target as HTMLElement) =>
-            el.textContent += el.textContent,
+            el.textContent += el.textContent!,
         },
         'a');
       assert(el.children === 'aa');
@@ -354,7 +354,7 @@ describe('Integration: Typed DOM', function () {
         onconnect: (ev, el = ev.target as HTMLElement) =>
           el.textContent = el.textContent!.toUpperCase(),
         ondisconnect: (ev, el = ev.target as HTMLElement) =>
-          el.textContent += el.textContent,
+          el.textContent += el.textContent!,
       };
       const el = HTML.ul([
         HTML.li(listeners, 'a'),
@@ -378,9 +378,9 @@ describe('Integration: Typed DOM', function () {
     it('observe record', function () {
       const listeners: Record<string, EventListener> = {
         onconnect: (ev, el = ev.target as HTMLElement) =>
-          el.textContent += el.textContent[0].toUpperCase(),
+          el.textContent += el.textContent![0].toUpperCase(),
         ondisconnect: (ev, el = ev.target as HTMLElement) =>
-          el.textContent += el.textContent[0].toLowerCase(),
+          el.textContent += el.textContent![0].toLowerCase(),
       };
       const el = HTML.ul({
         a: HTML.li(listeners, 'a'),
