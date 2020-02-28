@@ -1,5 +1,5 @@
-import { Array, WeakMap, WeakSet, Event, Object } from 'spica/global';
-import { hasOwnProperty, ObjectDefineProperties, ObjectFreeze } from 'spica/alias';
+import { WeakMap, WeakSet, Event, Object } from 'spica/global';
+import { isArray, hasOwnProperty, ObjectDefineProperties, ObjectFreeze } from 'spica/alias';
 import { uid } from './identity';
 import { text, define } from '../util/dom';
 import { Mutable } from 'spica/type';
@@ -67,7 +67,7 @@ export class Elem<
       case typeof children_ === 'string':
         this.type = ElChildrenType.Text
         break;
-      case Array.isArray(children_):
+      case isArray(children_):
         this.type = ElChildrenType.Array;
         break;
       case children_ && typeof children_ === 'object':
