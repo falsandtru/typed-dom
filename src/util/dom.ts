@@ -141,22 +141,29 @@ export function define<T extends Element>(el: T, attrs?: Attrs | Children, child
     else if (isArray(children)) {
       let cnt = 0;
       I:
-      for (let child of children as (string | Node)[]) {
-        child = typeof child === 'string'
-          ? text(child)
-          : child;
-        if (child.nodeType === 11) {
+      for (const child of children as (string | Node)[]) {
+        if (typeof child === 'object' && child.nodeType === 11) {
           cnt += child.childNodes.length;
           void el.insertBefore(child, el.childNodes[cnt - child.childNodes.length] || null);
           continue;
         }
         void ++cnt;
-        while (el.childNodes.length > cnt) {
-          if (el.childNodes[cnt - 1] === child) continue I;
-          void el.removeChild(el.childNodes[cnt - 1]);
+        if (typeof child === 'object') {
+          while (el.childNodes.length > cnt) {
+            if (el.childNodes[cnt - 1] === child) continue I;
+            void el.removeChild(el.childNodes[cnt - 1]);
+          }
+          if (childNodes.length <= cnt && child === childNodes[cnt - 1]) continue;
+          void el.insertBefore(child, childNodes[cnt - 1] || null);
         }
-        if (el.childNodes.length >= cnt && el.childNodes[cnt - 1] === child) continue;
-        void el.insertBefore(child, el.childNodes[cnt - 1] || null);
+        else {
+          while (el.childNodes.length > cnt) {
+            if ('wholeText' in childNodes[cnt - 1] && child === (childNodes[cnt - 1] as Text).data) continue I;
+            void el.removeChild(el.childNodes[cnt - 1]);
+          }
+          if (childNodes.length <= cnt && 'wholeText' in childNodes[cnt - 1] && child === (childNodes[cnt - 1] as Text).data) continue;
+          void el.insertBefore(text(child), childNodes[cnt - 1] || null);
+        }
       }
       while (el.childNodes.length > cnt) {
         void el.removeChild(el.childNodes[cnt]);
@@ -164,18 +171,21 @@ export function define<T extends Element>(el: T, attrs?: Attrs | Children, child
     }
     else {
       let cnt = 0;
-      for (let child of children) {
-        child = typeof child === 'string'
-          ? text(child)
-          : child;
-        if (child.nodeType === 11) {
+      for (const child of children) {
+        if (typeof child === 'object' && child.nodeType === 11) {
           cnt += child.childNodes.length;
           void el.insertBefore(child, el.childNodes[cnt - child.childNodes.length] || null);
           continue;
         }
         void ++cnt;
-        if (childNodes.length <= cnt && child === childNodes[cnt - 1]) continue;
-        void el.insertBefore(child, childNodes[cnt - 1] || null);
+        if (typeof child === 'object') {
+          if (childNodes.length <= cnt && child === childNodes[cnt - 1]) continue;
+          void el.insertBefore(child, childNodes[cnt - 1] || null);
+        }
+        else {
+          if (childNodes.length <= cnt && 'wholeText' in childNodes[cnt - 1] && child === (childNodes[cnt - 1] as Text).data) continue;
+          void el.insertBefore(text(child), childNodes[cnt - 1] || null);
+        }
       }
       while (childNodes.length > cnt) {
         void el.removeChild(childNodes[cnt]);
