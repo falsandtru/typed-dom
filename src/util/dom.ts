@@ -1,4 +1,4 @@
-import { document } from 'spica/global';
+import { Symbol, document } from 'spica/global';
 import { isArray, hasOwnProperty } from 'spica/alias';
 import { memoize } from 'spica/memoize';
 
