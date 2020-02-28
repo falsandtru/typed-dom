@@ -9,7 +9,7 @@ const enum NS {
 
 export type TagNameMap = object;
 export type Attrs = Record<string, string | EventListener | null | undefined>;
-export type Children = Iterable<Node> | string;
+export type Children = Iterable<string | Node> | string;
 
 export interface Factory<M extends TagNameMap> {
   <T extends Extract<keyof M, string>>(tag: T, children?: Children): M[T];
@@ -106,7 +106,7 @@ export function define<T extends Element | ShadowRoot>(el: T, children?: Childre
 export function define<T extends Element>(el: T, attrs?: Attrs, children?: Children): T;
 export function define<T extends Element>(el: T, attrs?: Attrs | Children, children?: Children): T {
   if (isChildren(attrs)) return define(el, void 0, attrs);
-  if (typeof children === 'string') return define(el, attrs, [text(children)]);
+  if (typeof children === 'string') return define(el, attrs, [children]);
   if (attrs) for (const name in attrs) {
     if (!hasOwnProperty(attrs, name)) continue;
     const value = attrs[name];
@@ -141,7 +141,10 @@ export function define<T extends Element>(el: T, attrs?: Attrs | Children, child
     else if (isArray(children)) {
       let cnt = 0;
       I:
-      for (const child of children as Node[]) {
+      for (let child of children as (string | Node)[]) {
+        child = typeof child === 'string'
+          ? text(child)
+          : child;
         if (child.nodeType === 11) {
           cnt += child.childNodes.length;
           void el.insertBefore(child, el.childNodes[cnt - child.childNodes.length] || null);
@@ -161,7 +164,10 @@ export function define<T extends Element>(el: T, attrs?: Attrs | Children, child
     }
     else {
       let cnt = 0;
-      for (const child of children) {
+      for (let child of children) {
+        child = typeof child === 'string'
+          ? text(child)
+          : child;
         if (child.nodeType === 11) {
           cnt += child.childNodes.length;
           void el.insertBefore(child, el.childNodes[cnt - child.childNodes.length] || null);

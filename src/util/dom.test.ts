@@ -56,8 +56,8 @@ describe('Unit: util/dom', () => {
     it('', () => {
       assert(define(html('html'), []).innerHTML === '');
       assert(define(define(html('a', { href: '' })), { href: null }).matches(':not([href])'));
-      assert(define(html('html', 'a'), [frag([text('b'), text('c')])]).innerHTML === 'bc');
-      assert(define(html('html', [frag([text('a'), text('b')])]), 'c').innerHTML === 'c');
+      assert(define(html('html', 'a'), [frag(['b', text('c')])]).innerHTML === 'bc');
+      assert(define(html('html', [frag(['a', text('b')])]), 'c').innerHTML === 'c');
     });
 
   });
