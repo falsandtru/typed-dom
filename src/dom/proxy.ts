@@ -1,4 +1,4 @@
-import { WeakMap, Event, Object } from 'spica/global';
+import { WeakMap, Event } from 'spica/global';
 import { isArray, ObjectDefineProperties, ObjectFreeze, ObjectKeys } from 'spica/alias';
 import { uid } from './identity';
 import { text, define } from '../util/dom';
