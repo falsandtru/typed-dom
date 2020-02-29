@@ -19,7 +19,7 @@ export interface Factory<M extends TagNameMap> {
 const shadows = new WeakMap<Element, ShadowRoot>();
 
 namespace caches {
-  export const elem = memoize<Document | Element, Map<string, Element>>(() => new Map(), new WeakMap());
+  export const elem = memoize<Document | Element, Record<string, Element>>(() => Object.create(null), new WeakMap());
   export const frag = document.createDocumentFragment();
 }
 
@@ -80,10 +80,8 @@ export function element(context: Document | Element, ns: NS, tag: string, attrs?
   const key = `${ns}:${tag}`;
   const el = tag.includes('-')
     ? elem(context, ns, tag)
-    : cache.has(key)
-      ? cache.get(key)!.cloneNode(true) as Element
-      : cache.set(key, elem(context, ns, tag)).get(key)!.cloneNode(true) as Element;
-  assert(tag.includes('-') || el !== cache.get(key));
+    : (cache[key] = cache[key] || elem(context, ns, tag)).cloneNode(true) as Element;
+  assert(tag.includes('-') || el !== cache[key]);
   assert(el.attributes.length === 0);
   assert(el.childNodes.length === 0);
   isChildren(attrs)
