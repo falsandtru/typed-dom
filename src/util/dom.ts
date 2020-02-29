@@ -84,10 +84,9 @@ export function element(context: Document | Element, ns: NS, tag: string, attrs?
   assert(tag.includes('-') || el !== cache[key]);
   assert(el.attributes.length === 0);
   assert(el.childNodes.length === 0);
-  isChildren(attrs)
+  return isChildren(attrs)
     ? defineChildren(el, attrs, true)
     : defineChildren(defineAttrs(el, attrs), children, true);
-  return el;
 }
 
 function elem(context: Document | Element, ns: NS, tag: string): Element {
