@@ -135,7 +135,8 @@ export function define<T extends Element>(el: T, attrs?: Attrs | Children, child
   }
   if (children) {
     const targetNodes = el.childNodes;
-    if (targetNodes.length === 0) {
+    let targetLength = targetNodes.length;
+    if (targetLength === 0) {
       void el.append(...children);
     }
     else if (isArray(children)) {
@@ -144,20 +145,25 @@ export function define<T extends Element>(el: T, attrs?: Attrs | Children, child
       for (const child of children as (string | Node)[]) {
         if (typeof child === 'object' && child.nodeType === 11) {
           const sourceNodes = child.childNodes;
-          cnt += sourceNodes.length;
-          void el.insertBefore(child, targetNodes[cnt - sourceNodes.length] || null);
+          const sourceLength = sourceNodes.length;
+          void el.insertBefore(child, targetNodes[cnt] || null);
+          cnt += sourceLength;
+          targetLength += sourceLength;
           continue;
         }
         void ++cnt;
-        while (targetNodes.length > cnt) {
+        while (targetLength > cnt) {
           if (equal(targetNodes[cnt - 1], child)) continue I;
           void el.removeChild(targetNodes[cnt - 1]);
+          void --targetLength;
         }
-        if (targetNodes.length <= cnt && equal(targetNodes[cnt - 1], child)) continue;
+        if (cnt <= targetLength && equal(targetNodes[cnt - 1], child)) continue;
         void el.insertBefore(typeof child === 'string' ? text(child) : child, targetNodes[cnt - 1] || null);
+        void ++targetLength;
       }
-      while (targetNodes.length > cnt) {
+      while (cnt < targetLength) {
         void el.removeChild(targetNodes[cnt]);
+        void --targetLength;
       }
     }
     else {
@@ -165,16 +171,20 @@ export function define<T extends Element>(el: T, attrs?: Attrs | Children, child
       for (const child of children) {
         if (typeof child === 'object' && child.nodeType === 11) {
           const sourceNodes = child.childNodes;
-          cnt += sourceNodes.length;
-          void el.insertBefore(child, targetNodes[cnt - sourceNodes.length] || null);
+          const sourceLength = sourceNodes.length;
+          void el.insertBefore(child, targetNodes[cnt] || null);
+          cnt += sourceLength;
+          targetLength += sourceLength;
           continue;
         }
         void ++cnt;
-        if (targetNodes.length <= cnt && equal(targetNodes[cnt - 1], child)) continue;
+        if (cnt <= targetLength && equal(targetNodes[cnt - 1], child)) continue;
         void el.insertBefore(typeof child === 'string' ? text(child) : child, targetNodes[cnt - 1] || null);
+        void ++targetLength;
       }
-      while (targetNodes.length > cnt) {
+      while (cnt < targetLength) {
         void el.removeChild(targetNodes[cnt]);
+        void --targetLength;
       }
     }
   }
