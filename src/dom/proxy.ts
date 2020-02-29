@@ -192,7 +192,7 @@ export class Elem<
       case ElChildrenType.Text:
         this.children_ = (this.children_ as unknown as Text).parentNode === this.container
           ? this.children_
-          : [...this.container.childNodes].find(node => node.nodeType === 3) as any || (this.children_ as unknown as Text).cloneNode();
+          : [...this.container.childNodes].find(node => 'wholeText' in node) as any || (this.children_ as unknown as Text).cloneNode();
         return (this.children_ as unknown as Text).data as C;
       default:
         return this.children_ as C;
