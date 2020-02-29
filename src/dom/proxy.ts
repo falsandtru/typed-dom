@@ -224,30 +224,32 @@ export class Elem<
         const sourceChildren = children as ElChildren.Array;
         const targetChildren = [] as Mutable<ElChildren.Array>;
         this.children_ = targetChildren as ElChildren as C;
+        const nodeChildren = this.container.children;
         const log = new WeakSet<El>();
         for (let i = 0; i < sourceChildren.length; ++i) {
           const newChild = sourceChildren[i];
+          const el = nodeChildren[i];
           if (log.has(newChild)) throw new Error(`TypedDOM: Typed DOM children can't repeatedly be used to the same object.`);
           void log.add(newChild);
           if (newChild.element.parentNode !== this.container) {
             void throwErrorIfNotUsable(newChild);
           }
-          if (newChild.element !== this.container.children[i]) {
+          if (newChild.element !== el) {
             if (newChild.element.parentNode !== this.container) {
               void this.scope(newChild);
               void addedChildren.push(newChild);
             }
-            void this.container.insertBefore(newChild.element, this.container.children[i]);
+            void this.container.insertBefore(newChild.element, el);
             isChanged = true;
           }
           void targetChildren.push(newChild);
         }
         void ObjectFreeze(targetChildren);
-        for (let i = sourceChildren.length; i < this.container.children.length; ++i) {
-          if (!proxies.has(this.container.children[i])) continue;
-          void removedChildren.push(proxy(this.container.removeChild(this.container.children[i])));
+        for (let i = nodeChildren.length; sourceChildren.length < i--;) {
+          const el = nodeChildren[sourceChildren.length];
+          if (!proxies.has(el)) continue;
+          void removedChildren.push(proxy(this.container.removeChild(el)));
           isChanged = true;
-          void --i;
         }
         assert(this.container.children.length === sourceChildren.length);
         assert(targetChildren.every((child, i) => child.element === this.container.children[i]));
