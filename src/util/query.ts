@@ -5,8 +5,8 @@ export function apply<T extends keyof SVGElementTagNameMap>(node: ParentNode, se
 export function apply<T extends Element = Element>(node: ParentNode, selector: string, attrs?: Attrs): NodeListOf<T>
 export function apply<T extends Element = Element>(node: ParentNode, selector: string, attrs?: Attrs): NodeListOf<T> {
   const ns = node.querySelectorAll<T>(selector);
-  for (const n of ns) {
-    void define(n, attrs);
+  for (let i = 0, len = ns.length; i < len; ++i) {
+    void define(ns[i], attrs);
   }
   return ns;
 }
