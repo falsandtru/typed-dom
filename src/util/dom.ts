@@ -20,7 +20,6 @@ const shadows = new WeakMap<Element, ShadowRoot>();
 
 namespace caches {
   export const elem = memoize<Document | Element, Map<string, Element>>(() => new Map(), new WeakMap());
-  export const text = document.createTextNode('');
   export const frag = document.createDocumentFragment();
 }
 
@@ -66,9 +65,7 @@ export function svg<T extends keyof SVGElementTagNameMap>(tag: T, attrs?: Attrs 
 }
 
 export function text(source: string): Text {
-  const text = caches.text.cloneNode() as Text;
-  text.data = source;
-  return text;
+  return document.createTextNode(source);
 }
 
 export function element<T extends keyof HTMLElementTagNameMap>(context: Document, ns: NS.HTML, tag: T, children?: Children): HTMLElementTagNameMap[T];
