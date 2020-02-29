@@ -223,7 +223,7 @@ export class Elem<
       case ElChildrenType.Array: {
         const sourceChildren = children as ElChildren.Array;
         const targetChildren = [] as Mutable<ElChildren.Array>;
-        this.children_ = targetChildren as unknown as C;
+        this.children_ = targetChildren as ElChildren as C;
         const log = new WeakSet<El>();
         for (let i = 0; i < sourceChildren.length; ++i) {
           const newChild = sourceChildren[i];
