@@ -1,4 +1,4 @@
-import { Set, WeakMap, Event, Object } from 'spica/global';
+import { WeakMap, Event, Object } from 'spica/global';
 import { isArray, ObjectDefineProperties, ObjectFreeze, ObjectKeys } from 'spica/alias';
 import { uid } from './identity';
 import { text, define } from '../util/dom';
@@ -224,7 +224,6 @@ export class Elem<
         const targetChildren = [] as Mutable<ElChildren.Array>;
         this.children_ = targetChildren as ElChildren as C;
         const nodeChildren = this.container.children;
-        if (new Set(sourceChildren).size !== sourceChildren.length) throw new Error(`TypedDOM: Typed DOM children can't repeatedly be used to the same object.`);
         for (let i = 0; i < sourceChildren.length; ++i) {
           const newChild = sourceChildren[i];
           const el = nodeChildren[i];
@@ -256,9 +255,7 @@ export class Elem<
         const sourceChildren = children as ElChildren.Record;
         const targetChildren = this.children_ as ElChildren.Record;
         assert.deepStrictEqual(Object.keys(sourceChildren), Object.keys(targetChildren));
-        const names = ObjectKeys(targetChildren);
-        if (new Set(names.map(name => sourceChildren[name])).size !== names.length) throw new Error(`TypedDOM: Typed DOM children can't repeatedly be used to the same object.`);
-        for (const name of names) {
+        for (const name of ObjectKeys(targetChildren)) {
           const oldChild = targetChildren[name];
           const newChild = sourceChildren[name];
           if (!this.isInitialization && newChild === oldChild) continue;
