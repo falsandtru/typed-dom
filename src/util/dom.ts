@@ -148,22 +148,12 @@ export function define<T extends Element>(el: T, attrs?: Attrs | Children, child
           continue;
         }
         void ++cnt;
-        if (typeof child === 'object') {
-          while (el.childNodes.length > cnt) {
-            if (el.childNodes[cnt - 1] === child) continue I;
-            void el.removeChild(el.childNodes[cnt - 1]);
-          }
-          if (childNodes.length <= cnt && child === childNodes[cnt - 1]) continue;
-          void el.insertBefore(child, childNodes[cnt - 1] || null);
+        while (el.childNodes.length > cnt) {
+          if (equal(el.childNodes[cnt - 1], child)) continue I;
+          void el.removeChild(el.childNodes[cnt - 1]);
         }
-        else {
-          while (el.childNodes.length > cnt) {
-            if ('wholeText' in childNodes[cnt - 1] && child === (childNodes[cnt - 1] as Text).data) continue I;
-            void el.removeChild(el.childNodes[cnt - 1]);
-          }
-          if (childNodes.length <= cnt && 'wholeText' in childNodes[cnt - 1] && child === (childNodes[cnt - 1] as Text).data) continue;
-          void el.insertBefore(text(child), childNodes[cnt - 1] || null);
-        }
+        if (childNodes.length <= cnt && equal(childNodes[cnt - 1], child)) continue;
+        void el.insertBefore(typeof child === 'string' ? text(child) : child, childNodes[cnt - 1] || null);
       }
       while (el.childNodes.length > cnt) {
         void el.removeChild(el.childNodes[cnt]);
@@ -178,14 +168,8 @@ export function define<T extends Element>(el: T, attrs?: Attrs | Children, child
           continue;
         }
         void ++cnt;
-        if (typeof child === 'object') {
-          if (childNodes.length <= cnt && child === childNodes[cnt - 1]) continue;
-          void el.insertBefore(child, childNodes[cnt - 1] || null);
-        }
-        else {
-          if (childNodes.length <= cnt && 'wholeText' in childNodes[cnt - 1] && child === (childNodes[cnt - 1] as Text).data) continue;
-          void el.insertBefore(text(child), childNodes[cnt - 1] || null);
-        }
+        if (childNodes.length <= cnt && equal(childNodes[cnt - 1], child)) continue;
+        void el.insertBefore(typeof child === 'string' ? text(child) : child, childNodes[cnt - 1] || null);
       }
       while (childNodes.length > cnt) {
         void el.removeChild(childNodes[cnt]);
@@ -197,4 +181,10 @@ export function define<T extends Element>(el: T, attrs?: Attrs | Children, child
 
 function isChildren(o: Attrs | Children | ShadowRootInit | undefined): o is Children {
   return !!o?.[Symbol.iterator];
+}
+
+function equal(node: Node | Text, data: Node | Text | string): boolean {
+  return typeof data === 'string'
+    ? 'wholeText' in node && data === node.data
+    : data === node;
 }
