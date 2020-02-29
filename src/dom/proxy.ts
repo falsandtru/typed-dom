@@ -193,7 +193,7 @@ export class Elem<
         this.children_ = (this.children_ as unknown as Text).parentNode === this.container
           ? this.children_
           : [...this.container.childNodes].find(node => node.nodeType === 3) as any || (this.children_ as unknown as Text).cloneNode();
-        return (this.children_ as unknown as Text).textContent as C;
+        return (this.children_ as unknown as Text).data as C;
       default:
         return this.children_ as C;
     }
@@ -208,9 +208,9 @@ export class Elem<
       case ElChildrenType.Text: {
         if (!this.isInitialization && children === this.children) return;
         const targetChildren = this.children_ as unknown as Text;
-        const oldText = targetChildren.textContent!;
+        const oldText = targetChildren.data;
         const newText = children as ElChildren.Text;
-        targetChildren.textContent = newText;
+        targetChildren.data = newText;
         if (newText === oldText) return;
         void this.element.dispatchEvent(new Event('change', { bubbles: false, cancelable: true }));
         return;
