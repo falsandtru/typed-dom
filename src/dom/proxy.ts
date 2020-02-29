@@ -190,9 +190,14 @@ export class Elem<
     assert([ElChildrenType.Void, ElChildrenType.Array].includes(this.type) ? Object.isFrozen(this.children_) : !Object.isFrozen(this.children_));
     switch (this.type) {
       case ElChildrenType.Text:
-        this.children_ = (this.children_ as unknown as Text).parentNode === this.container
-          ? this.children_
-          : [...this.container.childNodes].find(node => 'wholeText' in node) as any || (this.children_ as unknown as Text).cloneNode();
+        if ((this.children_ as unknown as Text).parentNode !== this.container) {
+          this.children_ = void 0 as unknown as C;
+          for (const node of this.container.childNodes) {
+            if ('wholeText' in node === false) continue;
+            this.children_ = node as any;
+            break;
+          }
+        }
         return (this.children_ as unknown as Text).data as C;
       default:
         return this.children_ as C;
