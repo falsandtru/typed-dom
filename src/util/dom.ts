@@ -26,8 +26,7 @@ namespace caches {
 export function frag(children?: Children): DocumentFragment {
   if (typeof children === 'string') return frag([children]);
   const node = caches.frag.cloneNode() as DocumentFragment;
-  children && void node.append(...children);
-  return node;
+  return defineChildren(node, children, true);
 }
 
 export function shadow(el: keyof ShadowHostElementTagNameMap | HTMLElement, opts?: ShadowRootInit): ShadowRoot;
@@ -36,20 +35,22 @@ export function shadow(el: keyof ShadowHostElementTagNameMap | HTMLElement, chil
   if (typeof el === 'string') return shadow(html(el), children as Children, opts);
   if (children && !isChildren(children)) return shadow(el, void 0, children);
   return el.shadowRoot || shadows.has(el)
-    ? define(
+    ? defineChildren(
         opts
           ? opts.mode === 'open'
             ? el.shadowRoot || el.attachShadow(opts)
             : shadows.get(el) || shadows.set(el, el.attachShadow(opts)).get(el)!
           : el.shadowRoot || shadows.get(el)!,
-        children)
-    : define(
+        children,
+        !shadows.has(el))
+    : defineChildren(
         !opts || opts.mode === 'open'
           ? el.attachShadow({ mode: 'open' })
           : shadows.set(el, el.attachShadow(opts)).get(el)!,
         children === void 0
           ? el.childNodes
-          : children);
+          : children,
+        !shadows.has(el));
 }
 
 export function html<T extends keyof HTMLElementTagNameMap>(tag: T, children?: Children): HTMLElementTagNameMap[T];
@@ -85,7 +86,9 @@ export function element(context: Document | Element, ns: NS, tag: string, attrs?
   assert(tag.includes('-') || el !== cache.get(key));
   assert(el.attributes.length === 0);
   assert(el.childNodes.length === 0);
-  void define(el, attrs as Attrs, children);
+  isChildren(attrs)
+    ? defineChildren(el, attrs, true)
+    : defineChildren(defineAttrs(el, attrs), children, true);
   return el;
 }
 
@@ -102,9 +105,13 @@ function elem(context: Document | Element, ns: NS, tag: string): Element {
 export function define<T extends Element | ShadowRoot>(el: T, children?: Children): T;
 export function define<T extends Element>(el: T, attrs?: Attrs, children?: Children): T;
 export function define<T extends Element>(el: T, attrs?: Attrs | Children, children?: Children): T {
-  if (isChildren(attrs)) return define(el, void 0, attrs);
-  if (typeof children === 'string') return define(el, attrs, [children]);
-  if (attrs) for (const name of ObjectKeys(attrs)) {
+  return isChildren(attrs)
+    ? defineChildren(el, attrs)
+    : defineChildren(defineAttrs(el, attrs), children);
+}
+function defineAttrs<T extends Element>(el: T, attrs?: Attrs): T {
+  if (!attrs) return el;
+  for (const name of ObjectKeys(attrs)) {
     const value = attrs[name];
     switch (typeof value) {
       case 'string':
@@ -129,61 +136,68 @@ export function define<T extends Element>(el: T, attrs?: Attrs | Children, child
         continue;
     }
   }
-  if (children) {
-    const targetNodes = el.childNodes;
-    let targetLength = targetNodes.length;
-    let count = 0;
-    if (targetLength === 0) {
-      void el.append(...children);
-    }
-    else if (isArray(children)) {
-      I:
-      for (const child of children as (string | Node)[]) {
-        if (typeof child === 'object' && child.nodeType === 11) {
-          const sourceNodes = child.childNodes;
-          const sourceLength = sourceNodes.length;
-          void el.insertBefore(child, targetNodes[count] || null);
-          count += sourceLength;
-          targetLength += sourceLength;
-          continue;
-        }
-        void ++count;
-        while (targetLength > count) {
-          const node = targetNodes[count - 1];
-          if (equal(node, child)) continue I;
-          void node.remove();
-          void --targetLength;
-        }
-        const node = targetNodes[count - 1] || null;
-        if (node && equal(node, child)) continue;
-        void el.insertBefore(typeof child === 'string' ? text(child) : child, node);
-        void ++targetLength;
+  return el;
+}
+function defineChildren<T extends DocumentFragment | ShadowRoot | Element>(el: T, children?: Children, clean = false): T {
+  switch (typeof children) {
+    case 'undefined':
+      return el;
+    case 'string':
+      return defineChildren(el, [children], clean);
+  }
+  const targetNodes = clean ? [] : el.childNodes;
+  let targetLength = targetNodes.length;
+  let count = 0;
+  if (targetLength === 0) {
+    void el.append(...children);
+  }
+  else if (isArray(children)) {
+    I:
+    for (const child of children as (string | Node)[]) {
+      if (typeof child === 'object' && child.nodeType === 11) {
+        const sourceNodes = child.childNodes;
+        const sourceLength = sourceNodes.length;
+        void el.insertBefore(child, targetNodes[count] || null);
+        count += sourceLength;
+        targetLength += sourceLength;
+        continue;
       }
-      while (count < targetLength) {
-        void targetNodes[count].remove();
+      void ++count;
+      while (targetLength > count) {
+        const node = targetNodes[count - 1];
+        if (equal(node, child)) continue I;
+        void node.remove();
         void --targetLength;
       }
+      const node = targetNodes[count - 1] || null;
+      if (node && equal(node, child)) continue;
+      void el.insertBefore(typeof child === 'string' ? text(child) : child, node);
+      void ++targetLength;
     }
-    else {
-      for (const child of children) {
-        if (typeof child === 'object' && child.nodeType === 11) {
-          const sourceNodes = child.childNodes;
-          const sourceLength = sourceNodes.length;
-          void el.insertBefore(child, targetNodes[count] || null);
-          count += sourceLength;
-          targetLength += sourceLength;
-          continue;
-        }
-        void ++count;
-        const node = targetNodes[count - 1] || null;
-        if (node && equal(node, child)) continue;
-        void el.insertBefore(typeof child === 'string' ? text(child) : child, node);
-        void ++targetLength;
+    while (count < targetLength) {
+      void targetNodes[count].remove();
+      void --targetLength;
+    }
+  }
+  else {
+    for (const child of children) {
+      if (typeof child === 'object' && child.nodeType === 11) {
+        const sourceNodes = child.childNodes;
+        const sourceLength = sourceNodes.length;
+        void el.insertBefore(child, targetNodes[count] || null);
+        count += sourceLength;
+        targetLength += sourceLength;
+        continue;
       }
-      while (count < targetLength) {
-        void targetNodes[count].remove();
-        void --targetLength;
-      }
+      void ++count;
+      const node = targetNodes[count - 1] || null;
+      if (node && equal(node, child)) continue;
+      void el.insertBefore(typeof child === 'string' ? text(child) : child, node);
+      void ++targetLength;
+    }
+    while (count < targetLength) {
+      void targetNodes[count].remove();
+      void --targetLength;
     }
   }
   return el;
