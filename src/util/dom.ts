@@ -25,7 +25,7 @@ namespace caches {
 }
 
 export function frag(children?: Children): DocumentFragment {
-  if (typeof children === 'string') return frag([text(children)]);
+  if (typeof children === 'string') return frag([children]);
   const node = caches.frag.cloneNode() as DocumentFragment;
   children && void node.append(...children);
   return node;
