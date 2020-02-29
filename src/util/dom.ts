@@ -153,16 +153,18 @@ export function define<T extends Element>(el: T, attrs?: Attrs | Children, child
         }
         void ++cnt;
         while (targetLength > cnt) {
-          if (equal(targetNodes[cnt - 1], child)) continue I;
-          void el.removeChild(targetNodes[cnt - 1]);
+          const node = targetNodes[cnt - 1];
+          if (equal(node, child)) continue I;
+          void node.remove();
           void --targetLength;
         }
-        if (cnt <= targetLength && equal(targetNodes[cnt - 1], child)) continue;
-        void el.insertBefore(typeof child === 'string' ? text(child) : child, targetNodes[cnt - 1] || null);
+        const node = targetNodes[cnt - 1] || null;
+        if (node && equal(node, child)) continue;
+        void el.insertBefore(typeof child === 'string' ? text(child) : child, node);
         void ++targetLength;
       }
       while (cnt < targetLength) {
-        void el.removeChild(targetNodes[cnt]);
+        void targetNodes[cnt].remove();
         void --targetLength;
       }
     }
@@ -178,12 +180,13 @@ export function define<T extends Element>(el: T, attrs?: Attrs | Children, child
           continue;
         }
         void ++cnt;
-        if (cnt <= targetLength && equal(targetNodes[cnt - 1], child)) continue;
-        void el.insertBefore(typeof child === 'string' ? text(child) : child, targetNodes[cnt - 1] || null);
+        const node = targetNodes[cnt - 1] || null;
+        if (node && equal(node, child)) continue;
+        void el.insertBefore(typeof child === 'string' ? text(child) : child, node);
         void ++targetLength;
       }
       while (cnt < targetLength) {
-        void el.removeChild(targetNodes[cnt]);
+        void targetNodes[cnt].remove();
         void --targetLength;
       }
     }
