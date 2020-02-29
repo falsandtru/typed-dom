@@ -127,6 +127,7 @@ export class Elem<
   private observe(children: ElChildren.Record): C {
     const descs: PropertyDescriptorMap = {};
     for (const name of ObjectKeys(children)) {
+      if (name in {}) continue;
       let child: El<string, Element, ElChildren> = children[name];
       void throwErrorIfNotUsable(child);
       void this.container.appendChild(child.element);
