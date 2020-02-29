@@ -1,5 +1,5 @@
-import { WeakMap, WeakSet, Event, Object } from 'spica/global';
-import { isArray, hasOwnProperty, ObjectDefineProperties, ObjectFreeze } from 'spica/alias';
+import { Set, WeakMap, WeakSet, Event, Object } from 'spica/global';
+import { isArray, ObjectDefineProperties, ObjectFreeze, ObjectKeys } from 'spica/alias';
 import { uid } from './identity';
 import { text, define } from '../util/dom';
 import { Mutable } from 'spica/type';
@@ -126,8 +126,7 @@ export class Elem<
   private isPartialUpdate = false;
   private observe(children: ElChildren.Record): C {
     const descs: PropertyDescriptorMap = {};
-    for (const name in children) {
-      if (!hasOwnProperty(children, name)) continue;
+    for (const name of ObjectKeys(children)) {
       let child: El<string, Element, ElChildren> = children[name];
       void throwErrorIfNotUsable(child);
       void this.container.appendChild(child.element);
@@ -260,8 +259,7 @@ export class Elem<
         const targetChildren = this.children_ as ElChildren.Record;
         assert.deepStrictEqual(Object.keys(sourceChildren), Object.keys(targetChildren));
         const log = new WeakSet<El>();
-        for (const name in targetChildren) {
-          if (!hasOwnProperty(sourceChildren, name)) continue;
+        for (const name of ObjectKeys(targetChildren)) {
           const oldChild = targetChildren[name];
           const newChild = sourceChildren[name];
           if (log.has(newChild)) throw new Error(`TypedDOM: Typed DOM children can't repeatedly be used to the same object.`);
