@@ -166,7 +166,7 @@ export class Elem<
     return ObjectDefineProperties(children, descs);
   }
   private scope(child: El<string, Element, ElChildren>): void {
-    if (child.element.nodeName !== 'STYLE') return;
+    if (child.element.tagName !== 'STYLE') return;
     const syntax = /(^|[,}])(\s*)\$scope(?![\w-])(?=[^;{}]*{)/g;
     const style = child.element;
     const query = this.query;
