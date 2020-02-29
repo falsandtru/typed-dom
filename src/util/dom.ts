@@ -102,7 +102,7 @@ function elem(context: Document | Element, ns: NS, tag: string): Element {
   }
 }
 
-export function define<T extends Element | ShadowRoot>(el: T, children?: Children): T;
+export function define<T extends Element | DocumentFragment | ShadowRoot>(el: T, children?: Children): T;
 export function define<T extends Element>(el: T, attrs?: Attrs, children?: Children): T;
 export function define<T extends Element>(el: T, attrs?: Attrs | Children, children?: Children): T {
   return isChildren(attrs)
