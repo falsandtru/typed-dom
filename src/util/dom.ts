@@ -1,5 +1,5 @@
 import { Symbol, document } from 'spica/global';
-import { isArray, hasOwnProperty } from 'spica/alias';
+import { isArray, ObjectKeys } from 'spica/alias';
 import { memoize } from 'spica/memoize';
 
 const enum NS {
@@ -107,8 +107,7 @@ export function define<T extends Element>(el: T, attrs?: Attrs, children?: Child
 export function define<T extends Element>(el: T, attrs?: Attrs | Children, children?: Children): T {
   if (isChildren(attrs)) return define(el, void 0, attrs);
   if (typeof children === 'string') return define(el, attrs, [children]);
-  if (attrs) for (const name in attrs) {
-    if (!hasOwnProperty(attrs, name)) continue;
+  if (attrs) for (const name of ObjectKeys(attrs)) {
     const value = attrs[name];
     switch (typeof value) {
       case 'string':

@@ -1,4 +1,4 @@
-import { hasOwnProperty, ObjectValues } from 'spica/alias';
+import { ObjectKeys, ObjectValues } from 'spica/alias';
 import { Elem, El, ElChildren } from './proxy';
 import { Factory as BaseFactory, TagNameMap, Attrs, shadow, html, svg, define } from '../util/dom';
 import { ExtractProp } from 'spica/type';
@@ -69,11 +69,10 @@ function handle
       const el = factory(baseFactory, tag, attrs || {}, children);
       if (tag !== el.tagName.toLowerCase()) throw new Error(`TypedDOM: Expected tag name is "${tag}" but actually "${el.tagName.toLowerCase()}".`);
       if (factory !== defaultFactory) {
-        if (attrs) for (const k in attrs) {
-          if (!hasOwnProperty(attrs, k)) continue;
-          const v = attrs[k];
-          if (typeof v !== 'function') continue;
-          void el.removeEventListener(k, v);
+        if (attrs) for (const name of ObjectKeys(attrs)) {
+          const value = attrs[name];
+          if (typeof value !== 'function') continue;
+          void el.removeEventListener(name, value);
         }
         void define(el, attrs);
       }
