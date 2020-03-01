@@ -149,7 +149,8 @@ function defineChildren<T extends DocumentFragment | ShadowRoot | Element>(el: T
   }
   else if (isArray(children)) {
     I:
-    for (const child of children as (string | Node)[]) {
+    for (let i = 0; i < children.length; ++i) {
+      const child: string | Node = children[i];
       if (typeof child === 'object' && child.nodeType === 11) {
         const sourceNodes = child.childNodes;
         const sourceLength = sourceNodes.length;
@@ -159,13 +160,15 @@ function defineChildren<T extends DocumentFragment | ShadowRoot | Element>(el: T
         continue;
       }
       void ++count;
-      while (targetLength > count) {
+      while (targetLength > children.length) {
         const node = targetNodes[count - 1];
         if (equal(node, child)) continue I;
         void node.remove();
         void --targetLength;
       }
-      const node = targetNodes[count - 1] || null;
+      const node = count <= targetLength
+        ? targetNodes[count - 1]
+        : null;
       if (node && equal(node, child)) continue;
       void el.insertBefore(typeof child === 'string' ? text(child) : child, node);
       void ++targetLength;
@@ -186,7 +189,9 @@ function defineChildren<T extends DocumentFragment | ShadowRoot | Element>(el: T
         continue;
       }
       void ++count;
-      const node = targetNodes[count - 1] || null;
+      const node = count <= targetLength
+        ? targetNodes[count - 1]
+        : null;
       if (node && equal(node, child)) continue;
       void el.insertBefore(typeof child === 'string' ? text(child) : child, node);
       void ++targetLength;
