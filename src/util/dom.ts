@@ -25,8 +25,7 @@ namespace caches {
 
 export function frag(children?: Children): DocumentFragment {
   if (typeof children === 'string') return frag([children]);
-  const node = caches.frag.cloneNode() as DocumentFragment;
-  return defineChildren(node, children, true);
+  return defineChildren(caches.frag.cloneNode() as DocumentFragment, children, true);
 }
 
 export function shadow(el: keyof ShadowHostElementTagNameMap | HTMLElement, opts?: ShadowRootInit): ShadowRoot;
@@ -206,6 +205,6 @@ function isChildren(o: Attrs | Children | ShadowRootInit | undefined): o is Chil
 
 function equal(node: Node | Text, data: Node | Text | string): boolean {
   return typeof data === 'string'
-    ? 'wholeText' in node && data === node.data
-    : data === node;
+    ? 'wholeText' in node && node.data === data
+    : node === data;
 }
