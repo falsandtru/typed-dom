@@ -34,8 +34,9 @@ export function proxy<E extends Element>(el: E): El<string, E, ElChildren>;
 export function proxy<C extends ElChildren>(el: Element): El<string, Element, C>;
 export function proxy<E extends Element, C extends ElChildren>(el: E): El<string, E, C>;
 export function proxy(el: Element): El<string, Element, ElChildren> {
-  if (!proxies.has(el)) throw new Error(`TypedDOM: This element has no proxy.`);
-  return proxies.get(el)!;
+  const proxy = proxies.get(el);
+  if (proxy) return proxy;
+  throw new Error(`TypedDOM: This element has no proxy.`);
 }
 
 const tag = Symbol.for('typed-dom/tag');
