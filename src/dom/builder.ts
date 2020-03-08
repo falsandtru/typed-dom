@@ -1,3 +1,4 @@
+import { undefined } from 'spica/global';
 import { ObjectKeys, ObjectValues } from 'spica/alias';
 import { Elem, El, ElChildren } from './proxy';
 import { Factory as BaseFactory, TagNameMap, Attrs, shadow, html, svg, define } from '../util/dom';
@@ -10,7 +11,7 @@ export function API
   <M extends TagNameMap, F extends BaseFactory<M>>
   (baseFactory: F, formatter: <E extends Element>(el: E) => E | ShadowRoot = el => el)
   : API<M, F> {
-  return new Proxy<API<M, F>>((() => void 0) as any, handle(baseFactory, formatter));
+  return new Proxy<API<M, F>>((() => undefined) as any, handle(baseFactory, formatter));
 }
 
 export const Shadow: API<ShadowHostElementTagNameMap> = API(html, shadow);
@@ -51,9 +52,9 @@ function handle
 
   function builder(tag: Extract<keyof M, string>, baseFactory: F): (attrs?: Attrs, children?: ElChildren, factory?: () => Element) => El<string, Element, ElChildren> {
     return function build(attrs?: Attrs, children?: ElChildren, factory?: Factory<F, Extract<keyof M, string>, ElChildren, Element>): El<string, Element, ElChildren> {
-      if (typeof attrs === 'function') return build(void 0, void 0, attrs);
-      if (typeof children === 'function') return build(attrs, void 0, children);
-      if (attrs !== void 0 && isChildren(attrs)) return build(void 0, attrs, factory);
+      if (typeof attrs === 'function') return build(undefined, undefined, attrs);
+      if (typeof children === 'function') return build(attrs, undefined, children);
+      if (attrs !== undefined && isChildren(attrs)) return build(undefined, attrs, factory);
       const node = formatter(elem(factory || defaultFactory, attrs, children));
       return node.nodeType === 1
         ? new Elem(node as Element, children)
@@ -72,9 +73,9 @@ function handle
         if (attrs) for (const name of ObjectKeys(attrs)) {
           const value = attrs[name];
           if (typeof value !== 'function') continue;
-          void el.removeEventListener(name, value);
+          el.removeEventListener(name, value);
         }
-        void define(el, attrs);
+        define(el, attrs);
       }
       return el;
     }

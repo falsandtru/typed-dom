@@ -1,4 +1,4 @@
-import { WeakMap, Event } from 'spica/global';
+import { undefined, WeakMap, Event } from 'spica/global';
 import { isArray, ObjectDefineProperties, ObjectFreeze, ObjectKeys } from 'spica/alias';
 import { uid } from './identity';
 import { text, define } from '../util/dom';
@@ -62,7 +62,7 @@ export class Elem<
     private readonly container: Element | ShadowRoot = element,
   ) {
     switch (true) {
-      case children_ === void 0:
+      case children_ === undefined:
         this.type = ElChildrenType.Void;
         break;
       case typeof children_ === 'string':
@@ -77,26 +77,26 @@ export class Elem<
       default:
         throw new Error(`TypedDOM: Invalid type children.`);
     }
-    void throwErrorIfNotUsable(this);
-    void proxies.set(this.element, this);
+    throwErrorIfNotUsable(this);
+    proxies.set(this.element, this);
     switch (this.type) {
       case ElChildrenType.Void:
         this.isInitialization = false;
         return;
       case ElChildrenType.Text:
-        void define(this.container, []);
+        define(this.container, []);
         this.children_ = this.container.appendChild(text('')) as any;
         this.children = children_ as C;
         this.isInitialization = false;
         return;
       case ElChildrenType.Array:
-        void define(this.container, []);
+        define(this.container, []);
         this.children_ = [] as ElChildren.Array as C;
         this.children = children_;
         this.isInitialization = false;
         return;
       case ElChildrenType.Record:
-        void define(this.container, []);
+        define(this.container, []);
         this.children_ = this.observe({ ...children_ as ElChildren.Record }) as C;
         this.children = children_;
         this.isInitialization = false;
@@ -111,7 +111,7 @@ export class Elem<
   private get id(): string {
     if (this.id_) return this.id_;
     this.id_ = uid();
-    void this.element.classList.add(this.id_);
+    this.element.classList.add(this.id_);
     return this.id_;
   }
   private get query(): string {
@@ -130,8 +130,8 @@ export class Elem<
     for (const name of ObjectKeys(children)) {
       if (name in {}) continue;
       let child: El<string, Element, ElChildren> = children[name];
-      void throwErrorIfNotUsable(child);
-      void this.container.appendChild(child.element);
+      throwErrorIfNotUsable(child);
+      this.container.appendChild(child.element);
       descs[name] = {
         configurable: true,
         enumerable: true,
@@ -147,12 +147,12 @@ export class Elem<
               const ref = newChild.element.nextSibling !== oldChild.element
                 ? newChild.element.nextSibling
                 : oldChild.element.nextSibling;
-              void this.container.replaceChild(newChild.element, oldChild.element);
-              void this.container.insertBefore(oldChild.element, ref);
+              this.container.replaceChild(newChild.element, oldChild.element);
+              this.container.insertBefore(oldChild.element, ref);
             }
             else {
-              void this.container.insertBefore(newChild.element, oldChild.element);
-              void this.container.removeChild(oldChild.element);
+              this.container.insertBefore(newChild.element, oldChild.element);
+              this.container.removeChild(oldChild.element);
             }
           }
           else {
@@ -177,13 +177,13 @@ export class Elem<
       case '.': {
         const id = query.slice(1);
         if (!style.classList.contains(id)) break;
-        void style.classList.add(id);
+        style.classList.add(id);
         break;
       }
     }
     if (style.children.length === 0) return;
     for (const el of style.querySelectorAll('*')) {
-      void el.remove();
+      el.remove();
     }
   }
   private isInitialization = true;
@@ -192,7 +192,7 @@ export class Elem<
     switch (this.type) {
       case ElChildrenType.Text:
         if ((this.children_ as unknown as Text).parentNode !== this.container) {
-          this.children_ = void 0 as unknown as C;
+          this.children_ = undefined as unknown as C;
           for (const node of this.container.childNodes) {
             if ('wholeText' in node === false) continue;
             this.children_ = node as any;
@@ -218,7 +218,7 @@ export class Elem<
         const newText = children as ElChildren.Text;
         targetChildren.data = newText;
         if (newText === oldText) return;
-        void this.element.dispatchEvent(new Event('change', { bubbles: false, cancelable: true }));
+        this.element.dispatchEvent(new Event('change', { bubbles: false, cancelable: true }));
         return;
       }
       case ElChildrenType.Array: {
@@ -230,23 +230,23 @@ export class Elem<
           const newChild = sourceChildren[i];
           const el = nodeChildren[i];
           if (newChild.element.parentNode !== this.container) {
-            void throwErrorIfNotUsable(newChild);
+            throwErrorIfNotUsable(newChild);
           }
           if (newChild.element !== el) {
             if (newChild.element.parentNode !== this.container) {
-              void this.scope(newChild);
-              void addedChildren.push(newChild);
+              this.scope(newChild);
+              addedChildren.push(newChild);
             }
-            void this.container.insertBefore(newChild.element, el);
+            this.container.insertBefore(newChild.element, el);
             isChanged = true;
           }
-          void targetChildren.push(newChild);
+          targetChildren.push(newChild);
         }
-        void ObjectFreeze(targetChildren);
+        ObjectFreeze(targetChildren);
         for (let i = nodeChildren.length; sourceChildren.length < i--;) {
           const el = nodeChildren[sourceChildren.length];
           if (!proxies.has(el)) continue;
-          void removedChildren.push(proxy(this.container.removeChild(el)));
+          removedChildren.push(proxy(this.container.removeChild(el)));
           isChanged = true;
         }
         assert(this.container.children.length === sourceChildren.length);
@@ -262,16 +262,16 @@ export class Elem<
           const newChild = sourceChildren[name];
           if (!this.isInitialization && newChild === oldChild) continue;
           if (newChild.element.parentNode !== this.container) {
-            void throwErrorIfNotUsable(newChild);
+            throwErrorIfNotUsable(newChild);
           }
           if (this.isInitialization || newChild !== oldChild && newChild.element.parentNode !== oldChild.element.parentNode) {
-            void this.scope(newChild);
-            void addedChildren.push(newChild);
+            this.scope(newChild);
+            addedChildren.push(newChild);
             if (!this.isInitialization) {
               let i = 0;
               i = removedChildren.lastIndexOf(newChild);
               i > -1 && removedChildren.splice(i, 1);
-              void removedChildren.push(oldChild);
+              removedChildren.push(oldChild);
               i = addedChildren.lastIndexOf(oldChild);
               i > -1 && addedChildren.splice(i, 1);
             }
@@ -285,14 +285,14 @@ export class Elem<
       }
     }
     for (const child of removedChildren) {
-      void child.element.dispatchEvent(new Event('disconnect', { bubbles: false, cancelable: true }));
+      child.element.dispatchEvent(new Event('disconnect', { bubbles: false, cancelable: true }));
     }
     for (const child of addedChildren) {
-      void child.element.dispatchEvent(new Event('connect', { bubbles: false, cancelable: true }));
+      child.element.dispatchEvent(new Event('connect', { bubbles: false, cancelable: true }));
     }
     assert(isChanged || removedChildren.length + addedChildren.length === 0);
     if (isChanged) {
-      void this.element.dispatchEvent(new Event('change', { bubbles: false, cancelable: true }));
+      this.element.dispatchEvent(new Event('change', { bubbles: false, cancelable: true }));
     }
   }
 }

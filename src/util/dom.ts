@@ -1,4 +1,4 @@
-import { Symbol, document } from 'spica/global';
+import { undefined, Symbol, document } from 'spica/global';
 import { isArray, ObjectKeys } from 'spica/alias';
 import { memoize } from 'spica/memoize';
 
@@ -32,17 +32,17 @@ export function shadow(el: keyof ShadowHostElementTagNameMap | HTMLElement, opts
 export function shadow(el: keyof ShadowHostElementTagNameMap | HTMLElement, children?: Children, opts?: ShadowRootInit): ShadowRoot;
 export function shadow(el: keyof ShadowHostElementTagNameMap | HTMLElement, children?: Children | ShadowRootInit, opts?: ShadowRootInit): ShadowRoot {
   if (typeof el === 'string') return shadow(html(el), children as Children, opts);
-  if (children && !isChildren(children)) return shadow(el, void 0, children);
-  const root = opts === void 0
+  if (children && !isChildren(children)) return shadow(el, undefined, children);
+  const root = opts === undefined
     ? el.shadowRoot || shadows.get(el)
     : opts.mode === 'open'
-      ? el.shadowRoot || void 0
+      ? el.shadowRoot || undefined
       : shadows.get(el);
   return defineChildren(
     !opts || opts.mode === 'open'
       ? root || el.attachShadow(opts || { mode: 'open' })
       : root || shadows.set(el, el.attachShadow(opts)).get(el)!,
-    !root && children == void 0
+    !root && children == undefined
       ? el.childNodes
       : children,
     !root);
@@ -107,12 +107,12 @@ function defineAttrs<T extends Element>(el: T, attrs?: Attrs): T {
     const value = attrs[name];
     switch (typeof value) {
       case 'string':
-        void el.setAttribute(name, value);
+        el.setAttribute(name, value);
         continue;
       case 'function':
         if (name.length < 3) throw new Error(`TypedDOM: Attribute names for event listeners must have an event name but got "${name}".`);
         if (name.slice(0, 2) !== 'on') throw new Error(`TypedDOM: Attribute names for event listeners must start with "on" but got "${name}".`);
-        void el.addEventListener(name.slice(2), value, {
+        el.addEventListener(name.slice(2), value, {
           passive: [
             'wheel',
             'mousewheel',
@@ -122,7 +122,7 @@ function defineAttrs<T extends Element>(el: T, attrs?: Attrs): T {
         });
         continue;
       case 'object':
-        void el.removeAttribute(name);
+        el.removeAttribute(name);
         continue;
       default:
         continue;
@@ -140,7 +140,7 @@ function defineChildren<T extends DocumentFragment | ShadowRoot | Element>(el: T
   const targetNodes = clean ? [] : el.childNodes;
   let targetLength = targetNodes.length;
   if (targetLength === 0) {
-    void el.append(...children);
+    el.append(...children);
     return el;
   }
   if (!isArray(children)) return defineChildren(el, [...children], clean);
@@ -149,39 +149,39 @@ function defineChildren<T extends DocumentFragment | ShadowRoot | Element>(el: T
   for (let i = 0; i < children.length; ++i) {
     assert(count <= targetLength);
     if (count === targetLength) {
-      void el.append(...children.slice(i));
+      el.append(...children.slice(i));
       return el;
     }
     const child: string | Node = children[i];
     if (typeof child === 'object' && child.nodeType === 11) {
       const sourceNodes = child.childNodes;
       const sourceLength = sourceNodes.length;
-      void el.insertBefore(child, targetNodes[count] || null);
+      el.insertBefore(child, targetNodes[count] || null);
       count += sourceLength;
       targetLength += sourceLength;
       continue;
     }
-    void ++count;
+    ++count;
     while (targetLength > children.length) {
       const node = targetNodes[count - 1];
       if (equal(node, child)) continue I;
-      void node.remove();
-      void --targetLength;
+      node.remove();
+      --targetLength;
     }
     const node = targetNodes[count - 1];
     if (equal(node, child)) continue;
     if (targetLength < children.length - i + count) {
-      void el.insertBefore(typeof child === 'string' ? text(child) : child, node);
-      void ++targetLength;
+      el.insertBefore(typeof child === 'string' ? text(child) : child, node);
+      ++targetLength;
     }
     else {
-      void el.replaceChild(typeof child === 'string' ? text(child) : child, node);
+      el.replaceChild(typeof child === 'string' ? text(child) : child, node);
     }
   }
   assert(count <= targetLength);
   while (count < targetLength) {
-    void targetNodes[count].remove();
-    void --targetLength;
+    targetNodes[count].remove();
+    --targetLength;
   }
   return el;
 }
