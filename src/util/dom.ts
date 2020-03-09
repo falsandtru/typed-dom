@@ -24,8 +24,7 @@ namespace caches {
 }
 
 export function frag(children?: Children): DocumentFragment {
-  if (typeof children === 'string') return frag([children]);
-  return defineChildren(caches.frag.cloneNode() as DocumentFragment, children);
+  return defineChildren(caches.fragment.cloneNode() as DocumentFragment, children);
 }
 
 export function shadow(el: keyof ShadowHostElementTagNameMap | HTMLElement, opts?: ShadowRootInit): ShadowRoot;
