@@ -108,21 +108,25 @@ export class Elem<
   }
   public readonly [tag]: T;
   private readonly type: ElChildrenType;
-  private id_: string = this.element.id.trim();
+  private id_ = '';
   private get id(): string {
+    if (this.id_) return this.id_;
+    this.id_ = this.element.id.trim();
     if (this.id_) return this.id_;
     this.id_ = uid();
     this.element.classList.add(this.id_);
     return this.id_;
   }
+  private query_ = '';
   private get query(): string {
+    if (this.query_) return this.query_;
     switch (true) {
       case this.element !== this.container:
-        return ':host';
+        return this.query_ = ':host';
       case this.id === this.element.id.trim():
-        return `#${this.id}`;
+        return this.query_ = `#${this.id}`;
       default:
-        return `.${this.id}`;
+        return this.query_ = `.${this.id}`;
     }
   }
   private isPartialUpdate = false;
