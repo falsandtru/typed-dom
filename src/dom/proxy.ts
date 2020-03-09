@@ -3,6 +3,7 @@ import { isArray, ObjectDefineProperties, ObjectFreeze, ObjectKeys } from 'spica
 import { uid } from './identity';
 import { text, define } from '../util/dom';
 import { Mutable } from 'spica/type';
+import { splice } from 'spica/array';
 
 type ElChildrenType =
   | typeof ElChildrenType.Void
@@ -270,10 +271,10 @@ export class Elem<
             if (!this.isInitialization) {
               let i = 0;
               i = removedChildren.lastIndexOf(newChild);
-              i > -1 && removedChildren.splice(i, 1);
+              i > -1 && splice(removedChildren, i, 1);
               removedChildren.push(oldChild);
               i = addedChildren.lastIndexOf(oldChild);
-              i > -1 && addedChildren.splice(i, 1);
+              i > -1 && splice(addedChildren, i, 1);
             }
           }
           this.isPartialUpdate = true;
