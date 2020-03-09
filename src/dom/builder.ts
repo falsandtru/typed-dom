@@ -50,8 +50,8 @@ function handle
         : target[prop] = builder(prop as Extract<keyof M, string>, baseFactory),
   };
 
-  function builder(tag: Extract<keyof M, string>, baseFactory: F): (attrs?: Attrs, children?: ElChildren, factory?: () => Element) => El<string, Element, ElChildren> {
-    return function build(attrs?: Attrs, children?: ElChildren, factory?: Factory<F, Extract<keyof M, string>, ElChildren, Element>): El<string, Element, ElChildren> {
+  function builder(tag: Extract<keyof M, string>, baseFactory: F): (attrs?: Attrs, children?: ElChildren, factory?: () => Element) => El {
+    return function build(attrs?: Attrs, children?: ElChildren, factory?: Factory<F, Extract<keyof M, string>, ElChildren, Element>): El {
       if (typeof attrs === 'function') return build(undefined, undefined, attrs);
       if (typeof children === 'function') return build(attrs, undefined, children);
       if (attrs !== undefined && isChildren(attrs)) return build(undefined, attrs, factory);

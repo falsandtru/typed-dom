@@ -29,12 +29,12 @@ export namespace ElChildren {
   export type Record = { [field: string]: El; };
 }
 
-const proxies = new WeakMap<Element, El<string, Element, ElChildren>>();
+const proxies = new WeakMap<Element, El>();
 
 export function proxy<E extends Element>(el: E): El<string, E, ElChildren>;
 export function proxy<C extends ElChildren>(el: Element): El<string, Element, C>;
 export function proxy<E extends Element, C extends ElChildren>(el: E): El<string, E, C>;
-export function proxy(el: Element): El<string, Element, ElChildren> {
+export function proxy(el: Element): El {
   const proxy = proxies.get(el);
   if (proxy) return proxy;
   throw new Error(`TypedDOM: This element has no proxy.`);
@@ -135,16 +135,16 @@ export class Elem<
     const descs: PropertyDescriptorMap = {};
     for (const name of ObjectKeys(children)) {
       if (name in {}) continue;
-      let child: El<string, Element, ElChildren> = children[name];
+      let child: El = children[name];
       throwErrorIfNotUsable(child);
       this.container.appendChild(child.element);
       descs[name] = {
         configurable: true,
         enumerable: true,
-        get: (): El<string, Element, ElChildren> => {
+        get: (): El => {
           return child;
         },
-        set: (newChild: El<string, Element, ElChildren>) => {
+        set: (newChild: El) => {
           const oldChild = child;
           if (newChild === oldChild) return;
           if (this.isPartialUpdate) {
@@ -172,7 +172,7 @@ export class Elem<
     }
     return ObjectDefineProperties(children, descs);
   }
-  private scope(child: El<string, Element, ElChildren>): void {
+  private scope(child: El): void {
     if (child.element.tagName !== 'STYLE') return;
     const style = child.element;
     const target = /(^|[,}])(\s*)\$scope(?![\w-])(?=[^;{}]*{)/g;
@@ -295,7 +295,7 @@ export class Elem<
   }
 }
 
-function throwErrorIfNotUsable({ element }: El<string, Element, ElChildren>): void {
+function throwErrorIfNotUsable({ element }: El): void {
   if (!element.parentElement || !proxies.has(element.parentElement)) return;
   throw new Error(`TypedDOM: Typed DOM children can't be used to another typed DOM.`);
 }
