@@ -105,7 +105,7 @@ HTML.custom().element.outerHTML; // '<custom></custom>'
 - once
 - delegate
 - bind
-- currentTargets
+- currentTarget
 - apply
 
 ## Usage
