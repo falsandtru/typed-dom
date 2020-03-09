@@ -1,6 +1,7 @@
 import { undefined, Symbol, document } from 'spica/global';
 import { isArray, ObjectKeys } from 'spica/alias';
 import { memoize } from 'spica/memoize';
+import { curry, uncurry } from 'spica/curry';
 
 const enum NS {
   HTML = 'HTML',
@@ -19,8 +20,13 @@ export interface Factory<M extends TagNameMap> {
 const shadows = new WeakMap<Element, ShadowRoot>();
 
 namespace caches {
-  export const elem = memoize<Document | Element, Record<string, Element>>(() => Object.create(null), new WeakMap());
-  export const frag = document.createDocumentFragment();
+  export const fragment = document.createDocumentFragment();
+  export const element = memoize(
+    (context: Document | Element) =>
+      memoize(
+        uncurry(curry(elem)(context)),
+        (ns, tag) => `${ns}:${tag}`),
+    new WeakMap());
 }
 
 export function frag(children?: Children): DocumentFragment {
@@ -69,12 +75,9 @@ export function element<T extends keyof SVGElementTagNameMap>(context: Document,
 export function element(context: Document | Element, ns: NS, tag: string, children?: Children): Element;
 export function element(context: Document | Element, ns: NS, tag: string, attrs?: Attrs, children?: Children): Element;
 export function element(context: Document | Element, ns: NS, tag: string, attrs?: Attrs | Children, children?: Children): Element {
-  const cache = caches.elem(context);
-  const key = `${ns}:${tag}`;
   const el = tag.includes('-')
     ? elem(context, ns, tag)
-    : (cache[key] = cache[key] || elem(context, ns, tag)).cloneNode(true) as Element;
-  assert(tag.includes('-') || el !== cache[key]);
+    : caches.element(context)(ns, tag).cloneNode(true) as Element;
   assert(el.attributes.length === 0);
   assert(el.childNodes.length === 0);
   return isChildren(attrs)
