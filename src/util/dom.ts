@@ -25,7 +25,7 @@ namespace caches {
 
 export function frag(children?: Children): DocumentFragment {
   if (typeof children === 'string') return frag([children]);
-  return defineChildren(caches.frag.cloneNode() as DocumentFragment, children, true);
+  return defineChildren(caches.frag.cloneNode() as DocumentFragment, children);
 }
 
 export function shadow(el: keyof ShadowHostElementTagNameMap | HTMLElement, opts?: ShadowRootInit): ShadowRoot;
@@ -44,8 +44,7 @@ export function shadow(el: keyof ShadowHostElementTagNameMap | HTMLElement, chil
       : root || shadows.set(el, el.attachShadow(opts)).get(el)!,
     !root && children == undefined
       ? el.childNodes
-      : children,
-    !root);
+      : children);
 }
 
 export function html<T extends keyof HTMLElementTagNameMap>(tag: T, children?: Children): HTMLElementTagNameMap[T];
@@ -80,8 +79,8 @@ export function element(context: Document | Element, ns: NS, tag: string, attrs?
   assert(el.attributes.length === 0);
   assert(el.childNodes.length === 0);
   return isChildren(attrs)
-    ? defineChildren(el, attrs, true)
-    : defineChildren(defineAttrs(el, attrs), children, true);
+    ? defineChildren(el, attrs)
+    : defineChildren(defineAttrs(el, attrs), children);
 }
 
 function elem(context: Document | Element, ns: NS, tag: string): Element {
@@ -130,20 +129,20 @@ function defineAttrs<T extends Element>(el: T, attrs?: Attrs): T {
   }
   return el;
 }
-function defineChildren<T extends DocumentFragment | ShadowRoot | Element>(el: T, children?: Children, clean = false): T {
+function defineChildren<T extends DocumentFragment | ShadowRoot | Element>(el: T, children?: Children): T {
   switch (typeof children) {
     case 'undefined':
       return el;
     case 'string':
-      return defineChildren(el, [children], clean);
+      return defineChildren(el, [children]);
   }
-  const targetNodes = clean ? [] : el.childNodes;
+  const targetNodes = el.firstChild ? el.childNodes : [];
   let targetLength = targetNodes.length;
   if (targetLength === 0) {
     el.append(...children);
     return el;
   }
-  if (!isArray(children)) return defineChildren(el, [...children], clean);
+  if (!isArray(children)) return defineChildren(el, [...children]);
   let count = 0;
   I:
   for (let i = 0; i < children.length; ++i) {
