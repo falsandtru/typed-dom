@@ -114,6 +114,7 @@ export class Elem<
     this.id_ = this.element.id.trim();
     if (this.id_) return this.id_;
     this.id_ = uid();
+    assert(!this.element.classList.contains(this.id_));
     this.element.classList.add(this.id_);
     return this.id_;
   }
@@ -173,21 +174,13 @@ export class Elem<
   }
   private scope(child: El<string, Element, ElChildren>): void {
     if (child.element.tagName !== 'STYLE') return;
-    const syntax = /(^|[,}])(\s*)\$scope(?![\w-])(?=[^;{}]*{)/g;
     const style = child.element;
+    const target = /(^|[,}])(\s*)\$scope(?![\w-])(?=[^;{}]*{)/g;
+    if (style.innerHTML.search(target) === -1) return;
     const query = this.query;
-    if (style.innerHTML.search(syntax) === -1) return;
-    style.innerHTML = style.innerHTML.replace(syntax, (_, frag, space) => `${frag}${space}${query}`);
-    switch (query[0]) {
-      case '.': {
-        const id = query.slice(1);
-        if (!style.classList.contains(id)) break;
-        style.classList.add(id);
-        break;
-      }
-    }
-    if (style.children.length === 0) return;
-    for (const el of style.querySelectorAll('*')) {
+    style.innerHTML = style.innerHTML.replace(target, (_, frag, space) => `${frag}${space}${query}`);
+    if (!style.firstElementChild) return;
+    for (const el of style.children) {
       el.remove();
     }
   }
