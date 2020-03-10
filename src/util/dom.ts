@@ -86,12 +86,12 @@ export function element(context: Document | Element, ns: NS, tag: string, attrs?
 }
 
 function elem(context: Document | Element, ns: NS, tag: string): Element {
-  if ('id' in context) throw new Error(`TypedDOM: Scoped custom elements are not supported.`);
+  if ('id' in context) throw new Error(`TypedDOM: Scoped custom elements are not supported yet.`);
   switch (ns) {
     case NS.HTML:
       return context.createElement(tag);
     case NS.SVG:
-      return context.createElementNS("http://www.w3.org/2000/svg", tag);
+      return context.createElementNS('http://www.w3.org/2000/svg', tag);
   }
 }
 
