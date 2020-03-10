@@ -95,12 +95,12 @@ function elem(context: Document | Element, ns: NS, tag: string): Element {
   }
 }
 
-export function define<T extends Element | DocumentFragment | ShadowRoot>(el: T, children?: Children): T;
 export function define<T extends Element>(el: T, attrs?: Attrs, children?: Children): T;
-export function define<T extends Element>(el: T, attrs?: Attrs | Children, children?: Children): T {
+export function define<T extends Element | DocumentFragment | ShadowRoot>(node: T, children?: Children): T;
+export function define<T extends Element>(node: T, attrs?: Attrs | Children, children?: Children): T {
   return isChildren(attrs)
-    ? defineChildren(el, attrs)
-    : defineChildren(defineAttrs(el, attrs), children);
+    ? defineChildren(node, attrs)
+    : defineChildren(defineAttrs(node, attrs), children);
 }
 function defineAttrs<T extends Element>(el: T, attrs?: Attrs): T {
   if (!attrs) return el;
@@ -131,51 +131,51 @@ function defineAttrs<T extends Element>(el: T, attrs?: Attrs): T {
   }
   return el;
 }
-function defineChildren<T extends DocumentFragment | ShadowRoot | Element>(el: T, children?: Children): T {
+function defineChildren<T extends DocumentFragment | ShadowRoot | Element>(node: T, children?: Children): T {
   switch (typeof children) {
     case 'undefined':
-      return el;
+      return node;
     case 'string':
-      return defineChildren(el, [children]);
+      return defineChildren(node, [children]);
   }
-  const targetNodes = el.firstChild ? el.childNodes : [];
+  const targetNodes = node.firstChild ? node.childNodes : [];
   let targetLength = targetNodes.length;
   if (targetLength === 0) {
-    el.append(...children);
-    return el;
+    node.append(...children);
+    return node;
   }
-  if (!isArray(children)) return defineChildren(el, [...children]);
+  if (!isArray(children)) return defineChildren(node, [...children]);
   let count = 0;
   I:
   for (let i = 0; i < children.length; ++i) {
     assert(count <= targetLength);
     if (count === targetLength) {
-      el.append(...children.slice(i));
-      return el;
+      node.append(...children.slice(i));
+      return node;
     }
-    const child: string | Node = children[i];
-    if (typeof child === 'object' && child.nodeType === 11) {
-      const sourceLength = child.childNodes.length;
-      el.insertBefore(child, targetNodes[count] || null);
+    const newChild: string | Node = children[i];
+    if (typeof newChild === 'object' && newChild.nodeType === 11) {
+      const sourceLength = newChild.childNodes.length;
+      node.insertBefore(newChild, targetNodes[count] || null);
       count += sourceLength;
       targetLength += sourceLength;
       continue;
     }
     ++count;
     while (targetLength > children.length) {
-      const node = targetNodes[count - 1];
-      if (equal(node, child)) continue I;
-      node.remove();
+      const oldChild = targetNodes[count - 1];
+      if (equal(oldChild, newChild)) continue I;
+      oldChild.remove();
       --targetLength;
     }
-    const node = targetNodes[count - 1];
-    if (equal(node, child)) continue;
+    const oldChild = targetNodes[count - 1];
+    if (equal(oldChild, newChild)) continue;
     if (targetLength < children.length - i + count) {
-      el.insertBefore(typeof child === 'string' ? text(child) : child, node);
+      node.insertBefore(typeof newChild === 'string' ? text(newChild) : newChild, oldChild);
       ++targetLength;
     }
     else {
-      el.replaceChild(typeof child === 'string' ? text(child) : child, node);
+      node.replaceChild(typeof newChild === 'string' ? text(newChild) : newChild, oldChild);
     }
   }
   assert(count <= targetLength);
@@ -183,7 +183,7 @@ function defineChildren<T extends DocumentFragment | ShadowRoot | Element>(el: T
     targetNodes[count].remove();
     --targetLength;
   }
-  return el;
+  return node;
 }
 
 function isChildren(o: Attrs | Children | ShadowRootInit | undefined): o is Children {
