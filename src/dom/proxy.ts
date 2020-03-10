@@ -173,15 +173,17 @@ export class Elem<
     return ObjectDefineProperties(children, descs) as C;
   }
   private scope(child: El): void {
-    if (child.element.tagName !== 'STYLE') return;
     const style = child.element;
+    if (style.tagName !== 'STYLE') return;
     const target = /(^|[,}])(\s*)\$scope(?![\w-])(?=[^;{}]*{)/g;
-    if (style.innerHTML.search(target) === -1) return;
+    const html = style.innerHTML;
+    if (html.search(target) === -1) return;
     const query = this.query;
-    style.innerHTML = style.innerHTML.replace(target, (_, frag, space) => `${frag}${space}${query}`);
+    if (query.includes('<')) return;
+    style.innerHTML = html.replace(target, (_, frag, space) => `${frag}${space}${query}`);
     if (!style.firstElementChild) return;
-    for (const el of style.children) {
-      el.remove();
+    for (let es = style.children, i = 0, len = es.length; i < len; ++i) {
+      es[0].remove();
     }
   }
   private isInitialization = true;
@@ -191,7 +193,8 @@ export class Elem<
       case ElChildrenType.Text:
         if ((this.children_ as unknown as Text).parentNode !== this.container) {
           this.children_ = undefined as unknown as C;
-          for (const node of this.container.childNodes) {
+          for (let ns = this.container.childNodes, i = 0, len = ns.length; i < len; ++i) {
+            const node = ns[i];
             if ('wholeText' in node === false) continue;
             this.children_ = node as any;
             break;

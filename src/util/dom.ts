@@ -155,8 +155,7 @@ function defineChildren<T extends DocumentFragment | ShadowRoot | Element>(el: T
     }
     const child: string | Node = children[i];
     if (typeof child === 'object' && child.nodeType === 11) {
-      const sourceNodes = child.childNodes;
-      const sourceLength = sourceNodes.length;
+      const sourceLength = child.childNodes.length;
       el.insertBefore(child, targetNodes[count] || null);
       count += sourceLength;
       targetLength += sourceLength;
