@@ -170,7 +170,7 @@ export class Elem<
         },
       };
     }
-    return ObjectDefineProperties(children, descs);
+    return ObjectDefineProperties(children, descs) as C;
   }
   private scope(child: El): void {
     if (child.element.tagName !== 'STYLE') return;
