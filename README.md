@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/falsandtru/typed-dom.svg?branch=master)](https://travis-ci.org/falsandtru/typed-dom)
 
-Statically typed DOM component builder.
+A DOM component builder creating type-level DOM structures.
 
 **Visualize** DOM structures and **Assist** DOM access by static types of TypeScript.
 
@@ -43,7 +43,7 @@ SVG.svg();
 
 ### Shadow: { [tagname]: (attrs?, children?, factory?) => El; };
 
-Create an HTML element proxy which make open shadow DOM to append children.
+Create an HTML element proxy creating open shadow DOM to append children.
 
 - attrs: Record<string, string | EventListener | null | undefined>
 - children: undefined | string | El[] | Record<string, El>
@@ -111,6 +111,7 @@ HTML.custom().element.outerHTML; // '<custom></custom>'
 ## Usage
 
 Build a typed DOM component with styling.
+APIs replace `$scope` selectors with `:host`, `#<id>`, or `.<generated-id>`.
 
 ```ts
 import { HTML } from 'typed-dom';
@@ -157,8 +158,8 @@ namespace ElChildren {
 }
 ```
 
-You can know the internal structure via this type which can be used as the visualization.
-And you can access and manipulate safely the internal structure guided by this type.
+You can know the internal structure via the static type which can be used as the visualization.
+And you can safely access and manipulate the internal structure using the static type.
 
 ```ts
 // inspect
