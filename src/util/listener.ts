@@ -34,8 +34,8 @@ export function once<T extends keyof SVGElementEventMap>(target: Document | SVGE
 export function once<T extends keyof ElementEventMap>(target: Document | Element, selector: string, type: T, listener: (ev: ElementEventMap[T]) => unknown, option?: AddEventListenerOptions): () => undefined;
 export function once<T extends keyof WindowEventMap | keyof DocumentEventMap | keyof ElementEventMap>(target: Window | Document | Element, a: T | string, b: ((ev: Event) => unknown) | T, c: boolean | AddEventListenerOptions | ((ev: Event) => unknown) = false, d: AddEventListenerOptions = {}): () => undefined {
   return typeof b === 'string'
-    ? delegate(target as Document, a, b as keyof ElementEventMap, c as () => void, { ...(typeof d === 'boolean' ? { capture: d } : d), once: true })
-    : bind(target as Element, a as keyof ElementEventMap, b, { ...(typeof c === 'boolean' ? { capture: c } : c), once: true });
+    ? delegate(target as Document, a, b as keyof ElementEventMap, c as () => void, { ...typeof d === 'boolean' ? { capture: d } : d, once: true })
+    : bind(target as Element, a as keyof ElementEventMap, b, { ...typeof c === 'boolean' ? { capture: c } : c, once: true });
 }
 
 export function wait<T extends keyof WindowEventMap>(target: Window, type: T, option?: boolean | AddEventListenerOptions): AtomicPromise<WindowEventMap[T]>;
