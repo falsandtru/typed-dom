@@ -1,4 +1,4 @@
-import { global } from 'spica/global';
+import { global, undefined } from 'spica/global';
 import { AtomicPromise } from 'spica/promise';
 import { noop } from 'spica/noop';
 
@@ -57,15 +57,19 @@ export function delegate<T extends keyof HTMLElementEventMap>(target: Document |
 export function delegate<T extends keyof SVGElementEventMap>(target: Document | SVGElement, selector: string, type: T, listener: (ev: SVGElementEventMap[T]) => unknown, option?: AddEventListenerOptions): () => undefined;
 export function delegate<T extends keyof ElementEventMap>(target: Document | Element, selector: string, type: T, listener: (ev: ElementEventMap[T]) => unknown, option?: AddEventListenerOptions): () => undefined;
 export function delegate<T extends keyof ElementEventMap>(target: Document | Element, selector: string, type: T, listener: (ev: ElementEventMap[T]) => unknown, option: AddEventListenerOptions = {}): () => undefined {
+  let unbind = noop;
   return bind(
     target.nodeType === 9
       ? (target as Document).documentElement!
       : target as Element,
     type,
     ev => {
+      unbind();
       const cx = (((ev.target as Element).shadowRoot && ev.composedPath()[0] || ev.target) as Element).closest(selector);
-      cx && once(cx, type, listener, option);
-      return ev.returnValue;
+      return !cx
+        ? undefined
+        : unbind = once(cx, type, listener, option),
+        ev.returnValue;
     },
     { ...option, capture: true });
 }
