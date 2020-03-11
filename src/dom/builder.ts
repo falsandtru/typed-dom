@@ -38,8 +38,8 @@ type Factory<F extends BaseFactory<TagNameMap>, T extends string, C extends ElCh
 
 function handle
   <M extends TagNameMap, F extends BaseFactory<M>>
-  (baseFactory: F, formatter: <E extends Element>(el: E) => E | ShadowRoot)
-  : ProxyHandler<API<M, F>> {
+  (baseFactory: F, formatter: <E extends Element>(el: E) => E | ShadowRoot,
+): ProxyHandler<API<M, F>> {
   return {
     apply(target, _, [prop, ...args]) {
       return this.get!(target, prop, target)(...args);

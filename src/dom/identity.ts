@@ -1,6 +1,6 @@
 import { uuid } from 'spica/uuid';
 
-const id = uuid().slice(-7);
+const id = uuid().split('-').pop()!;
 let counter = 0;
 
 export function uid(): string {
