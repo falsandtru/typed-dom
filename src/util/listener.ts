@@ -65,7 +65,9 @@ export function delegate<T extends keyof ElementEventMap>(target: Document | Ele
     type,
     ev => {
       unbind();
-      const cx = (((ev.target as Element).shadowRoot && ev.composedPath()[0] || ev.target) as Element).closest(selector);
+      const cx = (ev.target as Element).shadowRoot
+        ? (node => 'id' in node ? node : node.host)(ev.composedPath()[0] as Element | ShadowRoot)?.closest(selector)
+        : (ev.target as Element)?.closest(selector);
       return cx
         ? unbind = once(cx, type, listener, option)
         : undefined,
