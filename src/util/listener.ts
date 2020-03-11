@@ -49,8 +49,8 @@ export function wait<T extends keyof ElementEventMap>(target: Document | Element
 export function wait<T extends keyof WindowEventMap | keyof DocumentEventMap | keyof ElementEventMap>(target: Window | Document | Element, a: T | string, b: T | boolean | AddEventListenerOptions = false, c: AddEventListenerOptions = {}): AtomicPromise<Event> {
   return new AtomicPromise(resolve =>
     typeof b === 'string'
-      ? void once(target as Document, a, b as keyof ElementEventMap, resolve, c)
-      : void once(target as Element, a as keyof ElementEventMap, resolve, b));
+      ? once(target as Document, a, b as keyof ElementEventMap, resolve, c)
+      : once(target as Element, a as keyof ElementEventMap, resolve, b));
 }
 
 export function delegate<T extends keyof HTMLElementEventMap>(target: Document | HTMLElement, selector: string, type: T, listener: (ev: HTMLElementEventMap[T]) => unknown, option?: AddEventListenerOptions): () => undefined;
@@ -64,7 +64,7 @@ export function delegate<T extends keyof ElementEventMap>(target: Document | Ele
     type,
     ev => {
       const cx = (((ev.target as Element).shadowRoot && ev.composedPath()[0] || ev.target) as Element).closest(selector);
-      cx && void once(cx, type, listener, option);
+      cx && once(cx, type, listener, option);
       return ev.returnValue;
     },
     { ...option, capture: true });
@@ -76,10 +76,10 @@ export function bind<T extends keyof HTMLElementEventMap>(target: HTMLElement, t
 export function bind<T extends keyof SVGElementEventMap>(target: SVGElement, type: T, listener: (ev: SVGElementEventMap[T]) => unknown, option?: boolean | AddEventListenerOptions): () => undefined;
 export function bind<T extends keyof ElementEventMap>(target: Element, type: T, listener: (ev: ElementEventMap[T]) => unknown, option?: boolean | AddEventListenerOptions): () => undefined;
 export function bind<T extends keyof WindowEventMap | keyof DocumentEventMap | keyof ElementEventMap>(target: Window | Document | Element, type: T, listener: (ev: Event) => unknown, option: boolean | AddEventListenerOptions = false): () => undefined {
-  void target.addEventListener(type, handler, option);
-  let unbind: () => undefined = () => (
+  target.addEventListener(type, handler, option);
+  let unbind = () => (
     unbind = noop,
-    void target.removeEventListener(type, handler, option));
+    target.removeEventListener(type, handler, option));
   return () => void unbind();
 
   interface Event extends global.Event {
