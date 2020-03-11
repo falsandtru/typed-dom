@@ -66,9 +66,9 @@ export function delegate<T extends keyof ElementEventMap>(target: Document | Ele
     ev => {
       unbind();
       const cx = (((ev.target as Element).shadowRoot && ev.composedPath()[0] || ev.target) as Element).closest(selector);
-      return !cx
-        ? undefined
-        : unbind = once(cx, type, listener, option),
+      return cx
+        ? unbind = once(cx, type, listener, option)
+        : undefined,
         ev.returnValue;
     },
     { ...option, capture: true });
