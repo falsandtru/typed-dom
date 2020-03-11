@@ -59,9 +59,9 @@ export function delegate<T extends keyof ElementEventMap>(target: Document | Ele
 export function delegate<T extends keyof ElementEventMap>(target: Document | Element, selector: string, type: T, listener: (ev: ElementEventMap[T]) => unknown, option: AddEventListenerOptions = {}): () => undefined {
   let unbind = noop;
   return bind(
-    target.nodeType === 9
-      ? (target as Document).documentElement!
-      : target as Element,
+    'outerHTML' in target
+      ? target
+      : target.documentElement,
     type,
     ev => {
       unbind();
