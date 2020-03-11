@@ -81,10 +81,8 @@ export function bind<T extends keyof SVGElementEventMap>(target: SVGElement, typ
 export function bind<T extends keyof ElementEventMap>(target: Element, type: T, listener: (ev: ElementEventMap[T]) => unknown, option?: boolean | AddEventListenerOptions): () => undefined;
 export function bind<T extends keyof WindowEventMap | keyof DocumentEventMap | keyof ElementEventMap>(target: Window | Document | Element, type: T, listener: (ev: Event) => unknown, option: boolean | AddEventListenerOptions = false): () => undefined {
   target.addEventListener(type, handler, option);
-  let unbind = () => (
-    unbind = noop,
-    target.removeEventListener(type, handler, option));
-  return () => void unbind();
+  let unbind = () => void target.removeEventListener(type, handler, option);
+  return () => void (unbind = unbind() || noop);
 
   interface Event extends global.Event {
     [currentTarget]?: Event['currentTarget'];
