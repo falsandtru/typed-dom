@@ -95,6 +95,7 @@ HTML.custom().element.outerHTML; // '<custom></custom>'
 
 - El
 - proxy
+- NS
 - frag
 - shadow
 - html

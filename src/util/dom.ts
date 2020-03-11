@@ -3,7 +3,7 @@ import { isArray, ObjectKeys } from 'spica/alias';
 import { memoize } from 'spica/memoize';
 import { curry, uncurry } from 'spica/curry';
 
-const enum NS {
+export const enum NS {
   HTML = 'HTML',
   SVG = 'SVG',
 }
@@ -86,7 +86,7 @@ export function element(context: Document | Element, ns: NS, tag: string, attrs?
 }
 
 function elem(context: Document | Element, ns: NS, tag: string): Element {
-  if ('id' in context) throw new Error(`TypedDOM: Scoped custom elements are not supported yet.`);
+  if (!('createElement' in context)) throw new Error(`TypedDOM: Scoped custom elements are not supported on this browser.`);
   switch (ns) {
     case NS.HTML:
       return context.createElement(tag);
