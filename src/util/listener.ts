@@ -50,18 +50,24 @@ export function wait<T extends keyof WindowEventMap | keyof DocumentEventMap | k
   return new AtomicPromise(resolve =>
     typeof b === 'string'
       ? void once(target as Document, a, b as keyof ElementEventMap, resolve, c)
-      : void once(target as Element, a as keyof ElementEventMap, resolve, b as boolean));
+      : void once(target as Element, a as keyof ElementEventMap, resolve, b));
 }
 
 export function delegate<T extends keyof HTMLElementEventMap>(target: Document | HTMLElement, selector: string, type: T, listener: (ev: HTMLElementEventMap[T]) => unknown, option?: AddEventListenerOptions): () => undefined;
 export function delegate<T extends keyof SVGElementEventMap>(target: Document | SVGElement, selector: string, type: T, listener: (ev: SVGElementEventMap[T]) => unknown, option?: AddEventListenerOptions): () => undefined;
 export function delegate<T extends keyof ElementEventMap>(target: Document | Element, selector: string, type: T, listener: (ev: ElementEventMap[T]) => unknown, option?: AddEventListenerOptions): () => undefined;
 export function delegate<T extends keyof ElementEventMap>(target: Document | Element, selector: string, type: T, listener: (ev: ElementEventMap[T]) => unknown, option: AddEventListenerOptions = {}): () => undefined {
-  return bind(target.nodeType === 9 ? (target as Document).documentElement! : target as Element, type, ev => {
-    const cx = (((ev.target as Element).shadowRoot && ev.composedPath()[0] || ev.target) as Element).closest(selector);
-    cx && void once(cx, type, listener, option);
-    return ev.returnValue;
-  }, { ...option, capture: true });
+  return bind(
+    target.nodeType === 9
+      ? (target as Document).documentElement!
+      : target as Element,
+    type,
+    ev => {
+      const cx = (((ev.target as Element).shadowRoot && ev.composedPath()[0] || ev.target) as Element).closest(selector);
+      cx && void once(cx, type, listener, option);
+      return ev.returnValue;
+    },
+    { ...option, capture: true });
 }
 
 export function bind<T extends keyof WindowEventMap>(target: Window, type: T, listener: (ev: WindowEventMap[T]) => unknown, option?: boolean | AddEventListenerOptions): () => undefined;
