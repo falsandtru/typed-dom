@@ -122,12 +122,20 @@ function defineAttrs<T extends Element>(el: T, attrs?: Attrs): T {
   }
   return el;
 }
-function defineChildren<T extends DocumentFragment | ShadowRoot | Element>(node: T, children?: Children): T {
+function defineChildren<T extends DocumentFragment | ShadowRoot | Element>(node: T, children?: Children | NodeListOf<ChildNode>): T {
   switch (typeof children) {
     case 'undefined':
       return node;
     case 'string':
       return defineChildren(node, [children]);
+  }
+  if (!isArray(children)) {
+    if (!('length' in children)) return defineChildren(node, [...children]);
+    const ns: (string | Node)[] = [];
+    for (let i = 0, len = children.length; i < len; ++i) {
+      ns.push(children[i]);
+    }
+    return defineChildren(node, ns);
   }
   const targetNodes = node.firstChild ? node.childNodes : [];
   let targetLength = targetNodes.length;
@@ -135,7 +143,6 @@ function defineChildren<T extends DocumentFragment | ShadowRoot | Element>(node:
     node.append(...children);
     return node;
   }
-  if (!isArray(children)) return defineChildren(node, [...children]);
   let count = 0;
   I:
   for (let i = 0; i < children.length; ++i) {
