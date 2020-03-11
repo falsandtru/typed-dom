@@ -1,4 +1,4 @@
-import { global, undefined } from 'spica/global';
+import { undefined } from 'spica/global';
 import { AtomicPromise } from 'spica/promise';
 import { noop } from 'spica/noop';
 
@@ -6,7 +6,7 @@ export const currentTarget = Symbol.for('currentTarget');
 
 declare global {
   interface Event {
-    readonly [currentTarget]?: Event['currentTarget'];
+    [currentTarget]?: Event['currentTarget'];
   }
 }
 
@@ -84,15 +84,9 @@ export function bind<T extends keyof WindowEventMap | keyof DocumentEventMap | k
   let unbind = () => void target.removeEventListener(type, handler, option);
   return () => void (unbind = unbind() || noop);
 
-  interface Event extends global.Event {
-    [currentTarget]?: Event['currentTarget'];
-  }
-
   function handler(ev: Event): unknown {
     assert(ev.currentTarget);
-    return currentTarget in ev
-      ? undefined
-      : ev[currentTarget] = ev.currentTarget,
-      listener(ev);
+    ev[currentTarget] = ev.currentTarget;
+    return listener(ev);
   }
 }
