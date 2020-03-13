@@ -173,13 +173,18 @@ export class Elem<
     return ObjectDefineProperties(children, descs) as C;
   }
   private scope(child: El): void {
-    const style = child.element;
-    if (style.tagName !== 'STYLE') return;
+    const style = child.element as HTMLStyleElement | Element;
+    switch (false) {
+      case 'type' in style:
+      case 'media' in style:
+      case style.tagName === 'STYLE':
+        return;
+    }
     const target = /(^|[,}])(\s*)\$scope(?![\w-])(?=[^;{}]*{)/g;
     const html = style.innerHTML;
     if (html.search(target) === -1) return;
     const query = this.query;
-    if (query.includes('<')) return;
+    if (!/^[:#.][\w-]+$/.test(query)) return;
     style.innerHTML = html.replace(target, (_, frag, space) => `${frag}${space}${query}`);
     if (!style.firstElementChild) return;
     for (let es = style.children, i = 0, len = es.length; i < len; ++i) {
