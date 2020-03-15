@@ -122,7 +122,7 @@ interface CustomHTMLElementTagNameMap extends HTMLElementTagNameMap, CustomShado
 
 // Note that the following code is based on the unstandardized APIs of scoped custom elements.
 export const html = element<CustomHTMLElementTagNameMap>(
-  shadow('section', { mode: 'open', registry: ... }).host,
+  shadow('section', { mode: 'open', registry: ... }),
   NS.HTML);
 export const Shadow: API<CustomShadowHostElementTagNameMap> = API(html, shadow);
 export const HTML: API<CustomHTMLElementTagNameMap> = API(html);

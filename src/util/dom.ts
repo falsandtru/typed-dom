@@ -22,7 +22,7 @@ const shadows = new WeakMap<Element, ShadowRoot>();
 namespace caches {
   export const fragment = document.createDocumentFragment();
   export const element = memoize(
-    (context: Document | Element) =>
+    (context: Document | ShadowRoot) =>
       memoize(
         uncurry(curry(elem)(context)),
         (ns, tag) => `${ns}:${tag}`),
@@ -59,7 +59,7 @@ export function text(source: string): Text {
   return document.createTextNode(source);
 }
 
-export function element<M extends TagNameMap>(context: Document | Element, ns: NS) {
+export function element<M extends TagNameMap>(context: Document | ShadowRoot, ns: NS) {
   return element;
 
   function element<T extends keyof M>(tag: T, children?: Children): M[T];
@@ -76,7 +76,7 @@ export function element<M extends TagNameMap>(context: Document | Element, ns: N
   }
 }
 
-function elem(context: Document | Element, ns: NS, tag: string): Element {
+function elem(context: Document | ShadowRoot, ns: NS, tag: string): Element {
   if (!('createElement' in context)) throw new Error(`TypedDOM: Scoped custom elements are not supported on this browser.`);
   switch (ns) {
     case NS.HTML:
