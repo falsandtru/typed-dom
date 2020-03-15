@@ -91,6 +91,43 @@ HTML('custom-tag').element.outerHTML; // '<custom-tag></custom-tag>'
 HTML.custom().element.outerHTML; // '<custom></custom>'
 ```
 
+However, since scoped custom elements don't inherit global custom elements you shouldn't extend the built-in interfaces such as HTMLElementTagNameMap.
+Instead, you should define new interfaces and new APIs to define custom elements.
+
+```ts
+import { API, shadow, html } from 'typed-dom';
+
+interface CustomShadowHostElementTagNameMap extends ShadowHostElementTagNameMap {
+  'custom-tag': HTMLElement;
+}
+interface CustomHTMLElementTagNameMap extends HTMLElementTagNameMap, CustomShadowHostElementTagNameMap {
+  'custom': HTMLElement;
+}
+
+export const Shadow: API<CustomShadowHostElementTagNameMap> = API(html, shadow);
+export const HTML: API<CustomHTMLElementTagNameMap> = API(html);
+```
+
+Ideally, you should define custom elements only as scoped custom elements.
+
+```ts
+import { API, NS, shadow, element } from 'typed-dom';
+
+interface CustomShadowHostElementTagNameMap extends ShadowHostElementTagNameMap {
+  'custom-tag': HTMLElement;
+}
+interface CustomHTMLElementTagNameMap extends HTMLElementTagNameMap, CustomShadowHostElementTagNameMap {
+  'custom': HTMLElement;
+}
+
+// Note that the following code is based on the unstandardized APIs of scoped custom elements.
+export const html = element<CustomHTMLElementTagNameMap>(
+  shadow('section', { mode: 'open', registry: ... }).host,
+  NS.HTML);
+export const Shadow: API<CustomShadowHostElementTagNameMap> = API(html, shadow);
+export const HTML: API<CustomHTMLElementTagNameMap> = API(html);
+```
+
 ### Others
 
 - El
