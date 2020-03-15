@@ -1,5 +1,5 @@
 import { undefined, WeakMap, Event } from 'spica/global';
-import { isArray, ObjectDefineProperties, ObjectFreeze, ObjectKeys } from 'spica/alias';
+import { isArray, ObjectDefineProperties, ObjectKeys } from 'spica/alias';
 import { uid } from './identity';
 import { text, define } from '../util/dom';
 import { Mutable } from 'spica/type';
@@ -193,7 +193,6 @@ export class Elem<
   }
   private isInitialization = true;
   public get children(): C {
-    assert([ElChildrenType.Void, ElChildrenType.Array].includes(this.type) ? Object.isFrozen(this.children_) : !Object.isFrozen(this.children_));
     switch (this.type) {
       case ElChildrenType.Text:
         if ((this.children_ as unknown as Text).parentNode !== this.container) {
@@ -248,7 +247,6 @@ export class Elem<
           }
           targetChildren.push(newChild);
         }
-        ObjectFreeze(targetChildren);
         for (let i = nodeChildren.length; sourceChildren.length < i--;) {
           const el = nodeChildren[sourceChildren.length];
           if (!proxies.has(el)) continue;
