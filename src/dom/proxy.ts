@@ -5,16 +5,11 @@ import { text, define } from '../util/dom';
 import { Mutable } from 'spica/type';
 import { splice } from 'spica/array';
 
-type ElChildrenType =
-  | typeof ElChildrenType.Void
-  | typeof ElChildrenType.Text
-  | typeof ElChildrenType.Array
-  | typeof ElChildrenType.Record;
-namespace ElChildrenType {
-  export const Void = 'void';
-  export const Text = 'text';
-  export const Array = 'array';
-  export const Record = 'record';
+const enum ElChildrenType {
+  Void = 'void',
+  Text = 'text',
+  Array = 'array',
+  Record = 'record',
 }
 
 export type ElChildren =
