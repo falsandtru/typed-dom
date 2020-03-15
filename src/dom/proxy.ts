@@ -6,10 +6,10 @@ import { Mutable } from 'spica/type';
 import { splice } from 'spica/array';
 
 const enum ElChildrenType {
-  Void = 'void',
-  Text = 'text',
-  Array = 'array',
-  Record = 'record',
+  Void,
+  Text,
+  Array,
+  Record,
 }
 
 export type ElChildren =
