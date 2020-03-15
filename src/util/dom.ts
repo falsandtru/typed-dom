@@ -16,14 +16,9 @@ export interface Factory<M extends TagNameMap> {
   <T extends Extract<keyof M, string>>(tag: T, attrs?: Attrs, children?: Children): M[T];
 }
 
-const shadows = new WeakMap<Element, ShadowRoot>();
-
 namespace caches {
+  export const shadows = new WeakMap<Element, ShadowRoot>();
   export const fragment = document.createDocumentFragment();
-}
-
-export function frag(children?: Children): DocumentFragment {
-  return defineChildren(caches.fragment.cloneNode(true) as DocumentFragment, children);
 }
 
 export function shadow(el: keyof ShadowHostElementTagNameMap | HTMLElement, opts?: ShadowRootInit): ShadowRoot;
@@ -32,17 +27,21 @@ export function shadow(el: keyof ShadowHostElementTagNameMap | HTMLElement, chil
   if (typeof el === 'string') return shadow(html(el), children as Children, opts);
   if (children && !isChildren(children)) return shadow(el, undefined, children);
   const root = opts === undefined
-    ? el.shadowRoot || shadows.get(el)
+    ? el.shadowRoot || caches.shadows.get(el)
     : opts.mode === 'open'
       ? el.shadowRoot || undefined
-      : shadows.get(el);
+      : caches.shadows.get(el);
   return defineChildren(
     !opts || opts.mode === 'open'
       ? root || el.attachShadow(opts || { mode: 'open' })
-      : root || shadows.set(el, el.attachShadow(opts)).get(el)!,
+      : root || caches.shadows.set(el, el.attachShadow(opts)).get(el)!,
     !root && children == undefined
       ? el.childNodes
       : children);
+}
+
+export function frag(children?: Children): DocumentFragment {
+  return defineChildren(caches.fragment.cloneNode(true) as DocumentFragment, children);
 }
 
 export const html = element<HTMLElementTagNameMap>(document, NS.HTML);

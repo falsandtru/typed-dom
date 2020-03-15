@@ -1,4 +1,4 @@
-import { Shadow, HTML, SVG, API, El, proxy, frag, shadow, html, define } from '../../index';
+import { Shadow, HTML, SVG, API, El, proxy, shadow, frag, html, define } from '../../index';
 import { Coroutine } from 'spica/coroutine';
 import { Sequence } from 'spica/sequence';
 import { Attrs } from '../../internal';

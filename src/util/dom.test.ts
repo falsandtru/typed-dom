@@ -1,4 +1,4 @@
-import { shadow, html, svg, text, frag, define } from './dom';
+import { shadow, frag, html, svg, text, define } from './dom';
 import { HTML, SVG } from '../dom/builder';
 
 describe('Unit: util/dom', () => {
