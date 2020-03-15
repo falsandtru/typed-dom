@@ -288,11 +288,17 @@ export class Elem<
         break;
       }
     }
-    for (const child of removedChildren) {
-      child.element.dispatchEvent(new Event('disconnect', { bubbles: false, cancelable: true }));
+    if (removedChildren.length) {
+      const ev = new Event('disconnect', { bubbles: false, cancelable: true });
+      for (const child of removedChildren) {
+        child.element.dispatchEvent(ev);
+      }
     }
-    for (const child of addedChildren) {
-      child.element.dispatchEvent(new Event('connect', { bubbles: false, cancelable: true }));
+    if (addedChildren.length) {
+      const ev = new Event('connect', { bubbles: false, cancelable: true });
+      for (const child of addedChildren) {
+        child.element.dispatchEvent(ev);
+      }
     }
     assert(isChanged || removedChildren.length + addedChildren.length === 0);
     if (isChanged) {
