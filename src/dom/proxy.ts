@@ -304,5 +304,5 @@ export class Elem<
 
 function throwErrorIfNotUsable({ element }: El): void {
   if (!element.parentElement || !proxies.has(element.parentElement)) return;
-  throw new Error(`TypedDOM: Typed DOM children can't be used to another typed DOM.`);
+  throw new Error(`TypedDOM: Typed DOM children must not be used to another typed DOM.`);
 }
