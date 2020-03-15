@@ -290,14 +290,14 @@ export class Elem<
     }
     if (removedChildren.length) {
       const ev = new Event('disconnect', { bubbles: false, cancelable: true });
-      for (const child of removedChildren) {
-        child.element.dispatchEvent(ev);
+      for (const { element } of removedChildren) {
+        element.dispatchEvent(ev);
       }
     }
     if (addedChildren.length) {
       const ev = new Event('connect', { bubbles: false, cancelable: true });
-      for (const child of addedChildren) {
-        child.element.dispatchEvent(ev);
+      for (const { element } of addedChildren) {
+        element.dispatchEvent(ev);
       }
     }
     assert(isChanged || removedChildren.length + addedChildren.length === 0);
