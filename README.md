@@ -149,7 +149,7 @@ export const HTML: API<CustomHTMLElementTagNameMap> = API(html);
 ## Usage
 
 Build a typed DOM component with styling.
-APIs replace `$scope` selectors with `:host`, `#<id>`, or `.<generated-id>`.
+APIs replace the `$scope` selector with `:host`, `#<id>`, or `.<generated-id>`.
 
 ```ts
 import { HTML } from 'typed-dom';
