@@ -4,11 +4,12 @@ import { Elem, El, ElChildren } from './proxy';
 import { Factory as BaseFactory, TagNameMap, Attrs, shadow, html, svg, define } from '../util/dom';
 import { ExtractProp } from 'spica/type';
 
-export type API<M extends TagNameMap, F extends BaseFactory<M> = BaseFactory<M>> =
+export type API
+  <M extends TagNameMap, F extends BaseFactory<M> = BaseFactory<M>> =
   BuilderFunction<Extract<keyof ExtractProp<M, Element>, string>, Element, F> &
   { readonly [P in Extract<keyof ExtractProp<M, Element>, string>]: BuilderMethod<P, Extract<M[P], Element>, F>; };
 export function API
-  <M extends TagNameMap, F extends BaseFactory<M>>
+  <M extends TagNameMap, F extends BaseFactory<M> = BaseFactory<M>>
   (baseFactory: F, formatter: <E extends Element>(el: E) => E | ShadowRoot = el => el)
   : API<M, F> {
   return new Proxy<API<M, F>>((() => undefined) as any, handle(baseFactory, formatter));
