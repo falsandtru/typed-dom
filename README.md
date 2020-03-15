@@ -287,13 +287,13 @@ const memory = new WeakMap<Node, object>();
 const data = <K extends keyof TransDataMap>(data: TransDataMap[K]) =>
   <T extends string, E extends Element>(factory: (tag: T, attrs: Attrs, children: string) => E, tag: T, attrs: Attrs, children: K): E => {
     const el = factory(tag, attrs, children);
-    void memory.set(el, data);
+    memory.set(el, data);
     return el;
   };
 const trans: API<HTMLElementTagNameMap> = API((tag: keyof HTMLElementTagNameMap, ...args: any[]) =>
   define(html(tag, {
     onchange: args.every(arg => typeof arg !== 'string')
-      ? undefined
+      ? void 0
       : (ev, el = proxy<string>(ev.target as HTMLElement)) =>
           i18n.init((err, t) =>
             el.children = err
