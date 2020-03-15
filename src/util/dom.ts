@@ -1,7 +1,6 @@
 import { undefined, Symbol, document } from 'spica/global';
 import { isArray, ObjectKeys } from 'spica/alias';
 import { memoize } from 'spica/memoize';
-import { curry, uncurry } from 'spica/curry';
 
 export const enum NS {
   HTML = 'HTML',
@@ -21,12 +20,6 @@ const shadows = new WeakMap<Element, ShadowRoot>();
 
 namespace caches {
   export const fragment = document.createDocumentFragment();
-  export const element = memoize(
-    (context: Document | ShadowRoot) =>
-      memoize(
-        uncurry(curry(elem)(context)),
-        (ns, tag) => `${ns}:${tag}`),
-    new WeakMap());
 }
 
 export function frag(children?: Children): DocumentFragment {
@@ -60,6 +53,7 @@ export function text(source: string): Text {
 }
 
 export function element<M extends TagNameMap>(context: Document | ShadowRoot, ns: NS) {
+  const cache = memoize(elem, (_, ns, tag) => `${ns}:${tag}`);
   return element;
 
   function element<T extends keyof M>(tag: T, children?: Children): M[T];
@@ -67,7 +61,7 @@ export function element<M extends TagNameMap>(context: Document | ShadowRoot, ns
   function element(tag: string, attrs?: Attrs | Children, children?: Children): Element {
     const el = tag.includes('-')
       ? elem(context, ns, tag)
-      : caches.element(context)(ns, tag).cloneNode(true) as Element;
+      : cache(context, ns, tag).cloneNode(true) as Element;
     assert(el.attributes.length === 0);
     assert(el.childNodes.length === 0);
     return isChildren(attrs)
