@@ -82,25 +82,25 @@ export class Elem<
     proxies.set(this.element, this);
     switch (this.type) {
       case ElChildrenType.Void:
-        this.isInitialization = false;
+        this.isInit = false;
         return;
       case ElChildrenType.Text:
         define(this.container, []);
         this.children_ = this.container.appendChild(text('')) as any;
         this.children = children_ as C;
-        this.isInitialization = false;
+        this.isInit = false;
         return;
       case ElChildrenType.Array:
         define(this.container, []);
         this.children_ = [] as ElChildren.Array as C;
         this.children = children_;
-        this.isInitialization = false;
+        this.isInit = false;
         return;
       case ElChildrenType.Record:
         define(this.container, []);
         this.children_ = this.observe({ ...children_ as ElChildren.Record }) as C;
         this.children = children_;
-        this.isInitialization = false;
+        this.isInit = false;
         return;
       default:
         throw new Error(`TypedDOM: Unreachable code.`);
@@ -191,7 +191,7 @@ export class Elem<
       es[0].remove();
     }
   }
-  private isInitialization = true;
+  private isInit = true;
   public get children(): C {
     switch (this.type) {
       case ElChildrenType.Text:
@@ -217,7 +217,7 @@ export class Elem<
       case ElChildrenType.Void:
         return;
       case ElChildrenType.Text: {
-        if (!this.isInitialization && children === this.children) return;
+        if (!this.isInit && children === this.children) return;
         const targetChildren = this.children_ as unknown as Text;
         const oldText = targetChildren.data;
         const newText = children as ElChildren.Text;
@@ -264,14 +264,14 @@ export class Elem<
         for (const name of ObjectKeys(targetChildren)) {
           const oldChild = targetChildren[name];
           const newChild = sourceChildren[name];
-          if (!this.isInitialization && newChild === oldChild) continue;
+          if (!this.isInit && newChild === oldChild) continue;
           if (newChild.element.parentNode !== this.container) {
             throwErrorIfNotUsable(newChild);
           }
-          if (this.isInitialization || newChild !== oldChild && newChild.element.parentNode !== oldChild.element.parentNode) {
+          if (this.isInit || newChild !== oldChild && newChild.element.parentNode !== oldChild.element.parentNode) {
             this.scope(newChild);
             addedChildren.push(newChild);
-            if (!this.isInitialization) {
+            if (!this.isInit) {
               let i = 0;
               i = removedChildren.lastIndexOf(newChild);
               i > -1 && splice(removedChildren, i, 1);
