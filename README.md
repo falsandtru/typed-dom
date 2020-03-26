@@ -277,7 +277,7 @@ import { Coroutine } from 'spica/coroutine';
 
 class Component extends Coroutine implements El {
   constructor() {
-    super(function* (this: Component) {
+    super(async function* (this: Component) {
       while (true) {
         yield;
       }
