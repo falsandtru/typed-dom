@@ -481,7 +481,7 @@ describe('Integration: Typed DOM', function () {
     it('component coroutine', function () {
       class Component extends Coroutine implements El {
         constructor() {
-          super(function* (this: Component) {
+          super(async function* (this: Component) {
             assert(this.element);
             assert(this.children);
             this.children = this.children.map(el => {
