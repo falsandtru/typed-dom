@@ -491,7 +491,7 @@ describe('Integration: Typed DOM', function () {
             while (true) {
               yield;
             }
-          }, { trigger: 'element', size: Infinity });
+          }, { trigger: 'element', sendBufferSize: Infinity });
           assert(this.children[0].children === 'ITEM');
         }
         private readonly dom = Shadow.section({
