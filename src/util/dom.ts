@@ -51,13 +51,11 @@ export function text(source: string): Text {
   return document.createTextNode(source);
 }
 
-export function element<M extends TagNameMap>(context: Document | ShadowRoot, ns: NS) {
+export function element<M extends HTMLElementTagNameMap>(context: Document | ShadowRoot, ns: NS.HTML): Factory<M>;
+export function element<M extends SVGElementTagNameMap>(context: Document | ShadowRoot, ns: NS.SVG): Factory<M>;
+export function element<M extends TagNameMap>(context: Document | ShadowRoot, ns: NS): Factory<M> {
   const cache = memoize(elem, (_, ns, tag) => `${ns}:${tag}`);
-  return element;
-
-  function element<T extends keyof M>(tag: T, children?: Children): M[T];
-  function element<T extends keyof M>(tag: T, attrs?: Attrs, children?: Children): M[T];
-  function element(tag: string, attrs?: Attrs | Children, children?: Children): Element {
+  return (tag: string, attrs?: Attrs | Children, children?: Children) => {
     const el = tag.includes('-')
       ? elem(context, ns, tag)
       : cache(context, ns, tag).cloneNode(true) as Element;
@@ -66,7 +64,7 @@ export function element<M extends TagNameMap>(context: Document | ShadowRoot, ns
     return isChildren(attrs)
       ? defineChildren(el, attrs)
       : defineChildren(defineAttrs(el, attrs), children);
-  }
+  };
 }
 
 function elem(context: Document | ShadowRoot, ns: NS, tag: string): Element {
