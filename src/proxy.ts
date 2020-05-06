@@ -1,7 +1,7 @@
 import { undefined, WeakMap, Event } from 'spica/global';
 import { isArray, ObjectDefineProperties, ObjectKeys } from 'spica/alias';
 import { uid } from './identity';
-import { text, define } from '../util/dom';
+import { text, define } from './util/dom';
 import { Mutable } from 'spica/type';
 import { splice } from 'spica/array';
 

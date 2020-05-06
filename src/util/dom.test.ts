@@ -1,5 +1,5 @@
 import { shadow, frag, html, svg, text, define } from './dom';
-import { HTML, SVG } from '../dom/builder';
+import { HTML, SVG } from '../builder';
 
 describe('Unit: util/dom', () => {
   describe('shadow', () => {

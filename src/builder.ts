@@ -1,7 +1,7 @@
 import { undefined } from 'spica/global';
 import { ObjectKeys, ObjectValues } from 'spica/alias';
 import { Elem, El, ElChildren } from './proxy';
-import { Factory as BaseFactory, TagNameMap, Attrs, shadow, html, svg, define } from '../util/dom';
+import { Factory as BaseFactory, TagNameMap, Attrs, shadow, html, svg, define } from './util/dom';
 import { ExtractProp } from 'spica/type';
 
 export type API

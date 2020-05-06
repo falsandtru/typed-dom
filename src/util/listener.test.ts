@@ -1,5 +1,5 @@
 import { bind, delegate, listen, once, wait, currentTarget } from './listener';
-import { Shadow, HTML } from '../dom/builder';
+import { Shadow, HTML } from '../builder';
 
 describe('Unit: util/listener', () => {
   describe('bind', () => {
