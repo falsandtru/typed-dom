@@ -6,7 +6,7 @@ export { NS, shadow, frag, html, svg, text, element, define } from './src/util/d
 export { listen, once, wait, delegate, bind, currentTarget } from './src/util/listener';
 export { apply } from './src/util/query';
 
-type ShadowRootElementTagName =
+type ShadowHostElementTagName =
   | 'article'
   | 'aside'
   | 'blockquote'
@@ -25,12 +25,12 @@ type ShadowRootElementTagName =
   | 'p'
   | 'section'
   | 'span';
-type ShadowRootElementTagNameMap_ = {
-  [P in Extract<ShadowRootElementTagName, keyof HTMLElementTagNameMap>]: HTMLElementTagNameMap[P];
+type ShadowHostElementTagNameMap_ = {
+  [P in Extract<ShadowHostElementTagName, keyof HTMLElementTagNameMap>]: HTMLElementTagNameMap[P];
 };
 
 declare global {
-  interface ShadowHostElementTagNameMap extends ShadowRootElementTagNameMap_ {
+  interface ShadowHostElementTagNameMap extends ShadowHostElementTagNameMap_ {
   }
   interface HTMLElementTagNameMap extends ShadowHostElementTagNameMap {
   }
