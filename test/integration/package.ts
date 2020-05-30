@@ -101,32 +101,18 @@ describe('Integration: Typed DOM', function () {
       assert(dom.children.length === 1);
       assert(dom.children.every(({ element }, i) => element === dom.element.children[i]));
 
-      // property test
-      const ss = Array.from(Array(3), () => HTML.li(``));
-      void Sequence.zip(
-        Sequence.cycle([[...Array.from(Array(3), () => HTML.li(``)), ...ss]]),
-        Sequence.cycle([[...Array.from(Array(3), () => HTML.li(``)), ...ss]]))
-        .take(1000)
-        .map(lss =>
-          lss
-            .map(ls =>
-              _.shuffle(ls.slice(-ls.length % (Math.random() * ls.length | 0)))))
+      // exhaustive test
+      const el = HTML.ul([HTML.li('')]);
+      const es = Sequence.from([HTML.li('1'), HTML.li('2'), HTML.li('3')]);
+      el.children = [];
+      Sequence.from([
+        ...es.permutations(),
+        ...es.permutations().bind(es => Sequence.from(es).subsequences()),
+      ])
         .extract()
-        .forEach(([os, ns]) => {
-          dom.children = os;
-          Sequence.zip(
-            Sequence.from(Array.from(dom.element.children)),
-            Sequence.from(os.map(({ element }) => element)))
-            .extract()
-            .forEach(([a, b]) =>
-              void assert(a === b));
-          dom.children = ns;
-          Sequence.zip(
-            Sequence.from(Array.from(dom.element.children)),
-            Sequence.from(ns.map(({ element }) => element)))
-            .extract()
-            .forEach(([a, b]) =>
-              void assert(a === b));
+        .forEach(es => {
+          el.children = es;
+          assert.deepStrictEqual(el.children, es);
         });
     });
 

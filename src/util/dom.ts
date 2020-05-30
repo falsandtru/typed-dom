@@ -145,9 +145,11 @@ function defineChildren<T extends DocumentFragment | ShadowRoot | Element>(node:
     const newChild: string | Node = children[i];
     if (typeof newChild === 'object' && newChild.nodeType === 11) {
       const sourceLength = newChild.childNodes.length;
+      targetLength += newChild !== node
+        ? sourceLength
+        : 0;
       node.insertBefore(newChild, targetNodes[count] || null);
       count += sourceLength;
-      targetLength += sourceLength;
       continue;
     }
     ++count;
@@ -160,8 +162,10 @@ function defineChildren<T extends DocumentFragment | ShadowRoot | Element>(node:
     const oldChild = targetNodes[count - 1];
     if (equal(oldChild, newChild)) continue;
     if (targetLength < children.length - i + count) {
+      targetLength += typeof newChild === 'string' || newChild.parentNode !== node
+        ? 1
+        : 0;
       node.insertBefore(typeof newChild === 'string' ? text(newChild) : newChild, oldChild);
-      ++targetLength;
     }
     else {
       node.replaceChild(typeof newChild === 'string' ? text(newChild) : newChild, oldChild);

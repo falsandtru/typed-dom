@@ -1,5 +1,6 @@
 import { shadow, frag, html, svg, text, define } from './dom';
 import { HTML, SVG } from '../builder';
+import { Sequence } from 'spica/sequence';
 
 describe('Unit: util/dom', () => {
   describe('shadow', () => {
@@ -60,6 +61,18 @@ describe('Unit: util/dom', () => {
       assert(define(html('html', [frag(['a', text('b')])]), 'c').innerHTML === 'c');
       assert(define(html('html', 'a'), [frag(['b', text('c')])]).innerHTML === 'bc');
       assert(define(html('html', 'a'), ['a', frag(['b', 'c'])]).innerHTML === 'abc');
+    });
+
+    it('update', () => {
+      const el = html('span');
+      const es = Sequence.from([html('span', '1'), html('span', '2'), html('span', '3')]);
+      Sequence.from([
+        ...es.permutations(),
+        ...es.permutations().bind(es => Sequence.from(es).subsequences()),
+      ])
+        .extract()
+        .forEach(es =>
+          assert.deepStrictEqual([...define(el, es).children], es));
     });
 
   });
