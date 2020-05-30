@@ -102,10 +102,10 @@ describe('Integration: Typed DOM', function () {
       assert(dom.children.every(({ element }, i) => element === dom.element.children[i]));
 
       // property test
-      const ss = Array(3).fill(0).map(() => HTML.li(``));
+      const ss = Array.from(Array(3), () => HTML.li(``));
       void Sequence.zip(
-        Sequence.cycle([[...Array(3).fill(0).map(() => HTML.li(``)), ...ss]]),
-        Sequence.cycle([[...Array(3).fill(0).map(() => HTML.li(``)), ...ss]]))
+        Sequence.cycle([[...Array.from(Array(3), () => HTML.li(``)), ...ss]]),
+        Sequence.cycle([[...Array.from(Array(3), () => HTML.li(``)), ...ss]]))
         .take(1000)
         .map(lss =>
           lss
