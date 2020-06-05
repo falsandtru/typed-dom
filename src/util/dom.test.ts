@@ -66,6 +66,7 @@ describe('Unit: util/dom', () => {
     it('update', () => {
       const el = html('span');
       const es = Sequence.from([html('span', '1'), html('span', '2'), html('span', '3')]);
+      // Property test
       Sequence.from([
         ...es.permutations(),
         ...es.permutations().bind(es => Sequence.from(es).subsequences()),

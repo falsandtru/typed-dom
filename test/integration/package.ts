@@ -101,7 +101,7 @@ describe('Integration: Typed DOM', function () {
       assert(dom.children.length === 1);
       assert(dom.children.every(({ element }, i) => element === dom.element.children[i]));
 
-      // exhaustive test
+      // Property test
       const el = HTML.ul([HTML.li('')]);
       const es = Sequence.from([HTML.li('1'), HTML.li('2'), HTML.li('3')]);
       el.children = [];
