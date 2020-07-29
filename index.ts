@@ -6,31 +6,26 @@ export { NS, shadow, frag, html, svg, text, element, define } from './src/util/d
 export { listen, once, wait, delegate, bind, currentTarget } from './src/util/listener';
 export { apply } from './src/util/query';
 
-type ShadowHostElementTagName =
-  | 'article'
-  | 'aside'
-  | 'blockquote'
-  | 'body'
-  | 'div'
-  | 'footer'
-  | 'h1'
-  | 'h2'
-  | 'h3'
-  | 'h4'
-  | 'h5'
-  | 'h6'
-  | 'header'
-  | 'main'
-  | 'nav'
-  | 'p'
-  | 'section'
-  | 'span';
-type ShadowHostElementTagNameMap_ = {
-  [P in Extract<ShadowHostElementTagName, keyof HTMLElementTagNameMap>]: HTMLElementTagNameMap[P];
-};
-
 declare global {
-  interface ShadowHostElementTagNameMap extends ShadowHostElementTagNameMap_ {
+  interface ShadowHostElementTagNameMap {
+    'article': HTMLElement;
+    'aside': HTMLElement;
+    'blockquote': HTMLQuoteElement;
+    'body': HTMLBodyElement;
+    'div': HTMLDivElement;
+    'footer': HTMLElement;
+    'h1': HTMLHeadingElement;
+    'h2': HTMLHeadingElement;
+    'h3': HTMLHeadingElement;
+    'h4': HTMLHeadingElement;
+    'h5': HTMLHeadingElement;
+    'h6': HTMLHeadingElement;
+    'header': HTMLElement;
+    'main': HTMLElement;
+    'nav': HTMLElement;
+    'p': HTMLParagraphElement;
+    'section': HTMLElement;
+    'span': HTMLSpanElement;
   }
   interface HTMLElementTagNameMap extends ShadowHostElementTagNameMap {
   }
