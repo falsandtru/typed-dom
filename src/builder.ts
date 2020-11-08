@@ -1,15 +1,15 @@
 import { undefined } from 'spica/global';
 import { ObjectKeys, ObjectValues } from 'spica/alias';
 import { Elem, El, ElChildren } from './proxy';
-import { Factory as BaseFactory, TagNameMap, Attrs, shadow, html, svg, define } from './util/dom';
+import { Factory, TagNameMap, Attrs, shadow, html, svg, define } from './util/dom';
 import { ExtractProp } from 'spica/type';
 
 export type API
-  <M extends TagNameMap, F extends BaseFactory<M> = BaseFactory<M>> =
+  <M extends TagNameMap, F extends Factory<M> = Factory<M>> =
   BuilderFunction<Extract<keyof ExtractProp<M, Element>, string>, Element, F> &
   { readonly [P in Extract<keyof ExtractProp<M, Element>, string>]: BuilderMethod<P, Extract<M[P], Element>, F>; };
 export function API
-  <M extends TagNameMap, F extends BaseFactory<M> = BaseFactory<M>>
+  <M extends TagNameMap, F extends Factory<M> = Factory<M>>
   (baseFactory: F, formatter: <E extends Element>(el: E) => E | ShadowRoot = el => el)
   : API<M, F> {
   return new Proxy<API<M, F>>((() => undefined) as any, handle(baseFactory, formatter));
@@ -24,24 +24,24 @@ type Adjust<C extends ElChildren> =
   C extends ElChildren.Array ? Readonly<C> :
   C;
 
-interface BuilderFunction<T extends string, E extends Element, F extends BaseFactory<TagNameMap>> {
-                        (tag: T,                            factory?: Factory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
-  <C extends ElChildren>(tag: T,               children: C, factory?: Factory<F, T, C, E>              ): El<T, E, Adjust<C>>;
-                        (tag: T, attrs: Attrs,              factory?: Factory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
-  <C extends ElChildren>(tag: T, attrs: Attrs, children: C, factory?: Factory<F, T, C, E>              ): El<T, E, Adjust<C>>;
+interface BuilderFunction<T extends string, E extends Element, F extends Factory<TagNameMap>> {
+                        (tag: T,                            factory?: PFactory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
+  <C extends ElChildren>(tag: T,               children: C, factory?: PFactory<F, T, C, E>              ): El<T, E, Adjust<C>>;
+                        (tag: T, attrs: Attrs,              factory?: PFactory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
+  <C extends ElChildren>(tag: T, attrs: Attrs, children: C, factory?: PFactory<F, T, C, E>              ): El<T, E, Adjust<C>>;
 }
 
-interface BuilderMethod<T extends string, E extends Element, F extends BaseFactory<TagNameMap>> {
-                        (                           factory?: Factory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
-  <C extends ElChildren>(              children: C, factory?: Factory<F, T, C, E>              ): El<T, E, Adjust<C>>;
-                        (attrs: Attrs,              factory?: Factory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
-  <C extends ElChildren>(attrs: Attrs, children: C, factory?: Factory<F, T, C, E>              ): El<T, E, Adjust<C>>;
+interface BuilderMethod<T extends string, E extends Element, F extends Factory<TagNameMap>> {
+                        (                           factory?: PFactory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
+  <C extends ElChildren>(              children: C, factory?: PFactory<F, T, C, E>              ): El<T, E, Adjust<C>>;
+                        (attrs: Attrs,              factory?: PFactory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
+  <C extends ElChildren>(attrs: Attrs, children: C, factory?: PFactory<F, T, C, E>              ): El<T, E, Adjust<C>>;
 }
 
-type Factory<F extends BaseFactory<TagNameMap>, T extends string, C extends ElChildren, E extends Element> = (baseFactory: F, tag: T, attrs: Attrs, children: C) => E;
+type PFactory<F extends Factory<TagNameMap>, T extends string, C extends ElChildren, E extends Element> = (baseFactory: F, tag: T, attrs: Attrs, children: C) => E;
 
 function handle
-  <M extends TagNameMap, F extends BaseFactory<M>>
+  <M extends TagNameMap, F extends Factory<M>>
   (baseFactory: F, formatter: <E extends Element>(el: E) => E | ShadowRoot,
 ): ProxyHandler<API<M, F>> {
   return {
@@ -55,7 +55,7 @@ function handle
   };
 
   function builder(tag: Extract<keyof M, string>, baseFactory: F): (attrs?: Attrs, children?: ElChildren, factory?: () => Element) => El {
-    return function build(attrs?: Attrs, children?: ElChildren, factory?: Factory<F, Extract<keyof M, string>, ElChildren, Element>): El {
+    return function build(attrs?: Attrs, children?: ElChildren, factory?: PFactory<F, Extract<keyof M, string>, ElChildren, Element>): El {
       if (typeof attrs === 'function') return build(undefined, undefined, attrs);
       if (typeof children === 'function') return build(attrs, undefined, children);
       if (attrs !== undefined && isChildren(attrs)) return build(undefined, attrs, factory);
@@ -70,7 +70,7 @@ function handle
           || ObjectValues(children).slice(-1).every(val => typeof val === 'object');
     }
 
-    function elem(factory: Factory<F, Extract<keyof M, string>, ElChildren, Element>, attrs: Attrs | undefined, children: ElChildren): Element {
+    function elem(factory: PFactory<F, Extract<keyof M, string>, ElChildren, Element>, attrs: Attrs | undefined, children: ElChildren): Element {
       const el = factory(baseFactory, tag, attrs || {}, children);
       if (tag !== el.tagName.toLowerCase()) throw new Error(`TypedDOM: Expected tag name is "${tag}" but actually "${el.tagName.toLowerCase()}".`);
       if (factory !== defaultFactory) {
