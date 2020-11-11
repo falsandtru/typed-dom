@@ -15,9 +15,9 @@ export function API
   return new Proxy<API<M, F>>((() => undefined) as any, handle(baseFactory, formatter));
 }
 
-export const Shadow: API<ShadowHostElementTagNameMap> = API(html, shadow);
-export const HTML: API<HTMLElementTagNameMap> = API(html);
-export const SVG: API<SVGElementTagNameMap> = API(svg);
+export const Shadow = API<ShadowHostElementTagNameMap>(html, shadow);
+export const HTML = API<HTMLElementTagNameMap>(html);
+export const SVG = API<SVGElementTagNameMap>(svg);
 
 type PFactory<F extends Factory<TagNameMap>, T extends string, C extends ElChildren, E extends Element> = (baseFactory: F, tag: T, attrs: Attrs, children: C) => E;
 

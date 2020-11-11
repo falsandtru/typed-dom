@@ -64,9 +64,9 @@ All exposed APIs to create a proxy can be redefined as follows:
 ```ts
 import { API, shadow, html, svg } from 'typed-dom';
 
-const Shadow: API<ShadowHostElementTagNameMap> = API(html, shadow);
-const HTML: API<HTMLElementTagNameMap> = API(html);
-const SVG: API<SVGElementTagNameMap> = API(svg);
+const Shadow = API<ShadowHostElementTagNameMap>(html, shadow);
+const HTML = API<HTMLElementTagNameMap>(html);
+const SVG = API<SVGElementTagNameMap>(svg);
 ```
 
 #### Extend APIs
@@ -104,8 +104,8 @@ interface CustomHTMLElementTagNameMap extends HTMLElementTagNameMap, CustomShado
   'custom': HTMLElement;
 }
 
-export const Shadow: API<CustomShadowHostElementTagNameMap> = API(html, shadow);
-export const HTML: API<CustomHTMLElementTagNameMap> = API(html);
+export const Shadow = API<CustomShadowHostElementTagNameMap>(html, shadow);
+export const HTML = API<CustomHTMLElementTagNameMap>(html);
 ```
 
 Ideally, you should define custom elements only as scoped custom elements.
@@ -124,8 +124,8 @@ interface CustomHTMLElementTagNameMap extends HTMLElementTagNameMap, CustomShado
 export const html = element<CustomHTMLElementTagNameMap>(
   shadow('section', { mode: 'open', registry: ... }),
   NS.HTML);
-export const Shadow: API<CustomShadowHostElementTagNameMap> = API(html, shadow);
-export const HTML: API<CustomHTMLElementTagNameMap> = API(html);
+export const Shadow = API<CustomShadowHostElementTagNameMap>(html, shadow);
+export const HTML = API<CustomHTMLElementTagNameMap>(html);
 ```
 
 ### Others
@@ -327,7 +327,7 @@ const data = <K extends keyof TransDataMap>(data: TransDataMap[K]) =>
     memory.set(el, data);
     return el;
   };
-const trans: API<HTMLElementTagNameMap> = API((tag: keyof HTMLElementTagNameMap, ...args: any[]) =>
+const trans = API<HTMLElementTagNameMap>((tag: keyof HTMLElementTagNameMap, ...args: any[]) =>
   define(html(tag, {
     onchange: args.every(arg => typeof arg !== 'string')
       ? void 0

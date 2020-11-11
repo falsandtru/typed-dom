@@ -525,7 +525,7 @@ describe('Integration: Typed DOM', function () {
           memory.set(el, data);
           return el;
         };
-      const trans: API<HTMLElementTagNameMap> = API((tag: keyof HTMLElementTagNameMap, ...args: any[]) =>
+      const trans = API<HTMLElementTagNameMap>((tag: keyof HTMLElementTagNameMap, ...args: any[]) =>
         define(html(tag, {
           onchange: args.every(arg => typeof arg !== 'string')
             ? void 0
