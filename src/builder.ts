@@ -19,6 +19,8 @@ export const Shadow: API<ShadowHostElementTagNameMap> = API(html, shadow);
 export const HTML: API<HTMLElementTagNameMap> = API(html);
 export const SVG: API<SVGElementTagNameMap> = API(svg);
 
+type PFactory<F extends Factory<TagNameMap>, T extends string, C extends ElChildren, E extends Element> = (baseFactory: F, tag: T, attrs: Attrs, children: C) => E;
+
 type Adjust<C extends ElChildren> =
   C extends ElChildren.Text ? ElChildren.Text :
   C extends ElChildren.Array ? Readonly<C> :
@@ -37,8 +39,6 @@ interface BuilderMethod<T extends string, E extends Element, F extends Factory<T
                         (attrs: Attrs,              factory?: PFactory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
   <C extends ElChildren>(attrs: Attrs, children: C, factory?: PFactory<F, T, C, E>              ): El<T, E, Adjust<C>>;
 }
-
-type PFactory<F extends Factory<TagNameMap>, T extends string, C extends ElChildren, E extends Element> = (baseFactory: F, tag: T, attrs: Attrs, children: C) => E;
 
 function handle
   <M extends TagNameMap, F extends Factory<M>>
