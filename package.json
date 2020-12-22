@@ -1,6 +1,6 @@
 {
   "name": "typed-dom",
-  "version": "0.0.202",
+  "version": "0.0.203",
   "description": "A DOM component builder creating type-level DOM structures.",
   "private": true,
   "homepage": "https://github.com/falsandtru/typed-dom",
@@ -9,13 +9,13 @@
     "url": "https://github.com/falsandtru/typed-dom"
   },
   "keywords": [
+    "type",
     "dom",
-    "component",
-    "html",
+    "shadow dom",
+    "custom element",
     "css",
     "css-in-js",
-    "typed",
-    "typing"
+    "web component"
   ],
   "files": [
     "dist",
