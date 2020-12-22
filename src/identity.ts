@@ -1,8 +1,8 @@
 import { uuid } from 'spica/uuid';
 
-const id = uuid().split('-').pop()!;
+const unique = uuid().split('-').pop()!;
 let counter = 0;
 
-export function uid(): string {
-  return `id-${id}-${++counter}`;
+export function id(): string {
+  return `id-${unique}-${++counter}`;
 }
