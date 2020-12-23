@@ -3,7 +3,7 @@ import 'spica/global';
 export { Shadow, HTML, SVG, API } from './src/builder';
 export { El, proxy } from './src/proxy';
 export { NS, shadow, frag, html, svg, text, element, define } from './src/util/dom';
-export { listen, once, wait, delegate, bind, currentTarget } from './src/util/listener';
+export { listen, delegate, bind, once, wait, currentTarget } from './src/util/listener';
 export { apply } from './src/util/query';
 
 declare global {
