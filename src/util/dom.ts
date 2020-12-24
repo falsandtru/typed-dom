@@ -1,4 +1,4 @@
-import { undefined, Symbol, document } from 'spica/global';
+import { undefined, Array, Symbol, document } from 'spica/global';
 import { isArray, ObjectKeys } from 'spica/alias';
 import { memoize } from 'spica/memoize';
 
@@ -122,9 +122,9 @@ function defineChildren<T extends DocumentFragment | ShadowRoot | Element>(node:
   }
   if (!isArray(children)) {
     if (!('length' in children)) return defineChildren(node, [...children]);
-    const ns: (string | Node)[] = [];
-    for (let i = 0, len = children.length; i < len; ++i) {
-      ns.push(children[i]);
+    const ns = Array<string | Node>(children.length);
+    for (let i = 0; i < ns.length; ++i) {
+      ns[i] = children[i];
     }
     return defineChildren(node, ns);
   }
