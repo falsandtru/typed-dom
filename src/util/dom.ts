@@ -101,6 +101,8 @@ function defineAttrs<T extends Element>(el: T, attrs?: Attrs): T {
             'mousewheel',
             'touchstart',
             'touchmove',
+            'touchend',
+            'touchcancel',
           ].includes(name.slice(2)),
         });
         continue;
