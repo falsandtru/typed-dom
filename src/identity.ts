@@ -1,6 +1,6 @@
-import { uuid } from 'spica/uuid';
+import { rnd0Z } from 'spica/random';
 
-const unique = uuid().split('-').pop()!;
+const unique = rnd0Z(8);
 let counter = 0;
 
 export function identity(): string {
