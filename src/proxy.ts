@@ -106,8 +106,8 @@ export class Elem<
   private id_ = '';
   private get id(): string {
     if (this.id_) return this.id_;
-    this.id_ = this.element.id.trim();
-    if (this.id_) return this.id_;
+    this.id_ = this.element.id;
+    if (/^[\w-]+$/.test(this.id_)) return this.id_;
     this.id_ = identity();
     assert(!this.element.classList.contains(this.id_));
     this.element.classList.add(this.id_);
@@ -119,7 +119,7 @@ export class Elem<
     switch (true) {
       case this.element !== this.container:
         return this.query_ = ':host';
-      case this.id === this.element.id.trim():
+      case this.id === this.element.id:
         return this.query_ = `#${this.id}`;
       default:
         return this.query_ = `.${this.id}`;
@@ -179,7 +179,7 @@ export class Elem<
     const html = style.innerHTML;
     if (html.search(target) === -1) return;
     const query = this.query;
-    if (!/^[:#.][\w-]+$/.test(query)) return;
+    assert(/^[:#.][\w-]+$/.test(query));
     style.innerHTML = html.replace(target, (_, frag, space) => `${frag}${space}${query}`);
     if (!style.firstElementChild) return;
     for (let es = style.children, i = 0, len = es.length; i < len; ++i) {
