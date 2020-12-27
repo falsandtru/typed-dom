@@ -3,7 +3,7 @@ import { AtomicPromise } from 'spica/promise';
 import { once as one } from 'spica/function';
 import { noop } from 'spica/noop';
 
-export const currentTarget = Symbol.for('currentTarget');
+export const currentTarget = Symbol.for('typed-dom::currentTarget');
 
 declare global {
   interface Event {

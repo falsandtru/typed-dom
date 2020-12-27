@@ -35,7 +35,7 @@ export function proxy(el: Element): El {
   throw new Error(`TypedDOM: This element has no proxy.`);
 }
 
-const tag = Symbol.for('typed-dom/tag');
+const tag = Symbol.for('typed-dom::tag');
 
 export interface El<
   T extends string = string,
