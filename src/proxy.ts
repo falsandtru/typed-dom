@@ -37,7 +37,6 @@ export function proxy(el: Element): El {
 
 const tag = Symbol.for('typed-dom::tag');
 const id = identity();
-assert(id === id.toLowerCase());
 let counter = 0;
 
 export interface El<
