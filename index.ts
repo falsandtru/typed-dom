@@ -5,6 +5,7 @@ export { El, proxy } from './src/proxy';
 export { NS, shadow, frag, html, svg, text, element, define } from './src/util/dom';
 export { listen, delegate, bind, once, wait, currentTarget } from './src/util/listener';
 export { apply } from './src/util/query';
+export { identity } from './src/util/identity';
 
 declare global {
   interface ShadowHostElementTagNameMap {

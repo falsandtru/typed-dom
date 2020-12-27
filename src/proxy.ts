@@ -1,6 +1,6 @@
 import { undefined, WeakMap, Event } from 'spica/global';
 import { isArray, ObjectDefineProperties, ObjectKeys } from 'spica/alias';
-import { identity } from './identity';
+import { identity } from './util/identity';
 import { text, define } from './util/dom';
 import { Mutable } from 'spica/type';
 import { splice } from 'spica/array';
@@ -36,6 +36,9 @@ export function proxy(el: Element): El {
 }
 
 const tag = Symbol.for('typed-dom::tag');
+const id = identity();
+assert(id === id.toLowerCase());
+let counter = 0;
 
 export interface El<
   T extends string = string,
@@ -108,7 +111,7 @@ export class Elem<
     if (this.id_) return this.id_;
     this.id_ = this.element.id;
     if (/^[\w-]+$/.test(this.id_)) return this.id_;
-    this.id_ = identity();
+    this.id_ = `rnd-${id}-${++counter}`;
     assert(!this.element.classList.contains(this.id_));
     this.element.classList.add(this.id_);
     return this.id_;
