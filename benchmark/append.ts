@@ -29,6 +29,29 @@ describe('Benchmark:', function () {
 
   });
 
+  describe('append spread', function () {
+    function f(len: number) {
+      const children = [...Array(len)].map(() => html('div'));
+      return () => {
+        const el = html('div');
+        el.append(...children);
+      };
+    }
+
+    it('1', function (done) {
+      benchmark('append spread 1', f(1), done);
+    });
+
+    it('10', function (done) {
+      benchmark('append spread 10', f(10), done);
+    });
+
+    it('100', function (done) {
+      benchmark('append spread 100', f(100), done);
+    });
+
+  });
+
   describe('append for', function () {
     function f(len: number) {
       const children = [...Array(len)].map(() => html('div'));
@@ -54,25 +77,27 @@ describe('Benchmark:', function () {
 
   });
 
-  describe('append spread', function () {
+  describe('prepend for', function () {
     function f(len: number) {
       const children = [...Array(len)].map(() => html('div'));
       return () => {
         const el = html('div');
-        el.append(...children);
+        for (let i = len; i--;) {
+          el.prepend(children[i]);
+        }
       };
     }
 
     it('1', function (done) {
-      benchmark('append spread 1', f(1), done);
+      benchmark('prepend for 1', f(1), done);
     });
 
     it('10', function (done) {
-      benchmark('append spread 10', f(10), done);
+      benchmark('prepend for 10', f(10), done);
     });
 
     it('100', function (done) {
-      benchmark('append spread 100', f(100), done);
+      benchmark('prepend for 100', f(100), done);
     });
 
   });
