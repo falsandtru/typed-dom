@@ -1,6 +1,7 @@
-import { undefined, Array, Symbol, document } from 'spica/global';
+import { undefined, Symbol, document } from 'spica/global';
 import { isArray, ObjectKeys } from 'spica/alias';
 import { memoize } from 'spica/memoize';
+import { push } from 'spica/array';
 
 export const enum NS {
   HTML = 'HTML',
@@ -116,7 +117,7 @@ function defineAttrs<T extends Element>(el: T, attrs?: Attrs): T {
   }
   return el;
 }
-function defineChildren<T extends DocumentFragment | ShadowRoot | Element>(node: T, children?: Children | NodeListOf<ChildNode>): T {
+function defineChildren<T extends ParentNode & Node>(node: T, children?: Children | NodeListOf<ChildNode>): T {
   switch (typeof children) {
     case 'undefined':
       return node;
@@ -124,28 +125,27 @@ function defineChildren<T extends DocumentFragment | ShadowRoot | Element>(node:
       return defineChildren(node, [children]);
   }
   if (!('length' in children)) {
-    if (!node.firstChild) return node.append(...children), node;
-    const ns = Array<Node | string>();
-    for (const node of children) {
-      ns.push(node);
+    if (node.firstChild) return defineChildren(node, push([], children));
+    for (const child of children) {
+      node.append(child);
     }
-    return defineChildren(node, ns);
+    return node;
   }
   if (!isArray(children)) {
-    const ns = Array<Node>(children.length);
-    for (let i = 0; i < ns.length; ++i) {
-      ns[i] = children[i];
+    if (node.firstChild) return defineChildren(node, push([], children));
+    for (let i = 0, len = children.length; i < len; ++i) {
+      node.append(children[i]);
     }
-    return defineChildren(node, ns);
+    return node;
   }
   const targetNodes = node.firstChild ? node.childNodes : [];
   let targetLength = targetNodes.length;
-  if (targetLength === 0) return node.append(...children), node;
+  if (targetLength === 0) return append(node, children);
   let count = 0;
   I:
   for (let i = 0; i < children.length; ++i) {
     assert(count <= targetLength);
-    if (count === targetLength) return node.append(...children.slice(i)), node;
+    if (count === targetLength) return append(node, children, i);
     const newChild: string | Node = children[i];
     if (typeof newChild === 'object' && newChild.nodeType === 11) {
       const sourceLength = newChild.childNodes.length;
@@ -191,4 +191,11 @@ function equal(node: Node | Text, data: Node | Text | string): boolean {
   return typeof data === 'string'
     ? 'wholeText' in node && node.data === data
     : node === data;
+}
+
+function append<T extends ParentNode>(node: T, children: ArrayLike<Node>, i = 0): T {
+  for (let len = children.length; i < len; ++i) {
+    node.append(children[i]);
+  }
+  return node;
 }
