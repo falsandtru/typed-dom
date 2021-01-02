@@ -133,8 +133,8 @@ function defineChildren<T extends ParentNode & Node>(node: T, children?: Childre
   }
   if (!isArray(children)) {
     if (node.firstChild) return defineChildren(node, push([], children));
-    for (let i = 0, len = children.length; i < len; ++i) {
-      node.append(children[i]);
+    for (let i = children.length; i--;) {
+      node.prepend(children[i]);
     }
     return node;
   }
