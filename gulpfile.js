@@ -36,6 +36,13 @@ const config = {
         'test/**/*.ts'
       ],
       dest: 'dist'
+    },
+    bench: {
+      src: [
+        '*.ts',
+        'benchmark/**/*.ts'
+      ],
+      dest: 'dist'
     }
   },
   banner: [
@@ -95,6 +102,12 @@ gulp.task('ts:test', () =>
     .pipe($.rename({ extname: '.test.js' }))
     .pipe(gulp.dest(config.ts.test.dest)));
 
+gulp.task('ts:bench', () =>
+  compile(config.ts.bench.src)
+    .pipe($.unassert())
+    .pipe($.rename({ extname: '.test.js' }))
+    .pipe(gulp.dest(config.ts.bench.dest)));
+
 gulp.task('ts:dist', () =>
   compile(config.ts.dist.src)
     .pipe($.unassert())
@@ -121,6 +134,15 @@ gulp.task('karma:test', done =>
     preprocessors: {
       'dist/*.js': ['espower', 'karma-coverage-istanbul-instrumenter']
     },
+    concurrency: 1,
+  }, done).start());
+
+gulp.task('karma:bench', done =>
+  void new Server({
+    configFile: __dirname + '/karma.conf.js',
+    browsers: config.browsers,
+    browserDisconnectTimeout: 90 * 1e3,
+    browserNoActivityTimeout: 90 * 1e3,
     concurrency: 1,
   }, done).start());
 
@@ -164,6 +186,7 @@ gulp.task('test',
     series(
       'ts:test',
       'karma:test',
+      'ts:bench',
       'ts:dist',
     )));
 
@@ -173,6 +196,13 @@ gulp.task('dist',
     series(
       'ts:dist',
     )));
+
+gulp.task('bench',
+  series(
+    'clean',
+    'ts:bench',
+    'karma:bench',
+  ));
 
 gulp.task('ci',
   series(

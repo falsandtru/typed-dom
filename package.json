@@ -31,9 +31,11 @@
   ],
   "dependencies": {},
   "devDependencies": {
+    "@types/benchmark": "^2.1.0",
     "@types/i18next": "^13.0.0",
     "@types/mocha": "^8.2.0",
     "@types/power-assert": "1.5.3",
+    "benchmark": "^2.1.4",
     "browserify": "^17.0.0",
     "del": "4.1.0",
     "gulp": "^4.0.2",
