@@ -86,7 +86,8 @@ export function define<T extends Element>(node: T, attrs?: Attrs | Children, chi
 }
 function defineAttrs<T extends Element>(el: T, attrs?: Attrs): T {
   if (!attrs) return el;
-  for (const name of ObjectKeys(attrs)) {
+  for (let i = 0, names = ObjectKeys(attrs); i < names.length; ++i) {
+    const name = names[i];
     const value = attrs[name];
     switch (typeof value) {
       case 'string':

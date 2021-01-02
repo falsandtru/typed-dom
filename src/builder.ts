@@ -74,7 +74,8 @@ function handle
       const el = factory(baseFactory, tag, attrs || {}, children);
       if (tag !== el.tagName.toLowerCase()) throw new Error(`TypedDOM: Expected tag name is "${tag}" but actually "${el.tagName.toLowerCase()}".`);
       if (factory !== defaultFactory) {
-        if (attrs) for (const name of ObjectKeys(attrs)) {
+        if (attrs) for (let i = 0, names = ObjectKeys(attrs); i < names.length; ++i) {
+          const name = names[i];
           const value = attrs[name];
           if (typeof value !== 'function') continue;
           el.removeEventListener(name, value);
