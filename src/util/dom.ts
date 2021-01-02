@@ -122,9 +122,16 @@ function defineChildren<T extends DocumentFragment | ShadowRoot | Element>(node:
     case 'string':
       return defineChildren(node, [children]);
   }
+  if (!('length' in children)) {
+    if (!node.firstChild) return node.append(...children), node;
+    const ns = Array<Node | string>();
+    for (const node of children) {
+      ns.push(node);
+    }
+    return defineChildren(node, ns);
+  }
   if (!isArray(children)) {
-    if (!('length' in children)) return defineChildren(node, [...children]);
-    const ns = Array<string | Node>(children.length);
+    const ns = Array<Node>(children.length);
     for (let i = 0; i < ns.length; ++i) {
       ns[i] = children[i];
     }
@@ -132,18 +139,12 @@ function defineChildren<T extends DocumentFragment | ShadowRoot | Element>(node:
   }
   const targetNodes = node.firstChild ? node.childNodes : [];
   let targetLength = targetNodes.length;
-  if (targetLength === 0) {
-    node.append(...children);
-    return node;
-  }
+  if (targetLength === 0) return node.append(...children), node;
   let count = 0;
   I:
   for (let i = 0; i < children.length; ++i) {
     assert(count <= targetLength);
-    if (count === targetLength) {
-      node.append(...children.slice(i));
-      return node;
-    }
+    if (count === targetLength) return node.append(...children.slice(i)), node;
     const newChild: string | Node = children[i];
     if (typeof newChild === 'object' && newChild.nodeType === 11) {
       const sourceLength = newChild.childNodes.length;
