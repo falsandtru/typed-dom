@@ -1,6 +1,6 @@
 # typed-dom
 
-[![Build Status](https://travis-ci.org/falsandtru/typed-dom.svg?branch=master)](https://travis-ci.org/falsandtru/typed-dom)
+![CI](https://github.com/falsandtru/typed-dom/workflows/CI/badge.svg)
 
 A DOM component builder creating type-level DOM structures.
 
