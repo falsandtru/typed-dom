@@ -2,12 +2,11 @@ import { undefined } from 'spica/global';
 import { ObjectKeys, ObjectValues } from 'spica/alias';
 import { Elem, El, ElChildren } from './proxy';
 import { Factory, TagNameMap, Attrs, shadow, html, svg, define } from './util/dom';
-import { ExtractProp } from 'spica/type';
 
 export type API
   <M extends TagNameMap, F extends Factory<M> = Factory<M>> =
-  BuilderFunction<Extract<keyof ExtractProp<M, Element>, string>, Element, F> &
-  { readonly [P in Extract<keyof ExtractProp<M, Element>, string>]: BuilderMethod<P, Extract<M[P], Element>, F>; };
+  BuilderFunction<Extract<keyof M, string>, Element, F> &
+  { readonly [P in Extract<keyof M, string>]: BuilderMethod<P, Extract<M[P], Element>, F>; };
 export function API
   <M extends TagNameMap, F extends Factory<M> = Factory<M>>
   (baseFactory: F, formatter: <E extends Element>(el: E) => E | ShadowRoot = el => el)
