@@ -209,7 +209,7 @@ export class Elem<
   public set children(children: C) {
     const removedChildren: El[] = [];
     const addedChildren: El[] = [];
-    let isChanged = false;
+    let isMutated = false;
     switch (this.type) {
       case ElChildrenType.Void:
         return;
@@ -220,7 +220,7 @@ export class Elem<
         const newText = children as ElChildren.Text;
         targetChildren.data = newText;
         if (newText === oldText) return;
-        this.element.dispatchEvent(new Event('change', { bubbles: false, cancelable: true }));
+        this.element.dispatchEvent(new Event('mutate', { bubbles: false, cancelable: true }));
         return;
       }
       case ElChildrenType.Array: {
@@ -240,7 +240,7 @@ export class Elem<
               addedChildren.push(newChild);
             }
             this.container.insertBefore(newChild.element, el);
-            isChanged = true;
+            isMutated = true;
           }
           targetChildren.push(newChild);
         }
@@ -248,7 +248,7 @@ export class Elem<
           const el = nodeChildren[sourceChildren.length];
           if (!proxies.has(el)) continue;
           removedChildren.push(proxy(this.container.removeChild(el)));
-          isChanged = true;
+          isMutated = true;
         }
         assert(this.container.children.length === sourceChildren.length);
         assert(targetChildren.every((child, i) => child.element === this.container.children[i]));
@@ -280,7 +280,7 @@ export class Elem<
           this.isPartialUpdate = true;
           targetChildren[name] = sourceChildren[name];
           this.isPartialUpdate = false;
-          isChanged = true;
+          isMutated = true;
         }
         break;
       }
@@ -297,9 +297,9 @@ export class Elem<
         element.dispatchEvent(ev);
       }
     }
-    assert(isChanged || removedChildren.length + addedChildren.length === 0);
-    if (isChanged) {
-      this.element.dispatchEvent(new Event('change', { bubbles: false, cancelable: true }));
+    assert(isMutated || removedChildren.length + addedChildren.length === 0);
+    if (isMutated) {
+      this.element.dispatchEvent(new Event('mutate', { bubbles: false, cancelable: true }));
     }
   }
 }

@@ -329,7 +329,7 @@ const data = <K extends keyof TransDataMap>(data: TransDataMap[K]) =>
   };
 const trans = API<HTMLElementTagNameMap>((tag: keyof HTMLElementTagNameMap, ...args: any[]) =>
   define(html(tag, {
-    onchange: args.every(arg => typeof arg !== 'string')
+    onmutate: args.every(arg => typeof arg !== 'string')
       ? void 0
       : (ev, el = proxy<string>(ev.target as HTMLElement)) =>
           i18n.init((err, t) =>

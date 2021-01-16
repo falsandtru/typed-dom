@@ -327,7 +327,7 @@ describe('Integration: Typed DOM', function () {
     it('observe text', function () {
       const el = HTML.span(
         {
-          onchange: (ev, el = ev.target as HTMLElement) =>
+          onmutate: (ev, el = ev.target as HTMLElement) =>
             el.textContent += el.textContent!,
         },
         'a');
@@ -528,7 +528,7 @@ describe('Integration: Typed DOM', function () {
         };
       const trans = API<HTMLElementTagNameMap>((tag: keyof HTMLElementTagNameMap, ...args: any[]) =>
         define(html(tag, {
-          onchange: args.every(arg => typeof arg !== 'string')
+          onmutate: args.every(arg => typeof arg !== 'string')
             ? void 0
             : (ev, el = proxy<string>(ev.target as HTMLElement)) =>
                 i18n.init((err, t) =>
