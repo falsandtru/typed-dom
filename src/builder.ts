@@ -18,7 +18,7 @@ export const Shadow = API<ShadowHostElementTagNameMap>(html, shadow);
 export const HTML = API<HTMLElementTagNameMap>(html);
 export const SVG = API<SVGElementTagNameMap>(svg);
 
-type PFactory<F extends Factory<TagNameMap>, T extends string, C extends ElChildren, E extends Element> = (baseFactory: F, tag: T, attrs: Attrs, children: C) => E;
+type ElFactory<F extends Factory<TagNameMap>, T extends string, C extends ElChildren, E extends Element> = (baseFactory: F, tag: T, attrs: Attrs, children: C) => E;
 
 type Adjust<C extends ElChildren> =
   C extends ElChildren.Text ? ElChildren.Text :
@@ -26,17 +26,17 @@ type Adjust<C extends ElChildren> =
   C;
 
 interface BuilderFunction<T extends string, E extends Element, F extends Factory<TagNameMap>> {
-                        (tag: T,                            factory?: PFactory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
-  <C extends ElChildren>(tag: T,               children: C, factory?: PFactory<F, T, C, E>              ): El<T, E, Adjust<C>>;
-                        (tag: T, attrs: Attrs,              factory?: PFactory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
-  <C extends ElChildren>(tag: T, attrs: Attrs, children: C, factory?: PFactory<F, T, C, E>              ): El<T, E, Adjust<C>>;
+                        (tag: T,                            factory?: ElFactory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
+  <C extends ElChildren>(tag: T,               children: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, Adjust<C>>;
+                        (tag: T, attrs: Attrs,              factory?: ElFactory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
+  <C extends ElChildren>(tag: T, attrs: Attrs, children: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, Adjust<C>>;
 }
 
 interface BuilderMethod<T extends string, E extends Element, F extends Factory<TagNameMap>> {
-                        (                           factory?: PFactory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
-  <C extends ElChildren>(              children: C, factory?: PFactory<F, T, C, E>              ): El<T, E, Adjust<C>>;
-                        (attrs: Attrs,              factory?: PFactory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
-  <C extends ElChildren>(attrs: Attrs, children: C, factory?: PFactory<F, T, C, E>              ): El<T, E, Adjust<C>>;
+                        (                           factory?: ElFactory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
+  <C extends ElChildren>(              children: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, Adjust<C>>;
+                        (attrs: Attrs,              factory?: ElFactory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
+  <C extends ElChildren>(attrs: Attrs, children: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, Adjust<C>>;
 }
 
 function handle
@@ -54,7 +54,7 @@ function handle
   };
 
   function builder(tag: Extract<keyof M, string>, baseFactory: F): (attrs?: Attrs, children?: ElChildren, factory?: () => Element) => El {
-    return function build(attrs?: Attrs, children?: ElChildren, factory?: PFactory<F, Extract<keyof M, string>, ElChildren, Element>): El {
+    return function build(attrs?: Attrs, children?: ElChildren, factory?: ElFactory<F, Extract<keyof M, string>, ElChildren, Element>): El {
       if (typeof attrs === 'function') return build(undefined, undefined, attrs);
       if (typeof children === 'function') return build(attrs, undefined, children);
       if (attrs !== undefined && isChildren(attrs)) return build(undefined, attrs, factory);
@@ -69,7 +69,7 @@ function handle
           || ObjectValues(children).slice(-1).every(val => typeof val === 'object');
     }
 
-    function elem(factory: PFactory<F, Extract<keyof M, string>, ElChildren, Element>, attrs: Attrs | undefined, children: ElChildren): Element {
+    function elem(factory: ElFactory<F, Extract<keyof M, string>, ElChildren, Element>, attrs: Attrs | undefined, children: ElChildren): Element {
       const el = factory(baseFactory, tag, attrs || {}, children);
       if (tag !== el.tagName.toLowerCase()) throw new Error(`TypedDOM: Expected tag name is "${tag}" but actually "${el.tagName.toLowerCase()}".`);
       if (factory !== defaultFactory) {
