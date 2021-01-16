@@ -140,7 +140,7 @@ export class Elem<
     if (html.search(target) === -1) return;
     const query = this.query;
     assert(/^[:#.][\w-]+$/.test(query));
-    style.innerHTML = html.replace(target, (_, frag, space) => `${frag}${space}${query}`);
+    style.innerHTML = html.replace(target, `$1$2${query}`);
     if (!style.firstElementChild) return;
     for (let es = style.children, i = 0, len = es.length; i < len; ++i) {
       es[0].remove();
