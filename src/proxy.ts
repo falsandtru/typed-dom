@@ -127,6 +127,25 @@ export class Elem<
         return this.query_ = `.${this.id}`;
     }
   }
+  private scope(child: El): void {
+    const style = child.element as HTMLStyleElement | Element;
+    switch (false) {
+      case 'type' in style:
+      case 'media' in style:
+      case style.tagName === 'STYLE':
+        return;
+    }
+    const target = /(^|[,}])(\s*)\$scope(?![\w-])(?=[^;{}]*{)/g;
+    const html = style.innerHTML;
+    if (html.search(target) === -1) return;
+    const query = this.query;
+    assert(/^[:#.][\w-]+$/.test(query));
+    style.innerHTML = html.replace(target, (_, frag, space) => `${frag}${space}${query}`);
+    if (!style.firstElementChild) return;
+    for (let es = style.children, i = 0, len = es.length; i < len; ++i) {
+      es[0].remove();
+    }
+  }
   private isPartialUpdate = false;
   private observe(children: ElChildren.Record): C {
     const descs: PropertyDescriptorMap = {};
@@ -168,25 +187,6 @@ export class Elem<
       };
     }
     return ObjectDefineProperties(children, descs) as C;
-  }
-  private scope(child: El): void {
-    const style = child.element as HTMLStyleElement | Element;
-    switch (false) {
-      case 'type' in style:
-      case 'media' in style:
-      case style.tagName === 'STYLE':
-        return;
-    }
-    const target = /(^|[,}])(\s*)\$scope(?![\w-])(?=[^;{}]*{)/g;
-    const html = style.innerHTML;
-    if (html.search(target) === -1) return;
-    const query = this.query;
-    assert(/^[:#.][\w-]+$/.test(query));
-    style.innerHTML = html.replace(target, (_, frag, space) => `${frag}${space}${query}`);
-    if (!style.firstElementChild) return;
-    for (let es = style.children, i = 0, len = es.length; i < len; ++i) {
-      es[0].remove();
-    }
   }
   private isInit = true;
   public get children(): C {
