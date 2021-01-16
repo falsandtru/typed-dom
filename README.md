@@ -305,7 +305,7 @@ Create a custom API for translation.
 
 ```ts
 import { API, html, define } from 'typed-dom';
-import { Attrs } from 'typed-dom/internal';
+import { Attrs, Children } from 'typed-dom/internal';
 
 const i18n = i18next.createInstance({
   lng: 'en',
@@ -320,25 +320,31 @@ const i18n = i18next.createInstance({
 interface TransDataMap {
   'a': { data: string; };
 }
-const memory = new WeakMap<Node, object>();
-const data = <K extends keyof TransDataMap>(data: TransDataMap[K]) =>
-  <T extends string, E extends Element>(factory: (tag: T, attrs: Attrs, children: string) => E, tag: T, attrs: Attrs, children: K): E => {
-    const el = factory(tag, attrs, children);
-    memory.set(el, data);
-    return el;
-  };
-const trans = API<HTMLElementTagNameMap>((tag: keyof HTMLElementTagNameMap, ...args: any[]) =>
+const Trans = API<HTMLElementTagNameMap>((
+  tag: keyof HTMLElementTagNameMap,
+  attrs?: Attrs | Children,
+  children?: keyof TransDataMap,
+  data?: TransDataMap[keyof TransDataMap],
+) =>
   define(html(tag, {
-    onmutate: args.every(arg => typeof arg !== 'string')
-      ? void 0
-      : (ev, el = proxy<string>(ev.target as HTMLElement)) =>
+    onmutate: children
+      ? ev =>
           i18n.init((err, t) =>
-            el.children = err
+            proxy<string>(ev.target as HTMLElement).children = err
               ? 'Failed to init i18next.'
-              : t(el.children, memory.get(el.element))),
-  }), ...args));
+              : t(children, data))
+      : void 0,
+  }), attrs as Attrs, children));
+const data = <K extends keyof TransDataMap>(data: TransDataMap[K]) =>
+  <T extends string, E extends Element>(
+    factory: (tag: T, attrs: Attrs, children: string, data: TransDataMap[keyof TransDataMap]) => E,
+    tag: T,
+    attrs: Attrs,
+    children: K,
+  ): E =>
+    factory(tag, attrs, children, data);
 
-const el = trans.span('a', data({ data: 'A' }));
+const el = Trans.span('a', data({ data: 'A' }));
 assert(el.children === 'A');
 assert(el.element.textContent === 'A');
 ```
