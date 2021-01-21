@@ -1,7 +1,7 @@
 import { undefined } from 'spica/global';
 import { hasOwnProperty } from 'spica/alias';
 import { Elem, El, ElChildren } from './proxy';
-import { Factory, TagNameMap, Attrs, shadow, html, svg } from './util/dom';
+import { Factory, TagNameMap, Attrs, Children, isChildren, shadow, html, svg } from './util/dom';
 
 export type API
   <M extends TagNameMap, F extends Factory<M> = Factory<M>> =
@@ -57,14 +57,14 @@ function handle
     return function build(attrs?: Attrs, children?: ElChildren, factory?: ElFactory<F, Extract<keyof M, string>, ElChildren, Element>): El {
       if (typeof attrs === 'function') return build(undefined, undefined, attrs);
       if (typeof children === 'function') return build(attrs, undefined, children);
-      if (attrs !== undefined && isChildren(attrs)) return build(undefined, attrs, factory);
-      const node = formatter(elem(factory || defaultFactory, attrs || {}, children));
+      if (attrs !== undefined && isElChildren(attrs)) return build(undefined, attrs, factory);
+      const node = formatter(elem(factory, attrs, children));
       return node.nodeType === 1
         ? new Elem(node as Element, children)
         : new Elem((node as ShadowRoot).host, children, node);
     };
 
-    function isChildren(children: ElChildren | Attrs): children is ElChildren {
+    function isElChildren(children: ElChildren | Attrs): children is ElChildren {
       if (typeof children !== 'object') return true;
       for (const i in children) {
         if (!hasOwnProperty(children, i)) continue;
@@ -73,14 +73,22 @@ function handle
       return true;
     }
 
-    function elem(factory: ElFactory<F, Extract<keyof M, string>, ElChildren, Element>, attrs: Attrs, children: ElChildren): Element {
-      const el = factory(baseFactory, tag, attrs, children);
+    function elem(factory: ElFactory<F, Extract<keyof M, string>, ElChildren, Element> | undefined, attrs: Attrs | undefined, children: ElChildren): Element {
+      const el = factory
+        ? factory(defaultFactory as F, tag, attrs || {}, children)
+        : baseFactory(tag, attrs) as unknown as Element;
       if (tag !== el.tagName.toLowerCase()) throw new Error(`TypedDOM: Expected tag name is "${tag}" but actually "${el.tagName.toLowerCase()}".`);
       return el;
-    }
 
-    function defaultFactory(factory: typeof baseFactory, tag: Extract<keyof M, string>, attrs: Attrs): Element {
-      return factory(tag, attrs) as unknown as Element;
+      function defaultFactory<T extends Extract<keyof M, string>>(tag: T, children?: Children): M[T];
+      function defaultFactory<T extends Extract<keyof M, string>>(tag: T, attrs?: Attrs, children?: Children): M[T];
+      function defaultFactory<T extends Extract<keyof M, string>>(tag: T, as?: Attrs | Children, children?: Children, ...args: unknown[]): M[T] {
+        return isChildren(as)
+          // @ts-ignore
+          ? baseFactory(tag, attrs || {}, as, ...args)
+          // @ts-ignore
+          : baseFactory(tag, { ...as, ...attrs }, children, ...args);
+      }
     }
   }
 }

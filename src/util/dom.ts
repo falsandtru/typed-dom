@@ -183,7 +183,7 @@ function defineChildren<T extends ParentNode & Node>(node: T, children?: Childre
   return node;
 }
 
-function isChildren(o: Attrs | Children | ShadowRootInit | undefined): o is Children {
+export function isChildren(o: Attrs | Children | ShadowRootInit | undefined): o is Children {
   return !!o?.[Symbol.iterator];
 }
 
