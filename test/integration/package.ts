@@ -19,7 +19,7 @@ describe('Integration: Typed DOM', function () {
     it('call', function () {
       assert(HTML('p').element.outerHTML === '<p></p>');
       assert(HTML('p', 'a').element.outerHTML === '<p>a</p>');
-      assert(HTML('p', { class: 'class' }, 'a', (h, t) => h(t, { id: 'id' })).element.outerHTML === '<p id="id" class="class">a</p>');
+      assert(HTML('p', { class: 'class' }, 'a', (h, t, as) => h(t, { id: 'id', ...as })).element.outerHTML === '<p id="id" class="class">a</p>');
     });
 
     it('html', function () {
@@ -39,9 +39,9 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('factory', function () {
-      const dom = HTML.p({ class: 'test' }, [HTML.a()], (h, tag, _, children) => {
+      const dom = HTML.p({ class: 'test' }, [HTML.a()], (h, tag, attrs, children) => {
         assert(children.every(child => child.element instanceof HTMLAnchorElement));
-        return html('div').appendChild(h(tag, { id: 'test' }));
+        return html('div').appendChild(h(tag, { id: 'test', ...attrs }));
       });
       assert(dom.element.id === 'test');
       assert(dom.element.className === 'test');
@@ -202,8 +202,8 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('attr with factory', function () {
-      const dom = HTML.div({ id: 'test' }, (h, tag) =>
-        h(tag, { id: 'id', class: 'test' }));
+      const dom = HTML.div({ id: 'test' }, (h, tag, attrs) =>
+        h(tag, { id: 'id', class: 'test', ...attrs }));
       assert(dom.element.id === 'test');
       assert(dom.element.className === 'test');
       assert(dom.children === undefined);
@@ -231,24 +231,24 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('attr with text and factory', function () {
-      const dom = HTML.div({ id: 'test' }, '', (h, tag) =>
-        h(tag, { id: 'id', class: 'test' }));
+      const dom = HTML.div({ id: 'test' }, '', (h, tag, attrs) =>
+        h(tag, { id: 'id', class: 'test', ...attrs }));
       assert(dom.element.id === 'test');
       assert(dom.element.className === 'test');
       assert(dom.children === '');
     });
 
     it('attr with collection and factory', function () {
-      const dom = HTML.div({ id: 'test' }, [], (h, tag) =>
-        h(tag, { id: 'id', class: 'test' }));
+      const dom = HTML.div({ id: 'test' }, [], (h, tag, attrs) =>
+        h(tag, { id: 'id', class: 'test', ...attrs }));
       assert(dom.element.id === 'test');
       assert(dom.element.className === 'test');
       assert.deepStrictEqual(dom.children, []);
     });
 
     it('attr with struct and factory', function () {
-      const dom = HTML.div({ id: 'test' }, {}, (h, tag) =>
-        h(tag, { id: 'id', class: 'test' }));
+      const dom = HTML.div({ id: 'test' }, {}, (h, tag, attrs) =>
+        h(tag, { id: 'id', class: 'test', ...attrs }));
       assert(dom.element.id === 'test');
       assert(dom.element.className === 'test');
       assert.deepStrictEqual(dom.children, {});

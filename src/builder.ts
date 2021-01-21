@@ -1,7 +1,7 @@
 import { undefined } from 'spica/global';
-import { ObjectKeys, ObjectValues } from 'spica/alias';
+import { ObjectValues } from 'spica/alias';
 import { Elem, El, ElChildren } from './proxy';
-import { Factory, TagNameMap, Attrs, shadow, html, svg, define } from './util/dom';
+import { Factory, TagNameMap, Attrs, shadow, html, svg } from './util/dom';
 
 export type API
   <M extends TagNameMap, F extends Factory<M> = Factory<M>> =
@@ -72,15 +72,6 @@ function handle
     function elem(factory: ElFactory<F, Extract<keyof M, string>, ElChildren, Element>, attrs: Attrs | undefined, children: ElChildren): Element {
       const el = factory(baseFactory, tag, attrs || {}, children);
       if (tag !== el.tagName.toLowerCase()) throw new Error(`TypedDOM: Expected tag name is "${tag}" but actually "${el.tagName.toLowerCase()}".`);
-      if (factory !== defaultFactory) {
-        if (attrs) for (let i = 0, names = ObjectKeys(attrs); i < names.length; ++i) {
-          const name = names[i];
-          const value = attrs[name];
-          if (typeof value !== 'function') continue;
-          el.removeEventListener(name, value);
-        }
-        define(el, attrs);
-      }
       return el;
     }
 
