@@ -58,7 +58,7 @@ function handle
       if (typeof attrs === 'function') return build(undefined, undefined, attrs);
       if (typeof children === 'function') return build(attrs, undefined, children);
       if (attrs !== undefined && isChildren(attrs)) return build(undefined, attrs, factory);
-      const node = formatter(elem(factory || defaultFactory, attrs, children));
+      const node = formatter(elem(factory || defaultFactory, attrs || {}, children));
       return node.nodeType === 1
         ? new Elem(node as Element, children)
         : new Elem((node as ShadowRoot).host, children, node);
@@ -69,8 +69,8 @@ function handle
           || ObjectValues(children).slice(-1).every(val => typeof val === 'object');
     }
 
-    function elem(factory: ElFactory<F, Extract<keyof M, string>, ElChildren, Element>, attrs: Attrs | undefined, children: ElChildren): Element {
-      const el = factory(baseFactory, tag, attrs || {}, children);
+    function elem(factory: ElFactory<F, Extract<keyof M, string>, ElChildren, Element>, attrs: Attrs, children: ElChildren): Element {
+      const el = factory(baseFactory, tag, attrs, children);
       if (tag !== el.tagName.toLowerCase()) throw new Error(`TypedDOM: Expected tag name is "${tag}" but actually "${el.tagName.toLowerCase()}".`);
       return el;
     }
