@@ -1,5 +1,5 @@
 import { undefined } from 'spica/global';
-import { ObjectValues } from 'spica/alias';
+import { hasOwnProperty } from 'spica/alias';
 import { Elem, El, ElChildren } from './proxy';
 import { Factory, TagNameMap, Attrs, shadow, html, svg } from './util/dom';
 
@@ -65,8 +65,12 @@ function handle
     };
 
     function isChildren(children: ElChildren | Attrs): children is ElChildren {
-      return typeof children !== 'object'
-          || ObjectValues(children).slice(-1).every(val => typeof val === 'object');
+      if (typeof children !== 'object') return true;
+      for (const i in children) {
+        if (!hasOwnProperty(children, i)) continue;
+        return typeof children[i] === 'object';
+      }
+      return true;
     }
 
     function elem(factory: ElFactory<F, Extract<keyof M, string>, ElChildren, Element>, attrs: Attrs, children: ElChildren): Element {
