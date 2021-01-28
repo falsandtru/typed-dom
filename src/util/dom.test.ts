@@ -28,6 +28,7 @@ describe('Unit: util/dom', () => {
       assert(html('a').outerHTML === HTML.a().element.outerHTML);
       assert(html('a', { class: 'test' }).outerHTML === HTML.a({ class: 'test' }).element.outerHTML);
       assert(html('a', { class: 'test' }, 'b').outerHTML === HTML.a({ class: 'test' }, 'b').element.outerHTML);
+      assert(html('a', undefined, 'b').outerHTML === HTML.a('b').element.outerHTML);
       assert(html('a', 'b').outerHTML === HTML.a('b').element.outerHTML);
     });
 
@@ -57,6 +58,7 @@ describe('Unit: util/dom', () => {
   describe('define', () => {
     it('', () => {
       assert(define(html('html'), []).innerHTML === '');
+      assert(define(html('html'), undefined, 'a').innerHTML === 'a');
       assert(define(define(html('a', { href: '' })), { href: null }).matches(':not([href])'));
       assert(define(html('html', [frag(['a', text('b')])]), 'c').innerHTML === 'c');
       assert(define(html('html', 'a'), [frag(['b', text('c')])]).innerHTML === 'bc');
