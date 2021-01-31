@@ -1,7 +1,7 @@
 import { undefined } from 'spica/global';
 import { hasOwnProperty } from 'spica/alias';
 import { Elem, El, ElChildren } from './proxy';
-import { Factory, TagNameMap, Attrs, Children, isChildren, shadow, html, svg } from './util/dom';
+import { Factory, TagNameMap, Attrs, shadow, html, svg, define } from './util/dom';
 
 export type API
   <M extends TagNameMap, F extends Factory<M> = Factory<M>> =
@@ -75,20 +75,10 @@ function handle
 
     function elem(factory: ElFactory<F, Extract<keyof M, string>, ElChildren, Element> | undefined, attrs: Attrs | undefined, children: ElChildren): Element {
       const el = factory
-        ? factory(defaultFactory as F, tag, attrs || {}, children)
+        ? define(factory(baseFactory as F, tag, attrs || {}, children), attrs)
         : baseFactory(tag, attrs) as unknown as Element;
       if (tag !== el.tagName.toLowerCase()) throw new Error(`TypedDOM: Expected tag name is "${tag}" but actually "${el.tagName.toLowerCase()}".`);
       return el;
-
-      function defaultFactory<T extends Extract<keyof M, string>>(tag: T, children?: Children): M[T];
-      function defaultFactory<T extends Extract<keyof M, string>>(tag: T, attrs?: Attrs, children?: Children): M[T];
-      function defaultFactory<T extends Extract<keyof M, string>>(tag: T, as?: Attrs | Children, children?: Children, ...args: unknown[]): M[T] {
-        return isChildren(as)
-          // @ts-ignore
-          ? baseFactory(tag, attrs || {}, as, ...args)
-          // @ts-ignore
-          : baseFactory(tag, { ...as, ...attrs }, children, ...args);
-      }
     }
   }
 }

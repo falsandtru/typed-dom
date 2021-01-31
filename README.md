@@ -304,7 +304,7 @@ class Component extends Coroutine implements El {
 Create a custom API for translation.
 
 ```ts
-import { API, html, define } from 'typed-dom';
+import { API, html } from 'typed-dom';
 import { Attrs, Children } from 'typed-dom/internal';
 
 const i18n = i18next.createInstance({
@@ -322,11 +322,11 @@ interface TransDataMap {
 }
 const Trans = API<HTMLElementTagNameMap>((
   tag: keyof HTMLElementTagNameMap,
-  attrs?: Attrs | Children,
+  _?: Attrs | Children,
   children?: keyof TransDataMap,
   data?: TransDataMap[keyof TransDataMap],
 ) =>
-  define(html(tag, {
+  html(tag, {
     onmutate: children
       ? ev =>
           i18n.init((err, t) =>
@@ -334,7 +334,7 @@ const Trans = API<HTMLElementTagNameMap>((
               ? 'Failed to init i18next.'
               : t(children, data))
       : void 0,
-  }), attrs as Attrs, children));
+  }));
 const data = <K extends keyof TransDataMap>(data: TransDataMap[K]) =>
   <T extends string, E extends Element>(
     factory: (tag: T, attrs: Attrs, children: string, data: TransDataMap[keyof TransDataMap]) => E,

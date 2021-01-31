@@ -1,4 +1,4 @@
-import { Shadow, HTML, SVG, API, El, proxy, shadow, frag, html, define } from '../../index';
+import { Shadow, HTML, SVG, API, El, proxy, shadow, frag, html } from '../../index';
 import { Coroutine } from 'spica/coroutine';
 import { Sequence } from 'spica/sequence';
 import { Attrs, Children } from '../../internal';
@@ -521,11 +521,11 @@ describe('Integration: Typed DOM', function () {
       }
       const Trans = API<HTMLElementTagNameMap>((
         tag: keyof HTMLElementTagNameMap,
-        attrs?: Attrs | Children,
+        _?: Attrs | Children,
         children?: keyof TransDataMap,
         data?: TransDataMap[keyof TransDataMap],
       ) =>
-        define(html(tag, {
+        html(tag, {
           onmutate: children
             ? ev =>
                 i18n.init((err, t) =>
@@ -533,7 +533,7 @@ describe('Integration: Typed DOM', function () {
                     ? 'Failed to init i18next.'
                     : t(children, data))
             : void 0,
-        }), attrs as Attrs, children));
+        }));
       const data = <K extends keyof TransDataMap>(data: TransDataMap[K]) =>
         <T extends string, E extends Element>(
           factory: (tag: T, attrs: Attrs, children: string, data: TransDataMap[keyof TransDataMap]) => E,
