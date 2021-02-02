@@ -1,4 +1,4 @@
-import { shadow, frag, html, svg, text, define } from './dom';
+import { shadow, frag, html, svg, text, define, defrag } from './dom';
 import { HTML, SVG } from '../builder';
 import { Sequence } from 'spica/sequence';
 
@@ -76,6 +76,27 @@ describe('Unit: util/dom', () => {
         .extract()
         .forEach(es =>
           assert.deepStrictEqual([...define(el, es).children], es));
+    });
+
+  });
+
+  describe('defrag', () => {
+    it('', () => {
+      assert.deepStrictEqual(
+        defrag([]),
+        []);
+      assert.deepStrictEqual(
+        defrag(['']),
+        []);
+      assert.deepStrictEqual(
+        defrag(['', 'a']),
+        ['a']);
+      assert.deepStrictEqual(
+        defrag(['a', '']),
+        ['a']);
+      assert.deepStrictEqual(
+        defrag(['a', 'b']),
+        ['ab']);
     });
 
   });

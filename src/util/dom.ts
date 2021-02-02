@@ -199,3 +199,17 @@ function append<T extends ParentNode>(node: T, children: ArrayLike<Node>, i = 0)
   }
   return node;
 }
+
+export function defrag<T extends Element | string>(nodes: ArrayLike<T>): T[];
+export function defrag(nodes: ArrayLike<Element | string>): (Element | string)[] {
+  assert(push([], nodes).every(n => typeof n === 'string' || n instanceof Element));
+  const acc: (Element | string)[] = [];
+  for (let i = 0; i < nodes.length; ++i) {
+    const node = nodes[i];
+    if (node === '') continue;
+    acc.length > 0 && typeof node === 'string' && typeof nodes[i - 1] === 'string'
+      ? acc[acc.length - 1] += node
+      : acc.push(node);
+  }
+  return acc;
+}

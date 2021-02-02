@@ -139,6 +139,7 @@ export const HTML = API<CustomHTMLElementTagNameMap>(html);
 - svg
 - text
 - define
+- defrag
 - listen
 - once
 - delegate
