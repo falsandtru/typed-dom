@@ -1,5 +1,5 @@
 import { Mutable } from 'spica/type';
-import { undefined, WeakMap, Event } from 'spica/global';
+import { WeakMap, Event } from 'spica/global';
 import { isArray, ObjectDefineProperties, ObjectKeys } from 'spica/alias';
 import { identity } from './util/identity';
 import { text, define } from './util/dom';
@@ -60,7 +60,7 @@ export class Elem<
     private readonly container: Element | ShadowRoot = element,
   ) {
     switch (true) {
-      case children_ === undefined:
+      case children_ === void 0:
         this.type = ElChildrenType.Void;
         break;
       case typeof children_ === 'string':
@@ -193,7 +193,7 @@ export class Elem<
     switch (this.type) {
       case ElChildrenType.Text:
         if ((this.children_ as unknown as Text).parentNode !== this.container) {
-          this.children_ = undefined as unknown as C;
+          this.children_ = void 0 as unknown as C;
           for (let ns = this.container.childNodes, i = 0, len = ns.length; i < len; ++i) {
             const node = ns[i];
             if ('wholeText' in node === false) continue;

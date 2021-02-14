@@ -1,4 +1,3 @@
-import { undefined } from 'spica/global';
 import { hasOwnProperty } from 'spica/alias';
 import { Elem, El, ElChildren } from './proxy';
 import { Factory, TagNameMap, Attrs, shadow, html, svg, define } from './util/dom';
@@ -11,7 +10,7 @@ export function API
   <M extends TagNameMap, F extends Factory<M> = Factory<M>>
   (baseFactory: F, formatter: <E extends Element>(el: E) => E | ShadowRoot = el => el)
   : API<M, F> {
-  return new Proxy<API<M, F>>((() => undefined) as any, handle(baseFactory, formatter));
+  return new Proxy<API<M, F>>((() => void 0) as any, handle(baseFactory, formatter));
 }
 
 export const Shadow = API<ShadowHostElementTagNameMap>(html, shadow);
@@ -55,9 +54,9 @@ function handle
 
   function builder(tag: Extract<keyof M, string>, baseFactory: F): (attrs?: Attrs, children?: ElChildren, factory?: () => Element) => El {
     return function build(attrs?: Attrs, children?: ElChildren, factory?: ElFactory<F, Extract<keyof M, string>, ElChildren, Element>): El {
-      if (typeof attrs === 'function') return build(undefined, undefined, attrs);
-      if (typeof children === 'function') return build(attrs, undefined, children);
-      if (attrs !== undefined && isElChildren(attrs)) return build(undefined, attrs, factory);
+      if (typeof attrs === 'function') return build(void 0, void 0, attrs);
+      if (typeof children === 'function') return build(attrs, void 0, children);
+      if (attrs !== void 0 && isElChildren(attrs)) return build(void 0, attrs, factory);
       const node = formatter(elem(factory, attrs, children));
       return node.nodeType === 1
         ? new Elem(node as Element, children)

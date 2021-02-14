@@ -1,4 +1,3 @@
-import { undefined } from 'spica/global';
 import { AtomicPromise } from 'spica/promise';
 import { once as one } from 'spica/function';
 import { noop } from 'spica/noop';
@@ -68,7 +67,7 @@ export function delegate<T extends keyof ElementEventMap>(target: Document | Sha
       : (ev.target as Element)?.closest(selector);
     return cx
       ? unbind = once(cx, type, listener, option)
-      : undefined,
+      : void 0,
       ev.returnValue;
   }, { ...option, capture: true });
 }
@@ -85,7 +84,7 @@ export function bind<T extends keyof WindowEventMap | keyof DocumentEventMap | k
   function handler(ev: Event): unknown {
     assert(ev.currentTarget);
     return currentTarget in ev && !ev[currentTarget]
-      ? undefined
+      ? void 0
       : ev[currentTarget] = ev.currentTarget,
       listener(ev);
   }

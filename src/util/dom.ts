@@ -1,4 +1,4 @@
-import { undefined, Symbol, document } from 'spica/global';
+import { Symbol, document } from 'spica/global';
 import { isArray, ObjectKeys } from 'spica/alias';
 import { memoize } from 'spica/memoize';
 import { push } from 'spica/array';
@@ -26,17 +26,17 @@ export function shadow(el: keyof ShadowHostElementTagNameMap | HTMLElement, opts
 export function shadow(el: keyof ShadowHostElementTagNameMap | HTMLElement, children?: Children, opts?: ShadowRootInit): ShadowRoot;
 export function shadow(el: keyof ShadowHostElementTagNameMap | HTMLElement, children?: Children | ShadowRootInit, opts?: ShadowRootInit): ShadowRoot {
   if (typeof el === 'string') return shadow(html(el), children as Children, opts);
-  if (children && !isChildren(children)) return shadow(el, undefined, children);
-  const root = opts === undefined
+  if (children && !isChildren(children)) return shadow(el, void 0, children);
+  const root = opts === void 0
     ? el.shadowRoot || caches.shadows.get(el)
     : opts.mode === 'open'
-      ? el.shadowRoot || undefined
+      ? el.shadowRoot || void 0
       : caches.shadows.get(el);
   return defineChildren(
     !opts || opts.mode === 'open'
       ? root || el.attachShadow(opts || { mode: 'open' })
       : root || caches.shadows.set(el, el.attachShadow(opts)).get(el)!,
-    !root && children == undefined
+    !root && children == void 0
       ? el.childNodes
       : children);
 }
