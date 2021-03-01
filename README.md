@@ -282,7 +282,7 @@ class Component extends Coroutine implements El {
       while (true) {
         yield;
       }
-    }, { trigger: 'element', size: 0 });
+    }, { trigger: 'element', capacity: 0 });
   }
   private readonly dom = Shadow.section({
     style: HTML.style(`ul { width: 100px; }`),
