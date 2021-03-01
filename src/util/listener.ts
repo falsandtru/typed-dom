@@ -1,5 +1,5 @@
 import { AtomicPromise } from 'spica/promise';
-import { once as one } from 'spica/function';
+import { once as once_ } from 'spica/function';
 import { noop } from 'spica/noop';
 
 export const currentTarget = Symbol.for('typed-dom::currentTarget');
@@ -79,7 +79,7 @@ export function bind<T extends keyof SVGElementEventMap>(target: SVGElement, typ
 export function bind<T extends keyof ElementEventMap>(target: Element, type: T, listener: (ev: ElementEventMap[T]) => unknown, option?: boolean | AddEventListenerOptions): () => undefined;
 export function bind<T extends keyof WindowEventMap | keyof DocumentEventMap | keyof ElementEventMap>(target: Window | Document | ShadowRoot | Element, type: T, listener: (ev: Event) => unknown, option: boolean | AddEventListenerOptions = false): () => undefined {
   target.addEventListener(type, handler, option);
-  return one(() => void target.removeEventListener(type, handler, option));
+  return once_(() => void target.removeEventListener(type, handler, option));
 
   function handler(ev: Event): unknown {
     assert(ev.currentTarget);
