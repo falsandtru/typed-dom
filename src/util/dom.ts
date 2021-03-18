@@ -154,6 +154,7 @@ function defineChildren<T extends ParentNode & Node>(node: T, children?: Childre
         : 0;
       node.insertBefore(newChild, targetNodes[count] || null);
       count += sourceLength;
+      assert(targetNodes.length === targetLength);
       continue;
     }
     ++count;
@@ -162,6 +163,7 @@ function defineChildren<T extends ParentNode & Node>(node: T, children?: Childre
       if (equal(oldChild, newChild)) continue I;
       oldChild.remove();
       --targetLength;
+      assert(targetNodes.length === targetLength);
     }
     const oldChild = targetNodes[count - 1];
     if (equal(oldChild, newChild)) continue;
@@ -174,11 +176,13 @@ function defineChildren<T extends ParentNode & Node>(node: T, children?: Childre
     else {
       node.replaceChild(typeof newChild === 'string' ? text(newChild) : newChild, oldChild);
     }
+    assert(targetNodes.length === targetLength);
   }
   assert(count <= targetLength);
   while (count < targetLength) {
     targetNodes[count].remove();
     --targetLength;
+    assert(targetNodes.length === targetLength);
   }
   return node;
 }
