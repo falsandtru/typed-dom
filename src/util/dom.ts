@@ -117,7 +117,7 @@ function defineAttrs<T extends Element>(el: T, attrs?: Attrs): T {
   }
   return el;
 }
-function defineChildren<T extends ParentNode & Node>(node: T, children?: Children | NodeListOf<ChildNode>): T {
+function defineChildren<T extends ParentNode & Node>(node: T, children?: Children | Array<string | Node> | NodeListOf<Node>): T {
   switch (typeof children) {
     case 'undefined':
       return node;
@@ -146,7 +146,7 @@ function defineChildren<T extends ParentNode & Node>(node: T, children?: Childre
   for (let i = 0; i < children.length; ++i) {
     assert(count <= targetLength);
     if (count === targetLength) return append(node, children, i);
-    const newChild: string | Node = children[i];
+    const newChild = children[i];
     if (typeof newChild === 'object' && newChild.nodeType === 11) {
       const sourceLength = newChild.childNodes.length;
       targetLength += newChild !== node
@@ -193,8 +193,8 @@ function equal(node: Node | Text, data: Node | Text | string): boolean {
     : node === data;
 }
 
-function append<T extends ParentNode>(node: T, children: ArrayLike<Node>, i = 0): T {
-  for (let len = children.length; i < len; ++i) {
+function append<T extends ParentNode>(node: T, children: ArrayLike<string | Node>, i = 0): T {
+  for (const len = children.length; i < len; ++i) {
     node.append(children[i]);
   }
   return node;
