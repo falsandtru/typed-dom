@@ -31,14 +31,14 @@ interface BuilderFunction<T extends string, E extends Element, F extends Factory
 }
 
 interface BuilderMethod<T extends string, E extends Element, F extends Factory<TagNameMap>> {
-                            (                           factory?: ElFactory<F, T, ElChild.Void, E>): El<T, E, ElChild.Void>;
-  <C extends ElChild.Text  >(              children: C, factory?: ElFactory<F, T, C, E>           ): El<T, E, string>;
-  <C extends ElChild.Array >(              children: C, factory?: ElFactory<F, T, C, E>           ): El<T, E, Readonly<C>>;
-  <C extends ElChild.Record>(              children: C, factory?: ElFactory<F, T, C, E>           ): El<T, E, C>;
-                            (attrs: Attrs,              factory?: ElFactory<F, T, ElChild.Void, E>): El<T, E, ElChild.Void>;
-  <C extends ElChild.Text  >(attrs: Attrs, children: C, factory?: ElFactory<F, T, C, E>           ): El<T, E, string>;
-  <C extends ElChild.Array >(attrs: Attrs, children: C, factory?: ElFactory<F, T, C, E>           ): El<T, E, Readonly<C>>;
-  <C extends ElChild.Record>(attrs: Attrs, children: C, factory?: ElFactory<F, T, C, E>           ): El<T, E, C>;
+                            (                                   factory?: ElFactory<F, T, ElChild.Void, E>): El<T, E, ElChild.Void>;
+  <C extends ElChild.Text  >(                      children: C, factory?: ElFactory<F, T, C, E>           ): El<T, E, string>;
+  <C extends ElChild.Array >(                      children: C, factory?: ElFactory<F, T, C, E>           ): El<T, E, Readonly<C>>;
+  <C extends ElChild.Record>(                      children: C, factory?: ElFactory<F, T, C, E>           ): El<T, E, C>;
+                            (        attrs: Attrs,              factory?: ElFactory<F, T, ElChild.Void, E>): El<T, E, ElChild.Void>;
+  <C extends ElChild.Text  >(        attrs: Attrs, children: C, factory?: ElFactory<F, T, C, E>           ): El<T, E, string>;
+  <C extends ElChild.Array >(        attrs: Attrs, children: C, factory?: ElFactory<F, T, C, E>           ): El<T, E, Readonly<C>>;
+  <C extends ElChild.Record>(        attrs: Attrs, children: C, factory?: ElFactory<F, T, C, E>           ): El<T, E, C>;
 }
 
 function handle
