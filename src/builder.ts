@@ -19,23 +19,26 @@ export const SVG = API<SVGElementTagNameMap>(svg);
 
 type ElFactory<F extends Factory<TagNameMap>, T extends string, C extends ElChildren, E extends Element> = (baseFactory: F, tag: T, attrs: Attrs, children: C) => E;
 
-type Adjust<C extends ElChildren> =
-  C extends ElChildren.Text ? ElChildren.Text :
-  C extends ElChildren.Array ? Readonly<C> :
-  C;
-
 interface BuilderFunction<T extends string, E extends Element, F extends Factory<TagNameMap>> {
-                        (tag: T,                            factory?: ElFactory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
-  <C extends ElChildren>(tag: T,               children: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, Adjust<C>>;
-                        (tag: T, attrs: Attrs,              factory?: ElFactory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
-  <C extends ElChildren>(tag: T, attrs: Attrs, children: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, Adjust<C>>;
+                               (tag: T,                            factory?: ElFactory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
+  <C extends ElChildren.Text  >(tag: T,               children: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, string>;
+  <C extends ElChildren.Array >(tag: T,               children: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, Readonly<C>>;
+  <C extends ElChildren.Record>(tag: T,               children: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, C>;
+                               (tag: T, attrs: Attrs,              factory?: ElFactory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
+  <C extends ElChildren.Text  >(tag: T, attrs: Attrs, children: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, string>;
+  <C extends ElChildren.Array >(tag: T, attrs: Attrs, children: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, Readonly<C>>;
+  <C extends ElChildren.Record>(tag: T, attrs: Attrs, children: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, C>;
 }
 
 interface BuilderMethod<T extends string, E extends Element, F extends Factory<TagNameMap>> {
-                        (                           factory?: ElFactory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
-  <C extends ElChildren>(              children: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, Adjust<C>>;
-                        (attrs: Attrs,              factory?: ElFactory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
-  <C extends ElChildren>(attrs: Attrs, children: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, Adjust<C>>;
+                               (                           factory?: ElFactory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
+  <C extends ElChildren.Text  >(              children: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, string>;
+  <C extends ElChildren.Array >(              children: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, Readonly<C>>;
+  <C extends ElChildren.Record>(              children: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, C>;
+                               (attrs: Attrs,              factory?: ElFactory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
+  <C extends ElChildren.Text  >(attrs: Attrs, children: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, string>;
+  <C extends ElChildren.Array >(attrs: Attrs, children: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, Readonly<C>>;
+  <C extends ElChildren.Record>(attrs: Attrs, children: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, C>;
 }
 
 function handle
