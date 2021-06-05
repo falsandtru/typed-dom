@@ -5,7 +5,7 @@ import { identity } from './util/identity';
 import { text, define } from './util/dom';
 import { splice } from 'spica/array';
 
-const enum ElChildrenType {
+const enum ElChildType {
   Void,
   Text,
   Array,
@@ -13,11 +13,12 @@ const enum ElChildrenType {
 }
 
 export type ElChildren =
-  | ElChildren.Void
-  | ElChildren.Text
-  | ElChildren.Array
-  | ElChildren.Record;
-export namespace ElChildren {
+  | ElChild.Void
+  | ElChild.Text
+  | ElChild.Array
+  | ElChild.Record;
+
+export namespace ElChild {
   export type Void = undefined;
   export type Text = string;
   export type Array = readonly El[];
@@ -61,16 +62,16 @@ export class Elem<
   ) {
     switch (true) {
       case children_ === void 0:
-        this.type = ElChildrenType.Void;
+        this.type = ElChildType.Void;
         break;
       case typeof children_ === 'string':
-        this.type = ElChildrenType.Text
+        this.type = ElChildType.Text
         break;
       case isArray(children_):
-        this.type = ElChildrenType.Array;
+        this.type = ElChildType.Array;
         break;
       case children_ && typeof children_ === 'object':
-        this.type = ElChildrenType.Record;
+        this.type = ElChildType.Record;
         break;
       default:
         throw new Error(`TypedDOM: Invalid type children.`);
@@ -78,24 +79,24 @@ export class Elem<
     throwErrorIfNotUsable(this);
     proxies.set(this.element, this);
     switch (this.type) {
-      case ElChildrenType.Void:
+      case ElChildType.Void:
         this.isInit = false;
         return;
-      case ElChildrenType.Text:
+      case ElChildType.Text:
         define(this.container, []);
         this.children_ = this.container.appendChild(text('')) as any;
         this.children = children_ as C;
         this.isInit = false;
         return;
-      case ElChildrenType.Array:
+      case ElChildType.Array:
         define(this.container, []);
-        this.children_ = [] as ElChildren.Array as C;
+        this.children_ = [] as ElChild.Array as C;
         this.children = children_;
         this.isInit = false;
         return;
-      case ElChildrenType.Record:
+      case ElChildType.Record:
         define(this.container, []);
-        this.children_ = this.observe({ ...children_ as ElChildren.Record }) as C;
+        this.children_ = this.observe({ ...children_ as ElChild.Record }) as C;
         this.children = children_;
         this.isInit = false;
         return;
@@ -104,7 +105,7 @@ export class Elem<
     }
   }
   public readonly [tag]: T;
-  private readonly type: ElChildrenType;
+  private readonly type: ElChildType;
   private id_ = '';
   private get id(): string {
     if (this.id_) return this.id_;
@@ -147,7 +148,7 @@ export class Elem<
     }
   }
   private isPartialUpdate = false;
-  private observe(children: ElChildren.Record): C {
+  private observe(children: ElChild.Record): C {
     const descs: PropertyDescriptorMap = {};
     for (const name of ObjectKeys(children)) {
       if (name in {}) continue;
@@ -191,7 +192,7 @@ export class Elem<
   private isInit = true;
   public get children(): C {
     switch (this.type) {
-      case ElChildrenType.Text:
+      case ElChildType.Text:
         if ((this.children_ as unknown as Text).parentNode !== this.container) {
           this.children_ = void 0 as unknown as C;
           for (let ns = this.container.childNodes, i = 0, len = ns.length; i < len; ++i) {
@@ -211,21 +212,21 @@ export class Elem<
     const addedChildren: El[] = [];
     let isMutated = false;
     switch (this.type) {
-      case ElChildrenType.Void:
+      case ElChildType.Void:
         return;
-      case ElChildrenType.Text: {
+      case ElChildType.Text: {
         if (!this.isInit && children === this.children) return;
         const targetChildren = this.children_ as unknown as Text;
         const oldText = targetChildren.data;
-        const newText = children as ElChildren.Text;
+        const newText = children as ElChild.Text;
         targetChildren.data = newText;
         if (newText === oldText) return;
         this.element.dispatchEvent(new Event('mutate', { bubbles: false, cancelable: true }));
         return;
       }
-      case ElChildrenType.Array: {
-        const sourceChildren = children as ElChildren.Array;
-        const targetChildren = [] as Mutable<ElChildren.Array>;
+      case ElChildType.Array: {
+        const sourceChildren = children as ElChild.Array;
+        const targetChildren = [] as Mutable<ElChild.Array>;
         this.children_ = targetChildren as ElChildren as C;
         const nodeChildren = this.container.children;
         for (let i = 0; i < sourceChildren.length; ++i) {
@@ -254,9 +255,9 @@ export class Elem<
         assert(targetChildren.every((child, i) => child.element === this.container.children[i]));
         break;
       }
-      case ElChildrenType.Record: {
-        const sourceChildren = children as ElChildren.Record;
-        const targetChildren = this.children_ as ElChildren.Record;
+      case ElChildType.Record: {
+        const sourceChildren = children as ElChild.Record;
+        const targetChildren = this.children_ as ElChild.Record;
         assert.deepStrictEqual(Object.keys(sourceChildren), Object.keys(targetChildren));
         for (const name of ObjectKeys(targetChildren)) {
           const oldChild = targetChildren[name];

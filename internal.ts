@@ -1,2 +1,2 @@
 export { Attrs, Children, Factory } from './src/util/dom';
-export { ElChildren } from './src/proxy';
+export { ElChild } from './src/proxy';
