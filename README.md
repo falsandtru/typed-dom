@@ -185,11 +185,11 @@ export interface El<
   children: C;
 }
 type ElChildren
-  = ElChild.Void
-  | ElChild.Text
-  | ElChild.Array
-  | ElChild.Record;
-namespace ElChild {
+  = ElChildren.Void
+  | ElChildren.Text
+  | ElChildren.Array
+  | ElChildren.Record;
+namespace ElChildren {
   export type Void = undefined;
   export type Text = string;
   export type Array = readonly El[];

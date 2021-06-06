@@ -13,12 +13,12 @@ const enum ElChildType {
 }
 
 export type ElChildren =
-  | ElChild.Void
-  | ElChild.Text
-  | ElChild.Array
-  | ElChild.Record;
+  | ElChildren.Void
+  | ElChildren.Text
+  | ElChildren.Array
+  | ElChildren.Record;
 
-export namespace ElChild {
+export namespace ElChildren {
   export type Void = undefined;
   export type Text = string;
   export type Array = readonly El[];
@@ -90,13 +90,13 @@ export class Elem<
         return;
       case ElChildType.Array:
         define(this.container, []);
-        this.children_ = [] as ElChild.Array as C;
+        this.children_ = [] as ElChildren.Array as C;
         this.children = children_;
         this.isInit = false;
         return;
       case ElChildType.Record:
         define(this.container, []);
-        this.children_ = this.observe({ ...children_ as ElChild.Record }) as C;
+        this.children_ = this.observe({ ...children_ as ElChildren.Record }) as C;
         this.children = children_;
         this.isInit = false;
         return;
@@ -148,7 +148,7 @@ export class Elem<
     }
   }
   private isPartialUpdate = false;
-  private observe(children: ElChild.Record): C {
+  private observe(children: ElChildren.Record): C {
     const descs: PropertyDescriptorMap = {};
     for (const name of ObjectKeys(children)) {
       if (name in {}) continue;
@@ -218,15 +218,15 @@ export class Elem<
         if (!this.isInit && children === this.children) return;
         const targetChildren = this.children_ as unknown as Text;
         const oldText = targetChildren.data;
-        const newText = children as ElChild.Text;
+        const newText = children as ElChildren.Text;
         targetChildren.data = newText;
         if (newText === oldText) return;
         this.element.dispatchEvent(new Event('mutate', { bubbles: false, cancelable: true }));
         return;
       }
       case ElChildType.Array: {
-        const sourceChildren = children as ElChild.Array;
-        const targetChildren = [] as Mutable<ElChild.Array>;
+        const sourceChildren = children as ElChildren.Array;
+        const targetChildren = [] as Mutable<ElChildren.Array>;
         this.children_ = targetChildren as ElChildren as C;
         const nodeChildren = this.container.children;
         for (let i = 0; i < sourceChildren.length; ++i) {
@@ -256,8 +256,8 @@ export class Elem<
         break;
       }
       case ElChildType.Record: {
-        const sourceChildren = children as ElChild.Record;
-        const targetChildren = this.children_ as ElChild.Record;
+        const sourceChildren = children as ElChildren.Record;
+        const targetChildren = this.children_ as ElChildren.Record;
         assert.deepStrictEqual(Object.keys(sourceChildren), Object.keys(targetChildren));
         for (const name of ObjectKeys(targetChildren)) {
           const oldChild = targetChildren[name];
