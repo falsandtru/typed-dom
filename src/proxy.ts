@@ -154,7 +154,9 @@ export class Elem<
       if (name in {}) continue;
       let child: El = children[name];
       throwErrorIfNotUsable(child);
-      this.container.appendChild(child.element);
+      if (child.element.parentNode !== this.container) {
+        this.container.appendChild(child.element);
+      }
       descs[name] = {
         configurable: true,
         enumerable: true,
