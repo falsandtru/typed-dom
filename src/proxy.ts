@@ -74,7 +74,7 @@ export class Elem<
         this.type = ElChildType.Record;
         break;
       default:
-        throw new Error(`TypedDOM: Invalid type children.`);
+        throw new Error(`TypedDOM: Invalid children type.`);
     }
     throwErrorIfNotUsable(this);
     proxies.set(this.element, this);
@@ -150,11 +150,13 @@ export class Elem<
   private isPartialUpdate = false;
   private observe(children: ElChildren.Record): C {
     const descs: PropertyDescriptorMap = {};
+    let i = -1;
     for (const name of ObjectKeys(children)) {
-      if (name in {}) continue;
+      if (name in {}) throw new Error(`TypedDOM: Child names must be different from the object property names.`);
+      ++i;
       let child: El = children[name];
       throwErrorIfNotUsable(child);
-      if (child.element.parentNode !== this.container) {
+      if (child.element !== this.container.children[i]) {
         this.container.appendChild(child.element);
       }
       descs[name] = {
