@@ -1,5 +1,5 @@
 import { Symbol, document } from 'spica/global';
-import { isArray, ObjectKeys } from 'spica/alias';
+import { ObjectKeys } from 'spica/alias';
 import { memoize } from 'spica/memoize';
 import { push } from 'spica/array';
 
@@ -118,90 +118,12 @@ function defineAttrs<T extends Element>(el: T, attrs?: Attrs): T {
   return el;
 }
 function defineChildren<T extends ParentNode & Node>(node: T, children?: Children | Array<string | Node> | NodeListOf<Node>): T {
-  switch (typeof children) {
-    case 'undefined':
-      return node;
-    case 'string':
-      return defineChildren(node, [children]);
-  }
-  if (!('length' in children)) {
-    if (node.firstChild) return defineChildren(node, push([], children));
-    for (const child of children) {
-      node.append(child);
-    }
-    return node;
-  }
-  if (!isArray(children)) {
-    if (node.firstChild) return defineChildren(node, push([], children));
-    for (let i = children.length; i--;) {
-      node.prepend(children[i]);
-    }
-    return node;
-  }
-  const targetNodes = node.firstChild ? node.childNodes : [];
-  let targetLength = targetNodes.length;
-  if (targetLength === 0) return append(node, children);
-  let count = 0;
-  I:
-  for (let i = 0; i < children.length; ++i) {
-    assert(count <= targetLength);
-    if (count === targetLength) return append(node, children, i);
-    const newChild = children[i];
-    if (typeof newChild === 'object' && newChild.nodeType === 11) {
-      const sourceLength = newChild.childNodes.length;
-      targetLength += newChild !== node
-        ? sourceLength
-        : 0;
-      node.insertBefore(newChild, targetNodes[count] || null);
-      count += sourceLength;
-      assert(targetNodes.length === targetLength);
-      continue;
-    }
-    ++count;
-    while (targetLength > children.length) {
-      const oldChild = targetNodes[count - 1];
-      if (equal(oldChild, newChild)) continue I;
-      oldChild.remove();
-      --targetLength;
-      assert(targetNodes.length === targetLength);
-    }
-    const oldChild = targetNodes[count - 1];
-    if (equal(oldChild, newChild)) continue;
-    if (targetLength < children.length - i + count) {
-      targetLength += typeof newChild === 'string' || newChild.parentNode !== node
-        ? 1
-        : 0;
-      node.insertBefore(typeof newChild === 'string' ? text(newChild) : newChild, oldChild);
-    }
-    else {
-      node.replaceChild(typeof newChild === 'string' ? text(newChild) : newChild, oldChild);
-    }
-    assert(targetNodes.length === targetLength);
-  }
-  assert(count <= targetLength);
-  while (count < targetLength) {
-    targetNodes[count].remove();
-    --targetLength;
-    assert(targetNodes.length === targetLength);
-  }
+  children && node.replaceChildren(...children);
   return node;
 }
 
 export function isChildren(o: Attrs | Children | ShadowRootInit | undefined): o is Children {
   return !!o?.[Symbol.iterator];
-}
-
-function equal(node: Node | Text, data: Node | Text | string): boolean {
-  return typeof data === 'string'
-    ? 'wholeText' in node && node.data === data
-    : node === data;
-}
-
-function append<T extends ParentNode>(node: T, children: ArrayLike<string | Node>, i = 0): T {
-  for (const len = children.length; i < len; ++i) {
-    node.append(children[i]);
-  }
-  return node;
 }
 
 export function defrag<T extends Element | string>(nodes: ArrayLike<T>): T[];
