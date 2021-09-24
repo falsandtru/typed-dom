@@ -51,7 +51,7 @@ namespace privates {
 }
 
 const tag = Symbol.for('typed-dom::tag');
-const id = identity();
+let id = identity();
 let counter = 0;
 
 export interface El<
@@ -126,6 +126,10 @@ export class Elem<
     if (this[privates.id_]) return this[privates.id_];
     this[privates.id_] = this.element.id;
     if (/^[\w-]+$/.test(this[privates.id_])) return this[privates.id_];
+    if (counter === 999) {
+      id = identity();
+      counter = 0;
+    }
     this[privates.id_] = `rnd-${id}-${++counter}`;
     assert(!this.element.classList.contains(this[privates.id_]));
     this.element.classList.add(this[privates.id_]);
