@@ -154,7 +154,7 @@ export class Elem<
     for (const name of ObjectKeys(children)) {
       if (name in {}) throw new Error(`TypedDOM: Child names must be different from the object property names.`);
       ++i;
-      let child: El = children[name];
+      let child = children[name];
       throwErrorIfNotUsable(child);
       if (child.element !== this.container.children[i]) {
         this.container.appendChild(child.element);
