@@ -118,7 +118,7 @@ function defineAttrs<T extends Element>(el: T, attrs?: Attrs): T {
   return el;
 }
 function defineChildren<T extends ParentNode & Node>(node: T, children?: Children | Array<string | Node> | NodeListOf<Node>): T {
-  children && node.replaceChildren(...children);
+  children && node.replaceChildren(...typeof children === 'string' ? [children] : children);
   return node;
 }
 
