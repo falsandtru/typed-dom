@@ -36,6 +36,20 @@ export function proxy(el: Element): El {
   throw new Error(`TypedDOM: This element has no proxy.`);
 }
 
+namespace privates {
+  export const id = Symbol();
+  export const id_ = Symbol();
+  export const query = Symbol();
+  export const query_ = Symbol();
+  export const scope = Symbol();
+  export const observe = Symbol();
+  export const type = Symbol();
+  export const container = Symbol();
+  export const children = Symbol();
+  export const isInit = Symbol();
+  export const isPartialUpdate = Symbol();
+}
+
 const tag = Symbol.for('typed-dom::tag');
 const id = identity();
 let counter = 0;
@@ -57,88 +71,89 @@ export class Elem<
   > {
   constructor(
     public readonly element: E,
-    private children_: C,
-    private readonly container: Element | ShadowRoot = element,
+    children: C,
+    container: Element | ShadowRoot = element,
   ) {
+    this[privates.children] = children;
+    this[privates.container] = container;
     switch (true) {
-      case children_ === void 0:
-        this.type = ElChildType.Void;
+      case children === void 0:
+        this[privates.type] = ElChildType.Void;
         break;
-      case typeof children_ === 'string':
-        this.type = ElChildType.Text
+      case typeof children === 'string':
+        this[privates.type] = ElChildType.Text
         break;
-      case isArray(children_):
-        this.type = ElChildType.Array;
+      case isArray(children):
+        this[privates.type] = ElChildType.Array;
         break;
-      case children_ && typeof children_ === 'object':
-        this.type = ElChildType.Record;
+      case children && typeof children === 'object':
+        this[privates.type] = ElChildType.Record;
         break;
       default:
         throw new Error(`TypedDOM: Invalid children type.`);
     }
     throwErrorIfNotUsable(this);
     proxies.set(this.element, this);
-    switch (this.type) {
+    switch (this[privates.type]) {
       case ElChildType.Void:
-        this.isInit = false;
+        this[privates.isInit] = false;
         return;
       case ElChildType.Text:
-        define(this.container, []);
-        this.children_ = this.container.appendChild(text('')) as any;
-        this.children = children_ as C;
-        this.isInit = false;
+        define(this[privates.container], []);
+        this[privates.children] = this[privates.container].appendChild(text('')) as any;
+        this.children = children as C;
+        this[privates.isInit] = false;
         return;
       case ElChildType.Array:
-        define(this.container, []);
-        this.children_ = [] as ElChildren.Array as C;
-        this.children = children_;
-        this.isInit = false;
+        define(this[privates.container], []);
+        this[privates.children] = [] as ElChildren.Array as C;
+        this.children = children;
+        this[privates.isInit] = false;
         return;
       case ElChildType.Record:
-        define(this.container, []);
-        this.children_ = this.observe({ ...children_ as ElChildren.Record }) as C;
-        this.children = children_;
-        this.isInit = false;
+        define(this[privates.container], []);
+        this[privates.children] = this[privates.observe]({ ...children as ElChildren.Record }) as C;
+        this.children = children;
+        this[privates.isInit] = false;
         return;
       default:
         throw new Error(`TypedDOM: Unreachable code.`);
     }
   }
   public readonly [tag]: T;
-  private readonly type: ElChildType;
-  private id_ = '';
-  private get id(): string {
-    if (this.id_) return this.id_;
-    this.id_ = this.element.id;
-    if (/^[\w-]+$/.test(this.id_)) return this.id_;
-    this.id_ = `rnd-${id}-${++counter}`;
-    assert(!this.element.classList.contains(this.id_));
-    this.element.classList.add(this.id_);
-    return this.id_;
+  private [privates.id_] = '';
+  private get [privates.id](): string {
+    if (this[privates.id_]) return this[privates.id_];
+    this[privates.id_] = this.element.id;
+    if (/^[\w-]+$/.test(this[privates.id_])) return this[privates.id_];
+    this[privates.id_] = `rnd-${id}-${++counter}`;
+    assert(!this.element.classList.contains(this[privates.id_]));
+    this.element.classList.add(this[privates.id_]);
+    return this[privates.id_];
   }
-  private query_ = '';
-  private get query(): string {
-    if (this.query_) return this.query_;
+  private [privates.query_] = '';
+  private get [privates.query](): string {
+    if (this[privates.query_]) return this[privates.query_];
     switch (true) {
-      case this.element !== this.container:
-        return this.query_ = ':host';
-      case this.id === this.element.id:
-        return this.query_ = `#${this.id}`;
+      case this.element !== this[privates.container]:
+        return this[privates.query_] = ':host';
+      case this[privates.id] === this.element.id:
+        return this[privates.query_] = `#${this[privates.id]}`;
       default:
-        return this.query_ = `.${this.id}`;
+        return this[privates.query_] = `.${this[privates.id]}`;
     }
   }
-  private scope(child: El): void {
+  private [privates.scope](child: El): void {
     if (child.element.tagName !== 'STYLE') return;
     const target = /(^|[,}])(\s*)\$scope(?![\w-])(?=[^;{}]*{)/g;
     const style = child.element.innerHTML;
     if (!target.test(style)) return;
-    assert(/^[:#.][\w-]+$/.test(this.query));
-    child.element.innerHTML = style.replace(target, `$1$2${this.query}`);
+    assert(/^[:#.][\w-]+$/.test(this[privates.query]));
+    child.element.innerHTML = style.replace(target, `$1$2${this[privates.query]}`);
     child.element.firstElementChild && child.element.replaceChildren();
   }
-  private isPartialUpdate = false;
-  private observe(children: ElChildren.Record): C {
+  private [privates.isPartialUpdate] = false;
+  private [privates.observe](children: ElChildren.Record): C {
     const descs: PropertyDescriptorMap = {};
     let i = -1;
     for (const name of ObjectKeys(children)) {
@@ -146,8 +161,8 @@ export class Elem<
       ++i;
       let child = children[name];
       throwErrorIfNotUsable(child);
-      if (child.element !== this.container.children[i]) {
-        this.container.appendChild(child.element);
+      if (child.element !== this[privates.container].children[i]) {
+        this[privates.container].appendChild(child.element);
       }
       descs[name] = {
         configurable: true,
@@ -158,23 +173,23 @@ export class Elem<
         set: (newChild: El) => {
           const oldChild = child;
           if (newChild === oldChild) return;
-          if (this.isPartialUpdate) {
+          if (this[privates.isPartialUpdate]) {
             child = newChild;
             if (newChild.element.parentNode === oldChild.element.parentNode) {
               const ref = newChild.element.nextSibling !== oldChild.element
                 ? newChild.element.nextSibling
                 : oldChild.element.nextSibling;
-              this.container.replaceChild(newChild.element, oldChild.element);
-              this.container.insertBefore(oldChild.element, ref);
+              this[privates.container].replaceChild(newChild.element, oldChild.element);
+              this[privates.container].insertBefore(oldChild.element, ref);
             }
             else {
-              this.container.insertBefore(newChild.element, oldChild.element);
-              this.container.removeChild(oldChild.element);
+              this[privates.container].insertBefore(newChild.element, oldChild.element);
+              this[privates.container].removeChild(oldChild.element);
             }
           }
           else {
             this.children = {
-              ...this.children_ as typeof children,
+              ...this[privates.children] as typeof children,
               [name]: newChild,
             } as C;
           }
@@ -183,34 +198,37 @@ export class Elem<
     }
     return ObjectDefineProperties(children, descs) as C;
   }
-  private isInit = true;
+  private readonly [privates.type]: ElChildType;
+  private readonly [privates.container]: Element | ShadowRoot;
+  private [privates.isInit] = true;
+  private [privates.children]: C;
   public get children(): C {
-    switch (this.type) {
+    switch (this[privates.type]) {
       case ElChildType.Text:
-        if ((this.children_ as unknown as Text).parentNode !== this.container) {
-          this.children_ = void 0 as unknown as C;
-          for (let ns = this.container.childNodes, i = 0, len = ns.length; i < len; ++i) {
+        if ((this[privates.children] as unknown as Text).parentNode !== this[privates.container]) {
+          this[privates.children] = void 0 as unknown as C;
+          for (let ns = this[privates.container].childNodes, i = 0, len = ns.length; i < len; ++i) {
             const node = ns[i];
             if ('wholeText' in node === false) continue;
-            this.children_ = node as any;
+            this[privates.children] = node as any;
             break;
           }
         }
-        return (this.children_ as unknown as Text).data as C;
+        return (this[privates.children] as unknown as Text).data as C;
       default:
-        return this.children_ as C;
+        return this[privates.children] as C;
     }
   }
   public set children(children: C) {
     const removedChildren: El[] = [];
     const addedChildren: El[] = [];
     let isMutated = false;
-    switch (this.type) {
+    switch (this[privates.type]) {
       case ElChildType.Void:
         return;
       case ElChildType.Text: {
-        if (!this.isInit && children === this.children) return;
-        const targetChildren = this.children_ as unknown as Text;
+        if (!this[privates.isInit] && children === this.children) return;
+        const targetChildren = this[privates.children] as unknown as Text;
         const oldText = targetChildren.data;
         const newText = children as ElChildren.Text;
         targetChildren.data = newText;
@@ -221,20 +239,20 @@ export class Elem<
       case ElChildType.Array: {
         const sourceChildren = children as ElChildren.Array;
         const targetChildren = [] as Mutable<ElChildren.Array>;
-        this.children_ = targetChildren as ElChildren as C;
-        const nodeChildren = this.container.children;
+        this[privates.children] = targetChildren as ElChildren as C;
+        const nodeChildren = this[privates.container].children;
         for (let i = 0; i < sourceChildren.length; ++i) {
           const newChild = sourceChildren[i];
           const el = nodeChildren[i];
-          if (newChild.element.parentNode !== this.container) {
+          if (newChild.element.parentNode !== this[privates.container]) {
             throwErrorIfNotUsable(newChild);
           }
           if (newChild.element !== el) {
-            if (newChild.element.parentNode !== this.container) {
-              this.scope(newChild);
+            if (newChild.element.parentNode !== this[privates.container]) {
+              this[privates.scope](newChild);
               addedChildren.push(newChild);
             }
-            this.container.insertBefore(newChild.element, el);
+            this[privates.container].insertBefore(newChild.element, el);
             isMutated = true;
           }
           targetChildren.push(newChild);
@@ -242,28 +260,28 @@ export class Elem<
         for (let i = nodeChildren.length; sourceChildren.length < i--;) {
           const el = nodeChildren[sourceChildren.length];
           if (!proxies.has(el)) continue;
-          removedChildren.push(proxy(this.container.removeChild(el)));
+          removedChildren.push(proxy(this[privates.container].removeChild(el)));
           isMutated = true;
         }
-        assert(this.container.children.length === sourceChildren.length);
-        assert(targetChildren.every((child, i) => child.element === this.container.children[i]));
+        assert(this[privates.container].children.length === sourceChildren.length);
+        assert(targetChildren.every((child, i) => child.element === this[privates.container].children[i]));
         break;
       }
       case ElChildType.Record: {
         const sourceChildren = children as ElChildren.Record;
-        const targetChildren = this.children_ as ElChildren.Record;
+        const targetChildren = this[privates.children] as ElChildren.Record;
         assert.deepStrictEqual(Object.keys(sourceChildren), Object.keys(targetChildren));
         for (const name of ObjectKeys(targetChildren)) {
           const oldChild = targetChildren[name];
           const newChild = sourceChildren[name];
-          if (!this.isInit && newChild === oldChild) continue;
-          if (newChild.element.parentNode !== this.container) {
+          if (!this[privates.isInit] && newChild === oldChild) continue;
+          if (newChild.element.parentNode !== this[privates.container]) {
             throwErrorIfNotUsable(newChild);
           }
-          if (this.isInit || newChild !== oldChild && newChild.element.parentNode !== oldChild.element.parentNode) {
-            this.scope(newChild);
+          if (this[privates.isInit] || newChild !== oldChild && newChild.element.parentNode !== oldChild.element.parentNode) {
+            this[privates.scope](newChild);
             addedChildren.push(newChild);
-            if (!this.isInit) {
+            if (!this[privates.isInit]) {
               let i = 0;
               i = removedChildren.lastIndexOf(newChild);
               i > -1 && splice(removedChildren, i, 1);
@@ -272,9 +290,9 @@ export class Elem<
               i > -1 && splice(addedChildren, i, 1);
             }
           }
-          this.isPartialUpdate = true;
+          this[privates.isPartialUpdate] = true;
           targetChildren[name] = sourceChildren[name];
-          this.isPartialUpdate = false;
+          this[privates.isPartialUpdate] = false;
           isMutated = true;
         }
         break;
