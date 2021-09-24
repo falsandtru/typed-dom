@@ -129,23 +129,13 @@ export class Elem<
     }
   }
   private scope(child: El): void {
-    const style = child.element as HTMLStyleElement | Element;
-    switch (false) {
-      case 'type' in style:
-      case 'media' in style:
-      case style.tagName === 'STYLE':
-        return;
-    }
+    if (child.element.tagName !== 'STYLE') return;
     const target = /(^|[,}])(\s*)\$scope(?![\w-])(?=[^;{}]*{)/g;
-    const html = style.innerHTML;
-    if (html.search(target) === -1) return;
-    const query = this.query;
-    assert(/^[:#.][\w-]+$/.test(query));
-    style.innerHTML = html.replace(target, `$1$2${query}`);
-    if (!style.firstElementChild) return;
-    for (let es = style.children, i = 0, len = es.length; i < len; ++i) {
-      es[0].remove();
-    }
+    const style = child.element.innerHTML;
+    if (!target.test(style)) return;
+    assert(/^[:#.][\w-]+$/.test(this.query));
+    child.element.innerHTML = style.replace(target, `$1$2${this.query}`);
+    child.element.firstElementChild && child.element.replaceChildren();
   }
   private isPartialUpdate = false;
   private observe(children: ElChildren.Record): C {
