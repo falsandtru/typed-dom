@@ -67,8 +67,7 @@ export function delegate<T extends keyof ElementEventMap>(target: Document | Sha
       : (ev.target as Element)?.closest(selector);
     return cx
       ? unbind = once(cx, type, listener, option)
-      : void 0,
-      ev.returnValue;
+      : void 0;
   }, { ...option, capture: true });
 }
 
