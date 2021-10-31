@@ -82,9 +82,7 @@ export function bind<T extends keyof WindowEventMap | keyof DocumentEventMap | k
 
   function handler(ev: Event): unknown {
     assert(ev.currentTarget);
-    return currentTarget in ev && !ev[currentTarget]
-      ? void 0
-      : ev[currentTarget] = ev.currentTarget,
-      listener(ev);
+    ev[currentTarget] = ev.currentTarget;
+    return listener(ev);
   }
 }
