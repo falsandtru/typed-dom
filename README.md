@@ -188,12 +188,12 @@ type ElChildren
   = ElChildren.Void
   | ElChildren.Text
   | ElChildren.Array
-  | ElChildren.Record;
+  | ElChildren.Struct;
 namespace ElChildren {
   export type Void = undefined;
   export type Text = string;
   export type Array = readonly El[];
-  export type Record = { [field: string]: El; };
+  export type Struct = { [field: string]: El; };
 }
 ```
 

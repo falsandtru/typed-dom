@@ -9,20 +9,20 @@ const enum ElChildType {
   Void,
   Text,
   Array,
-  Record,
+  Struct,
 }
 
 export type ElChildren =
   | ElChildren.Void
   | ElChildren.Text
   | ElChildren.Array
-  | ElChildren.Record;
+  | ElChildren.Struct;
 
 export namespace ElChildren {
   export type Void = undefined;
   export type Text = string;
   export type Array = readonly El[];
-  export type Record = { [field: string]: El; };
+  export type Struct = { [field: string]: El; };
 }
 
 const proxies = new WeakMap<Element, El>();
@@ -87,7 +87,7 @@ export class Elem<
         this[privates.type] = ElChildType.Array;
         break;
       case children && typeof children === 'object':
-        this[privates.type] = ElChildType.Record;
+        this[privates.type] = ElChildType.Struct;
         break;
       default:
         throw new Error(`TypedDOM: Invalid children type.`);
@@ -110,9 +110,9 @@ export class Elem<
         this.children = children;
         this[privates.isInit] = false;
         return;
-      case ElChildType.Record:
+      case ElChildType.Struct:
         define(this[privates.container], []);
-        this[privates.children] = this[privates.observe]({ ...children as ElChildren.Record }) as C;
+        this[privates.children] = this[privates.observe]({ ...children as ElChildren.Struct }) as C;
         this.children = children;
         this[privates.isInit] = false;
         return;
@@ -157,7 +157,7 @@ export class Elem<
     child.element.firstElementChild && child.element.replaceChildren();
   }
   private [privates.isPartialUpdate] = false;
-  private [privates.observe](children: ElChildren.Record): C {
+  private [privates.observe](children: ElChildren.Struct): C {
     const descs: PropertyDescriptorMap = {};
     let i = -1;
     for (const name of ObjectKeys(children)) {
@@ -271,9 +271,9 @@ export class Elem<
         assert(targetChildren.every((child, i) => child.element === this[privates.container].children[i]));
         break;
       }
-      case ElChildType.Record: {
-        const sourceChildren = children as ElChildren.Record;
-        const targetChildren = this[privates.children] as ElChildren.Record;
+      case ElChildType.Struct: {
+        const sourceChildren = children as ElChildren.Struct;
+        const targetChildren = this[privates.children] as ElChildren.Struct;
         assert.deepStrictEqual(Object.keys(sourceChildren), Object.keys(targetChildren));
         for (const name of ObjectKeys(targetChildren)) {
           const oldChild = targetChildren[name];
