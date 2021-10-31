@@ -1,7 +1,6 @@
 import { Symbol, document } from 'spica/global';
 import { ObjectKeys } from 'spica/alias';
 import { memoize } from 'spica/memoize';
-import { push } from 'spica/array';
 
 export const enum NS {
   HTML = 'HTML',
@@ -129,7 +128,7 @@ export function isChildren(o: Attrs | Children | ShadowRootInit | undefined): o 
 
 export function defrag<T extends Element | string>(nodes: ArrayLike<T>): T[];
 export function defrag(nodes: ArrayLike<Element | string>): (Element | string)[] {
-  assert(push([], nodes).every(n => typeof n === 'string' || n instanceof Element));
+  assert(Array.from(nodes).every(n => typeof n === 'string' || n instanceof Element));
   const acc: (Element | string)[] = [];
   for (let i = 0; i < nodes.length; ++i) {
     const node = nodes[i];
