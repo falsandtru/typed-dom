@@ -77,7 +77,7 @@ function handle
 
     function elem(factory: ElFactory<F, Extract<keyof M, string>, ElChildren, Element> | undefined, attrs: Attrs | undefined, children: ElChildren): Element {
       const el = factory
-        ? define(factory(baseFactory as F, tag, attrs || {}, children), attrs)
+        ? define(factory(baseFactory as F, tag, attrs ?? {}, children), attrs)
         : baseFactory(tag, attrs) as unknown as Element;
       if (tag !== el.tagName.toLowerCase()) throw new Error(`TypedDOM: Expected tag name is "${tag}" but actually "${el.tagName.toLowerCase()}".`);
       return el;

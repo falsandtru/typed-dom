@@ -27,14 +27,14 @@ export function shadow(el: keyof ShadowHostElementTagNameMap | HTMLElement, chil
   if (typeof el === 'string') return shadow(html(el), children as Children, opts);
   if (children && !isChildren(children)) return shadow(el, void 0, children);
   const root = opts === void 0
-    ? el.shadowRoot || caches.shadows.get(el)
+    ? el.shadowRoot ?? caches.shadows.get(el)
     : opts.mode === 'open'
-      ? el.shadowRoot || void 0
+      ? el.shadowRoot ?? void 0
       : caches.shadows.get(el);
   return defineChildren(
     !opts || opts.mode === 'open'
-      ? root || el.attachShadow(opts || { mode: 'open' })
-      : root || caches.shadows.set(el, el.attachShadow(opts)).get(el)!,
+      ? root ?? el.attachShadow(opts ?? { mode: 'open' })
+      : root ?? caches.shadows.set(el, el.attachShadow(opts)).get(el)!,
     !root && children == void 0
       ? el.childNodes
       : children);
