@@ -35,7 +35,7 @@ export function shadow(el: keyof ShadowHostElementTagNameMap | HTMLElement, chil
     !opts || opts.mode === 'open'
       ? root ?? el.attachShadow(opts ?? { mode: 'open' })
       : root ?? caches.shadows.set(el, el.attachShadow(opts)).get(el)!,
-    !root && children == void 0
+    !root && children === void 0
       ? el.childNodes
       : children);
 }
