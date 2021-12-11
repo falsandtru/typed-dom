@@ -95,19 +95,24 @@ function defineAttrs<T extends Element>(el: T, attrs?: Attrs): T {
         continue;
       case 'function':
         if (name.length < 3) throw new Error(`TypedDOM: Attribute names for event listeners must have an event name but got "${name}".`);
-        if (name.slice(0, 2) !== 'on') throw new Error(`TypedDOM: Attribute names for event listeners must start with "on" but got "${name}".`);
-        el.addEventListener(name.slice(2), value, {
-          passive: [
-            'wheel',
-            'mousewheel',
-            'touchstart',
-            'touchmove',
-            'touchend',
-            'touchcancel',
-          ].includes(name.slice(2)),
-        });
+        const names = name.split(/\s+/);
+        for (let i = 0; i < names.length; ++i) {
+          const name = names[i];
+          if (name.slice(0, 2) !== 'on') throw new Error(`TypedDOM: Attribute names for event listeners must start with "on" but got "${name}".`);
+          el.addEventListener(name.slice(2), value, {
+            passive: [
+              'wheel',
+              'mousewheel',
+              'touchstart',
+              'touchmove',
+              'touchend',
+              'touchcancel',
+            ].includes(name.slice(2)),
+          });
+        }
         continue;
       case 'object':
+        assert(value === null);
         el.removeAttribute(name);
         continue;
       default:
