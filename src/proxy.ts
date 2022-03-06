@@ -149,7 +149,7 @@ export class Elem<
   }
   private [privates.scope](child: El): void {
     if (child.element.tagName !== 'STYLE') return;
-    const target = /(^|[,}])(\s*)\$scope(?![\w-])(?=[^;{}]*{)/g;
+    const target = /(^|[,}]|\*\/)(\s*)\$scope(?=[\s~+[{:>,])/g;
     const style = child.element.innerHTML;
     if (!target.test(style)) return;
     assert(/^[:#.][\w-]+$/.test(this[privates.query]));
