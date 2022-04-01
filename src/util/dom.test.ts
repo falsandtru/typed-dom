@@ -28,8 +28,8 @@ describe('Unit: util/dom', () => {
       assert(html('a').outerHTML === HTML.a().element.outerHTML);
       assert(html('a', { class: 'test' }).outerHTML === HTML.a({ class: 'test' }).element.outerHTML);
       assert(html('a', { class: 'test' }, 'b').outerHTML === HTML.a({ class: 'test' }, 'b').element.outerHTML);
-      assert(html('a', undefined, 'b').outerHTML === HTML.a('b').element.outerHTML);
       assert(html('a', 'b').outerHTML === HTML.a('b').element.outerHTML);
+      assert(html('a', undefined, 'b').outerHTML === HTML.a('b').element.outerHTML);
     });
 
   });

@@ -1,3 +1,4 @@
+import { Symbol } from 'spica/global';
 import { hasOwnProperty } from 'spica/alias';
 import { Elem, El, ElChildren } from './proxy';
 import { Factory, TagNameMap, Attrs, shadow, html, svg, define } from './util/dom';
@@ -20,25 +21,25 @@ export const SVG = API<SVGElementTagNameMap>(svg);
 type ElFactory<F extends Factory<TagNameMap>, T extends string, C extends ElChildren, E extends Element> = (baseFactory: F, tag: T, attrs: Attrs, children: C) => E;
 
 interface BuilderFunction<T extends string, E extends Element, F extends Factory<TagNameMap>> {
-                               (tag: T,                            factory?: ElFactory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
-  <C extends ElChildren.Text  >(tag: T,               children: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, string>;
-  <C extends ElChildren.Array >(tag: T,               children: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, Readonly<C>>;
-  <C extends ElChildren.Struct>(tag: T,               children: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, C>;
-                               (tag: T, attrs: Attrs,              factory?: ElFactory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
-  <C extends ElChildren.Text  >(tag: T, attrs: Attrs, children: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, string>;
-  <C extends ElChildren.Array >(tag: T, attrs: Attrs, children: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, Readonly<C>>;
-  <C extends ElChildren.Struct>(tag: T, attrs: Attrs, children: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, C>;
+                               (tag: T,                              factory?: ElFactory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
+  <C extends ElChildren.Text  >(tag: T,                children?: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, string>;
+  <C extends ElChildren.Array >(tag: T,                children?: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, Readonly<C>>;
+  <C extends ElChildren.Struct>(tag: T,                children?: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, C>;
+                               (tag: T, attrs?: Attrs,               factory?: ElFactory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
+  <C extends ElChildren.Text  >(tag: T, attrs?: Attrs, children?: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, string>;
+  <C extends ElChildren.Array >(tag: T, attrs?: Attrs, children?: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, Readonly<C>>;
+  <C extends ElChildren.Struct>(tag: T, attrs?: Attrs, children?: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, C>;
 }
 
 interface BuilderMethod<T extends string, E extends Element, F extends Factory<TagNameMap>> {
-                               (                                   factory?: ElFactory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
-  <C extends ElChildren.Text  >(                      children: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, string>;
-  <C extends ElChildren.Array >(                      children: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, Readonly<C>>;
-  <C extends ElChildren.Struct>(                      children: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, C>;
-                               (        attrs: Attrs,              factory?: ElFactory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
-  <C extends ElChildren.Text  >(        attrs: Attrs, children: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, string>;
-  <C extends ElChildren.Array >(        attrs: Attrs, children: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, Readonly<C>>;
-  <C extends ElChildren.Struct>(        attrs: Attrs, children: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, C>;
+                               (                                     factory?: ElFactory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
+  <C extends ElChildren.Text  >(                       children?: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, string>;
+  <C extends ElChildren.Array >(                       children?: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, Readonly<C>>;
+  <C extends ElChildren.Struct>(                       children?: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, C>;
+                               (        attrs?: Attrs,               factory?: ElFactory<F, T, ElChildren.Void, E>): El<T, E, ElChildren.Void>;
+  <C extends ElChildren.Text  >(        attrs?: Attrs, children?: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, string>;
+  <C extends ElChildren.Array >(        attrs?: Attrs, children?: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, Readonly<C>>;
+  <C extends ElChildren.Struct>(        attrs?: Attrs, children?: C, factory?: ElFactory<F, T, C, E>              ): El<T, E, C>;
 }
 
 function handle
@@ -56,21 +57,22 @@ function handle
   };
 
   function builder(tag: Extract<keyof M, string>, baseFactory: F): (attrs?: Attrs, children?: ElChildren, factory?: () => Element) => El {
-    return function build(attrs?: Attrs, children?: ElChildren, factory?: ElFactory<F, Extract<keyof M, string>, ElChildren, Element>): El {
-      if (typeof attrs === 'function') return build(void 0, void 0, attrs);
+    return function build(attrs?: Attrs | ElChildren , children?: ElChildren, factory?: ElFactory<F, Extract<keyof M, string>, ElChildren, Element>): El {
       if (typeof children === 'function') return build(attrs, void 0, children);
-      if (attrs !== void 0 && isElChildren(attrs)) return build(void 0, attrs, factory);
-      const node = formatter(elem(factory, attrs, children));
+      if (typeof attrs === 'function') return build(void 0, void 0, attrs);
+      if (isElChildren(attrs)) return build(void 0, attrs, factory);
+      const node = formatter(elem(factory, attrs as Attrs, children));
       return node.nodeType === 1
         ? new Elem(node as Element, children)
         : new Elem((node as ShadowRoot).host, children, node);
     };
 
-    function isElChildren(children: ElChildren | Attrs): children is ElChildren {
-      if (typeof children !== 'object') return true;
-      for (const i in children) {
-        if (!hasOwnProperty(children, i)) continue;
-        return typeof children[i] === 'object';
+    function isElChildren(param: Attrs | ElChildren): param is ElChildren {
+      if (param === void 0) return false;
+      if (param[Symbol.iterator]) return true;
+      for (const i in param as Attrs) {
+        if (!hasOwnProperty(param, i)) continue;
+        return typeof param[i] === 'object' && !!param[i];
       }
       return true;
     }

@@ -19,6 +19,7 @@ describe('Integration: Typed DOM', function () {
     it('call', function () {
       assert(HTML('p').element.outerHTML === '<p></p>');
       assert(HTML('p', 'a').element.outerHTML === '<p>a</p>');
+      assert(HTML('p', undefined, 'a').element.outerHTML === '<p>a</p>');
       assert(HTML('p', { class: 'class' }, 'a', (h, t) => h(t, { id: 'id' })).element.outerHTML === '<p id="id" class="class">a</p>');
     });
 

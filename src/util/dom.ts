@@ -127,8 +127,8 @@ function defineChildren<T extends ParentNode & Node>(node: T, children?: Childre
   return node;
 }
 
-export function isChildren(o: Attrs | Children | ShadowRootInit | undefined): o is Children {
-  return !!o?.[Symbol.iterator];
+export function isChildren(param: Attrs | Children | ShadowRootInit | undefined): param is Children {
+  return !!param?.[Symbol.iterator];
 }
 
 export function defrag<T extends Element | string>(nodes: ArrayLike<T>): T[];
