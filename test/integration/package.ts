@@ -340,7 +340,7 @@ describe('Integration: Typed DOM', function () {
     it('observe collection', function () {
       const listeners: Record<string, EventListener> = {
         onconnect: (ev, el = ev.target as HTMLElement) =>
-          el.textContent = el.textContent!.toUpperCase(),
+          el.textContent += el.textContent!.toUpperCase(),
         ondisconnect: (ev, el = ev.target as HTMLElement) =>
           el.textContent += el.textContent!,
       };
@@ -348,6 +348,12 @@ describe('Integration: Typed DOM', function () {
         HTML.li(listeners, 'a'),
         HTML.li(listeners, 'b'),
       ]);
+      assert.deepStrictEqual(
+        el.children.map(el => el.children),
+        [
+          'aA',
+          'bB',
+        ]);
       el.children = [
         el.children[1],
         HTML.li(listeners, 'c'),
@@ -355,8 +361,8 @@ describe('Integration: Typed DOM', function () {
       assert.deepStrictEqual(
         el.children.map(el => el.children),
         [
-          'B',
-          'C',
+          'bB',
+          'cC',
         ]);
       assert.deepStrictEqual(
         el.children.map(v => v.element),
@@ -377,6 +383,15 @@ describe('Integration: Typed DOM', function () {
         d: HTML.li(listeners, 'd'),
         e: HTML.li(listeners, 'e'),
       });
+      assert.deepStrictEqual(
+        Object.entries(el.children).map(([k, v]) => [k, v.children]),
+        [
+          ['a', 'aA'],
+          ['b', 'bB'],
+          ['c', 'cC'],
+          ['d', 'dD'],
+          ['e', 'eE'],
+        ]);
       el.children = {
         a: el.children.a,
         b: el.children.c,
