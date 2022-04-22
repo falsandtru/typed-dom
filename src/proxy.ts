@@ -251,9 +251,10 @@ export class Elem<
           targetChildren.push(newChild);
         }
         for (let i = nodeChildren.length; sourceChildren.length < i--;) {
-          const el = nodeChildren[sourceChildren.length];
-          if (!proxies.has(el)) continue;
-          removedChildren.push(proxy(this[privates.container].removeChild(el)));
+          const oldChild = proxy(nodeChildren[sourceChildren.length]);
+          if (!oldChild) continue;
+          this[privates.container].removeChild(oldChild.element);
+          removedChildren.push(oldChild);
           isMutated = true;
         }
         assert(this[privates.container].children.length === sourceChildren.length);
