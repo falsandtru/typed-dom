@@ -148,15 +148,10 @@ export class Elem<
   private [privates.isPartialUpdate] = false;
   private [privates.observe](children: El.Children.Struct): C {
     const descs: PropertyDescriptorMap = {};
-    let i = -1;
     for (const name of ObjectKeys(children)) {
       if (name in {}) throw new Error(`TypedDOM: Child names must be different from the object property names.`);
-      ++i;
       let child = children[name];
       throwErrorIfNotUsable(child);
-      if (child.element !== this[privates.container].children[i]) {
-        this[privates.container].appendChild(child.element);
-      }
       descs[name] = {
         configurable: true,
         enumerable: true,
@@ -166,6 +161,7 @@ export class Elem<
         set: (newChild: El) => {
           const partial = this[privates.isPartialUpdate];
           this[privates.isPartialUpdate] = false;
+          if (this[privates.isInit]) return this[privates.container].appendChild(newChild.element);
           const oldChild = child;
           if (newChild === oldChild) return;
           if (partial) {
@@ -273,8 +269,10 @@ export class Elem<
             throwErrorIfNotUsable(newChild);
           }
           if (this[privates.isInit] || newChild !== oldChild && newChild.element.parentNode !== oldChild.element.parentNode) {
-            this[privates.scope](newChild);
-            addedChildren.push(newChild);
+            if (newChild.element.parentNode !== this[privates.container]) {
+              this[privates.scope](newChild);
+              addedChildren.push(newChild);
+            }
             if (!this[privates.isInit]) {
               let i = 0;
               i = removedChildren.lastIndexOf(newChild);
