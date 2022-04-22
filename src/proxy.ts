@@ -1,7 +1,7 @@
 import { WeakMap, Event } from 'spica/global';
 import { isArray, ObjectDefineProperties, ObjectKeys } from 'spica/alias';
 import { identity } from './util/identity';
-import { text, define } from './util/dom';
+import { text } from './util/dom';
 
 const tag = Symbol.for('typed-dom::tag');
 
@@ -86,19 +86,19 @@ export class Elem<
         this[privates.isInit] = false;
         return;
       case ElChildType.Text:
-        define(this[privates.container], []);
+        this[privates.container].replaceChildren();
         this[privates.children] = this[privates.container].appendChild(text('')) as any;
         this.children = children as C;
         this[privates.isInit] = false;
         return;
       case ElChildType.Array:
-        define(this[privates.container], []);
+        this[privates.container].replaceChildren();
         this[privates.children] = [] as El.Children.Array as C;
         this.children = children;
         this[privates.isInit] = false;
         return;
       case ElChildType.Struct:
-        define(this[privates.container], []);
+        this[privates.container].replaceChildren();
         this[privates.children] = this[privates.observe](children as El.Children.Struct) as C;
         this.children = children;
         this[privates.isInit] = false;
