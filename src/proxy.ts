@@ -270,11 +270,9 @@ export class Elem<
             throwErrorIfNotUsable(newChild);
           }
           if (this[privates.isInit] || newChild !== oldChild && newChild.element.parentNode !== oldChild.element.parentNode) {
-            if (newChild.element.parentNode !== this[privates.container]) {
-              this[privates.scope](newChild);
-              assert(!addedChildren.includes(newChild));
-              addedChildren.push(newChild);
-            }
+            this[privates.scope](newChild);
+            assert(!addedChildren.includes(newChild));
+            addedChildren.push(newChild);
             if (!this[privates.isInit]) {
               assert(!removedChildren.includes(oldChild));
               removedChildren.push(oldChild);
