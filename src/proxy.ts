@@ -45,7 +45,7 @@ namespace privates {
   export const container = Symbol();
   export const children = Symbol();
   export const isInit = Symbol();
-  export const isPartialUpdate = Symbol();
+  export const isObserverUpdate = Symbol();
 }
 
 let id = identity();
@@ -143,7 +143,7 @@ export class Elem<
     child.element.innerHTML = style.replace(target, `$1$2${this[privates.query]}`);
     child.element.firstElementChild && child.element.replaceChildren();
   }
-  private [privates.isPartialUpdate] = false;
+  private [privates.isObserverUpdate] = false;
   private [privates.observe](children: El.Children.Struct): C {
     const descs: PropertyDescriptorMap = {};
     for (const name of ObjectKeys(children)) {
@@ -157,28 +157,13 @@ export class Elem<
           return child;
         },
         set: (newChild: El) => {
-          const partial = this[privates.isPartialUpdate];
-          this[privates.isPartialUpdate] = false;
-          if (this[privates.isInit]) return this[privates.container].appendChild(newChild.element);
-          const oldChild = child;
-          if (newChild === oldChild) return;
-          if (partial) {
-            child = newChild;
-            if (newChild.element.parentNode === oldChild.element.parentNode) {
-              const ref = newChild.element.nextSibling !== oldChild.element
-                ? newChild.element.nextSibling
-                : oldChild.element.nextSibling;
-              this[privates.container].replaceChild(newChild.element, oldChild.element);
-              this[privates.container].insertBefore(oldChild.element, ref);
-            }
-            else {
-              this[privates.container].insertBefore(newChild.element, oldChild.element);
-              this[privates.container].removeChild(oldChild.element);
-            }
-          }
-          else {
+          if (!this[privates.isObserverUpdate]) {
             this.children = { [name]: newChild } as C;
           }
+          else {
+            this[privates.isObserverUpdate] = false;
+          }
+          child = newChild;
         },
       };
     }
@@ -206,7 +191,7 @@ export class Elem<
     }
   }
   public set children(children: C) {
-    assert(!this[privates.isPartialUpdate]);
+    assert(!this[privates.isObserverUpdate]);
     const removedChildren: El[] = [];
     const addedChildren: El[] = [];
     let isMutated = false;
@@ -255,10 +240,11 @@ export class Elem<
         const sourceChildren = children as El.Children.Struct;
         const targetChildren = this[privates.children] as El.Children.Struct;
         for (const name of ObjectKeys(sourceChildren)) {
-          const oldChild = targetChildren[name];
           const newChild = sourceChildren[name];
-          if (!oldChild || !newChild) continue;
+          const oldChild = targetChildren[name];
+          if (!newChild || !oldChild) continue;
           if (!this[privates.isInit] && newChild === oldChild) continue;
+          isMutated = true;
           if (newChild.element.parentNode !== this[privates.container]) {
             throwErrorIfNotUsable(newChild);
           }
@@ -266,16 +252,28 @@ export class Elem<
             this[privates.scope](newChild);
             assert(!addedChildren.includes(newChild));
             addedChildren.push(newChild);
-            if (!this[privates.isInit]) {
+            if (this[privates.isInit]) {
+              this[privates.container].appendChild(newChild.element);
+            }
+            else {
+              this[privates.container].insertBefore(newChild.element, oldChild.element);
+              this[privates.container].removeChild(oldChild.element);
               assert(!removedChildren.includes(oldChild));
               removedChildren.push(oldChild);
             }
           }
-          this[privates.isPartialUpdate] = true;
-          targetChildren[name] = sourceChildren[name];
-          assert(!this[privates.isPartialUpdate]);
-          this[privates.isPartialUpdate] = false;
-          isMutated = true;
+          else {
+            assert(newChild.element.parentNode === oldChild.element.parentNode);
+            const ref = newChild.element.nextSibling !== oldChild.element
+              ? newChild.element.nextSibling
+              : oldChild.element.nextSibling;
+            this[privates.container].replaceChild(newChild.element, oldChild.element);
+            this[privates.container].insertBefore(oldChild.element, ref);
+          }
+          this[privates.isObserverUpdate] = true;
+          targetChildren[name] = newChild;
+          assert(!this[privates.isObserverUpdate]);
+          this[privates.isObserverUpdate] = false;
         }
         break;
       }
