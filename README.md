@@ -178,21 +178,23 @@ const component: El<"article", HTMLElement, {
 export interface El<
   T extends string = string,
   E extends Element = Element,
-  C extends ElChildren = ElChildren,
+  C extends El.Children = El.Children,
   > {
   readonly element: E;
   children: C;
 }
-type ElChildren
-  = ElChildren.Void
-  | ElChildren.Text
-  | ElChildren.Array
-  | ElChildren.Struct;
-namespace ElChildren {
-  export type Void = undefined;
-  export type Text = string;
-  export type Array = readonly El[];
-  export type Struct = { [field: string]: El; };
+export namespace El {
+  export type Children =
+    | Children.Void
+    | Children.Text
+    | Children.Array
+    | Children.Struct;
+  export namespace Children {
+    export type Void = undefined;
+    export type Text = string;
+    export type Array = readonly El[];
+    export type Struct = { [field: string]: El; };
+  }
 }
 ```
 
