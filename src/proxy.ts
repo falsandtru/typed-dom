@@ -1,4 +1,3 @@
-import { Mutable } from 'spica/type';
 import { WeakMap, Event } from 'spica/global';
 import { isArray, ObjectDefineProperties, ObjectKeys } from 'spica/alias';
 import { identity } from './util/identity';
@@ -226,36 +225,31 @@ export class Elem<
       }
       case ElChildType.Array: {
         const sourceChildren = children as El.Children.Array;
-        const targetChildren = [] as Mutable<El.Children.Array>;
-        this[privates.children] = targetChildren as El.Children as C;
-        const nodeChildren = this[privates.container].children;
+        const targetChildren = this[privates.children] as El.Children.Array;
+        isMutated ||= sourceChildren.length !== targetChildren.length;
         for (let i = 0; i < sourceChildren.length; ++i) {
           const newChild = sourceChildren[i];
-          const el = nodeChildren[i];
+          const oldChild = targetChildren[i];
+          isMutated ||= newChild.element !== oldChild.element;
           if (newChild.element.parentNode !== this[privates.container]) {
             throwErrorIfNotUsable(newChild);
+            this[privates.scope](newChild);
+            assert(!addedChildren.includes(newChild));
+            addedChildren.push(newChild);
           }
-          if (newChild.element !== el) {
-            if (newChild.element.parentNode !== this[privates.container]) {
-              this[privates.scope](newChild);
-              assert(!addedChildren.includes(newChild));
-              addedChildren.push(newChild);
-            }
-            this[privates.container].insertBefore(newChild.element, el);
-            isMutated = true;
-          }
-          targetChildren.push(newChild);
         }
-        for (let i = nodeChildren.length; sourceChildren.length < i--;) {
-          const oldChild = proxy(nodeChildren[sourceChildren.length]);
-          if (!oldChild) continue;
-          this[privates.container].removeChild(oldChild.element);
-          assert(!removedChildren.includes(oldChild));
-          removedChildren.push(oldChild);
-          isMutated = true;
+        this[privates.container].replaceChildren(...sourceChildren.map(c => c.element));
+        this[privates.children] = children;
+        for (let i = 0; i < targetChildren.length; ++i) {
+          const oldChild = targetChildren[i];
+          if (oldChild.element.parentNode !== this[privates.container]) {
+            assert(!removedChildren.includes(oldChild));
+            removedChildren.push(oldChild);
+            assert(isMutated);
+          }
         }
         assert(this[privates.container].children.length === sourceChildren.length);
-        assert(targetChildren.every((child, i) => child.element === this[privates.container].children[i]));
+        assert(sourceChildren.every((child, i) => child.element === this[privates.container].children[i]));
         break;
       }
       case ElChildType.Struct: {
