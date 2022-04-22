@@ -164,9 +164,11 @@ export class Elem<
           return child;
         },
         set: (newChild: El) => {
+          const partial = this[privates.isPartialUpdate];
+          this[privates.isPartialUpdate] = false;
           const oldChild = child;
           if (newChild === oldChild) return;
-          if (this[privates.isPartialUpdate]) {
+          if (partial) {
             child = newChild;
             if (newChild.element.parentNode === oldChild.element.parentNode) {
               const ref = newChild.element.nextSibling !== oldChild.element
@@ -213,6 +215,7 @@ export class Elem<
     }
   }
   public set children(children: C) {
+    assert(!this[privates.isPartialUpdate]);
     const removedChildren: El[] = [];
     const addedChildren: El[] = [];
     let isMutated = false;
@@ -286,6 +289,7 @@ export class Elem<
           }
           this[privates.isPartialUpdate] = true;
           targetChildren[name] = sourceChildren[name];
+          assert(!this[privates.isPartialUpdate]);
           this[privates.isPartialUpdate] = false;
           isMutated = true;
         }
