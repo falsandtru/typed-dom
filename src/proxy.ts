@@ -215,13 +215,12 @@ export class Elem<
         return;
       case ElChildType.Text: {
         if (!this[privates.isInit] && children === this.children) return;
-        const targetChildren = this[privates.children] as unknown as Text;
-        const oldText = targetChildren.data;
+        const node = this[privates.children] as unknown as Text;
         const newText = children as El.Children.Text;
-        targetChildren.data = newText;
-        if (newText === oldText) return;
-        this.element.dispatchEvent(new Event('mutate', { bubbles: false, cancelable: true }));
-        return;
+        const oldText = node.data;
+        isMutated = newText !== oldText;
+        node.data = newText;
+        break;
       }
       case ElChildType.Array: {
         const sourceChildren = children as El.Children.Array;
