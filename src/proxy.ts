@@ -5,31 +5,11 @@ import { identity } from './util/identity';
 import { text, define } from './util/dom';
 import { splice } from 'spica/array';
 
-const enum ElChildType {
-  Void,
-  Text,
-  Array,
-  Struct,
-}
-
-export type ElChildren =
-  | ElChildren.Void
-  | ElChildren.Text
-  | ElChildren.Array
-  | ElChildren.Struct;
-
-export namespace ElChildren {
-  export type Void = undefined;
-  export type Text = string;
-  export type Array = readonly El[];
-  export type Struct = { [field: string]: El; };
-}
-
 const proxies = new WeakMap<Element, El>();
 
-export function proxy<E extends Element>(el: E): El<string, E, ElChildren>;
-export function proxy<C extends ElChildren>(el: Element): El<string, Element, C>;
-export function proxy<E extends Element, C extends ElChildren>(el: E): El<string, E, C>;
+export function proxy<E extends Element>(el: E): El<string, E, El.Children>;
+export function proxy<C extends El.Children>(el: Element): El<string, Element, C>;
+export function proxy<E extends Element, C extends El.Children>(el: E): El<string, E, C>;
 export function proxy(el: Element): El {
   const proxy = proxies.get(el);
   if (proxy) return proxy;
@@ -57,17 +37,36 @@ let counter = 0;
 export interface El<
   T extends string = string,
   E extends Element = Element,
-  C extends ElChildren = ElChildren,
+  C extends El.Children = El.Children,
   > {
   readonly [tag]?: T;
   readonly element: E;
   children: C;
 }
+export namespace El {
+  export type Children =
+    | Children.Void
+    | Children.Text
+    | Children.Array
+    | Children.Struct;
+  export namespace Children {
+    export type Void = undefined;
+    export type Text = string;
+    export type Array = readonly El[];
+    export type Struct = { [field: string]: El; };
+  }
+}
+const enum ElChildType {
+  Void,
+  Text,
+  Array,
+  Struct,
+}
 
 export class Elem<
   T extends string,
   E extends Element,
-  C extends ElChildren,
+  C extends El.Children,
   > {
   constructor(
     public readonly element: E,
@@ -106,13 +105,13 @@ export class Elem<
         return;
       case ElChildType.Array:
         define(this[privates.container], []);
-        this[privates.children] = [] as ElChildren.Array as C;
+        this[privates.children] = [] as El.Children.Array as C;
         this.children = children;
         this[privates.isInit] = false;
         return;
       case ElChildType.Struct:
         define(this[privates.container], []);
-        this[privates.children] = this[privates.observe]({ ...children as ElChildren.Struct }) as C;
+        this[privates.children] = this[privates.observe]({ ...children as El.Children.Struct }) as C;
         this.children = children;
         this[privates.isInit] = false;
         return;
@@ -157,7 +156,7 @@ export class Elem<
     child.element.firstElementChild && child.element.replaceChildren();
   }
   private [privates.isPartialUpdate] = false;
-  private [privates.observe](children: ElChildren.Struct): C {
+  private [privates.observe](children: El.Children.Struct): C {
     const descs: PropertyDescriptorMap = {};
     let i = -1;
     for (const name of ObjectKeys(children)) {
@@ -234,16 +233,16 @@ export class Elem<
         if (!this[privates.isInit] && children === this.children) return;
         const targetChildren = this[privates.children] as unknown as Text;
         const oldText = targetChildren.data;
-        const newText = children as ElChildren.Text;
+        const newText = children as El.Children.Text;
         targetChildren.data = newText;
         if (newText === oldText) return;
         this.element.dispatchEvent(new Event('mutate', { bubbles: false, cancelable: true }));
         return;
       }
       case ElChildType.Array: {
-        const sourceChildren = children as ElChildren.Array;
-        const targetChildren = [] as Mutable<ElChildren.Array>;
-        this[privates.children] = targetChildren as ElChildren as C;
+        const sourceChildren = children as El.Children.Array;
+        const targetChildren = [] as Mutable<El.Children.Array>;
+        this[privates.children] = targetChildren as El.Children as C;
         const nodeChildren = this[privates.container].children;
         for (let i = 0; i < sourceChildren.length; ++i) {
           const newChild = sourceChildren[i];
@@ -272,8 +271,8 @@ export class Elem<
         break;
       }
       case ElChildType.Struct: {
-        const sourceChildren = children as ElChildren.Struct;
-        const targetChildren = this[privates.children] as ElChildren.Struct;
+        const sourceChildren = children as El.Children.Struct;
+        const targetChildren = this[privates.children] as El.Children.Struct;
         assert.deepStrictEqual(Object.keys(sourceChildren), Object.keys(targetChildren));
         for (const name of ObjectKeys(targetChildren)) {
           const oldChild = targetChildren[name];
