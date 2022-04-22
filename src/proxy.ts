@@ -101,7 +101,7 @@ export class Elem<
         return;
       case ElChildType.Struct:
         define(this[privates.container], []);
-        this[privates.children] = this[privates.observe]({ ...children as El.Children.Struct }) as C;
+        this[privates.children] = this[privates.observe](children as El.Children.Struct) as C;
         this.children = children;
         this[privates.isInit] = false;
         return;
@@ -183,10 +183,7 @@ export class Elem<
             }
           }
           else {
-            this.children = {
-              ...this[privates.children] as typeof children,
-              [name]: newChild,
-            } as C;
+            this.children = { [name]: newChild } as C;
           }
         },
       };
@@ -267,10 +264,10 @@ export class Elem<
       case ElChildType.Struct: {
         const sourceChildren = children as El.Children.Struct;
         const targetChildren = this[privates.children] as El.Children.Struct;
-        assert.deepStrictEqual(Object.keys(sourceChildren), Object.keys(targetChildren));
-        for (const name of ObjectKeys(targetChildren)) {
+        for (const name of ObjectKeys(sourceChildren)) {
           const oldChild = targetChildren[name];
           const newChild = sourceChildren[name];
+          if (!oldChild || !newChild) continue;
           if (!this[privates.isInit] && newChild === oldChild) continue;
           if (newChild.element.parentNode !== this[privates.container]) {
             throwErrorIfNotUsable(newChild);
