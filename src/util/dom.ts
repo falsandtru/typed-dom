@@ -2,6 +2,31 @@ import { Symbol, document } from 'spica/global';
 import { ObjectKeys } from 'spica/alias';
 import { memoize } from 'spica/memoize';
 
+declare global {
+  interface ShadowHostElementTagNameMap {
+    'article': HTMLElement;
+    'aside': HTMLElement;
+    'blockquote': HTMLQuoteElement;
+    'body': HTMLBodyElement;
+    'div': HTMLDivElement;
+    'footer': HTMLElement;
+    'h1': HTMLHeadingElement;
+    'h2': HTMLHeadingElement;
+    'h3': HTMLHeadingElement;
+    'h4': HTMLHeadingElement;
+    'h5': HTMLHeadingElement;
+    'h6': HTMLHeadingElement;
+    'header': HTMLElement;
+    'main': HTMLElement;
+    'nav': HTMLElement;
+    'p': HTMLParagraphElement;
+    'section': HTMLElement;
+    'span': HTMLSpanElement;
+  }
+  interface HTMLElementTagNameMap extends ShadowHostElementTagNameMap {
+  }
+}
+
 export const enum NS {
   HTML = 'HTML',
   SVG = 'SVG',
