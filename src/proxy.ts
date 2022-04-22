@@ -79,7 +79,7 @@ export class Elem<
       default:
         throw new Error(`TypedDOM: Invalid children type.`);
     }
-    throwErrorIfNotUsable(this);
+    throwErrorIfNotUsable(this, null);
     proxies.set(this.element, this);
     switch (this[privates.type]) {
       case ElChildType.Void:
@@ -149,7 +149,7 @@ export class Elem<
     for (const name of ObjectKeys(children)) {
       if (name in {}) throw new Error(`TypedDOM: Child names must be different from the object property names.`);
       let child = children[name];
-      throwErrorIfNotUsable(child);
+      throwErrorIfNotUsable(child, null);
       descs[name] = {
         configurable: true,
         enumerable: true,
@@ -215,8 +215,8 @@ export class Elem<
           const newChild = sourceChildren[i];
           const oldChild = targetChildren[i];
           isMutated ||= newChild.element !== oldChild.element;
+          throwErrorIfNotUsable(newChild, this[privates.container]);
           if (newChild.element.parentNode !== this[privates.container]) {
-            throwErrorIfNotUsable(newChild);
             this[privates.scope](newChild);
             assert(!addedChildren.includes(newChild));
             addedChildren.push(newChild);
@@ -245,9 +245,7 @@ export class Elem<
           if (!newChild || !oldChild) continue;
           if (!this[privates.isInit] && newChild === oldChild) continue;
           isMutated = true;
-          if (newChild.element.parentNode !== this[privates.container]) {
-            throwErrorIfNotUsable(newChild);
-          }
+          throwErrorIfNotUsable(newChild, this[privates.container]);
           if (this[privates.isInit] || newChild !== oldChild && newChild.element.parentNode !== oldChild.element.parentNode) {
             this[privates.scope](newChild);
             assert(!addedChildren.includes(newChild));
@@ -308,7 +306,8 @@ export function proxy(el: Element): El {
   throw new Error(`TypedDOM: This element has no proxy.`);
 }
 
-function throwErrorIfNotUsable({ element: { parentElement } }: El): void {
-  if (!parentElement || !proxies.has(parentElement)) return;
+function throwErrorIfNotUsable(child: El, container: Element | ShadowRoot | null): void {
+  const parent = child.element.parentElement;
+  if (!parent || container === parent || !proxies.has(parent)) return;
   throw new Error(`TypedDOM: Typed DOM children must not be used to another typed DOM.`);
 }
