@@ -311,7 +311,7 @@ export function proxy(el: Element): El {
   throw new Error(`TypedDOM: This element has no proxy.`);
 }
 
-function throwErrorIfNotUsable({ element }: El): void {
-  if (!element.parentElement || !proxies.has(element.parentElement)) return;
+function throwErrorIfNotUsable({ element: { parentElement } }: El): void {
+  if (!parentElement || !proxies.has(parentElement)) return;
   throw new Error(`TypedDOM: Typed DOM children must not be used to another typed DOM.`);
 }
