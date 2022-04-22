@@ -545,7 +545,7 @@ describe('Integration: Typed DOM', function () {
           onmutate: children
             ? ev =>
                 i18n.init((err, t) =>
-                  proxy<string>(ev.target as HTMLElement).children = err
+                  proxy<string>(ev.target as HTMLElement)!.children = err
                     ? 'Failed to init i18next.'
                     : t(children, data))
             : void 0,

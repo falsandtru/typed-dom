@@ -297,13 +297,11 @@ export class Elem<
 
 const proxies = new WeakMap<Element, El>();
 
-export function proxy<E extends Element>(el: E): El<string, E, El.Children>;
-export function proxy<C extends El.Children>(el: Element): El<string, Element, C>;
-export function proxy<E extends Element, C extends El.Children>(el: E): El<string, E, C>;
-export function proxy(el: Element): El {
-  const proxy = proxies.get(el);
-  if (proxy) return proxy;
-  throw new Error(`TypedDOM: This element has no proxy.`);
+export function proxy<C extends El.Children>(el: Element): El<string, Element, C> | undefined;
+export function proxy<E extends Element, C extends El.Children = El.Children>(el: E): El<string, E, C> | undefined;
+export function proxy<T extends string, E extends Element, C extends El.Children = El.Children>(el: E): El<T, E, C> | undefined;
+export function proxy(el: Element): El | undefined {
+  return proxies.get(el);
 }
 
 function throwErrorIfNotUsable(child: El, container: Element | ShadowRoot | null): void {
