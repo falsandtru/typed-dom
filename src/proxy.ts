@@ -3,7 +3,6 @@ import { WeakMap, Event } from 'spica/global';
 import { isArray, ObjectDefineProperties, ObjectKeys } from 'spica/alias';
 import { identity } from './util/identity';
 import { text, define } from './util/dom';
-import { splice } from 'spica/array';
 
 const tag = Symbol.for('typed-dom::tag');
 
@@ -274,12 +273,7 @@ export class Elem<
               addedChildren.push(newChild);
             }
             if (!this[privates.isInit]) {
-              let i = 0;
-              i = removedChildren.lastIndexOf(newChild);
-              i > -1 && splice(removedChildren, i, 1);
               removedChildren.push(oldChild);
-              i = addedChildren.lastIndexOf(oldChild);
-              i > -1 && splice(addedChildren, i, 1);
             }
           }
           this[privates.isPartialUpdate] = true;
