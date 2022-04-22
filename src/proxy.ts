@@ -5,34 +5,7 @@ import { identity } from './util/identity';
 import { text, define } from './util/dom';
 import { splice } from 'spica/array';
 
-const proxies = new WeakMap<Element, El>();
-
-export function proxy<E extends Element>(el: E): El<string, E, El.Children>;
-export function proxy<C extends El.Children>(el: Element): El<string, Element, C>;
-export function proxy<E extends Element, C extends El.Children>(el: E): El<string, E, C>;
-export function proxy(el: Element): El {
-  const proxy = proxies.get(el);
-  if (proxy) return proxy;
-  throw new Error(`TypedDOM: This element has no proxy.`);
-}
-
-namespace privates {
-  export const id = Symbol();
-  export const id_ = Symbol();
-  export const query = Symbol();
-  export const query_ = Symbol();
-  export const scope = Symbol();
-  export const observe = Symbol();
-  export const type = Symbol();
-  export const container = Symbol();
-  export const children = Symbol();
-  export const isInit = Symbol();
-  export const isPartialUpdate = Symbol();
-}
-
 const tag = Symbol.for('typed-dom::tag');
-let id = identity();
-let counter = 0;
 
 export interface El<
   T extends string = string,
@@ -62,6 +35,23 @@ const enum ElChildType {
   Array,
   Struct,
 }
+
+namespace privates {
+  export const id = Symbol();
+  export const id_ = Symbol();
+  export const query = Symbol();
+  export const query_ = Symbol();
+  export const scope = Symbol();
+  export const observe = Symbol();
+  export const type = Symbol();
+  export const container = Symbol();
+  export const children = Symbol();
+  export const isInit = Symbol();
+  export const isPartialUpdate = Symbol();
+}
+
+let id = identity();
+let counter = 0;
 
 export class Elem<
   T extends string,
@@ -318,6 +308,17 @@ export class Elem<
       this.element.dispatchEvent(new Event('mutate', { bubbles: false, cancelable: true }));
     }
   }
+}
+
+const proxies = new WeakMap<Element, El>();
+
+export function proxy<E extends Element>(el: E): El<string, E, El.Children>;
+export function proxy<C extends El.Children>(el: Element): El<string, Element, C>;
+export function proxy<E extends Element, C extends El.Children>(el: E): El<string, E, C>;
+export function proxy(el: Element): El {
+  const proxy = proxies.get(el);
+  if (proxy) return proxy;
+  throw new Error(`TypedDOM: This element has no proxy.`);
 }
 
 function throwErrorIfNotUsable({ element }: El): void {
