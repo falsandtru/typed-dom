@@ -193,7 +193,7 @@ export class Elem<
     switch (this[privates.type]) {
       case ElChildType.Text:
         if ((this[privates.children] as unknown as Text).parentNode !== this[privates.container]) {
-          this[privates.children] = void 0 as unknown as C;
+          this[privates.children] = void 0 as C;
           for (let ns = this[privates.container].childNodes, i = 0, len = ns.length; i < len; ++i) {
             const node = ns[i];
             if ('wholeText' in node === false) continue;
