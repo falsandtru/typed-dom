@@ -238,6 +238,7 @@ export class Elem<
           if (newChild.element !== el) {
             if (newChild.element.parentNode !== this[privates.container]) {
               this[privates.scope](newChild);
+              assert(!addedChildren.includes(newChild));
               addedChildren.push(newChild);
             }
             this[privates.container].insertBefore(newChild.element, el);
@@ -249,6 +250,7 @@ export class Elem<
           const oldChild = proxy(nodeChildren[sourceChildren.length]);
           if (!oldChild) continue;
           this[privates.container].removeChild(oldChild.element);
+          assert(!removedChildren.includes(oldChild));
           removedChildren.push(oldChild);
           isMutated = true;
         }
@@ -270,9 +272,11 @@ export class Elem<
           if (this[privates.isInit] || newChild !== oldChild && newChild.element.parentNode !== oldChild.element.parentNode) {
             if (newChild.element.parentNode !== this[privates.container]) {
               this[privates.scope](newChild);
+              assert(!addedChildren.includes(newChild));
               addedChildren.push(newChild);
             }
             if (!this[privates.isInit]) {
+              assert(!removedChildren.includes(oldChild));
               removedChildren.push(oldChild);
             }
           }
