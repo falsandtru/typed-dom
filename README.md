@@ -332,7 +332,7 @@ const Trans = API<HTMLElementTagNameMap>((
     onmutate: children
       ? ev =>
           i18n.init((err, t) =>
-            proxy<string>(ev.target as HTMLElement)!.children = err
+            (ev.target as HTMLElement).textContent = err
               ? 'Failed to init i18next.'
               : t(children, data))
       : void 0,
