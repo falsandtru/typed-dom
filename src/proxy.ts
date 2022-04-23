@@ -265,13 +265,13 @@ export class Elem<
       }
     }
     if (removedChildren.length) {
-      for (const { element } of removedChildren) {
-        element.dispatchEvent(new Event('disconnect', { bubbles: false, cancelable: true }));
+      for (const child of removedChildren) {
+        child.element.dispatchEvent(new Event('disconnect', { bubbles: false, cancelable: true }));
       }
     }
     if (addedChildren.length) {
-      for (const { element } of addedChildren) {
-        element.dispatchEvent(new Event('connect', { bubbles: false, cancelable: true }));
+      for (const child of addedChildren) {
+        child.element.dispatchEvent(new Event('connect', { bubbles: false, cancelable: true }));
       }
     }
     assert(isMutated || removedChildren.length + addedChildren.length === 0);
