@@ -11,8 +11,8 @@ export interface El<
   C extends El.Children = El.Children,
   > {
   readonly [tag]?: T;
-  readonly parent?: El;
   readonly element: E;
+  parent: El | undefined;
   children: C;
 }
 export namespace El {
@@ -57,7 +57,7 @@ export class Elem<
   T extends string,
   E extends Element,
   C extends El.Children,
-  > {
+  > implements El<T, E, C> {
   constructor(
     public readonly element: E,
     attrs: Attrs,
@@ -178,6 +178,7 @@ export class Elem<
   private readonly [privates.type]: ElChildType;
   private readonly [privates.container]: Element | ShadowRoot;
   private [privates.isInit] = true;
+  public readonly parent = void 0;
   private [privates.children]: C;
   public get children(): C {
     switch (this[privates.type]) {
@@ -218,7 +219,6 @@ export class Elem<
           throwErrorIfNotUsable(newChild, this.element);
           isMutated ||= newChild.element !== oldChild.element;
           if (newChild.parent?.element !== this.element) {
-            // @ts-expect-error
             newChild.parent = this;
             this[privates.scope](newChild);
             assert(!addedChildren.includes(newChild));
@@ -230,7 +230,6 @@ export class Elem<
         for (let i = 0; i < targetChildren.length; ++i) {
           const oldChild = targetChildren[i];
           if (oldChild.element.parentNode !== container) {
-            // @ts-expect-error
             oldChild.parent = void 0;
             assert(!removedChildren.includes(oldChild));
             oldChild[privates.events]?.disconnect && removedChildren.push(oldChild);
@@ -254,7 +253,6 @@ export class Elem<
             assert(!addedChildren.includes(newChild));
             newChild[privates.events]?.connect && addedChildren.push(newChild);
             container.appendChild(newChild.element);
-            // @ts-expect-error
             newChild.parent = this;
           }
           break;
@@ -275,10 +273,8 @@ export class Elem<
             assert(!addedChildren.includes(newChild));
             newChild[privates.events]?.connect && addedChildren.push(newChild);
             container.insertBefore(newChild.element, oldChild.element);
-            // @ts-expect-error
             newChild.parent = this;
             container.removeChild(oldChild.element);
-            // @ts-expect-error
             oldChild.parent = void 0;
             assert(!removedChildren.includes(oldChild));
             oldChild[privates.events]?.disconnect && removedChildren.push(oldChild);

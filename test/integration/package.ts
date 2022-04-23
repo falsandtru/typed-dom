@@ -445,6 +445,12 @@ describe('Integration: Typed DOM', function () {
           ]),
         });
         public readonly element = this.dom.element;
+        public get parent() {
+          return this.dom.parent;
+        }
+        public set parent(parent) {
+          this.dom.parent = parent;
+        }
         public get children() {
           return this.dom.children.content.children;
         }
@@ -471,6 +477,12 @@ describe('Integration: Typed DOM', function () {
           ]),
         });
         public readonly element = this.dom.element;
+        public get parent() {
+          return this.dom.parent;
+        }
+        public set parent(parent) {
+          this.dom.parent = parent;
+        }
         public get children() {
           return this.dom.children.content.children;
         }
@@ -511,6 +523,12 @@ describe('Integration: Typed DOM', function () {
           ]),
         });
         public readonly element = this.dom.element;
+        public get parent() {
+          return this.dom.parent;
+        }
+        public set parent(parent) {
+          this.dom.parent = parent;
+        }
         public get children() {
           return this.dom.children.content.children;
         }
