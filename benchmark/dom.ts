@@ -2,7 +2,7 @@ import { benchmark } from './benchmark';
 import { HTML, html } from '..';
 
 describe('Benchmark:', function () {
-  this.timeout(20 * 1e3);
+  this.timeout(30 * 1e3);
 
   describe('create', function () {
     it('native', function (done) {
@@ -47,7 +47,7 @@ describe('Benchmark:', function () {
 
   describe('set text', function () {
     it('native', function (done) {
-      const el = document.createElement('div');
+      const el = html('div');
       let cnt = 0;
       benchmark('set text native', () => el.textContent = `${++cnt}`, done);
     });
@@ -62,10 +62,10 @@ describe('Benchmark:', function () {
 
   describe('set node', function () {
     it('native', function (done) {
-      const el = document.createElement('div');
+      const el = html('div');
       const nodes = [
-        document.createElement('div'),
-        document.createElement('div'),
+        html('div'),
+        html('div'),
       ];
       let cnt = 0;
       benchmark('set node native', () => el.replaceChildren(nodes[++cnt % 2]), done);
@@ -104,19 +104,28 @@ describe('Benchmark:', function () {
   });
 
   describe('traversal', function () {
-    it('native', function (done) {
-      const el = document.createElement('div');
-      el.appendChild(document.createElement('div'));
-      benchmark('traversal native', () => el.firstChild, done);
+    it('native walk', function (done) {
+      const el = html('div', [html('div'), html('div')]);
+      benchmark('traversal native walk', () => el.firstChild?.nextSibling, done);
+    });
+
+    it('native children', function (done) {
+      const el = html('div', [html('div'), html('div')]);
+      benchmark('traversal native children', () => el.children[1], done);
+    });
+
+    it('native query', function (done) {
+      const el = html('div', [html('div'), html('div')]);
+      benchmark('traversal native query', () => el.querySelector(':scope > div'), done);
     });
 
     it('HTML array', function (done) {
-      const el = HTML.div([HTML.div()]);
+      const el = HTML.div([HTML.div(), HTML.div()]);
       benchmark('traversal HTML array', () => el.children[0], done);
     });
 
     it('HTML struct', function (done) {
-      const el = HTML.div({ a: HTML.div() });
+      const el = HTML.div({ a: HTML.div(), b: HTML.div() });
       benchmark('traversal HTML struct', () => el.children.a, done);
     });
 
