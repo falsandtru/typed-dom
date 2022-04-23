@@ -1,7 +1,6 @@
 import { WeakMap, Event } from 'spica/global';
 import { isArray, ObjectDefineProperties, ObjectKeys } from 'spica/alias';
 import { identity } from './util/identity';
-import { text } from './util/dom';
 
 const tag = Symbol.for('typed-dom::tag');
 
@@ -86,8 +85,6 @@ export class Elem<
         this[privates.isInit] = false;
         return;
       case ElChildType.Text:
-        this[privates.container].replaceChildren();
-        this[privates.children] = this[privates.container].appendChild(text('')) as any;
         this.children = children as C;
         this[privates.isInit] = false;
         return;
@@ -176,16 +173,7 @@ export class Elem<
   public get children(): C {
     switch (this[privates.type]) {
       case ElChildType.Text:
-        if ((this[privates.children] as unknown as Text).parentNode !== this[privates.container]) {
-          this[privates.children] = void 0 as C;
-          for (let ns = this[privates.container].childNodes, i = 0, len = ns.length; i < len; ++i) {
-            const node = ns[i];
-            if ('wholeText' in node === false) continue;
-            this[privates.children] = node as any;
-            break;
-          }
-        }
-        return (this[privates.children] as unknown as Text).data as C;
+        return this[privates.container].textContent as C;
       default:
         return this[privates.children] as C;
     }
@@ -199,12 +187,11 @@ export class Elem<
       case ElChildType.Void:
         return;
       case ElChildType.Text: {
-        if (!this[privates.isInit] && children === this.children) return;
-        const node = this[privates.children] as unknown as Text;
-        const newText = children as El.Children.Text;
-        const oldText = node.data;
-        isMutated = newText !== oldText;
-        node.data = newText;
+        const newText = children;
+        const oldText = this.children;
+        if (!this[privates.isInit] && newText === oldText) return;
+        isMutated = true;
+        this[privates.container].textContent = newText as El.Children.Text;
         break;
       }
       case ElChildType.Array: {
