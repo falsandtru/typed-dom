@@ -54,9 +54,9 @@ let id = identity();
 let counter = 0;
 
 export class Elem<
-  T extends string,
-  E extends Element,
-  C extends El.Children,
+  T extends string = string,
+  E extends Element = Element,
+  C extends El.Children = El.Children,
   > implements El<T, E, C> {
   constructor(
     public readonly element: E,
@@ -143,7 +143,7 @@ export class Elem<
     }
   }
   private [privates.scope](child: El): void {
-    if (child.element.tagName !== 'STYLE') return;
+    if (child.element.tagName.toUpperCase() !== 'STYLE') return;
     const target = /(^|[,}]|\*\/)(\s*)\$scope(?=[\s~+[{:>,])/g;
     const style = child.element.innerHTML;
     if (!target.test(style)) return;
@@ -152,7 +152,7 @@ export class Elem<
     child.element.firstElementChild && child.element.replaceChildren();
   }
   private [privates.isObserverUpdate] = false;
-  private [privates.observe](children: El.Children.Struct): C {
+  private [privates.observe](children: El.Children.Struct): El.Children.Struct {
     const descs: PropertyDescriptorMap = {};
     for (const name of ObjectKeys(children)) {
       if (name in {}) throw new Error(`TypedDOM: Child names must be different from the object property names.`);
@@ -174,7 +174,7 @@ export class Elem<
         },
       };
     }
-    return ObjectDefineProperties(children, descs) as C;
+    return ObjectDefineProperties(children, descs);
   }
   private readonly [privates.type]: ElChildType;
   private readonly [privates.container]: Element | ShadowRoot;
@@ -301,7 +301,7 @@ export class Elem<
   }
 }
 
-function events(child: El): Elem<string, Element, El.Children>[typeof privates.events] | undefined {
+function events(child: El): Elem[typeof privates.events] | undefined {
   return child[privates.events] ?? child.element[proxy]?.[privates.events];
 }
 

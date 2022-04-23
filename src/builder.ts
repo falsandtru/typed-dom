@@ -54,8 +54,8 @@ function handle
   (baseFactory: F, formatter: <E extends Element>(el: E) => E | ShadowRoot,
 ): ProxyHandler<API<M, F>> {
   return {
-    apply(target, _, [prop, ...args]) {
-      return this.get!(target, prop, target)(...args);
+    apply(target, _, [tag, ...args]) {
+      return this.get!(target, tag, target)(...args);
     },
     get: (target, prop) =>
       target[prop] || prop in target || typeof prop !== 'string'
@@ -92,7 +92,7 @@ function handle
       const el = factory
         ? define(factory(baseFactory as F, tag, attrs, children), attrs)
         : baseFactory(tag, attrs) as unknown as Element;
-      if (tag !== el.tagName.toLowerCase()) throw new Error(`TypedDOM: Expected tag name is "${tag}" but actually "${el.tagName.toLowerCase()}".`);
+      if (tag.toLowerCase() !== el.tagName.toLowerCase()) throw new Error(`TypedDOM: Expected tag name is "${tag.toLowerCase()}" but actually "${el.tagName.toLowerCase()}".`);
       return el;
     }
   }
