@@ -221,7 +221,7 @@ export class Elem<
           if (newChild.element.parentNode !== this.element) {
             this[privates.scope](newChild);
             assert(!addedChildren.includes(newChild));
-            newChild[privates.events]?.connect && addedChildren.push(newChild);
+            events(newChild)?.connect && addedChildren.push(newChild);
           }
         }
         container.replaceChildren(...sourceChildren.map(c => c.element));
@@ -230,7 +230,7 @@ export class Elem<
           const oldChild = targetChildren[i];
           if (oldChild.element.parentNode !== container) {
             assert(!removedChildren.includes(oldChild));
-            oldChild[privates.events]?.disconnect && removedChildren.push(oldChild);
+            events(oldChild)?.disconnect && removedChildren.push(oldChild);
             assert(isMutated);
           }
         }
@@ -249,7 +249,7 @@ export class Elem<
             isMutated = true;
             this[privates.scope](newChild);
             assert(!addedChildren.includes(newChild));
-            newChild[privates.events]?.connect && addedChildren.push(newChild);
+            events(newChild)?.connect && addedChildren.push(newChild);
             container.appendChild(newChild.element);
           }
           break;
@@ -268,11 +268,11 @@ export class Elem<
           if (newChild !== oldChild && newChild.element.parentNode !== oldChild.element.parentNode) {
             this[privates.scope](newChild);
             assert(!addedChildren.includes(newChild));
-            newChild[privates.events]?.connect && addedChildren.push(newChild);
+            events(newChild)?.connect && addedChildren.push(newChild);
             container.insertBefore(newChild.element, oldChild.element);
             container.removeChild(oldChild.element);
             assert(!removedChildren.includes(oldChild));
-            oldChild[privates.events]?.disconnect && removedChildren.push(oldChild);
+            events(oldChild)?.disconnect && removedChildren.push(oldChild);
           }
           else {
             assert(newChild.element.parentNode === oldChild.element.parentNode);
@@ -299,6 +299,10 @@ export class Elem<
       this.element.dispatchEvent(new Event('mutate', { bubbles: false, cancelable: true }));
     }
   }
+}
+
+function events(child: El): Elem<string, Element, El.Children>[typeof privates.events] | undefined {
+  return child[privates.events] || proxies.get(child.element)?.[privates.events];
 }
 
 function throwErrorIfNotUsable(child: El, newParent?: ParentNode): void {
