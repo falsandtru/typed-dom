@@ -1,4 +1,4 @@
-import { Shadow, HTML, SVG, API, El, shadow, html } from '../../index';
+import { API, Shadow, HTML, SVG, El, shadow, html } from '../..';
 import { Coroutine } from 'spica/coroutine';
 import { Sequence } from 'spica/sequence';
 import { Attrs } from '../../internal';
@@ -417,6 +417,7 @@ describe('Integration: Typed DOM', function () {
     it('shadow', function () {
       assert(Shadow('section', [HTML.p()]).element.outerHTML === '<section></section>');
       assert(Shadow.section([HTML.p()]).element.outerHTML === '<section></section>');
+      assert(Shadow.section([HTML.p()]).element.shadowRoot instanceof ShadowRoot);
       assert(Shadow.section([HTML.p()]).element.shadowRoot!.innerHTML === '<p></p>');
       assert(Shadow.section([HTML.p()]).children[0].element.outerHTML === '<p></p>');
       assert(Shadow.section((h, t) => h(t, [html('p')])).element.shadowRoot!.innerHTML === '<p></p>');
@@ -424,6 +425,12 @@ describe('Integration: Typed DOM', function () {
       assert(Shadow.section((h, t) => shadow(h(t, [html('p')]), { mode: 'closed' }).host as HTMLElement).element.shadowRoot === null);
       assert(Shadow.section([HTML.p()], (h, t) => shadow(h(t), { mode: 'closed' }).host as HTMLElement).element.shadowRoot === null);
       assert(Shadow.section([HTML.p()], (h, t) => shadow(h(t), { mode: 'closed' }).host as HTMLElement).children[0].element.outerHTML === '<p></p>');
+      const el = HTML.div([Shadow.section([HTML.p('a')])]);
+      assert(el.element.outerHTML === '<div><section></section></div>');
+      assert(el.children[0].children[0].element.outerHTML === '<p>a</p>');
+      el.children[0].children[0].children = 'b';
+      assert(el.element.outerHTML === '<div><section></section></div>');
+      assert(el.element.firstElementChild!.shadowRoot!.innerHTML === '<p>b</p>');
     });
 
   });

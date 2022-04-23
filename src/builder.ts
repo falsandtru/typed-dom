@@ -69,10 +69,13 @@ function handle
       if (typeof attrs === 'function') return build(void 0, void 0, attrs);
       if (isElChildren(attrs)) return build(void 0, attrs, factory);
       attrs ??= {} as typeof attrs;
-      const node = formatter(elem(factory, attrs, children));
-      return node.nodeType === 1
-        ? new Elem(node as Element, attrs, children)
-        : new Elem((node as ShadowRoot).host, attrs, children, node);
+      const el = elem(factory, attrs, children);
+      const node = formatter(el);
+      return node !== el && 'host' in node
+        // Shadow
+        ? new Elem(el, attrs, children, node)
+        // Element
+        : new Elem(el, attrs, children);
     };
 
     function isElChildren(param: Attrs | El.Children): param is El.Children {

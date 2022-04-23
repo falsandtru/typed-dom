@@ -43,7 +43,7 @@ SVG.svg();
 
 ### Shadow: { [tagname]: (attrs?, children?, factory?) => El; };
 
-Create an HTML element proxy creating open shadow DOM to append children.
+Create an element proxy appending the children to the own open shadow DOM.
 
 - attrs: Record<string, string | EventListener | null | undefined>
 - children: undefined | string | El[] | Record<string, El>
@@ -59,7 +59,7 @@ Shadow.section();
 
 #### Create APIs
 
-All exposed APIs to create a proxy can be redefined as follows:
+All the exposed proxy APIs can be redefined as follows:
 
 ```ts
 import { API, shadow, html, svg } from 'typed-dom';
@@ -132,8 +132,8 @@ export const HTML = API<CustomHTMLElementTagNameMap>(html);
 
 - El
 - NS
-- frag
 - shadow
+- frag
 - html
 - svg
 - text

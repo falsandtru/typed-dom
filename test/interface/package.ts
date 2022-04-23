@@ -1,7 +1,12 @@
-import { Shadow, HTML, SVG, API, NS, shadow, frag, html, svg, text, element, define, defrag, listen, once, wait, bind, delegate, currentTarget, apply, identity } from '../../index';
+import { API, Shadow, HTML, SVG, NS, shadow, frag, html, svg, text, element, define, defrag, listen, once, wait, bind, delegate, currentTarget, apply, identity } from '../..';
 
 describe('Interface: Package', function () {
   describe('Typed', function () {
+    it('API', function () {
+      assert((): API<HTMLElementTagNameMap> => HTML);
+      assert((): typeof HTML => API(html));
+    });
+
     it('Shadow', function () {
       assert(typeof Shadow === 'function');
     });
@@ -12,11 +17,6 @@ describe('Interface: Package', function () {
 
     it('SVG', function () {
       assert(typeof SVG === 'function');
-    });
-
-    it('API', function () {
-      assert((): API<HTMLElementTagNameMap> => HTML);
-      assert((): typeof HTML => API(html));
     });
 
   });
