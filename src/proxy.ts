@@ -4,6 +4,7 @@ import { Attrs } from './util/dom';
 import { identity } from './util/identity';
 
 const tag = Symbol.for('typed-dom::tag');
+const proxy = Symbol.for('typed-dom::proxy');
 
 export interface El<
   T extends string = string,
@@ -49,7 +50,6 @@ namespace privates {
   export const isObserverUpdate = Symbol('isObserverUpdate');
 }
 
-const proxies = new WeakMap<Node, El>();
 let id = identity();
 let counter = 0;
 
@@ -87,7 +87,7 @@ export class Elem<
         throw new Error(`TypedDOM: Invalid children type.`);
     }
     throwErrorIfNotUsable(this);
-    proxies.set(this.element, this);
+    this.element[proxy] = this;
     switch (this[privates.type]) {
       case ElChildType.Void:
         this[privates.isInit] = false;
@@ -302,11 +302,11 @@ export class Elem<
 }
 
 function events(child: El): Elem<string, Element, El.Children>[typeof privates.events] | undefined {
-  return child[privates.events] || proxies.get(child.element)?.[privates.events];
+  return child[privates.events] ?? child.element[proxy]?.[privates.events];
 }
 
 function throwErrorIfNotUsable(child: El, newParent?: ParentNode): void {
   const oldParent = child.element.parentNode;
-  if (!oldParent || oldParent === newParent || !proxies.has(oldParent)) return;
+  if (!oldParent || oldParent === newParent || !(proxy in oldParent)) return;
   throw new Error(`TypedDOM: Typed DOM children must not be used to another typed DOM.`);
 }
