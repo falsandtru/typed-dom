@@ -227,6 +227,7 @@ export class Elem<
         const sourceChildren = children as El.Children.Struct;
         const targetChildren = this[privates.children] as El.Children.Struct;
         for (const name of ObjectKeys(sourceChildren)) {
+          if (name in {}) continue;
           const newChild = sourceChildren[name];
           const oldChild = targetChildren[name];
           if (!newChild || !oldChild) continue;
