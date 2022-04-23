@@ -544,13 +544,11 @@ describe('Integration: Typed DOM', function () {
           children: K,
         ): E =>
           factory(tag, Object.assign<Attrs, Attrs>(attrs, {
-            onmutate: children
-              ? ev =>
-                i18n.init((err, t) =>
-                  (ev.target as HTMLElement).textContent = err
-                    ? 'Failed to init i18next.'
-                    : t(children, data))
-              : void 0,
+            onmutate: ev =>
+              i18n.init((err, t) =>
+                (ev.target as HTMLElement).textContent = err
+                  ? 'Failed to init i18next.'
+                  : t(children, data)),
           }), children);
 
       const el = Trans.span('a', bind({ data: 'A' }));
