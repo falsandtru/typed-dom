@@ -101,7 +101,6 @@ export class Elem<
         this[privates.isInit] = false;
         return;
       case ElChildType.Struct:
-        this[privates.container].replaceChildren();
         this[privates.children] = this[privates.observe](children as El.Children.Struct) as C;
         this.children = children;
         this[privates.isInit] = false;
@@ -191,7 +190,6 @@ export class Elem<
   public set children(children: C) {
     assert(!this[privates.isObserverUpdate]);
     const container = this[privates.container];
-    const isInit = this[privates.isInit];
     const removedChildren: El[] = [];
     const addedChildren: El[] = [];
     let isMutated = false;
@@ -201,7 +199,7 @@ export class Elem<
       case ElChildType.Text: {
         const newText = children;
         const oldText = this.children;
-        if (!isInit && newText === oldText) return;
+        if (!this[privates.isInit] && newText === oldText) return;
         isMutated = true;
         container.textContent = newText as El.Children.Text;
         break;
@@ -213,8 +211,8 @@ export class Elem<
         for (let i = 0; i < sourceChildren.length; ++i) {
           const newChild = sourceChildren[i];
           const oldChild = targetChildren[i];
-          isMutated ||= newChild.element !== oldChild.element;
           throwErrorIfNotUsable(newChild, this.element);
+          isMutated ||= newChild.element !== oldChild.element;
           if (newChild.parent?.element !== this.element) {
             // @ts-expect-error
             newChild.parent = this;
@@ -240,33 +238,46 @@ export class Elem<
         break;
       }
       case ElChildType.Struct: {
+        if (this[privates.isInit]) {
+          container.firstChild && container.replaceChildren();
+          const sourceChildren = children as El.Children.Struct;
+          for (const name of ObjectKeys(sourceChildren)) {
+            assert(name in {} === false);
+            const newChild = sourceChildren[name];
+            throwErrorIfNotUsable(newChild, this.element);
+            isMutated = true;
+            this[privates.scope](newChild);
+            assert(!addedChildren.includes(newChild));
+            newChild[privates.events]?.connect && addedChildren.push(newChild);
+            container.appendChild(newChild.element);
+            // @ts-expect-error
+            newChild.parent = this;
+          }
+          break;
+        }
         const sourceChildren = children as El.Children.Struct;
         const targetChildren = this[privates.children] as El.Children.Struct;
+        if (sourceChildren === targetChildren) break;
         for (const name of ObjectKeys(sourceChildren)) {
           if (name in {}) continue;
           const newChild = sourceChildren[name];
           const oldChild = targetChildren[name];
           if (!newChild || !oldChild) continue;
-          if (!isInit && newChild === oldChild) continue;
-          isMutated = true;
+          if (newChild === oldChild) continue;
           throwErrorIfNotUsable(newChild, this.element);
-          if (isInit || newChild !== oldChild && newChild.parent?.element !== oldChild.parent?.element) {
+          isMutated = true;
+          if (newChild !== oldChild && newChild.parent?.element !== oldChild.parent?.element) {
             this[privates.scope](newChild);
             assert(!addedChildren.includes(newChild));
             newChild[privates.events]?.connect && addedChildren.push(newChild);
-            if (isInit) {
-              container.appendChild(newChild.element);
-            }
-            else {
-              container.insertBefore(newChild.element, oldChild.element);
-              container.removeChild(oldChild.element);
-              // @ts-expect-error
-              oldChild.parent = void 0;
-              assert(!removedChildren.includes(oldChild));
-              oldChild[privates.events]?.disconnect && removedChildren.push(oldChild);
-            }
+            container.insertBefore(newChild.element, oldChild.element);
             // @ts-expect-error
             newChild.parent = this;
+            container.removeChild(oldChild.element);
+            // @ts-expect-error
+            oldChild.parent = void 0;
+            assert(!removedChildren.includes(oldChild));
+            oldChild[privates.events]?.disconnect && removedChildren.push(oldChild);
           }
           else {
             assert(newChild.parent?.element === oldChild.parent?.element);
