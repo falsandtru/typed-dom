@@ -2,7 +2,7 @@ import { benchmark } from './benchmark';
 import { HTML, html } from '..';
 
 describe('Benchmark:', function () {
-  this.timeout(10 * 1e3);
+  this.timeout(20 * 1e3);
 
   describe('create', function () {
     it('native', function (done) {
