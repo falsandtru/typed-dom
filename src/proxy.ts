@@ -89,7 +89,6 @@ export class Elem<
         this[privates.isInit] = false;
         return;
       case ElChildType.Array:
-        this[privates.container].replaceChildren();
         this[privates.children] = [] as El.Children.Array as C;
         this.children = children;
         this[privates.isInit] = false;
