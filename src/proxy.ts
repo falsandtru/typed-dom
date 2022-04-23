@@ -1,4 +1,4 @@
-import { WeakMap, Event } from 'spica/global';
+import { Event } from 'spica/global';
 import { isArray, ObjectDefineProperties, ObjectKeys } from 'spica/alias';
 import { identity } from './util/identity';
 
@@ -80,7 +80,6 @@ export class Elem<
         throw new Error(`TypedDOM: Invalid children type.`);
     }
     throwErrorIfNotUsable(this);
-    proxies.set(this.element, this);
     switch (this[privates.type]) {
       case ElChildType.Void:
         this[privates.isInit] = false;
@@ -289,17 +288,8 @@ export class Elem<
   }
 }
 
-const proxies = new WeakMap<Element, El>();
-
-export function proxy<C extends El.Children>(el: Element): El<string, Element, C> | undefined;
-export function proxy<E extends Element, C extends El.Children = El.Children>(el: E): El<string, E, C> | undefined;
-export function proxy<T extends string, E extends Element, C extends El.Children = El.Children>(el: E): El<T, E, C> | undefined;
-export function proxy(el: Element): El | undefined {
-  return proxies.get(el);
-}
-
 function throwErrorIfNotUsable(child: El, newParent?: Element): void {
   const oldParent = child.parent?.element;
-  if (!oldParent || newParent === oldParent || !proxies.has(oldParent)) return;
+  if (!oldParent || newParent === oldParent) return;
   throw new Error(`TypedDOM: Typed DOM children must not be used to another typed DOM.`);
 }

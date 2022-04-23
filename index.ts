@@ -1,7 +1,7 @@
 import 'spica/global';
 
 export { Shadow, HTML, SVG, API } from './src/builder';
-export { El, proxy } from './src/proxy';
+export { El } from './src/proxy';
 export { NS, shadow, frag, html, svg, text, element, define, defrag } from './src/util/dom';
 export { listen, delegate, bind, once, wait, currentTarget } from './src/util/listener';
 export { apply } from './src/util/query';

@@ -131,7 +131,6 @@ export const HTML = API<CustomHTMLElementTagNameMap>(html);
 ### Others
 
 - El
-- proxy
 - NS
 - frag
 - shadow
