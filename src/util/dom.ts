@@ -111,8 +111,7 @@ export function define<T extends Element>(node: T, attrs?: Attrs | Children, chi
 }
 function defineAttrs<T extends Element>(el: T, attrs?: Attrs): T {
   if (!attrs) return el;
-  for (let i = 0, names = ObjectKeys(attrs); i < names.length; ++i) {
-    const name = names[i];
+  for (const name of ObjectKeys(attrs)) {
     const value = attrs[name];
     switch (typeof value) {
       case 'string':
@@ -121,8 +120,7 @@ function defineAttrs<T extends Element>(el: T, attrs?: Attrs): T {
       case 'function':
         if (name.length < 3) throw new Error(`TypedDOM: Attribute names for event listeners must have an event name but got "${name}".`);
         const names = name.split(/\s+/);
-        for (let i = 0; i < names.length; ++i) {
-          const name = names[i];
+        for (const name of names) {
           if (name.slice(0, 2) !== 'on') throw new Error(`TypedDOM: Attribute names for event listeners must start with "on" but got "${name}".`);
           el.addEventListener(name.slice(2), value, {
             passive: [
