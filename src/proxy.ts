@@ -180,6 +180,8 @@ export class Elem<
   }
   public set children(children: C) {
     assert(!this[privates.isObserverUpdate]);
+    const container = this[privates.container];
+    const isInit = this[privates.isInit];
     const removedChildren: El[] = [];
     const addedChildren: El[] = [];
     let isMutated = false;
@@ -189,9 +191,9 @@ export class Elem<
       case ElChildType.Text: {
         const newText = children;
         const oldText = this.children;
-        if (!this[privates.isInit] && newText === oldText) return;
+        if (!isInit && newText === oldText) return;
         isMutated = true;
-        this[privates.container].textContent = newText as El.Children.Text;
+        container.textContent = newText as El.Children.Text;
         break;
       }
       case ElChildType.Array: {
@@ -202,25 +204,25 @@ export class Elem<
           const newChild = sourceChildren[i];
           const oldChild = targetChildren[i];
           isMutated ||= newChild.element !== oldChild.element;
-          throwErrorIfNotUsable(newChild, this[privates.container]);
-          if (newChild.element.parentNode !== this[privates.container]) {
+          throwErrorIfNotUsable(newChild, container);
+          if (newChild.element.parentNode !== container) {
             this[privates.scope](newChild);
             assert(!addedChildren.includes(newChild));
             addedChildren.push(newChild);
           }
         }
-        this[privates.container].replaceChildren(...sourceChildren.map(c => c.element));
+        container.replaceChildren(...sourceChildren.map(c => c.element));
         this[privates.children] = children;
         for (let i = 0; i < targetChildren.length; ++i) {
           const oldChild = targetChildren[i];
-          if (oldChild.element.parentNode !== this[privates.container]) {
+          if (oldChild.element.parentNode !== container) {
             assert(!removedChildren.includes(oldChild));
             removedChildren.push(oldChild);
             assert(isMutated);
           }
         }
-        assert(this[privates.container].children.length === sourceChildren.length);
-        assert(sourceChildren.every((child, i) => child.element === this[privates.container].children[i]));
+        assert(container.children.length === sourceChildren.length);
+        assert(sourceChildren.every((child, i) => child.element === container.children[i]));
         break;
       }
       case ElChildType.Struct: {
@@ -231,19 +233,19 @@ export class Elem<
           const newChild = sourceChildren[name];
           const oldChild = targetChildren[name];
           if (!newChild || !oldChild) continue;
-          if (!this[privates.isInit] && newChild === oldChild) continue;
+          if (!isInit && newChild === oldChild) continue;
           isMutated = true;
-          throwErrorIfNotUsable(newChild, this[privates.container]);
-          if (this[privates.isInit] || newChild !== oldChild && newChild.element.parentNode !== oldChild.element.parentNode) {
+          throwErrorIfNotUsable(newChild, container);
+          if (isInit || newChild !== oldChild && newChild.element.parentNode !== oldChild.element.parentNode) {
             this[privates.scope](newChild);
             assert(!addedChildren.includes(newChild));
             addedChildren.push(newChild);
-            if (this[privates.isInit]) {
-              this[privates.container].appendChild(newChild.element);
+            if (isInit) {
+              container.appendChild(newChild.element);
             }
             else {
-              this[privates.container].insertBefore(newChild.element, oldChild.element);
-              this[privates.container].removeChild(oldChild.element);
+              container.insertBefore(newChild.element, oldChild.element);
+              container.removeChild(oldChild.element);
               assert(!removedChildren.includes(oldChild));
               removedChildren.push(oldChild);
             }
@@ -251,8 +253,8 @@ export class Elem<
           else {
             assert(newChild.element.parentNode === oldChild.element.parentNode);
             const ref = newChild.element.nextSibling;
-            this[privates.container].insertBefore(newChild.element, oldChild.element);
-            this[privates.container].insertBefore(oldChild.element, ref);
+            container.insertBefore(newChild.element, oldChild.element);
+            container.insertBefore(oldChild.element, ref);
           }
           this[privates.isObserverUpdate] = true;
           targetChildren[name] = newChild;
