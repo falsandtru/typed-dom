@@ -10,6 +10,7 @@ export interface El<
   C extends El.Children = El.Children,
   > {
   readonly [tag]?: T;
+  readonly parent?: El;
   readonly element: E;
   children: C;
 }
@@ -78,7 +79,7 @@ export class Elem<
       default:
         throw new Error(`TypedDOM: Invalid children type.`);
     }
-    throwErrorIfNotUsable(this, null);
+    throwErrorIfNotUsable(this);
     proxies.set(this.element, this);
     switch (this[privates.type]) {
       case ElChildType.Void:
@@ -203,8 +204,10 @@ export class Elem<
           const newChild = sourceChildren[i];
           const oldChild = targetChildren[i];
           isMutated ||= newChild.element !== oldChild.element;
-          throwErrorIfNotUsable(newChild, container);
-          if (newChild.element.parentNode !== container) {
+          throwErrorIfNotUsable(newChild, this.element);
+          if (newChild.parent?.element !== this.element) {
+            // @ts-expect-error
+            newChild.parent = this;
             this[privates.scope](newChild);
             assert(!addedChildren.includes(newChild));
             addedChildren.push(newChild);
@@ -215,6 +218,8 @@ export class Elem<
         for (let i = 0; i < targetChildren.length; ++i) {
           const oldChild = targetChildren[i];
           if (oldChild.element.parentNode !== container) {
+            // @ts-expect-error
+            oldChild.parent = void 0;
             assert(!removedChildren.includes(oldChild));
             removedChildren.push(oldChild);
             assert(isMutated);
@@ -234,8 +239,8 @@ export class Elem<
           if (!newChild || !oldChild) continue;
           if (!isInit && newChild === oldChild) continue;
           isMutated = true;
-          throwErrorIfNotUsable(newChild, container);
-          if (isInit || newChild !== oldChild && newChild.element.parentNode !== oldChild.element.parentNode) {
+          throwErrorIfNotUsable(newChild, this.element);
+          if (isInit || newChild !== oldChild && newChild.parent?.element !== oldChild.parent?.element) {
             this[privates.scope](newChild);
             assert(!addedChildren.includes(newChild));
             addedChildren.push(newChild);
@@ -245,12 +250,16 @@ export class Elem<
             else {
               container.insertBefore(newChild.element, oldChild.element);
               container.removeChild(oldChild.element);
+              // @ts-expect-error
+              oldChild.parent = void 0;
               assert(!removedChildren.includes(oldChild));
               removedChildren.push(oldChild);
             }
+            // @ts-expect-error
+            newChild.parent = this;
           }
           else {
-            assert(newChild.element.parentNode === oldChild.element.parentNode);
+            assert(newChild.parent?.element === oldChild.parent?.element);
             const ref = newChild.element.nextSibling;
             container.insertBefore(newChild.element, oldChild.element);
             container.insertBefore(oldChild.element, ref);
@@ -289,8 +298,8 @@ export function proxy(el: Element): El | undefined {
   return proxies.get(el);
 }
 
-function throwErrorIfNotUsable(child: El, container: Element | ShadowRoot | null): void {
-  const parent = child.element.parentElement;
-  if (!parent || container === parent || !proxies.has(parent)) return;
+function throwErrorIfNotUsable(child: El, newParent?: Element): void {
+  const oldParent = child.parent?.element;
+  if (!oldParent || newParent === oldParent || !proxies.has(oldParent)) return;
   throw new Error(`TypedDOM: Typed DOM children must not be used to another typed DOM.`);
 }
