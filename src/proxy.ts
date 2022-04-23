@@ -197,6 +197,10 @@ export class Elem<
       case ElChildType.Void:
         return;
       case ElChildType.Text: {
+        if (!this[privates.events].mutate) {
+          container.textContent = children as El.Children.Text;
+          break;
+        }
         const newText = children;
         const oldText = this.children;
         if (!this[privates.isInit] && newText === oldText) return;
@@ -300,7 +304,7 @@ export class Elem<
       addedChildren[i].element.dispatchEvent(new Event('connect', { bubbles: false, cancelable: true }));
     }
     assert(isMutated || removedChildren.length + addedChildren.length === 0);
-    if (isMutated && this[privates.events]?.mutate) {
+    if (isMutated && this[privates.events].mutate) {
       this.element.dispatchEvent(new Event('mutate', { bubbles: false, cancelable: true }));
     }
   }
