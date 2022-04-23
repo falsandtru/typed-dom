@@ -37,8 +37,8 @@ export type Attrs = Record<string, string | EventListener | null | undefined>;
 export type Children = Iterable<string | Node> | string;
 
 export interface Factory<M extends TagNameMap> {
-  <T extends Extract<keyof M, string>>(tag: T, children?: Children): M[T];
-  <T extends Extract<keyof M, string>>(tag: T, attrs?: Attrs, children?: Children): M[T];
+  <T extends keyof M & string>(tag: T, children?: Children): M[T];
+  <T extends keyof M & string>(tag: T, attrs?: Attrs, children?: Children): M[T];
 }
 
 namespace caches {

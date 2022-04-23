@@ -20,7 +20,7 @@ export const SVG = API<SVGElementTagNameMap>(svg);
 
 type Empty = readonly [];
 type ElFactory<M extends TagNameMap, F extends Factory<M>, T extends K<M>, C extends El.Children, E extends Element> = (baseFactory: F, tag: T, attrs: Attrs, children: C) => E;
-type K<M> = Extract<keyof M, string>;
+type K<M> = keyof M & string;
 type E<V> = Extract<V, Element>;
 
 interface BuilderFunction<M extends TagNameMap, F extends Factory<M>> {
@@ -60,11 +60,11 @@ function handle
     get: (target, prop) =>
       target[prop] || prop in target || typeof prop !== 'string'
         ? target[prop]
-        : target[prop] = builder(prop as Extract<keyof M, string>, baseFactory),
+        : target[prop] = builder(prop as keyof M & string, baseFactory),
   };
 
-  function builder(tag: Extract<keyof M, string>, baseFactory: F): (attrs?: Attrs, children?: El.Children, factory?: () => Element) => El {
-    return function build(attrs?: Attrs | El.Children , children?: El.Children, factory?: ElFactory<M, F, Extract<keyof M, string>, El.Children, Element>): El {
+  function builder(tag: keyof M & string, baseFactory: F): (attrs?: Attrs, children?: El.Children, factory?: () => Element) => El {
+    return function build(attrs?: Attrs | El.Children, children?: El.Children, factory?: ElFactory<M, F, keyof M & string, El.Children, Element>): El {
       if (typeof children === 'function') return build(attrs, void 0, children);
       if (typeof attrs === 'function') return build(void 0, void 0, attrs);
       if (isElChildren(attrs)) return build(void 0, attrs, factory);
@@ -85,7 +85,7 @@ function handle
       return true;
     }
 
-    function elem(factory: ElFactory<M, F, Extract<keyof M, string>, El.Children, Element> | undefined, attrs: Attrs, children: El.Children): Element {
+    function elem(factory: ElFactory<M, F, keyof M & string, El.Children, Element> | undefined, attrs: Attrs, children: El.Children): Element {
       const el = factory
         ? define(factory(baseFactory as F, tag, attrs, children), attrs)
         : baseFactory(tag, attrs) as unknown as Element;
