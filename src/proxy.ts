@@ -20,7 +20,7 @@ export namespace El {
     | Children.Array
     | Children.Struct;
   export namespace Children {
-    export type Void = undefined;
+    export type Void = void;
     export type Text = string;
     export type Array = readonly El[];
     export type Struct = { [field: string]: El; };
