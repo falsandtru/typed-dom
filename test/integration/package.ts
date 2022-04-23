@@ -1,4 +1,4 @@
-import { Shadow, HTML, SVG, API, El, proxy, shadow, frag, html } from '../../index';
+import { Shadow, HTML, SVG, API, El, proxy, shadow, html } from '../../index';
 import { Coroutine } from 'spica/coroutine';
 import { Sequence } from 'spica/sequence';
 import { Attrs, Children } from '../../internal';
@@ -317,11 +317,10 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('swap', function () {
-      assert.throws(() => HTML.article(HTML.article([HTML.p()]).children));
       const el = HTML.article([HTML.p()]);
       const children = el.children;
+      assert.throws(() => HTML.article(children));
       el.children = [HTML.p()];
-      frag(children.map(el => el.element));
       assert(HTML.article(children));
     });
 
