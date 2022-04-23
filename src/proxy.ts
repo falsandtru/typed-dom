@@ -146,7 +146,6 @@ export class Elem<
     for (const name of ObjectKeys(children)) {
       if (name in {}) throw new Error(`TypedDOM: Child names must be different from the object property names.`);
       let child = children[name];
-      throwErrorIfNotUsable(child, null);
       descs[name] = {
         configurable: true,
         enumerable: true,
