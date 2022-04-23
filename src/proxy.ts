@@ -293,15 +293,11 @@ export class Elem<
         break;
       }
     }
-    if (removedChildren.length) {
-      for (const child of removedChildren) {
-        child.element.dispatchEvent(new Event('disconnect', { bubbles: false, cancelable: true }));
-      }
+    for (let i = 0; i < removedChildren.length; ++i) {
+      removedChildren[i].element.dispatchEvent(new Event('disconnect', { bubbles: false, cancelable: true }));
     }
-    if (addedChildren.length) {
-      for (const child of addedChildren) {
-        child.element.dispatchEvent(new Event('connect', { bubbles: false, cancelable: true }));
-      }
+    for (let i = 0; i < addedChildren.length; ++i) {
+      addedChildren[i].element.dispatchEvent(new Event('connect', { bubbles: false, cancelable: true }));
     }
     assert(isMutated || removedChildren.length + addedChildren.length === 0);
     if (isMutated && this[privates.events]?.mutate) {
