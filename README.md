@@ -180,7 +180,6 @@ export interface El<
   C extends El.Children = El.Children,
   > {
   readonly element: E;
-  parent: El | undefined;
   children: C;
 }
 export namespace El {
