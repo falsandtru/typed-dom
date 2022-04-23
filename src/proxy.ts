@@ -250,10 +250,8 @@ export class Elem<
           }
           else {
             assert(newChild.element.parentNode === oldChild.element.parentNode);
-            const ref = newChild.element.nextSibling !== oldChild.element
-              ? newChild.element.nextSibling
-              : oldChild.element.nextSibling;
-            this[privates.container].replaceChild(newChild.element, oldChild.element);
+            const ref = newChild.element.nextSibling;
+            this[privates.container].insertBefore(newChild.element, oldChild.element);
             this[privates.container].insertBefore(oldChild.element, ref);
           }
           this[privates.isObserverUpdate] = true;
