@@ -34,17 +34,17 @@ const enum ElChildType {
 }
 
 namespace privates {
-  export const id = Symbol();
-  export const id_ = Symbol();
-  export const query = Symbol();
-  export const query_ = Symbol();
-  export const scope = Symbol();
-  export const observe = Symbol();
-  export const type = Symbol();
-  export const container = Symbol();
-  export const children = Symbol();
-  export const isInit = Symbol();
-  export const isObserverUpdate = Symbol();
+  export const id = Symbol('id');
+  export const id_ = Symbol('id_');
+  export const query = Symbol('query');
+  export const query_ = Symbol('query_');
+  export const scope = Symbol('scope');
+  export const observe = Symbol('observe');
+  export const type = Symbol('type');
+  export const container = Symbol('container');
+  export const children = Symbol('children');
+  export const isInit = Symbol('isInit');
+  export const isObserverUpdate = Symbol('isObserverUpdate');
 }
 
 let id = identity();
