@@ -1,5 +1,6 @@
 import { Event } from 'spica/global';
 import { isArray, ObjectDefineProperties, ObjectKeys } from 'spica/alias';
+import { Attrs } from './util/dom';
 import { identity } from './util/identity';
 
 const tag = Symbol.for('typed-dom::tag');
@@ -35,6 +36,7 @@ const enum ElChildType {
 }
 
 namespace privates {
+  export const events = Symbol.for('typed-dom::events');
   export const id = Symbol('id');
   export const id_ = Symbol('id_');
   export const query = Symbol('query');
@@ -58,9 +60,14 @@ export class Elem<
   > {
   constructor(
     public readonly element: E,
+    attrs: Attrs,
     children: C,
     container: Element | ShadowRoot = element,
   ) {
+    const events = this[privates.events];
+    events.connect = (attrs?.['onconnect'] ?? void 0) !== void 0;
+    events.disconnect = (attrs?.['ondisconnect'] ?? void 0) !== void 0;
+    events.mutate = (attrs?.['onmutate'] ?? void 0) !== void 0;
     this[privates.children] = children;
     this[privates.container] = container;
     switch (true) {
@@ -104,6 +111,11 @@ export class Elem<
     }
   }
   public readonly [tag]: T;
+  private readonly [privates.events] = {
+    connect: false,
+    disconnect: false,
+    mutate: false,
+  };
   private [privates.id_] = '';
   private get [privates.id](): string {
     if (this[privates.id_]) return this[privates.id_];
@@ -208,7 +220,7 @@ export class Elem<
             newChild.parent = this;
             this[privates.scope](newChild);
             assert(!addedChildren.includes(newChild));
-            addedChildren.push(newChild);
+            newChild[privates.events]?.connect && addedChildren.push(newChild);
           }
         }
         container.replaceChildren(...sourceChildren.map(c => c.element));
@@ -219,7 +231,7 @@ export class Elem<
             // @ts-expect-error
             oldChild.parent = void 0;
             assert(!removedChildren.includes(oldChild));
-            removedChildren.push(oldChild);
+            oldChild[privates.events]?.disconnect && removedChildren.push(oldChild);
             assert(isMutated);
           }
         }
@@ -241,7 +253,7 @@ export class Elem<
           if (isInit || newChild !== oldChild && newChild.parent?.element !== oldChild.parent?.element) {
             this[privates.scope](newChild);
             assert(!addedChildren.includes(newChild));
-            addedChildren.push(newChild);
+            newChild[privates.events]?.connect && addedChildren.push(newChild);
             if (isInit) {
               container.appendChild(newChild.element);
             }
@@ -251,7 +263,7 @@ export class Elem<
               // @ts-expect-error
               oldChild.parent = void 0;
               assert(!removedChildren.includes(oldChild));
-              removedChildren.push(oldChild);
+              oldChild[privates.events]?.disconnect && removedChildren.push(oldChild);
             }
             // @ts-expect-error
             newChild.parent = this;
@@ -281,7 +293,7 @@ export class Elem<
       }
     }
     assert(isMutated || removedChildren.length + addedChildren.length === 0);
-    if (isMutated) {
+    if (isMutated && this[privates.events]?.mutate) {
       this.element.dispatchEvent(new Event('mutate', { bubbles: false, cancelable: true }));
     }
   }

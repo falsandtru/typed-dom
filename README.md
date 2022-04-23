@@ -306,7 +306,7 @@ Create a custom API for translation.
 
 ```ts
 import { API, html } from 'typed-dom';
-import { Attrs, Children } from 'typed-dom/internal';
+import { Attrs } from 'typed-dom/internal';
 
 const i18n = i18next.createInstance({
   lng: 'en',
@@ -321,31 +321,25 @@ const i18n = i18next.createInstance({
 interface TransDataMap {
   'a': { data: string; };
 }
-const Trans = API<HTMLElementTagNameMap>((
-  tag: keyof HTMLElementTagNameMap,
-  _?: Attrs | Children,
-  children?: keyof TransDataMap,
-  data?: TransDataMap[keyof TransDataMap],
-) =>
-  html(tag, {
-    onmutate: children
-      ? ev =>
-          i18n.init((err, t) =>
-            (ev.target as HTMLElement).textContent = err
-              ? 'Failed to init i18next.'
-              : t(children, data))
-      : void 0,
-  }));
-const data = <K extends keyof TransDataMap>(data: TransDataMap[K]) =>
+const Trans = API<HTMLElementTagNameMap>(html);
+const bind = <K extends keyof TransDataMap>(data: TransDataMap[K]) =>
   <T extends string, E extends Element>(
-    factory: (tag: T, attrs: Attrs, children: string, data: TransDataMap[keyof TransDataMap]) => E,
+    factory: (tag: T, attrs: Attrs, children: K) => E,
     tag: T,
     attrs: Attrs,
     children: K,
   ): E =>
-    factory(tag, attrs, children, data);
+    factory(tag, Object.assign<Attrs, Attrs>(attrs, {
+      onmutate: children
+        ? ev =>
+          i18n.init((err, t) =>
+            (ev.target as HTMLElement).textContent = err
+              ? 'Failed to init i18next.'
+              : t(children, data))
+        : void 0,
+    }), children);
 
-const el = Trans.span('a', data({ data: 'A' }));
+const el = Trans.span('a', bind({ data: 'A' }));
 assert(el.children === 'A');
 assert(el.element.textContent === 'A');
 ```
