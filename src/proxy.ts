@@ -153,11 +153,10 @@ export class Elem<
   }
   private [privates.isObserverUpdate] = false;
   private [privates.observe](children: El.Children.Struct): El.Children.Struct {
-    const descs: PropertyDescriptorMap = {};
-    for (const name of ObjectKeys(children)) {
+    return ObjectDefineProperties(children, ObjectKeys(children).reduce((obj, name) => {
       if (name in {}) throw new Error(`TypedDOM: Child names must be different from the object property names.`);
       let child = children[name];
-      descs[name] = {
+      obj[name] = {
         configurable: true,
         enumerable: true,
         get: (): El => {
@@ -173,8 +172,8 @@ export class Elem<
           child = newChild;
         },
       };
-    }
-    return ObjectDefineProperties(children, descs);
+      return obj;
+    }, {}));
   }
   private readonly [privates.type]: ElChildType;
   private readonly [privates.container]: Element | ShadowRoot;
