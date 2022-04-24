@@ -170,12 +170,20 @@ export function defrag<T extends Node | string>(nodes: ArrayLike<T>): T[];
 export function defrag(nodes: ArrayLike<Node | string>): (Node | string)[] {
   assert(Array.from(nodes).every(n => typeof n === 'string' || n instanceof Node));
   const acc: (Node | string)[] = [];
+  let appendable = false;
   for (let i = 0; i < nodes.length; ++i) {
     const node = nodes[i];
     if (node === '') continue;
-    acc.length > 0 && typeof node === 'string' && typeof nodes[i - 1] === 'string'
-      ? acc[acc.length - 1] += node
-      : acc.push(node);
+    if (typeof node === 'string') {
+      appendable
+        ? acc[acc.length - 1] += node
+        : acc.push(node);
+      appendable = true;
+    }
+    else {
+      acc.push(node);
+      appendable = false;
+    }
   }
   return acc;
 }
