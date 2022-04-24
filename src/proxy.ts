@@ -283,8 +283,8 @@ export class Elem<
             this[privates.scope](newChild);
             assert(!addedChildren.includes(newChild));
             events(newChild)?.connect && addedChildren.push(newChild);
-            container.insertBefore(newChild.element, oldChild.element);
-            container.removeChild(oldChild.element);
+            container.replaceChild(newChild.element, oldChild.element);
+            assert(!oldChild.element.parentNode);
             assert(!removedChildren.includes(oldChild));
             events(oldChild)?.disconnect && removedChildren.push(oldChild);
           }
