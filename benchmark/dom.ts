@@ -14,8 +14,12 @@ describe('Benchmark:', function () {
       benchmark('create html', () => html('div'), done);
     });
 
-    it('HTML', function (done) {
-      benchmark('create HTML', () => HTML.div(), done);
+    it('HTML function', function (done) {
+      benchmark('create HTML function', () => HTML('div'), done);
+    });
+
+    it('HTML method', function (done) {
+      benchmark('create HTML method', () => HTML.div(), done);
     });
 
   });
