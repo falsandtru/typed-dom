@@ -155,7 +155,7 @@ APIs replace the `$scope` selector with `:host`, `#<id>`, or `.<generated-id>`.
 import { HTML } from 'typed-dom';
 
 const component = HTML.article({
-  style: HTML.style(`$scope ul { width: 100px; }`),
+  style: HTML.style(`$scope { color: red; }`),
   title: HTML.h1(`Title`),
   content: HTML.ul([
     HTML.li(`item`),
@@ -209,7 +209,7 @@ And you can safely access and manipulate the internal structure using the static
 
 ```ts
 // Inspect
-component.element.outerHTML; // '<article class="RANDOM"><style>.RANDOM ul { width: 100px; }</style><h1>Title</h1><ul><li>item</li><li>item</li></ul></article>'
+component.element.outerHTML; // '<article class="RANDOM"><style>.RANDOM { color: red; }</style><h1>Title</h1><ul><li>item</li><li>item</li></ul></article>'
 component.children.title.element.outerHTML; // '<h1>Title</h1>'
 component.children.title.children; // 'Title'
 component.children.content.element.outerHTML; // '<ul><li>item</li><li>item</li></ul>'
@@ -246,7 +246,7 @@ import { Shadow, HTML, El } from 'typed-dom';
 
 class Component implements El {
   private readonly dom = HTML.section({
-    style: HTML.style(`$scope ul { width: 100px; }`),
+    style: HTML.style(`$scope { color: red; }`),
     content: HTML.ul([
       HTML.li(`item`),
     ]),
@@ -262,7 +262,7 @@ class Component implements El {
 
 class ShadowComponent implements El {
   private readonly dom = Shadow.section({
-    style: HTML.style(`ul { width: 100px; }`),
+    style: HTML.style(`$scope { color: red; }`),
     content: HTML.ul([
       HTML.li(`item`),
     ]),
@@ -293,7 +293,7 @@ class Component extends Coroutine implements El {
     }, { trigger: 'element', capacity: 0 });
   }
   private readonly dom = Shadow.section({
-    style: HTML.style(`ul { width: 100px; }`),
+    style: HTML.style(`$scope { color: red; }`),
     content: HTML.ul([
       HTML.li(`item`),
     ]),

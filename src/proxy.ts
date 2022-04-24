@@ -152,11 +152,15 @@ export class Elem<
   }
   private [privates.scope](child: El): void {
     if (child.element.tagName.toUpperCase() !== 'STYLE') return;
-    const target = /(^|[,}]|\*\/)(\s*)\$scope(?=[\s~+[{:>,])/g;
-    const style = child.element.innerHTML;
-    if (!target.test(style)) return;
+    const source = child.element.innerHTML;
+    if (!source.includes('$scope')) return;
+    const scope = /(^|[>~+,}/])(\s*)\$scope(?!\w)(?=\s*[A-Za-z#.:[>~+,{/])/g;
+    const style = source.replace(scope, (...$) => `${$[1]}${$[2]}${this[privates.query]}`);
+    assert(!this[privates.query_] || style !== source);
+    if (style === source) return;
+    child.element.innerHTML = style;
     assert(/^[:#.][\w-]+$/.test(this[privates.query]));
-    child.element.innerHTML = style.replace(target, `$1$2${this[privates.query]}`);
+    assert(child.element.children.length === 0);
     child.element.firstElementChild && child.element.replaceChildren();
   }
   private [privates.isObserverUpdate] = false;
