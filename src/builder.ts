@@ -81,9 +81,10 @@ function handle
     function isElChildren(param: Attrs | El.Children): param is El.Children {
       if (param === void 0) return false;
       if (param[Symbol.iterator]) return true;
-      for (const i in param as Attrs) {
-        if (!hasOwnProperty(param, i)) continue;
-        return typeof param[i] === 'object' && !!param[i];
+      for (const name in param as Attrs) {
+        if (!hasOwnProperty(param, name)) continue;
+        const p = param[name];
+        return !!p && typeof p === 'object';
       }
       return true;
     }
