@@ -166,10 +166,10 @@ export function isChildren(param: Attrs | Children | ShadowRootInit | undefined)
   return !!param?.[Symbol.iterator];
 }
 
-export function defrag<T extends Element | string>(nodes: ArrayLike<T>): T[];
-export function defrag(nodes: ArrayLike<Element | string>): (Element | string)[] {
-  assert(Array.from(nodes).every(n => typeof n === 'string' || n instanceof Element));
-  const acc: (Element | string)[] = [];
+export function defrag<T extends Node | string>(nodes: ArrayLike<T>): T[];
+export function defrag(nodes: ArrayLike<Node | string>): (Node | string)[] {
+  assert(Array.from(nodes).every(n => typeof n === 'string' || n instanceof Node));
+  const acc: (Node | string)[] = [];
   for (let i = 0; i < nodes.length; ++i) {
     const node = nodes[i];
     if (node === '') continue;
