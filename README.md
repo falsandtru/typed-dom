@@ -4,7 +4,7 @@
 
 A DOM component builder creating type-level DOM structures.
 
-**Visualize** DOM structures and **Assist** DOM access by static types of TypeScript.
+**Visualize** DOM structures and **Assist** DOM access by static types.
 
 ## APIs
 
@@ -156,7 +156,7 @@ import { HTML } from 'typed-dom';
 
 const component = HTML.article({
   style: HTML.style(`$scope ul { width: 100px; }`),
-  title: HTML.h1(`title`),
+  title: HTML.h1(`Title`),
   content: HTML.ul([
     HTML.li(`item`),
     HTML.li(`item`),
@@ -180,7 +180,8 @@ export interface El<
   C extends El.Children = El.Children,
   > {
   readonly element: E;
-  children: C;
+  get children(): El.Getter<C>;
+  set children(children: El.Setter<C>);
 }
 export namespace El {
   export type Children =
@@ -189,11 +190,17 @@ export namespace El {
     | Children.Array
     | Children.Struct;
   export namespace Children {
-    export type Void = undefined;
+    export type Void = void;
     export type Text = string;
     export type Array = readonly El[];
     export type Struct = { [field: string]: El; };
   }
+  export type Getter<C extends El.Children> =
+    C extends readonly unknown[] ? C :
+    C;
+  export type Setter<C extends El.Children> =
+    C extends readonly unknown[] ? C :
+    Partial<C>;
 }
 ```
 
@@ -201,30 +208,31 @@ You can know the internal structure via the static type which can be used as the
 And you can safely access and manipulate the internal structure using the static type.
 
 ```ts
-// inspect
-component.element.outerHTML; // '<article class="RANDOM"><style>.RANDOM ul { width: 100px; }</style><h1>title</h1><ul><li>item</li><li>item</li></ul></article>'
-component.children.title.element.outerHTML; // '<h1>title</h1>'
-component.children.title.children; // 'title'
+// Inspect
+component.element.outerHTML; // '<article class="RANDOM"><style>.RANDOM ul { width: 100px; }</style><h1>Title</h1><ul><li>item</li><li>item</li></ul></article>'
+component.children.title.element.outerHTML; // '<h1>Title</h1>'
+component.children.title.children; // 'Title'
 component.children.content.element.outerHTML; // '<ul><li>item</li><li>item</li></ul>'
 component.children.content.children[0].children; // 'item'
 
-// update
-// - text
-component.children.title.children = 'Title';
-component.children.title.element.outerHTML; // '<h1>Title</h1>'
+// Update
+// - Text
+component.children.title.children = 'Text';
+component.children.title.element.outerHTML; // '<h1>Text</h1>'
 
-// - collection
+// - Array
 component.children.content.children = [
-  HTML.li('Item'),
+  HTML.li('Array'),
 ];
-component.children.content.element.outerHTML; // '<ul><li>Item</li></ul>'
+component.children.content.element.outerHTML; // '<ul><li>Array</li></ul>'
 
-// - HTML
-component.children.title = HTML.h1('Title!');
-component.children.content = HTML.ul([
-  HTML.li('Item!'),
-]);
-component.element.outerHTML; // '<article class="RANDOM>"><style>.RANDOM ul { width: 100px; }</style><h1>Title!</h1><ul><li>Item!</li></ul></article>'
+// - Struct
+component.children = {
+  title: HTML.h1('Struct'),
+};
+component.children.title.element.outerHTML; // '<h1>Struct</h1>'
+component.children.title = HTML.h1('title');
+component.children.title.element.outerHTML; // '<h1>title</h1>'
 ```
 
 ## Examples

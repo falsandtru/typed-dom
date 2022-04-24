@@ -57,6 +57,8 @@ describe('Integration: Typed DOM', function () {
 
     it('text children update', function () {
       const dom = HTML.p(`a`);
+      // @ts-expect-error
+      () => dom.children = undefined;
       dom.children = 'b';
       assert(dom.element.outerHTML === '<p>b</p>');
       assert(dom.children === 'b');
@@ -125,6 +127,8 @@ describe('Integration: Typed DOM', function () {
       //assert.throws(() => dom.children.push(HTML.li()));
       //assert.throws(() => dom.children.pop());
       //assert.throws(() => dom.children.length = 0);
+      // @ts-expect-error
+      () => dom.children = [undefined];
       assert(dom.children.length === 1);
       assert(dom.children.every(({ element }, i) => element === dom.element.children[i]));
     });
@@ -139,9 +143,9 @@ describe('Integration: Typed DOM', function () {
     it('struct', function () {
       const dom = HTML.article({
         title: HTML.h1(`title`),
-        content: HTML.p([HTML.a()])
+        content: HTML.p()
       });
-      assert(dom.element.outerHTML === '<article><h1>title</h1><p><a></a></p></article>');
+      assert(dom.element.outerHTML === '<article><h1>title</h1><p></p></article>');
       assert(dom.children.title.element === dom.element.firstChild);
       assert(dom.children.content.element === dom.element.lastChild);
     });
@@ -153,7 +157,7 @@ describe('Integration: Typed DOM', function () {
 
     it('struct children update', function () {
       const dom = HTML.article({
-        title: HTML.h1(`a`)
+        title: HTML.h1(`a`),
       });
       assert.doesNotThrow(() => dom.children = dom.children);
       assert.throws(() => dom.children = HTML.article({ title: HTML.h1(`b`) }).children);
@@ -170,7 +174,8 @@ describe('Integration: Typed DOM', function () {
 
     it('struct children partial update', function () {
       const dom = HTML.article({
-        title: HTML.h1(`a`)
+        title: HTML.h1(`a`),
+        content: HTML.p()
       });
       assert.doesNotThrow(() => dom.children.title = dom.children.title);
       assert.throws(() => dom.children.title = HTML.article({ title: HTML.h1(`b`) }).children.title);
@@ -185,6 +190,18 @@ describe('Integration: Typed DOM', function () {
       assert(dom.children.title.element === dom.element.firstChild);
       assert(dom.children.title.element.textContent === 'c');
       assert(dom.children.title.children === 'c');
+      dom.children = {
+        title: HTML.h1(`d`),
+      };
+      assert(dom.children.title.element === dom.element.firstChild);
+      assert(dom.children.title.element.textContent === 'd');
+      assert(dom.children.title.children === 'd');
+      dom.children = {
+        title: HTML.h1(`e`),
+        content: undefined,
+      };
+      assert(dom.children.content.element === dom.element.lastChild);
+      assert(dom.element.outerHTML === '<article><h1>e</h1><p></p></article>');
     });
 
     it('struct with factory', function () {

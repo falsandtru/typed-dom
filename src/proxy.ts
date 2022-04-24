@@ -13,7 +13,9 @@ export interface El<
   > {
   readonly [tag]?: T;
   readonly element: E;
-  children: C;
+  //get children(): C;
+  get children(): El.Getter<C>;
+  set children(children: El.Setter<C>);
 }
 export namespace El {
   export type Children =
@@ -27,6 +29,12 @@ export namespace El {
     export type Array = readonly El[];
     export type Struct = { [field: string]: El; };
   }
+  export type Getter<C extends El.Children> =
+    C extends readonly unknown[] ? C :
+    C;
+  export type Setter<C extends El.Children> =
+    C extends readonly unknown[] ? C :
+    Partial<C>;
 }
 const enum ElChildType {
   Void,
@@ -93,17 +101,17 @@ export class Elem<
         this[privates.isInit] = false;
         return;
       case ElChildType.Text:
-        this.children = children as C;
+        this.children = children as El.Setter<C>;
         this[privates.isInit] = false;
         return;
       case ElChildType.Array:
         this[privates.children] = [] as El.Children.Array as C;
-        this.children = children;
+        this.children = children as El.Setter<C>;
         this[privates.isInit] = false;
         return;
       case ElChildType.Struct:
         this[privates.children] = this[privates.observe](children as El.Children.Struct) as C;
-        this.children = children;
+        this.children = children as El.Setter<C>;
         this[privates.isInit] = false;
         return;
       default:
@@ -164,7 +172,7 @@ export class Elem<
         },
         set: (newChild: El) => {
           if (!this[privates.isObserverUpdate]) {
-            this.children = { [name]: newChild } as C;
+            this.children = { [name]: newChild } as El.Setter<C>;
           }
           else {
             this[privates.isObserverUpdate] = false;
@@ -179,15 +187,15 @@ export class Elem<
   private readonly [privates.container]: Element | ShadowRoot;
   private [privates.isInit] = true;
   private [privates.children]: C;
-  public get children(): C {
+  public get children(): El.Getter<C> {
     switch (this[privates.type]) {
       case ElChildType.Text:
-        return this[privates.container].textContent as C;
+        return this[privates.container].textContent as El.Getter<C>;
       default:
-        return this[privates.children] as C;
+        return this[privates.children] as El.Getter<C>;
     }
   }
-  public set children(children: C) {
+  public set children(children: El.Setter<C>) {
     assert(!this[privates.isObserverUpdate]);
     const container = this[privates.container];
     const removedChildren: El[] = [];
@@ -224,7 +232,7 @@ export class Elem<
           }
         }
         container.replaceChildren(...sourceChildren.map(c => c.element));
-        this[privates.children] = children;
+        this[privates.children] = sourceChildren as C;
         for (let i = 0; i < targetChildren.length; ++i) {
           const oldChild = targetChildren[i];
           if (oldChild.element.parentNode !== container) {
