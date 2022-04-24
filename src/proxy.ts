@@ -73,9 +73,9 @@ export class Elem<
     container: Element | ShadowRoot = element,
   ) {
     const events = this[privates.events];
-    events.connect = (attrs?.['onconnect'] ?? void 0) !== void 0;
-    events.disconnect = (attrs?.['ondisconnect'] ?? void 0) !== void 0;
-    events.mutate = (attrs?.['onmutate'] ?? void 0) !== void 0;
+    events.mutate = attrs?.['onmutate'] != null;
+    events.connect = attrs?.['onconnect'] != null;
+    events.disconnect = attrs?.['ondisconnect'] != null;
     this[privates.children] = children;
     this[privates.container] = container;
     switch (true) {
@@ -120,9 +120,9 @@ export class Elem<
   }
   public readonly [tag]: T;
   private readonly [privates.events] = {
+    mutate: false,
     connect: false,
     disconnect: false,
-    mutate: false,
   };
   private [privates.id_] = '';
   private get [privates.id](): string {
