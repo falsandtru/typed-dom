@@ -350,73 +350,73 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('swap', function () {
-      const el = HTML.article([HTML.p()]);
-      const children = el.children;
+      const dom = HTML.article([HTML.p()]);
+      const children = dom.children;
       assert.throws(() => HTML.article(children));
-      el.children = [HTML.p()];
+      dom.children = [HTML.p()];
       assert(HTML.article(children));
     });
 
     it('observe text', function () {
-      const el = HTML.span(
+      const dom = HTML.span(
         {
           onmutate: (ev, el = ev.target as HTMLElement) =>
             el.textContent += el.textContent!,
         },
         'a');
-      assert(el.children === 'aa');
-      el.children = 'b';
-      assert(el.children === 'bb');
+      assert(dom.children === 'aa');
+      dom.children = 'b';
+      assert(dom.children === 'bb');
     });
 
     it('observe collection', function () {
-      const listeners: Record<string, EventListener> = {
+      const attrs: Attrs = {
         onconnect: (ev, el = ev.target as HTMLElement) =>
           el.textContent += el.textContent!.toUpperCase(),
         ondisconnect: (ev, el = ev.target as HTMLElement) =>
           el.textContent += el.textContent!,
       };
-      const el = HTML.ul([
-        HTML.li(listeners, 'a'),
-        HTML.li(listeners, 'b'),
+      const dom = HTML.ul([
+        HTML.li(attrs, 'a'),
+        HTML.li(attrs, 'b'),
       ]);
       assert.deepStrictEqual(
-        el.children.map(el => el.children),
+        dom.children.map(child => child.children),
         [
           'aA',
           'bB',
         ]);
-      el.children = [
-        el.children[1],
-        HTML.li(listeners, 'c'),
+      dom.children = [
+        dom.children[1],
+        HTML.li(attrs, 'c'),
       ];
       assert.deepStrictEqual(
-        el.children.map(el => el.children),
+        dom.children.map(child => child.children),
         [
           'bB',
           'cC',
         ]);
       assert.deepStrictEqual(
-        el.children.map(v => v.element),
-        [...el.element.children]);
+        dom.children.map(v => v.element),
+        [...dom.element.children]);
     });
 
     it('observe record', function () {
-      const listeners: Record<string, EventListener> = {
+      const attrs: Attrs = {
         onconnect: (ev, el = ev.target as HTMLElement) =>
           el.textContent += el.textContent![0].toUpperCase(),
         ondisconnect: (ev, el = ev.target as HTMLElement) =>
           el.textContent += el.textContent![0].toLowerCase(),
       };
-      const el = HTML.ul({
-        a: HTML.li(listeners, 'a'),
-        b: HTML.li(listeners, 'b'),
-        c: HTML.li(listeners, 'c'),
-        d: HTML.li(listeners, 'd'),
-        e: HTML.li(listeners, 'e'),
+      const dom = HTML.ul({
+        a: HTML.li(attrs, 'a'),
+        b: HTML.li(attrs, 'b'),
+        c: HTML.li(attrs, 'c'),
+        d: HTML.li(attrs, 'd'),
+        e: HTML.li(attrs, 'e'),
       });
       assert.deepStrictEqual(
-        Object.entries(el.children).map(([k, v]) => [k, v.children]),
+        Object.entries(dom.children).map(([k, v]) => [k, v.children]),
         [
           ['a', 'aA'],
           ['b', 'bB'],
@@ -424,16 +424,16 @@ describe('Integration: Typed DOM', function () {
           ['d', 'dD'],
           ['e', 'eE'],
         ]);
-      el.children = {
-        a: el.children.a,
-        b: el.children.c,
-        c: el.children.b,
-        d: HTML.li(listeners, 'f'),
-        e: el.children.e,
+      dom.children = {
+        a: dom.children.a,
+        b: dom.children.c,
+        c: dom.children.b,
+        d: HTML.li(attrs, 'f'),
+        e: dom.children.e,
       };
-      el.children.e = HTML.li(listeners, 'g');
+      dom.children.e = HTML.li(attrs, 'g');
       assert.deepStrictEqual(
-        Object.entries(el.children).map(([k, v]) => [k, v.children]),
+        Object.entries(dom.children).map(([k, v]) => [k, v.children]),
         [
           ['a', 'aA'],
           ['b', 'cC'],
@@ -442,8 +442,8 @@ describe('Integration: Typed DOM', function () {
           ['e', 'gG'],
         ]);
       assert.deepStrictEqual(
-        [...Object.values(el.children)].map(v => v.element),
-        [...el.element.children]);
+        [...Object.values(dom.children)].map(v => v.element),
+        [...dom.element.children]);
     });
 
     it('shadow', function () {
@@ -457,12 +457,12 @@ describe('Integration: Typed DOM', function () {
       assert(Shadow.section((h, t) => shadow(h(t, [html('p')]), { mode: 'closed' }).host as HTMLElement).element.shadowRoot === null);
       assert(Shadow.section([HTML.p()], (h, t) => shadow(h(t), { mode: 'closed' }).host as HTMLElement).element.shadowRoot === null);
       assert(Shadow.section([HTML.p()], (h, t) => shadow(h(t), { mode: 'closed' }).host as HTMLElement).children[0].element.outerHTML === '<p></p>');
-      const el = HTML.div([Shadow.section([HTML.p('a')])]);
-      assert(el.element.outerHTML === '<div><section></section></div>');
-      assert(el.children[0].children[0].element.outerHTML === '<p>a</p>');
-      el.children[0].children[0].children = 'b';
-      assert(el.element.outerHTML === '<div><section></section></div>');
-      assert(el.element.firstElementChild!.shadowRoot!.innerHTML === '<p>b</p>');
+      const dom = HTML.div([Shadow.section([HTML.p('a')])]);
+      assert(dom.element.outerHTML === '<div><section></section></div>');
+      assert(dom.children[0].children[0].element.outerHTML === '<p>a</p>');
+      dom.children[0].children[0].children = 'b';
+      assert(dom.element.outerHTML === '<div><section></section></div>');
+      assert(dom.element.firstElementChild!.shadowRoot!.innerHTML === '<p>b</p>');
     });
 
   });
@@ -490,13 +490,13 @@ describe('Integration: Typed DOM', function () {
       (empty = HTML.section()): typeof empty => new Component();
       // @ts-expect-error
       (): El<''> => new Component();
-      const comp = new Component();
-      assert(comp.children[0].children === 'item');
-      comp.children = [
+      const dom = new Component();
+      assert(dom.children[0].children === 'item');
+      dom.children = [
         HTML.li('Item')
       ];
-      assert(comp.children[0].children === 'Item');
-      assert(HTML.div([comp]));
+      assert(dom.children[0].children === 'Item');
+      assert(HTML.div([dom]));
     });
 
     it('component shadow', function () {
@@ -517,13 +517,13 @@ describe('Integration: Typed DOM', function () {
         }
       }
 
-      const comp = new Component();
-      assert(comp.children[0].children === 'item');
-      comp.children = [
+      const dom = new Component();
+      assert(dom.children[0].children === 'item');
+      dom.children = [
         HTML.li('Item')
       ];
-      assert(comp.children[0].children === 'Item');
-      assert(HTML.div([comp]));
+      assert(dom.children[0].children === 'Item');
+      assert(HTML.div([dom]));
     });
 
     it('component coroutine', function () {
@@ -532,9 +532,9 @@ describe('Integration: Typed DOM', function () {
           super(async function* (this: Component) {
             assert(this.element);
             assert(this.children);
-            this.children = this.children.map(el => {
-              el.children = el.children.toUpperCase();
-              return el;
+            this.children = this.children.map(child => {
+              child.children = child.children.toUpperCase();
+              return child;
             });
             while (true) {
               yield;
@@ -558,13 +558,13 @@ describe('Integration: Typed DOM', function () {
         }
       }
 
-      const comp = new Component();
-      assert(comp.children[0].children === 'ITEM');
-      comp.children = [
+      const dom = new Component();
+      assert(dom.children[0].children === 'ITEM');
+      dom.children = [
         HTML.li('item')
       ];
-      assert(comp.children[0].children === 'item');
-      assert(HTML.div([comp]));
+      assert(dom.children[0].children === 'item');
+      assert(HTML.div([dom]));
     });
 
     it('translate', function () {
