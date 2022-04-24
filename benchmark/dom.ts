@@ -107,30 +107,30 @@ describe('Benchmark:', function () {
 
   });
 
-  describe('traversal', function () {
+  describe('traverse', function () {
     it('native walk', function (done) {
       const el = html('div', [html('div'), html('div')]);
-      benchmark('traversal native walk', () => el.firstChild?.nextSibling, done);
+      benchmark('traverse native walk', () => el.firstChild?.nextSibling, done);
     });
 
     it('native children', function (done) {
       const el = html('div', [html('div'), html('div')]);
-      benchmark('traversal native children', () => el.children[1], done);
+      benchmark('traverse native children', () => el.children[1], done);
     });
 
     it('native query', function (done) {
       const el = html('div', [html('div'), html('div')]);
-      benchmark('traversal native query', () => el.querySelector(':scope > div'), done);
+      benchmark('traverse native query', () => el.querySelector(':scope > div'), done);
     });
 
     it('HTML array', function (done) {
       const el = HTML.div([HTML.div(), HTML.div()]);
-      benchmark('traversal HTML array', () => el.children[0], done);
+      benchmark('traverse HTML array', () => el.children[0], done);
     });
 
     it('HTML struct', function (done) {
       const el = HTML.div({ a: HTML.div(), b: HTML.div() });
-      benchmark('traversal HTML struct', () => el.children.a, done);
+      benchmark('traverse HTML struct', () => el.children.a, done);
     });
 
   });
