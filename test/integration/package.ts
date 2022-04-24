@@ -122,11 +122,12 @@ describe('Integration: Typed DOM', function () {
       const dom = HTML.ul([
         HTML.li()
       ] as const);
-      //assert.throws(() => dom.children[0] = dom.children[0]);
-      //assert.throws(() => dom.children[0] = HTML.li());
-      //assert.throws(() => dom.children.push(HTML.li()));
-      //assert.throws(() => dom.children.pop());
-      //assert.throws(() => dom.children.length = 0);
+      // @ts-expect-error
+      () => dom.children[0] = dom.children[0];
+      //() => dom.children[0] = HTML.li();
+      //() => dom.children.push(HTML.li());
+      //() => dom.children.pop();
+      //() => dom.children.length = 0;
       // @ts-expect-error
       () => dom.children = [undefined];
       assert(dom.children.length === 1);
