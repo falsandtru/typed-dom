@@ -231,7 +231,14 @@ export class Elem<
             events(newChild)?.connect && addedChildren.push(newChild);
           }
         }
-        container.replaceChildren(...sourceChildren.map(c => c.element));
+        if (container.firstChild) {
+          container.replaceChildren(...sourceChildren.map(c => c.element));
+        }
+        else {
+          for (let i = 0; i < sourceChildren.length; ++i) {
+            container.appendChild(sourceChildren[i].element);
+          }
+        }
         this[privates.children] = sourceChildren as C;
         for (let i = 0; i < targetChildren.length; ++i) {
           const oldChild = targetChildren[i];

@@ -146,7 +146,19 @@ function defineAttrs<T extends Element>(el: T, attrs?: Attrs): T {
 }
 function defineChildren<T extends ParentNode & Node>(node: T, children?: Children): T {
   if (children === void 0) return node;
-  node.replaceChildren(...typeof children === 'string' ? [children] : children);
+  if (typeof children === 'string') {
+    node.textContent = children;
+  }
+  else if (node.firstChild) {
+    node.replaceChildren(...children);
+  }
+  else {
+    for (const child of children) {
+      typeof child === 'object'
+        ? node.appendChild(child)
+        : node.append(child);
+    }
+  }
   return node;
 }
 
