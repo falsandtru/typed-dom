@@ -187,6 +187,7 @@ export interface El<
   E extends Element = Element,
   C extends El.Children = El.Children,
   > {
+  readonly tag?: string;
   readonly element: E;
   get children(): El.Getter<C>;
   set children(children: El.Setter<C>);
@@ -259,6 +260,7 @@ class Component implements El {
       HTML.li(`item`),
     ]),
   });
+  public readonly tag: typeof this.dom.tag;
   public readonly element = this.dom.element;
   public get children() {
     return this.dom.children.content.children;
@@ -275,6 +277,7 @@ class ShadowComponent implements El {
       HTML.li(`item`),
     ]),
   });
+  public readonly tag: typeof this.dom.tag;
   public readonly element = this.dom.element;
   public get children() {
     return this.dom.children.content.children;
@@ -306,6 +309,7 @@ class Component extends Coroutine implements El {
       HTML.li(`item`),
     ]),
   });
+  public readonly tag: typeof this.dom.tag;
   public readonly element = this.dom.element;
   public get children() {
     return this.dom.children.content.children;

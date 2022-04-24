@@ -24,27 +24,27 @@ type K<M> = keyof M & string;
 type E<V> = Extract<V, Element>;
 
 interface BuilderFunction<M extends TagNameMap, F extends Factory<M>> {
-  <T extends K<M>, C extends El.Children.Void  >(tag: T,                              factory?: ElFactory<M, F, T, C, E<M[T]>>): El<T, E<M[T]>, El.Children.Void>;
+  <T extends K<M>, C extends El.Children.Void  >(tag: T,                              factory?: ElFactory<M, F, T, C, E<M[T]>>): El<T, E<M[T]>, El.Children>;
   <T extends K<M>, C extends Empty             >(tag: T,                children?: C, factory?: ElFactory<M, F, T, C, E<M[T]>>): El<T, E<M[T]>, El.Children.Array>;
-  <T extends K<M>, C extends El.Children.Text  >(tag: T,                children?: C, factory?: ElFactory<M, F, T, C, E<M[T]>>): El<T, E<M[T]>, string>;
+  <T extends K<M>, C extends El.Children.Text  >(tag: T,                children?: C, factory?: ElFactory<M, F, T, C, E<M[T]>>): El<T, E<M[T]>, El.Children.Text>;
   <T extends K<M>, C extends El.Children.Array >(tag: T,                children?: C, factory?: ElFactory<M, F, T, C, E<M[T]>>): El<T, E<M[T]>, Readonly<C>>;
   <T extends K<M>, C extends El.Children.Struct>(tag: T,                children?: C, factory?: ElFactory<M, F, T, C, E<M[T]>>): El<T, E<M[T]>, C>;
-  <T extends K<M>, C extends El.Children.Void  >(tag: T, attrs?: Attrs,               factory?: ElFactory<M, F, T, C, E<M[T]>>): El<T, E<M[T]>, El.Children.Void>;
+  <T extends K<M>, C extends El.Children.Void  >(tag: T, attrs?: Attrs,               factory?: ElFactory<M, F, T, C, E<M[T]>>): El<T, E<M[T]>, El.Children>;
   <T extends K<M>, C extends Empty             >(tag: T, attrs?: Attrs, children?: C, factory?: ElFactory<M, F, T, C, E<M[T]>>): El<T, E<M[T]>, El.Children.Array>;
-  <T extends K<M>, C extends El.Children.Text  >(tag: T, attrs?: Attrs, children?: C, factory?: ElFactory<M, F, T, C, E<M[T]>>): El<T, E<M[T]>, string>;
+  <T extends K<M>, C extends El.Children.Text  >(tag: T, attrs?: Attrs, children?: C, factory?: ElFactory<M, F, T, C, E<M[T]>>): El<T, E<M[T]>, El.Children.Text>;
   <T extends K<M>, C extends El.Children.Array >(tag: T, attrs?: Attrs, children?: C, factory?: ElFactory<M, F, T, C, E<M[T]>>): El<T, E<M[T]>, Readonly<C>>;
   <T extends K<M>, C extends El.Children.Struct>(tag: T, attrs?: Attrs, children?: C, factory?: ElFactory<M, F, T, C, E<M[T]>>): El<T, E<M[T]>, C>;
 }
 
 interface BuilderMethod<M extends TagNameMap, F extends Factory<M>, T extends K<M>, E extends Element> {
-                  <C extends El.Children.Void  >(                                     factory?: ElFactory<M, F, T, C, E>      ): El<T, E,       El.Children.Void>;
+                  <C extends El.Children.Void  >(                                     factory?: ElFactory<M, F, T, C, E>      ): El<T, E,       El.Children>;
                   <C extends Empty             >(                       children?: C, factory?: ElFactory<M, F, T, C, E>      ): El<T, E,       El.Children.Array>;
-                  <C extends El.Children.Text  >(                       children?: C, factory?: ElFactory<M, F, T, C, E>      ): El<T, E,       string>;
+                  <C extends El.Children.Text  >(                       children?: C, factory?: ElFactory<M, F, T, C, E>      ): El<T, E,       El.Children.Text>;
                   <C extends El.Children.Array >(                       children?: C, factory?: ElFactory<M, F, T, C, E>      ): El<T, E,       Readonly<C>>;
                   <C extends El.Children.Struct>(                       children?: C, factory?: ElFactory<M, F, T, C, E>      ): El<T, E,       C>;
-                  <C extends El.Children.Void  >(        attrs?: Attrs,               factory?: ElFactory<M, F, T, C, E>      ): El<T, E,       El.Children.Void>;
+                  <C extends El.Children.Void  >(        attrs?: Attrs,               factory?: ElFactory<M, F, T, C, E>      ): El<T, E,       El.Children>;
                   <C extends Empty             >(        attrs?: Attrs, children?: C, factory?: ElFactory<M, F, T, C, E>      ): El<T, E,       El.Children.Array>;
-                  <C extends El.Children.Text  >(        attrs?: Attrs, children?: C, factory?: ElFactory<M, F, T, C, E>      ): El<T, E,       string>;
+                  <C extends El.Children.Text  >(        attrs?: Attrs, children?: C, factory?: ElFactory<M, F, T, C, E>      ): El<T, E,       El.Children.Text>;
                   <C extends El.Children.Array >(        attrs?: Attrs, children?: C, factory?: ElFactory<M, F, T, C, E>      ): El<T, E,       Readonly<C>>;
                   <C extends El.Children.Struct>(        attrs?: Attrs, children?: C, factory?: ElFactory<M, F, T, C, E>      ): El<T, E,       C>;
 }

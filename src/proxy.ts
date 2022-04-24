@@ -3,7 +3,6 @@ import { isArray, hasOwnProperty, ObjectDefineProperties, ObjectKeys } from 'spi
 import { Attrs } from './util/dom';
 import { identity } from './util/identity';
 
-const tag = Symbol.for('typed-dom::tag');
 const proxy = Symbol.for('typed-dom::proxy');
 
 export interface El<
@@ -11,7 +10,7 @@ export interface El<
   E extends Element = Element,
   C extends El.Children = El.Children,
   > {
-  readonly [tag]?: T;
+  readonly tag?: T;
   readonly element: E;
   //get children(): C;
   get children(): El.Getter<C>;
@@ -118,7 +117,7 @@ export class Elem<
         throw new Error(`TypedDOM: Unreachable code.`);
     }
   }
-  public readonly [tag]: T;
+  public readonly tag?: T;
   private readonly [privates.events] = {
     mutate: false,
     connect: false,

@@ -476,6 +476,7 @@ describe('Integration: Typed DOM', function () {
             HTML.li(`item`)
           ]),
         });
+        public readonly tag: typeof this.dom.tag;
         public readonly element = this.dom.element;
         public get children() {
           return this.dom.children.content.children;
@@ -485,6 +486,10 @@ describe('Integration: Typed DOM', function () {
         }
       }
 
+      (): El => new Component();
+      (empty = HTML.section()): typeof empty => new Component();
+      // @ts-expect-error
+      (): El<''> => new Component();
       const comp = new Component();
       assert(comp.children[0].children === 'item');
       comp.children = [
@@ -502,6 +507,7 @@ describe('Integration: Typed DOM', function () {
             HTML.li(`item`)
           ]),
         });
+        public readonly tag: typeof this.dom.tag;
         public readonly element = this.dom.element;
         public get children() {
           return this.dom.children.content.children;
@@ -542,6 +548,7 @@ describe('Integration: Typed DOM', function () {
             HTML.li(`item`)
           ]),
         });
+        public readonly tag: typeof this.dom.tag;
         public readonly element = this.dom.element;
         public get children() {
           return this.dom.children.content.children;
