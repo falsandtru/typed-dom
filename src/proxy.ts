@@ -1,5 +1,5 @@
 import { Event } from 'spica/global';
-import { isArray, ObjectDefineProperties, ObjectKeys } from 'spica/alias';
+import { isArray, hasOwnProperty, ObjectDefineProperties, ObjectKeys } from 'spica/alias';
 import { Attrs } from './util/dom';
 import { identity } from './util/identity';
 
@@ -260,8 +260,8 @@ export class Elem<
         if (this[privates.isInit]) {
           container.firstChild && container.replaceChildren();
           const sourceChildren = children as El.Children.Struct;
-          for (const name of ObjectKeys(sourceChildren)) {
-            assert(name in {} === false);
+          for (const name in sourceChildren) {
+            if (!hasOwnProperty(sourceChildren, name)) continue;
             const newChild = sourceChildren[name];
             throwErrorIfNotUsable(newChild, this[privates.container]);
             isMutated = true;
@@ -275,8 +275,8 @@ export class Elem<
         const sourceChildren = children as El.Children.Struct;
         const targetChildren = this[privates.children] as El.Children.Struct;
         if (sourceChildren === targetChildren) break;
-        for (const name of ObjectKeys(sourceChildren)) {
-          if (name in {}) continue;
+        for (const name in sourceChildren) {
+          if (!hasOwnProperty(sourceChildren, name)) continue;
           const newChild = sourceChildren[name];
           const oldChild = targetChildren[name];
           if (!newChild || !oldChild) continue;

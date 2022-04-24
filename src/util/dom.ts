@@ -1,5 +1,5 @@
 import { Symbol, document } from 'spica/global';
-import { ObjectKeys } from 'spica/alias';
+import { hasOwnProperty } from 'spica/alias';
 import { memoize } from 'spica/memoize';
 
 declare global {
@@ -111,7 +111,8 @@ export function define<T extends Element>(node: T, attrs?: Attrs | Children, chi
 }
 function defineAttrs<T extends Element>(el: T, attrs?: Attrs): T {
   if (!attrs) return el;
-  for (const name of ObjectKeys(attrs)) {
+  for (const name in attrs) {
+    if (!hasOwnProperty(attrs, name)) continue;
     const value = attrs[name];
     switch (typeof value) {
       case 'string':
