@@ -1,7 +1,7 @@
 {
   "name": "typed-dom",
   "version": "0.0.259",
-  "description": "A DOM component builder creating type-level DOM structures.",
+  "description": "A value-level and type-level DOM builder.",
   "private": true,
   "homepage": "https://github.com/falsandtru/typed-dom",
   "repository": {

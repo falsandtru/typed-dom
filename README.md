@@ -2,9 +2,17 @@
 
 ![CI](https://github.com/falsandtru/typed-dom/workflows/CI/badge.svg)
 
-A DOM component builder creating type-level DOM structures.
+A value-level and type-level DOM builder.
 
-**Visualize** DOM structures and **Assist** DOM access by static types.
+**Visualize** DOM structures and **Assist** DOM access using static types.
+
+```ts
+const component: El<"article", HTMLElement, {
+  style: El<"style", HTMLStyleElement, string>;
+  title: El<"h1", HTMLHeadingElement, string>;
+  content: El<"ul", HTMLUListElement, readonly El<"li", HTMLLIElement, string>[]>;
+}>
+```
 
 ## APIs
 
@@ -43,7 +51,7 @@ SVG.svg();
 
 ### Shadow: { [tagname]: (attrs?, children?, factory?) => El; };
 
-Create an element proxy appending the children to the own open shadow DOM.
+Create an HTML element proxy assigning the children to the own open shadow DOM.
 
 - attrs: Record<string, string | EventListener | null | undefined>
 - children: undefined | string | El[] | Record<string, El>
