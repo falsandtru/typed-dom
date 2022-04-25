@@ -10,7 +10,7 @@ export interface El<
   E extends Element = Element,
   C extends El.Children = El.Children,
   > {
-  readonly tag?: T;
+  readonly tag: T;
   readonly element: E;
   //get children(): C;
   get children(): El.Getter<C>;
@@ -66,6 +66,7 @@ export class Elem<
   C extends El.Children = El.Children,
   > implements El<T, E, C> {
   constructor(
+    public readonly tag: T,
     public readonly element: E,
     attrs: Attrs,
     children: C,
@@ -117,7 +118,6 @@ export class Elem<
         throw new Error(`TypedDOM: Unreachable code.`);
     }
   }
-  public readonly tag?: T;
   private readonly [privates.events] = {
     mutate: false,
     connect: false,
@@ -150,7 +150,7 @@ export class Elem<
     }
   }
   private [privates.scope](child: El): void {
-    if (child.element.tagName.toUpperCase() !== 'STYLE') return;
+    if (child.tag.toUpperCase() !== 'STYLE') return;
     const source = child.element.innerHTML;
     if (!source.includes('$scope')) return;
     const scope = /(^|[>~+,}/])(\s*)\$scope(?!\w)(?=\s*[A-Za-z#.:[>~+,{/])/g;

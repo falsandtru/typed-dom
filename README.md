@@ -187,7 +187,7 @@ export interface El<
   E extends Element = Element,
   C extends El.Children = El.Children,
   > {
-  readonly tag?: string;
+  readonly tag: string;
   readonly element: E;
   get children(): El.Getter<C>;
   set children(children: El.Setter<C>);

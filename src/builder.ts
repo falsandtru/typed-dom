@@ -73,9 +73,9 @@ function handle
       const node = formatter(el);
       return node !== el && 'host' in node
         // Shadow
-        ? new Elem(el, attrs, children, node)
+        ? new Elem(tag, el, attrs, children, node)
         // Element
-        : new Elem(el, attrs, children);
+        : new Elem(tag, el, attrs, children);
     };
 
     function isElChildren(param: Attrs | El.Children): param is El.Children {
