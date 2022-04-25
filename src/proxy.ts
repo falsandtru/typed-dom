@@ -209,15 +209,15 @@ export class Elem<
         return;
       case ElChildType.Text: {
         if (this[privates.isInit] || !this[privates.events].mutate) {
-          isMutated = true;
           container.textContent = children as El.Children.Text;
+          isMutated = true;
           break;
         }
         const newText = children;
         const oldText = this.children;
         if (newText === oldText) break;
-        isMutated = true;
         container.textContent = newText as El.Children.Text;
+        isMutated = true;
         break;
       }
       case ElChildType.Array: {
@@ -264,11 +264,11 @@ export class Elem<
             if (!hasOwnProperty(sourceChildren, name)) continue;
             const newChild = sourceChildren[name];
             throwErrorIfNotUsable(newChild, this[privates.container]);
-            isMutated = true;
             this[privates.scope](newChild);
+            container.appendChild(newChild.element);
             assert(!addedChildren.includes(newChild));
             events(newChild)?.connect && addedChildren.push(newChild);
-            container.appendChild(newChild.element);
+            isMutated = true;
           }
           break;
         }
@@ -282,13 +282,12 @@ export class Elem<
           if (!newChild || !oldChild) continue;
           if (newChild === oldChild) continue;
           throwErrorIfNotUsable(newChild, this[privates.container]);
-          isMutated = true;
           if (newChild !== oldChild && newChild.element.parentNode !== oldChild.element.parentNode) {
             this[privates.scope](newChild);
-            assert(!addedChildren.includes(newChild));
-            events(newChild)?.connect && addedChildren.push(newChild);
             container.replaceChild(newChild.element, oldChild.element);
             assert(!oldChild.element.parentNode);
+            assert(!addedChildren.includes(newChild));
+            events(newChild)?.connect && addedChildren.push(newChild);
             assert(!removedChildren.includes(oldChild));
             events(oldChild)?.disconnect && removedChildren.push(oldChild);
           }
@@ -298,6 +297,7 @@ export class Elem<
             container.insertBefore(newChild.element, oldChild.element);
             container.insertBefore(oldChild.element, ref);
           }
+          isMutated = true;
           this[privates.isObserverUpdate] = true;
           targetChildren[name] = newChild;
           assert(!this[privates.isObserverUpdate]);
