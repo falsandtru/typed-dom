@@ -11,7 +11,7 @@ export function API
   <M extends TagNameMap, F extends Factory<M> = Factory<M>>
   (baseFactory: F, container?: <E extends Element>(el: E) => ShadowRoot)
   : API<M, F> {
-  return new Proxy<API<M, F>>((() => void 0) as any, handle(baseFactory, container));
+  return new Proxy<API<M, F>>((() => 0) as any, handle(baseFactory, container));
 }
 
 export const Shadow = API<ShadowHostElementTagNameMap>(html, shadow);
