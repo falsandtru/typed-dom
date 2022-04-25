@@ -573,18 +573,18 @@ describe('Integration: Typed DOM', function () {
         resources: {
           en: {
             translation: {
-              "a": "{{data}}",
-            }
-          }
-        }
+              'Greeting': 'Hello, {{name}}.',
+            },
+          },
+        },
       });
       interface TransDataMap {
-        'a': { data: string; };
+        'Greeting': { name: string; };
       }
       const Trans = API<HTMLElementTagNameMap>(html);
       const bind = <K extends keyof TransDataMap>(data: TransDataMap[K]) =>
         <T extends string, E extends Element>(
-          factory: (tag: T, attrs: Attrs, children: K) => E,
+          factory: (tag: T, attrs: Attrs) => E,
           tag: T,
           attrs: Attrs,
           children: K,
@@ -593,13 +593,13 @@ describe('Integration: Typed DOM', function () {
             onmutate: ev =>
               i18n.init((err, t) =>
                 (ev.target as HTMLElement).textContent = err
-                  ? 'Failed to init i18next.'
-                  : t(children, data)),
-          }), children);
+                  ? '{% Failed to init i18next. %}'
+                  : t(children, data) ?? `{% Failed to translate "${children}". %}`),
+          }));
 
-      const el = Trans.span('a', bind({ data: 'A' }));
-      assert(el.children === 'A');
-      assert(el.element.textContent === 'A');
+      const el = Trans.span('Greeting', bind({ name: 'world' }));
+      assert(el.children === 'Hello, world.');
+      assert(el.element.textContent === 'Hello, world.');
     });
 
   });
