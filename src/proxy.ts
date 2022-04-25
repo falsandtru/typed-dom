@@ -208,13 +208,14 @@ export class Elem<
       case ElChildType.Void:
         return;
       case ElChildType.Text: {
-        if (!this[privates.events].mutate) {
+        if (this[privates.isInit] || !this[privates.events].mutate) {
+          isMutated = true;
           container.textContent = children as El.Children.Text;
           break;
         }
         const newText = children;
         const oldText = this.children;
-        if (!this[privates.isInit] && newText === oldText) return;
+        if (newText === oldText) break;
         isMutated = true;
         container.textContent = newText as El.Children.Text;
         break;
