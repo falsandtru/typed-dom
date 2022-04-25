@@ -127,7 +127,7 @@ export class Elem<
   private get [privates.id](): string {
     if (this[privates.id_]) return this[privates.id_];
     this[privates.id_] = this.element.id;
-    if (/^[\w-]+$/.test(this[privates.id_])) return this[privates.id_];
+    if (/^[a-z][\w-]*$/i.test(this[privates.id_])) return this[privates.id_];
     if (counter === 999) {
       id = identity();
       counter = 0;
