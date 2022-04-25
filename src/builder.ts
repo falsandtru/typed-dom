@@ -9,9 +9,9 @@ export type API
   { readonly [P in K<M>]: BuilderMethod<M, F, P>; };
 export function API
   <M extends TagNameMap, F extends Factory<M> = Factory<M>>
-  (baseFactory: F, formatter?: <E extends Element>(el: E) => E | ShadowRoot)
+  (baseFactory: F, container?: <E extends Element>(el: E) => ShadowRoot)
   : API<M, F> {
-  return new Proxy<API<M, F>>((() => void 0) as any, handle(baseFactory, formatter));
+  return new Proxy<API<M, F>>((() => void 0) as any, handle(baseFactory, container));
 }
 
 export const Shadow = API<ShadowHostElementTagNameMap>(html, shadow);
@@ -54,7 +54,7 @@ interface BuilderMethod<M extends TagNameMap, F extends Factory<M>, T extends K<
 
 function handle
   <M extends TagNameMap, F extends Factory<M>>
-  (baseFactory: F, formatter?: <E extends Element>(el: E) => E | ShadowRoot,
+  (baseFactory: F, container?: <E extends Element>(el: E) => ShadowRoot,
 ): ProxyHandler<API<M, F>> {
   return {
     apply(target, _, [tag, ...args]) {
@@ -73,7 +73,7 @@ function handle
       if (isElChildren(attrs)) return build(void 0, attrs, factory);
       attrs ??= {} as typeof attrs;
       const el = elem(tag, factory, attrs, children);
-      return new Elem(tag, el, attrs, children, formatter?.(el));
+      return new Elem(tag, el, attrs, children, container?.(el));
     };
   }
 
