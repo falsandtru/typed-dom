@@ -1,4 +1,4 @@
-import { API, Shadow, HTML, SVG, El, Attrs, shadow, html } from '../..';
+import { API, Shadow, HTML, SVG, El, Attrs, Factory, shadow, html } from '../..';
 import { Coroutine } from 'spica/coroutine';
 import { Sequence } from 'spica/sequence';
 
@@ -583,7 +583,7 @@ describe('Integration: Typed DOM', function () {
       const Trans = API<HTMLElementTagNameMap>(html);
       const bind = <K extends keyof TransDataMap>(data: TransDataMap[K]) =>
         <T extends keyof HTMLElementTagNameMap>(
-          factory: (tag: T, attrs?: Attrs) => HTMLElementTagNameMap[T],
+          factory: Factory<HTMLElementTagNameMap>,
           tag: T,
           attrs: Attrs,
           children: K,
