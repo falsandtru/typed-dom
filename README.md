@@ -140,6 +140,9 @@ export const HTML = API<CustomHTMLElementTagNameMap>(html);
 
 - El
 - NS
+- Attrs
+- Children
+- Factory
 - shadow
 - frag
 - html
@@ -325,8 +328,7 @@ class Component extends Coroutine implements El {
 Create a custom API for translation.
 
 ```ts
-import { API, html } from 'typed-dom';
-import { Attrs } from 'typed-dom/internal';
+import { API, Attrs, html } from 'typed-dom';
 
 const i18n = i18next.createInstance({
   lng: 'en',
@@ -343,12 +345,12 @@ interface TransDataMap {
 }
 const Trans = API<HTMLElementTagNameMap>(html);
 const bind = <K extends keyof TransDataMap>(data: TransDataMap[K]) =>
-  <T extends string, E extends Element>(
-    factory: (tag: T, attrs?: Attrs) => E,
+  <T extends keyof HTMLElementTagNameMap>(
+    factory: (tag: T, attrs?: Attrs) => HTMLElementTagNameMap[T],
     tag: T,
     attrs: Attrs,
     children: K,
-  ): E =>
+  ) =>
     factory(tag, void Object.assign<Attrs, Attrs>(attrs, {
       onmutate: ev =>
         void i18n.init((err, t) =>

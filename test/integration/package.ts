@@ -1,7 +1,6 @@
-import { API, Shadow, HTML, SVG, El, shadow, html } from '../..';
+import { API, Shadow, HTML, SVG, El, Attrs, shadow, html } from '../..';
 import { Coroutine } from 'spica/coroutine';
 import { Sequence } from 'spica/sequence';
-import { Attrs } from '../../internal';
 
 declare global {
   interface ShadowHostElementTagNameMap {
@@ -583,12 +582,12 @@ describe('Integration: Typed DOM', function () {
       }
       const Trans = API<HTMLElementTagNameMap>(html);
       const bind = <K extends keyof TransDataMap>(data: TransDataMap[K]) =>
-        <T extends string, E extends Element>(
-          factory: (tag: T, attrs?: Attrs) => E,
+        <T extends keyof HTMLElementTagNameMap>(
+          factory: (tag: T, attrs?: Attrs) => HTMLElementTagNameMap[T],
           tag: T,
           attrs: Attrs,
           children: K,
-        ): E =>
+        ) =>
           factory(tag, void Object.assign<Attrs, Attrs>(attrs, {
             onmutate: ev =>
               void i18n.init((err, t) =>
@@ -600,6 +599,10 @@ describe('Integration: Typed DOM', function () {
       const el = Trans.span('Greeting', bind({ name: 'world' }));
       assert(el.children === 'Hello, world.');
       assert(el.element.textContent === 'Hello, world.');
+      // @ts-expect-error
+      Trans.span('', bind({ name: 'world' }));
+      // @ts-expect-error
+      Trans.span('Greeting', bind({}));
     });
 
   });
