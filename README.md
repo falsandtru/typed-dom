@@ -260,7 +260,7 @@ class Component implements El {
       HTML.li(`item`),
     ]),
   });
-  public readonly tag: typeof this.dom.tag;
+  public readonly tag = this.dom.tag;
   public readonly element = this.dom.element;
   public get children() {
     return this.dom.children.content.children;
@@ -277,7 +277,7 @@ class ShadowComponent implements El {
       HTML.li(`item`),
     ]),
   });
-  public readonly tag: typeof this.dom.tag;
+  public readonly tag = this.dom.tag;
   public readonly element = this.dom.element;
   public get children() {
     return this.dom.children.content.children;
@@ -309,7 +309,7 @@ class Component extends Coroutine implements El {
       HTML.li(`item`),
     ]),
   });
-  public readonly tag: typeof this.dom.tag;
+  public readonly tag = this.dom.tag;
   public readonly element = this.dom.element;
   public get children() {
     return this.dom.children.content.children;

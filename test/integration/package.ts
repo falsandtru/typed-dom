@@ -476,7 +476,7 @@ describe('Integration: Typed DOM', function () {
             HTML.li(`item`)
           ]),
         });
-        public readonly tag: typeof this.dom.tag;
+        public readonly tag = this.dom.tag;
         public readonly element = this.dom.element;
         public get children() {
           return this.dom.children.content.children;
@@ -507,7 +507,7 @@ describe('Integration: Typed DOM', function () {
             HTML.li(`item`)
           ]),
         });
-        public readonly tag: typeof this.dom.tag;
+        public readonly tag = this.dom.tag;
         public readonly element = this.dom.element;
         public get children() {
           return this.dom.children.content.children;
@@ -548,7 +548,7 @@ describe('Integration: Typed DOM', function () {
             HTML.li(`item`)
           ]),
         });
-        public readonly tag: typeof this.dom.tag;
+        public readonly tag = this.dom.tag;
         public readonly element = this.dom.element;
         public get children() {
           return this.dom.children.content.children;
