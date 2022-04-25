@@ -152,8 +152,8 @@ export class Elem<
   private [privates.scope](child: El): void {
     if (child.tag.toUpperCase() !== 'STYLE') return;
     const source = child.element.innerHTML;
-    if (!source.includes('$scope')) return;
-    const scope = /(^|[>~+,}/])(\s*)\$scope(?!\w)(?=\s*[A-Za-z#.:[>~+,{/])/g;
+    if (!source.includes(':scope')) return;
+    const scope = /(^|[>~+,}/])(\s*)\:scope(?!\w)(?=\s*[A-Za-z#.:[>~+,{/])/g;
     const style = source.replace(scope, (...$) => `${$[1]}${$[2]}${this[privates.query]}`);
     assert(!this[privates.query_] || style !== source);
     if (style === source) return;

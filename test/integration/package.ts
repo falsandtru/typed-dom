@@ -289,29 +289,29 @@ describe('Integration: Typed DOM', function () {
 
     it('scope', function () {
       const template = [
-        '$scope{}',
-        '$scope:empty {}',
-        '$scope[id] {}',
-        '$scope#id {}',
-        '$scope.class {}',
-        '$scope div {}',
-        '$scope>div {}',
-        '$scope,$scope {}',
-        '$scope{}$scope{}',
-        '$scope/* */ {}',
-        '/* */$scope {}',
-        '  $scope  {}',
+        ':scope{}',
+        ':scope:empty {}',
+        ':scope[id] {}',
+        ':scope#id {}',
+        ':scope.class {}',
+        ':scope div {}',
+        ':scope>div {}',
+        ':scope,:scope {}',
+        ':scope{}:scope{}',
+        ':scope/* */ {}',
+        '/* */:scope {}',
+        '  :scope  {}',
       ].join('\n');
       const id = 'id';
-      const style = template.replace(/\$scope/g, `#${id}`);
+      const style = template.replace(/\:scope/g, `#${id}`);
       assert(HTML.div({ id }, [HTML.style(template)]).children[0].element.innerHTML === style);
       assert(HTML.div({ id }, { style: HTML.style(template) }).children.style.element.innerHTML === style);
-      assert(HTML.div([HTML.style('$scope {}')]).element.className.match(/^rnd-\w+-\d+$/));
-      assert(Shadow.div([HTML.style('$scope {}')]).element.outerHTML === '<div></div>');
-      assert(Shadow.div([HTML.style('$scope {}')]).children[0].element.innerHTML === ':host {}');
-      assert(Shadow.div([HTML.style('/* $scope */$scope/* $scope */{content:" $scope "}')]).children[0].element.innerHTML === '/* $scope */:host/* $scope */{content:" $scope "}');
+      assert(HTML.div([HTML.style(':scope {}')]).element.className.match(/^rnd-\w+-\d+$/));
+      assert(Shadow.div([HTML.style(':scope {}')]).element.outerHTML === '<div></div>');
+      assert(Shadow.div([HTML.style(':scope {}')]).children[0].element.innerHTML === ':host {}');
+      assert(Shadow.div([HTML.style('/* :scope */:scope/* :scope */{content:" :scope "}')]).children[0].element.innerHTML === '/* :scope */:host/* :scope */{content:" :scope "}');
       assert(HTML.div([HTML.style(`<script>`)]).children[0].element.children.length === 0);
-      assert(HTML.div([HTML.style(`$scope{}<script>`)]).children[0].element.children.length === 0);
+      assert(HTML.div([HTML.style(`:scope{}<script>`)]).children[0].element.children.length === 0);
     });
 
     it('clear', function () {
@@ -471,7 +471,7 @@ describe('Integration: Typed DOM', function () {
     it('component', function () {
       class Component implements El {
         private readonly dom = HTML.section({
-          style: HTML.style(`$scope { color: red; }`),
+          style: HTML.style(`:scope { color: red; }`),
           content: HTML.ul([
             HTML.li(`item`)
           ]),
@@ -502,7 +502,7 @@ describe('Integration: Typed DOM', function () {
     it('component shadow', function () {
       class Component implements El {
         private readonly dom = Shadow.section({
-          style: HTML.style(`$scope { color: red; }`),
+          style: HTML.style(`:scope { color: red; }`),
           content: HTML.ul([
             HTML.li(`item`)
           ]),
@@ -543,7 +543,7 @@ describe('Integration: Typed DOM', function () {
           assert(this.children[0].children === 'ITEM');
         }
         private readonly dom = Shadow.section({
-          style: HTML.style(`$scope { color: red; }`),
+          style: HTML.style(`:scope { color: red; }`),
           content: HTML.ul([
             HTML.li(`item`)
           ]),
