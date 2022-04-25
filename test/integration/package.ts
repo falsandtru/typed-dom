@@ -584,16 +584,16 @@ describe('Integration: Typed DOM', function () {
       const Trans = API<HTMLElementTagNameMap>(html);
       const bind = <K extends keyof TransDataMap>(data: TransDataMap[K]) =>
         <T extends string, E extends Element>(
-          factory: (tag: T, attrs: Attrs) => E,
+          factory: (tag: T, attrs?: Attrs) => E,
           tag: T,
           attrs: Attrs,
           children: K,
         ): E =>
-          factory(tag, Object.assign<Attrs, Attrs>(attrs, {
+          factory(tag, void Object.assign<Attrs, Attrs>(attrs, {
             onmutate: ev =>
-              i18n.init((err, t) =>
+              void i18n.init((err, t) =>
                 (ev.target as HTMLElement).textContent = err
-                  ? '{% Failed to init i18next. %}'
+                  ? '{% Failed to initialize the translator. %}'
                   : t(children, data) ?? `{% Failed to translate "${children}". %}`),
           }));
 
