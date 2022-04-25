@@ -73,9 +73,9 @@ export class Elem<
     container: Element | ShadowRoot = element,
   ) {
     const events = this[privates.events];
-    events.mutate = attrs?.['onmutate'] != null;
-    events.connect = attrs?.['onconnect'] != null;
-    events.disconnect = attrs?.['ondisconnect'] != null;
+    events.mutate = (attrs?.['onmutate'] ?? attrs?.['onMutate']) != null;
+    events.connect = (attrs?.['onconnect'] ?? attrs?.['onConnect']) != null;
+    events.disconnect = (attrs?.['ondisconnect'] ?? attrs?.['onDisconnect']) != null;
     this[privates.children] = children;
     this[privates.container] = container;
     switch (true) {
