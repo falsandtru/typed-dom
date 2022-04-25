@@ -60,36 +60,36 @@ function handle
     get: (target, prop) =>
       target[prop] || prop in target || typeof prop !== 'string'
         ? target[prop]
-        : target[prop] = builder(prop as keyof M & string, baseFactory),
+        : target[prop] = builder(prop as keyof M & string),
   };
 
-  function builder(tag: keyof M & string, baseFactory: F): (attrs?: Attrs, children?: El.Children, factory?: () => Element) => El {
+  function builder(tag: keyof M & string) {
     return function build(attrs?: Attrs | El.Children, children?: El.Children, factory?: ElFactory<M, F, keyof M & string, El.Children, Element>): El {
       if (typeof children === 'function') return build(attrs, void 0, children);
       if (typeof attrs === 'function') return build(void 0, void 0, attrs);
       if (isElChildren(attrs)) return build(void 0, attrs, factory);
       attrs ??= {} as typeof attrs;
-      const el = elem(factory, attrs, children);
+      const el = elem(tag, factory, attrs, children);
       return new Elem(tag, el, attrs, children, formatter?.(el));
     };
-
-    function isElChildren(param: Attrs | El.Children): param is El.Children {
-      if (param === void 0) return false;
-      if (param[Symbol.iterator]) return true;
-      for (const name in param as Attrs) {
-        if (!hasOwnProperty(param, name)) continue;
-        const p = param[name];
-        return !!p && typeof p === 'object';
-      }
-      return true;
-    }
-
-    function elem(factory: ElFactory<M, F, keyof M & string, El.Children, Element> | undefined, attrs: Attrs, children: El.Children): Element {
-      const el = factory
-        ? define(factory(baseFactory as F, tag, attrs, children), attrs)
-        : baseFactory(tag, attrs) as unknown as Element;
-      if (tag.toLowerCase() !== el.tagName.toLowerCase()) throw new Error(`TypedDOM: Expected tag name is "${tag.toLowerCase()}" but actually "${el.tagName.toLowerCase()}".`);
-      return el;
-    }
   }
+
+  function elem(tag: keyof M & string, factory: ElFactory<M, F, keyof M & string, El.Children, Element> | undefined, attrs: Attrs, children: El.Children): Element {
+    const el = factory
+      ? define(factory(baseFactory, tag, attrs, children), attrs)
+      : baseFactory(tag, attrs) as unknown as Element;
+    if (tag.toLowerCase() !== el.tagName.toLowerCase()) throw new Error(`TypedDOM: Expected tag name is "${tag.toLowerCase()}" but actually "${el.tagName.toLowerCase()}".`);
+    return el;
+  }
+}
+
+function isElChildren(param: Attrs | El.Children): param is El.Children {
+  if (param === void 0) return false;
+  if (param[Symbol.iterator]) return true;
+  for (const name in param as Attrs | El.Children.Struct) {
+    if (!hasOwnProperty(param, name)) continue;
+    const value = param[name];
+    return !!value && typeof value === 'object';
+  }
+  return true;
 }
