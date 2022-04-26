@@ -39,7 +39,7 @@ export type Children = Iterable<string | Node> | string | undefined;
 
 export interface Factory<M extends TagNameMap> {
   <T extends keyof M & string>(tag: T, children?: Children): M[T];
-  <T extends keyof M & string>(tag: T, attrs?: Attrs, children?: Children): M[T];
+  <T extends keyof M & string>(tag: T, attrs: Attrs | undefined, children?: Children): M[T];
 }
 
 namespace caches {
