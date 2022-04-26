@@ -600,9 +600,11 @@ describe('Integration: Typed DOM', function () {
       assert(el.children === 'Hello, world.');
       assert(el.element.textContent === 'Hello, world.');
       // @ts-expect-error
+      Trans.span('Greeting', bind({}));
+      // @ts-expect-error
       Trans.span('', bind({ name: 'world' }));
       // @ts-expect-error
-      Trans.span('Greeting', bind({}));
+      Trans.span(bind({ name: 'world' }));
     });
 
   });
