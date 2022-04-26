@@ -80,7 +80,7 @@ const SVG = API<SVGElementTagNameMap>(svg);
 
 #### Extend APIs
 
-Custom elements will be defined by extending `ShadowHostHTMLElementTagNameMap`, `HTMLElementTagNameMap`, or `SVGElementTagNameMap` interface.
+Custom elements can be defined by extending `ShadowHostHTMLElementTagNameMap`, `HTMLElementTagNameMap`, or `SVGElementTagNameMap` interface.
 
 ```ts
 import { Shadow, HTML } from 'typed-dom';
