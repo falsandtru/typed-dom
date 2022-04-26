@@ -43,6 +43,7 @@ export interface Factory<M extends TagNameMap> {
 
 namespace caches {
   export const shadows = new WeakMap<Element, ShadowRoot>();
+  export const shadow = memoize((el: Element, opts: ShadowRootInit) => el.attachShadow(opts), shadows);
   export const fragment = document.createDocumentFragment();
 }
 
@@ -56,18 +57,13 @@ export function shadow<M extends ShadowHostHTMLElementTagNameMap>(el: keyof M & 
   if (typeof children === 'function') return shadow(el, opts as ShadowRootInit, void 0, children);
   if (isChildren(opts)) return shadow(el, void 0, opts, factory);
   if (children !== void 0 && !isChildren(children)) return shadow(el, void 0, children, factory);
-  const root = opts === void 0
-    ? el.shadowRoot ?? caches.shadows.get(el)
-    : opts.mode === 'open'
-      ? el.shadowRoot ?? void 0
-      : caches.shadows.get(el);
   return defineChildren(
-    !opts || opts.mode === 'open'
-      ? root ?? el.attachShadow(opts ?? { mode: 'open' })
-      : root ?? caches.shadows.set(el, el.attachShadow(opts)).get(el)!,
-    !root && children === void 0
-      ? el.childNodes
-      : children);
+    opts === void 0
+      ? el.shadowRoot ?? caches.shadows.get(el) ?? el.attachShadow(opts ?? { mode: 'open' })
+      : opts.mode === 'open'
+        ? el.shadowRoot ?? el.attachShadow(opts ?? { mode: 'open' })
+        : caches.shadows.get(el) ?? caches.shadow(el, opts),
+    children);
 }
 
 export function frag(children?: Children): DocumentFragment {

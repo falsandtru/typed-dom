@@ -448,12 +448,8 @@ describe('Integration: Typed DOM', function () {
     it('shadow', function () {
       assert(Shadow('section', [HTML.slot()]).element.outerHTML === '<section></section>');
       assert(Shadow.section([HTML.slot()]).element.outerHTML === '<section></section>');
-      assert(Shadow.section([HTML.slot()]).element.shadowRoot instanceof ShadowRoot);
       assert(Shadow.section([HTML.slot()]).element.shadowRoot!.innerHTML === '<slot></slot>');
       assert(Shadow.section([HTML.slot()]).children[0].element.outerHTML === '<slot></slot>');
-      assert(Shadow.section((h, t) => h(t, [html('slot')])).element.shadowRoot!.innerHTML === '<slot></slot>');
-      assert(Shadow.section((h, t) => shadow(h(t, [html('slot')])).host as HTMLElement).element.shadowRoot!.innerHTML === '<slot></slot>');
-      assert(Shadow.section((h, t) => shadow(h(t, [html('slot')]), { mode: 'closed' }).host as HTMLElement).element.shadowRoot === null);
       assert(Shadow.section([HTML.slot()], (h, t) => shadow(h(t), { mode: 'closed' }).host as HTMLElement).element.shadowRoot === null);
       assert(Shadow.section([HTML.slot()], (h, t) => shadow(h(t), { mode: 'closed' }).host as HTMLElement).children[0].element.outerHTML === '<slot></slot>');
       const dom = HTML.div([Shadow.section([HTML.slot('a')])]);
