@@ -105,10 +105,10 @@ function elem(context: Document | ShadowRoot, ns: NS, tag: string): Element {
 
 export function define<T extends Element>(el: T, attrs?: Attrs, children?: Children): T;
 export function define<T extends Element | DocumentFragment | ShadowRoot>(node: T, children?: Children): T;
-export function define<T extends Element>(node: T, attrs?: Attrs | Children, children?: Children): T {
+export function define<T extends Element | DocumentFragment | ShadowRoot>(node: T, attrs?: Attrs | Children, children?: Children): T {
   return isChildren(attrs)
     ? defineChildren(node, attrs)
-    : defineChildren(defineAttrs(node, attrs), children);
+    : defineChildren(defineAttrs(node as Element, attrs) as T, children);
 }
 function defineAttrs<T extends Element>(el: T, attrs: Attrs): T {
   if (!attrs) return el;
