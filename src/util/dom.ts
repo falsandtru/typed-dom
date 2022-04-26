@@ -168,8 +168,8 @@ function defineChildren<T extends ParentNode & Node>(node: T, children: Children
   return node;
 }
 
-export function isChildren(param: Attrs | Children | ShadowRootInit): param is Children {
-  return !!param?.[Symbol.iterator];
+export function isChildren(value: Attrs | Children | ShadowRootInit): value is Children {
+  return !!value?.[Symbol.iterator];
 }
 
 export function append<T extends ParentNode & Node>(node: T, children: Children): T {

@@ -86,13 +86,13 @@ function handle
   }
 }
 
-function isElChildren(param: Attrs | El.Children): param is El.Children {
-  if (param === void 0) return false;
-  if (param[Symbol.iterator]) return true;
-  for (const name in param as Attrs | El.Children.Struct) {
-    if (!hasOwnProperty(param, name)) continue;
-    const value = param[name];
-    return !!value && typeof value === 'object';
+function isElChildren(value: Attrs | El.Children): value is El.Children {
+  if (value === void 0) return false;
+  if (value[Symbol.iterator]) return true;
+  for (const name in value as Attrs | El.Children.Struct) {
+    if (!hasOwnProperty(value, name)) continue;
+    const val = value[name];
+    return !!val && typeof val === 'object';
   }
   return true;
 }
