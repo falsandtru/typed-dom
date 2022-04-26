@@ -33,6 +33,7 @@ HTML.p([HTML.a()]);
 HTML.p({ link: HTML.a() }]);
 HTML.p({ id: 'id' });
 HTML.p(() => document.createElement('p'));
+HTML.p(() => document.querySelector('p'));
 ```
 
 ### SVG: { [tagname]: (attrs?, children?, factory?) => El; };
@@ -119,21 +120,28 @@ export const HTML = API<CustomHTMLElementTagNameMap>(html);
 Ideally, you should define custom elements only as scoped custom elements.
 
 ```ts
-import { API, NS, shadow, element } from 'typed-dom';
+import { API, NS, shadow, html as h, element } from 'typed-dom';
 
-interface CustomShadowHostElementTagNameMap extends ShadowHostElementTagNameMap {
+interface ScopedCustomShadowHostElementTagNameMap extends ShadowHostElementTagNameMap {
   'custom-tag': HTMLElement;
 }
-interface CustomHTMLElementTagNameMap extends HTMLElementTagNameMap, CustomShadowHostElementTagNameMap {
+interface ScopedCustomHTMLElementTagNameMap extends HTMLElementTagNameMap, ScopedCustomShadowHostElementTagNameMap {
   'custom': HTMLElement;
 }
 
 // Note that the following code is based on the unstandardized APIs of scoped custom elements.
-export const html = element<CustomHTMLElementTagNameMap>(
-  shadow('section', { mode: 'open', registry: ... }),
+const registry = new CustomElementRegistry();
+// This Host function creates a proxy and attaches its shadow root in the base document.
+export const Host = API<ShadowHostElementTagNameMap>(h, el =>
+  shadow(el, { mode: 'open', registry }));
+// This html function creates a scoped custom element in a shadow DOM.
+export const html = element<ScopedCustomHTMLElementTagNameMap>(
+  shadow('body', { mode: 'open', registry }),
   NS.HTML);
-export const Shadow = API<CustomShadowHostElementTagNameMap>(html, shadow);
-export const HTML = API<CustomHTMLElementTagNameMap>(html);
+// This HTML function creates a scoped custom element proxy in a shadow DOM.
+export const HTML = API<ScopedCustomHTMLElementTagNameMap>(html);
+// This Shadow function creates a proxy and attaches its shadow root in a shadow DOM.
+export const Shadow = API<ScopedCustomShadowHostElementTagNameMap>(html, shadow);
 ```
 
 ### Others
