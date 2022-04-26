@@ -46,9 +46,9 @@ namespace caches {
   export const fragment = document.createDocumentFragment();
 }
 
-export function shadow(el: keyof ShadowHostElementTagNameMap | HTMLElement, opts?: ShadowRootInit): ShadowRoot;
-export function shadow(el: keyof ShadowHostElementTagNameMap | HTMLElement, children?: Children, opts?: ShadowRootInit): ShadowRoot;
-export function shadow(el: keyof ShadowHostElementTagNameMap | HTMLElement, children?: Children | ShadowRootInit, opts?: ShadowRootInit): ShadowRoot {
+export function shadow(el: keyof ShadowHostElementTagNameMap | Element, opts?: ShadowRootInit): ShadowRoot;
+export function shadow(el: keyof ShadowHostElementTagNameMap | Element, children?: Children, opts?: ShadowRootInit): ShadowRoot;
+export function shadow(el: keyof ShadowHostElementTagNameMap | Element, children?: Children | ShadowRootInit, opts?: ShadowRootInit): ShadowRoot {
   if (typeof el === 'string') return shadow(html(el), children as Children, opts);
   if (children && !isChildren(children)) return shadow(el, void 0, children);
   const root = opts === void 0
