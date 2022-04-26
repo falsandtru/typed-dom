@@ -73,20 +73,20 @@ All the exposed proxy APIs can be redefined as follows:
 ```ts
 import { API, shadow, html, svg } from 'typed-dom';
 
-const Shadow = API<ShadowHostElementTagNameMap>(html, shadow);
+const Shadow = API<ShadowHostHTMLElementTagNameMap>(html, shadow);
 const HTML = API<HTMLElementTagNameMap>(html);
 const SVG = API<SVGElementTagNameMap>(svg);
 ```
 
 #### Extend APIs
 
-Custom elements will be defined by extending `ShadowHostElementTagNameMap`, `HTMLElementTagNameMap`, or `SVGElementTagNameMap` interface.
+Custom elements will be defined by extending `ShadowHostHTMLElementTagNameMap`, `HTMLElementTagNameMap`, or `SVGElementTagNameMap` interface.
 
 ```ts
 import { Shadow, HTML } from 'typed-dom';
 
 declare global {
-  interface ShadowHostElementTagNameMap {
+  interface ShadowHostHTMLElementTagNameMap {
     'custom-tag': HTMLElement;
   }
   interface HTMLElementTagNameMap {
@@ -106,7 +106,7 @@ Instead, you should define new interfaces and new APIs to define custom elements
 ```ts
 import { API, shadow, html } from 'typed-dom';
 
-interface CustomShadowHostElementTagNameMap extends ShadowHostElementTagNameMap {
+interface CustomShadowHostElementTagNameMap extends ShadowHostHTMLElementTagNameMap {
   'custom-tag': HTMLElement;
 }
 interface CustomHTMLElementTagNameMap extends HTMLElementTagNameMap, CustomShadowHostElementTagNameMap {
@@ -122,17 +122,17 @@ Ideally, you should define custom elements only as scoped custom elements.
 ```ts
 import { API, NS, shadow, html as h, element } from 'typed-dom';
 
-interface ScopedCustomShadowHostElementTagNameMap extends ShadowHostElementTagNameMap {
+interface ScopedCustomShadowHostHTMLElementTagNameMap extends ShadowHostHTMLElementTagNameMap {
   'custom-tag': HTMLElement;
 }
-interface ScopedCustomHTMLElementTagNameMap extends HTMLElementTagNameMap, ScopedCustomShadowHostElementTagNameMap {
+interface ScopedCustomHTMLElementTagNameMap extends HTMLElementTagNameMap, ScopedCustomShadowHostHTMLElementTagNameMap {
   'custom': HTMLElement;
 }
 
 // Note that the following code is based on the unstandardized APIs of scoped custom elements.
 const registry = new CustomElementRegistry();
 // This Host function creates a proxy and attaches its shadow root in the base document.
-export const Host = API<ShadowHostElementTagNameMap>(h, el =>
+export const Host = API<ShadowHostHTMLElementTagNameMap>(h, el =>
   shadow(el, { mode: 'open', registry }));
 // This html function creates a scoped custom element in a shadow DOM.
 export const html = element<ScopedCustomHTMLElementTagNameMap>(
@@ -141,7 +141,7 @@ export const html = element<ScopedCustomHTMLElementTagNameMap>(
 // This HTML function creates a scoped custom element proxy in a shadow DOM.
 export const HTML = API<ScopedCustomHTMLElementTagNameMap>(html);
 // This Shadow function creates a proxy and attaches its shadow root in a shadow DOM.
-export const Shadow = API<ScopedCustomShadowHostElementTagNameMap>(html, shadow);
+export const Shadow = API<ScopedCustomShadowHostHTMLElementTagNameMap>(html, shadow);
 ```
 
 ### Others

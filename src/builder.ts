@@ -14,7 +14,7 @@ export function API
   return new Proxy<API<M, F>>((() => 0) as any, handle(baseFactory, container));
 }
 
-export const Shadow = API<ShadowHostElementTagNameMap>(html, shadow);
+export const Shadow = API<ShadowHostHTMLElementTagNameMap>(html, shadow);
 export const HTML = API<HTMLElementTagNameMap>(html);
 export const SVG = API<SVGElementTagNameMap>(svg);
 

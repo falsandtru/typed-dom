@@ -3,7 +3,7 @@ import { Coroutine } from 'spica/coroutine';
 import { Sequence } from 'spica/sequence';
 
 declare global {
-  interface ShadowHostElementTagNameMap {
+  interface ShadowHostHTMLElementTagNameMap {
     'custom-tag': HTMLElement;
   }
   interface HTMLElementTagNameMap {

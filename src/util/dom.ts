@@ -3,7 +3,7 @@ import { hasOwnProperty } from 'spica/alias';
 import { memoize } from 'spica/memoize';
 
 declare global {
-  interface ShadowHostElementTagNameMap {
+  interface ShadowHostHTMLElementTagNameMap {
     'article': HTMLElement;
     'aside': HTMLElement;
     'blockquote': HTMLQuoteElement;
@@ -23,7 +23,7 @@ declare global {
     'section': HTMLElement;
     'span': HTMLSpanElement;
   }
-  interface HTMLElementTagNameMap extends ShadowHostElementTagNameMap {
+  interface HTMLElementTagNameMap extends ShadowHostHTMLElementTagNameMap {
   }
 }
 
@@ -46,9 +46,9 @@ namespace caches {
   export const fragment = document.createDocumentFragment();
 }
 
-export function shadow(el: keyof ShadowHostElementTagNameMap | Element, opts?: ShadowRootInit): ShadowRoot;
-export function shadow(el: keyof ShadowHostElementTagNameMap | Element, children?: Children, opts?: ShadowRootInit): ShadowRoot;
-export function shadow(el: keyof ShadowHostElementTagNameMap | Element, children?: Children | ShadowRootInit, opts?: ShadowRootInit): ShadowRoot {
+export function shadow(el: keyof ShadowHostHTMLElementTagNameMap | Element, opts?: ShadowRootInit): ShadowRoot;
+export function shadow(el: keyof ShadowHostHTMLElementTagNameMap | Element, children?: Children, opts?: ShadowRootInit): ShadowRoot;
+export function shadow(el: keyof ShadowHostHTMLElementTagNameMap | Element, children?: Children | ShadowRootInit, opts?: ShadowRootInit): ShadowRoot {
   if (typeof el === 'string') return shadow(html(el), children as Children, opts);
   if (children && !isChildren(children)) return shadow(el, void 0, children);
   const root = opts === void 0
