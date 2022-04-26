@@ -34,7 +34,7 @@ export const enum NS {
 
 export type TagNameMap = object;
 export type Attrs = Record<string, string | EventListener | null | undefined>;
-export type Children = Iterable<string | Node> | string;
+export type Children = Iterable<string | Node> | string | undefined;
 
 export interface Factory<M extends TagNameMap> {
   <T extends keyof M & string>(tag: T, children?: Children): M[T];
@@ -110,7 +110,7 @@ export function define<T extends Element>(node: T, attrs?: Attrs | Children, chi
     ? defineChildren(node, attrs)
     : defineChildren(defineAttrs(node, attrs), children);
 }
-function defineAttrs<T extends Element>(el: T, attrs?: Attrs): T {
+function defineAttrs<T extends Element>(el: T, attrs: Attrs): T {
   if (!attrs) return el;
   for (const name in attrs) {
     if (!hasOwnProperty(attrs, name)) continue;
@@ -146,7 +146,7 @@ function defineAttrs<T extends Element>(el: T, attrs?: Attrs): T {
   }
   return el;
 }
-function defineChildren<T extends ParentNode & Node>(node: T, children?: Children): T {
+function defineChildren<T extends ParentNode & Node>(node: T, children: Children): T {
   if (children === void 0) return node;
   if (typeof children === 'string') {
     node.textContent = children;
@@ -164,7 +164,7 @@ function defineChildren<T extends ParentNode & Node>(node: T, children?: Childre
   return node;
 }
 
-export function isChildren(param: Attrs | Children | ShadowRootInit | undefined): param is Children {
+export function isChildren(param: Attrs | Children | ShadowRootInit): param is Children {
   return !!param?.[Symbol.iterator];
 }
 
