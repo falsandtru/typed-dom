@@ -31,6 +31,9 @@
     "NOTICE",
     "LICENSE"
   ],
+  "dependencies": {
+    "typed-query-selector": "^2.6.1"
+  },
   "devDependencies": {
     "@types/benchmark": "2.1.1",
     "@types/i18next": "13.0.0",

@@ -1,12 +1,27 @@
-import { Attrs, define } from './dom';
+import type { ParseSelector } from 'typed-query-selector/parser';
 
-export function apply<T extends keyof HTMLElementTagNameMap>(node: ParentNode, selector: T, attrs: Attrs): NodeListOf<HTMLElementTagNameMap[T]>
-export function apply<T extends keyof SVGElementTagNameMap>(node: ParentNode, selector: T, attrs: Attrs): NodeListOf<SVGElementTagNameMap[T]>
-export function apply<T extends Element = Element>(node: ParentNode, selector: string, attrs: Attrs): NodeListOf<T>
-export function apply<T extends Element = Element>(node: ParentNode, selector: string, attrs: Attrs): NodeListOf<T> {
-  const ns = node.querySelectorAll<T>(selector);
-  for (let i = 0, len = ns.length; i < len; ++i) {
-    define(ns[i], attrs);
+export function querySelector<T extends keyof HTMLElementTagNameMap>(node: ParentNode, selector: T): HTMLElementTagNameMap[T] | null;
+export function querySelector<T extends keyof SVGElementTagNameMap>(node: ParentNode, selector: T): SVGElementTagNameMap[T] | null;
+export function querySelector<T extends string>(node: ParentNode, selector: T): ParseSelector<T>;
+export function querySelector<T extends Element = Element>(node: ParentNode, selector: string): T | null;
+export function querySelector(node: ParentNode | Element, selector: string): Element | null {
+  return 'matches' in node && node.matches(selector)
+    ? node
+    : node.querySelector(selector);
+}
+
+export function querySelectorAll<T extends keyof HTMLElementTagNameMap>(node: ParentNode, selector: T): HTMLElementTagNameMap[T][];
+export function querySelectorAll<T extends keyof SVGElementTagNameMap>(node: ParentNode, selector: T): SVGElementTagNameMap[T][];
+export function querySelectorAll<T extends string>(node: ParentNode, selector: T): ParseSelector<T>[];
+export function querySelectorAll<T extends Element = Element>(node: ParentNode, selector: string): T[];
+export function querySelectorAll(node: ParentNode | Element, selector: string): Element[] {
+  const acc: Element[] = [];
+  if ('matches' in node && node.matches(selector)) {
+    acc.push(node);
   }
-  return ns;
+  const nodes = node.querySelectorAll(selector);
+  for (let i = 0, len = nodes.length; i < len; ++i) {
+    acc.push(nodes[i]);
+  }
+  return acc;
 }

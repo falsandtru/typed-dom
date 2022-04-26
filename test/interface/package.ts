@@ -1,4 +1,4 @@
-import { API, Shadow, HTML, SVG, NS, shadow, frag, html, svg, text, element, define, append, prepend, defrag, listen, once, wait, bind, delegate, currentTarget, apply, identity } from '../..';
+import { API, Shadow, HTML, SVG, NS, shadow, frag, html, svg, text, element, define, append, prepend, defrag, listen, once, wait, bind, delegate, currentTarget, querySelector, querySelectorAll, identity } from '../..';
 
 describe('Interface: Package', function () {
   describe('Typed', function () {
@@ -91,8 +91,12 @@ describe('Interface: Package', function () {
       assert(typeof currentTarget === 'symbol');
     });
 
-    it('apply', function () {
-      assert(typeof apply === 'function');
+    it('querySelector', function () {
+      assert(typeof querySelector === 'function');
+    });
+
+    it('querySelectorAll', function () {
+      assert(typeof querySelectorAll === 'function');
     });
 
     it('identity', function () {
