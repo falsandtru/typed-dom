@@ -1,5 +1,5 @@
 import { Symbol, document } from 'spica/global';
-import { hasOwnProperty } from 'spica/alias';
+import { isArray, hasOwnProperty } from 'spica/alias';
 import { memoize } from 'spica/memoize';
 
 declare global {
@@ -150,16 +150,17 @@ function defineAttrs<T extends Element>(el: T, attrs: Attrs): T {
   }
   return el;
 }
-function defineChildren<T extends ParentNode & Node>(node: T, children: Children): T {
+function defineChildren<T extends ParentNode & Node>(node: T, children: Children | readonly (string | Node)[]): T {
   if (children === void 0) return node;
   if (typeof children === 'string') {
     node.textContent = children;
   }
-  else if (node.firstChild) {
+  else if (!isArray(children) || node.firstChild) {
     node.replaceChildren(...children);
   }
   else {
-    for (const child of children) {
+    for (let i = 0; i < children.length; ++i) {
+      const child = children[i];
       typeof child === 'object'
         ? node.appendChild(child)
         : node.append(child);
