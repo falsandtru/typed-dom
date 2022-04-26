@@ -122,10 +122,10 @@ Ideally, you should define custom elements only as scoped custom elements.
 ```ts
 import { API, NS, shadow, html as h, element } from 'typed-dom';
 
-interface ScopedCustomShadowHostHTMLElementTagNameMap extends ShadowHostHTMLElementTagNameMap {
+interface ShadowHostScopedCustomHTMLElementTagNameMap extends ShadowHostHTMLElementTagNameMap {
   'custom-tag': HTMLElement;
 }
-interface ScopedCustomHTMLElementTagNameMap extends HTMLElementTagNameMap, ScopedCustomShadowHostHTMLElementTagNameMap {
+interface ScopedCustomHTMLElementTagNameMap extends HTMLElementTagNameMap, ShadowHostScopedCustomHTMLElementTagNameMap {
   'custom': HTMLElement;
 }
 
@@ -141,7 +141,7 @@ export const html = element<ScopedCustomHTMLElementTagNameMap>(
 // This HTML function creates a scoped custom element proxy in a shadow DOM.
 export const HTML = API<ScopedCustomHTMLElementTagNameMap>(html);
 // This Shadow function creates a proxy and attaches its shadow root in a shadow DOM.
-export const Shadow = API<ScopedCustomShadowHostHTMLElementTagNameMap>(html, shadow);
+export const Shadow = API<ShadowHostScopedCustomHTMLElementTagNameMap>(html, shadow);
 ```
 
 ### Others
