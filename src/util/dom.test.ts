@@ -10,12 +10,12 @@ describe('Unit: util/dom', () => {
       assert(shadow('section', { mode: 'closed' }).mode === 'closed');
       assert(shadow('section').childNodes.length === 0);
       assert(shadow('section', html));
-      assert(shadow('section', 'a').textContent === 'a');
-      assert(shadow('section', [html('p')]).innerHTML === '<p></p>');
-      assert(shadow('section', { mode: 'closed' }, '').innerHTML === '');
-      assert(shadow('section', { mode: 'closed' }, [html('p')]).innerHTML === '<p></p>');
-      assert(shadow(html('section', [html('p')])).innerHTML === '<p></p>');
-      assert(shadow(html('section', [html('p')]), { mode: 'closed' }).innerHTML === '<p></p>');
+      assert(shadow('section', '').textContent === '');
+      assert(shadow('section', [html('slot')]).innerHTML === '<slot></slot>');
+      assert(shadow('section', { mode: 'closed' }, '').textContent === '');
+      assert(shadow('section', { mode: 'closed' }, [html('slot')]).innerHTML === '<slot></slot>');
+      assert(shadow(html('section', [html('slot')])).innerHTML === '<slot></slot>');
+      assert(shadow(html('section', [html('slot')]), { mode: 'closed' }).innerHTML === '<slot></slot>');
       assert(shadow(shadow('section').host));
       assert(shadow(shadow('section', { mode: 'open' }).host));
       assert(shadow(shadow('section', { mode: 'closed' }).host));
