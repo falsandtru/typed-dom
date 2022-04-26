@@ -3,6 +3,8 @@ import { benchmark } from './benchmark';
 describe('Benchmark:', function () {
   this.timeout(30 * 1e3);
 
+  if (navigator.userAgent.includes('Firefox')) return;
+
   const doc = document;
 
   describe('native', function () {
