@@ -131,7 +131,7 @@ interface ScopedCustomHTMLElementTagNameMap extends HTMLElementTagNameMap, Shado
 
 // Note that the following code is based on the unstandardized APIs of scoped custom elements.
 const registry = new CustomElementRegistry();
-// This Host function creates a proxy and attaches its shadow root in the base document (light DOM).
+// This Host function creates a proxy and makes its shadow DOM in the base document (light DOM).
 export const Host = API<ShadowHostHTMLElementTagNameMap>(h, el =>
   shadow(el, { mode: 'open', registry }));
 // This html function creates a scoped custom element in a shadow DOM.
@@ -140,7 +140,7 @@ export const html = element<ScopedCustomHTMLElementTagNameMap>(
   NS.HTML);
 // This HTML function creates a scoped custom element proxy in a shadow DOM.
 export const HTML = API<ScopedCustomHTMLElementTagNameMap>(html);
-// This Shadow function creates a proxy and attaches its shadow root in a shadow DOM.
+// This Shadow function creates a scoped custom element proxy and makes its shadow DOM in a shadow DOM.
 export const Shadow = API<ShadowHostScopedCustomHTMLElementTagNameMap>(html, shadow);
 ```
 
