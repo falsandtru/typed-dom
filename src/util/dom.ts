@@ -110,9 +110,15 @@ function elem(context: Document | ShadowRoot, ns: NS, tag: string): Element {
 export function define<T extends Element>(el: T, attrs?: Attrs, children?: Children): T;
 export function define<T extends Element | DocumentFragment | ShadowRoot>(node: T, children?: Children): T;
 export function define<T extends Element | DocumentFragment | ShadowRoot>(node: T, attrs?: Attrs | Children, children?: Children): T {
+  // Need the next type assertions to suppress an impossible type error on dependent projects.
+  // Probably caused by typed-query-selector.
+  //
+  //   typed-dom/dom.ts(113,3): Error TS2322: Type 'ParentNode & Node' is not assignable to type 'T'.
+  //     'T' could be instantiated with an arbitrary type which could be unrelated to 'ParentNode & Node'.
+  //
   return isChildren(attrs)
-    ? defineChildren(node, attrs)
-    : defineChildren(defineAttrs(node as Element, attrs) as T, children);
+    ? defineChildren(node, attrs) as T
+    : defineChildren(defineAttrs(node as Element, attrs), children) as T;
 }
 function defineAttrs<T extends Element>(el: T, attrs: Attrs): T {
   if (!attrs) return el;
