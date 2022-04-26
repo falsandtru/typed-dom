@@ -30,6 +30,7 @@ declare global {
 export const enum NS {
   HTML = 'HTML',
   SVG = 'SVG',
+  MathML = 'MathML',
 }
 
 export type TagNameMap = object;
@@ -79,6 +80,7 @@ export function text(source: string): Text {
 
 export function element<M extends HTMLElementTagNameMap>(context: Document | ShadowRoot, ns: NS.HTML): Factory<M>;
 export function element<M extends SVGElementTagNameMap>(context: Document | ShadowRoot, ns: NS.SVG): Factory<M>;
+export function element<M extends TagNameMap>(context: Document | ShadowRoot, ns: NS.MathML): Factory<M>;
 export function element<M extends TagNameMap>(context: Document | ShadowRoot, ns: NS): Factory<M> {
   const cache = memoize(elem, (_, ns, tag) => `${ns}:${tag}`);
   return (tag: string, attrs?: Attrs | Children, children?: Children) => {
@@ -100,6 +102,8 @@ function elem(context: Document | ShadowRoot, ns: NS, tag: string): Element {
       return context.createElement(tag);
     case NS.SVG:
       return context.createElementNS('http://www.w3.org/2000/svg', tag);
+    case NS.MathML:
+      return context.createElementNS('http://www.w3.org/1998/Math/MathML', tag);
   }
 }
 
