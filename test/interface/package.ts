@@ -1,4 +1,4 @@
-import { API, Shadow, HTML, SVG, NS, shadow, frag, html, svg, text, element, define, defrag, listen, once, wait, bind, delegate, currentTarget, apply, identity } from '../..';
+import { API, Shadow, HTML, SVG, NS, shadow, frag, html, svg, text, element, define, append, prepend, defrag, listen, once, wait, bind, delegate, currentTarget, apply, identity } from '../..';
 
 describe('Interface: Package', function () {
   describe('Typed', function () {
@@ -53,6 +53,14 @@ describe('Interface: Package', function () {
 
     it('define', function () {
       assert(typeof define === 'function');
+    });
+
+    it('append', function () {
+      assert(typeof append === 'function');
+    });
+
+    it('prepend', function () {
+      assert(typeof prepend === 'function');
     });
 
     it('defrag', function () {

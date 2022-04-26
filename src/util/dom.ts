@@ -168,6 +168,36 @@ export function isChildren(param: Attrs | Children | ShadowRootInit): param is C
   return !!param?.[Symbol.iterator];
 }
 
+export function append<T extends ParentNode & Node>(node: T, children: Children): T {
+  if (children === void 0) return node;
+  if (typeof children === 'string') {
+    node.append(children);
+  }
+  else {
+    for (const child of children) {
+      typeof child === 'object'
+        ? node.appendChild(child)
+        : node.append(child);
+    }
+  }
+  return node;
+}
+
+export function prepend<T extends ParentNode & Node>(node: T, children: Children): T {
+  if (children === void 0) return node;
+  if (typeof children === 'string') {
+    node.prepend(children);
+  }
+  else {
+    for (const child of children) {
+      typeof child === 'object'
+        ? node.insertBefore(child, null)
+        : node.prepend(child);
+    }
+  }
+  return node;
+}
+
 export function defrag<T extends Node | string>(nodes: ArrayLike<T>): T[];
 export function defrag(nodes: ArrayLike<Node | string>): (Node | string)[] {
   assert(Array.from(nodes).every(n => typeof n === 'string' || n instanceof Node));

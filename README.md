@@ -157,6 +157,8 @@ export const Shadow = API<ShadowHostScopedCustomHTMLElementTagNameMap>(html, sha
 - svg
 - text
 - define
+- append
+- prepend
 - defrag
 - listen
 - once

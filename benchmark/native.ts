@@ -5,7 +5,7 @@ describe('Benchmark:', function () {
 
   const doc = document;
 
-  describe('append', function () {
+  describe('native', function () {
     it('appendChild', function (done) {
       benchmark('appendChild', () => {
         const el = doc.createElement('div');
@@ -43,6 +43,24 @@ describe('Benchmark:', function () {
           doc.createElement('div'),
           doc.createElement('div'),
         ]);
+      }, done);
+    });
+
+    it('prepend', function (done) {
+      benchmark('prepend', () => {
+        const el = doc.createElement('div');
+        el.prepend(doc.createElement('div'));
+        el.prepend(doc.createElement('div'));
+        el.prepend(doc.createElement('div'));
+      }, done);
+    });
+
+    it('insertBefore', function (done) {
+      benchmark('insertBefore', () => {
+        const el = doc.createElement('div');
+        el.insertBefore(doc.createElement('div'), null);
+        el.insertBefore(doc.createElement('div'), null);
+        el.insertBefore(doc.createElement('div'), null);
       }, done);
     });
 
