@@ -29,4 +29,39 @@ describe('Benchmark:', function () {
 
   });
 
+  describe('querySelectorAll loop', function () {
+    it('native for-i', function (done) {
+      benchmark('querySelectorAll loop native for-i', () => {
+        for (let es = el.querySelectorAll('a'), i = 0, len = es.length; i < len; ++i) {
+          es[i];
+        }
+      }, done);
+    });
+
+    it('custom for-i', function (done) {
+      benchmark('querySelectorAll loop custom for-i', () => {
+        for (let es = querySelectorAll(el, 'a'), i = 0, len = es.length; i < len; ++i) {
+          es[i];
+        }
+      }, done);
+    });
+
+    it('native for-of', function (done) {
+      benchmark('querySelectorAll loop native for-of', () => {
+        for (const e of el.querySelectorAll('a')) {
+          e;
+        }
+      }, done);
+    });
+
+    it('custom for-of', function (done) {
+      benchmark('querySelectorAll loop custom for-of', () => {
+        for (const e of querySelectorAll(el, 'a')) {
+          e;
+        }
+      }, done);
+    });
+
+  });
+
 });
