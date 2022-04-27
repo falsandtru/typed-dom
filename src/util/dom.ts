@@ -57,7 +57,6 @@ export function shadow<M extends ShadowHostHTMLElementTagNameMap>(el: keyof M & 
   if (typeof opts === 'function') return shadow(el, void 0, children as Children, opts);
   if (typeof children === 'function') return shadow(el, opts as ShadowRootInit, void 0, children);
   if (isChildren(opts)) return shadow(el, void 0, opts, factory);
-  if (children !== void 0 && !isChildren(children)) return shadow(el, void 0, children, factory);
   return defineChildren(
     !opts
       ? el.shadowRoot ?? caches.shadows.get(el) ?? el.attachShadow({ mode: 'open' })
@@ -89,8 +88,8 @@ export function element<M extends TagNameMap>(context: Document | ShadowRoot, ns
       : cache(context, ns, tag).cloneNode(true) as Element;
     assert(el.attributes.length === 0);
     assert(el.childNodes.length === 0);
-    return isChildren(attrs)
-      ? defineChildren(el, attrs)
+    return !attrs || isChildren(attrs)
+      ? defineChildren(el, attrs ?? children)
       : defineChildren(defineAttrs(el, attrs), children);
   };
 }
@@ -116,12 +115,11 @@ export function define<T extends Element | DocumentFragment | ShadowRoot>(node: 
   //   typed-dom/dom.ts(113,3): Error TS2322: Type 'ParentNode & Node' is not assignable to type 'T'.
   //     'T' could be instantiated with an arbitrary type which could be unrelated to 'ParentNode & Node'.
   //
-  return isChildren(attrs)
-    ? defineChildren(node, attrs) as T
+  return !attrs || isChildren(attrs)
+    ? defineChildren(node, attrs ?? children) as T
     : defineChildren(defineAttrs(node as Element, attrs), children) as T;
 }
 function defineAttrs<T extends Element>(el: T, attrs: Attrs): T {
-  if (!attrs) return el;
   for (const name in attrs) {
     if (!hasOwnProperty(attrs, name)) continue;
     const value = attrs[name];
@@ -175,7 +173,7 @@ function defineChildren<T extends ParentNode & Node>(node: T, children: Children
   return node;
 }
 
-export function isChildren(value: Attrs | Children | ShadowRootInit): value is Children {
+export function isChildren(value: Attrs | Children | ShadowRootInit): value is NonNullable<Children> {
   return !!value?.[Symbol.iterator];
 }
 
