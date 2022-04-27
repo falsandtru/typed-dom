@@ -59,10 +59,10 @@ export function shadow<M extends ShadowHostHTMLElementTagNameMap>(el: keyof M & 
   if (isChildren(opts)) return shadow(el, void 0, opts, factory);
   if (children !== void 0 && !isChildren(children)) return shadow(el, void 0, children, factory);
   return defineChildren(
-    opts === void 0
-      ? el.shadowRoot ?? caches.shadows.get(el) ?? el.attachShadow(opts ?? { mode: 'open' })
+    !opts
+      ? el.shadowRoot ?? caches.shadows.get(el) ?? el.attachShadow({ mode: 'open' })
       : opts.mode === 'open'
-        ? el.shadowRoot ?? el.attachShadow(opts ?? { mode: 'open' })
+        ? el.shadowRoot ?? el.attachShadow(opts)
         : caches.shadows.get(el) ?? caches.shadow(el, opts),
     children);
 }
