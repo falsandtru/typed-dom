@@ -159,16 +159,16 @@ function defineChildren<T extends ParentNode & Node>(node: T, children: Children
   if (typeof children === 'string') {
     node.textContent = children;
   }
-  else if (!isArray(children) || node.firstChild) {
-    node.replaceChildren(...children);
-  }
-  else {
+  else if (isArray(children) && !node.firstChild) {
     for (let i = 0; i < children.length; ++i) {
       const child = children[i];
       typeof child === 'object'
         ? node.appendChild(child)
         : node.append(child);
     }
+  }
+  else {
+    node.replaceChildren(...children);
   }
   return node;
 }
