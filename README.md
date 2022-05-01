@@ -357,12 +357,12 @@ interface TransDataMap {
 const Trans = API<HTMLElementTagNameMap>(html);
 const bind = <K extends keyof TransDataMap>(data: TransDataMap[K]) =>
   <T extends keyof HTMLElementTagNameMap>(
-    factory: Factory<HTMLElementTagNameMap>,
+    html: Factory<HTMLElementTagNameMap>,
     tag: T,
     attrs: Attrs,
     children: K,
   ) =>
-    factory(tag, void Object.assign<Attrs, Attrs>(attrs, {
+    html(tag, void Object.assign<Attrs, Attrs>(attrs, {
       onmutate: ev =>
         void i18n.init((err, t) =>
           (ev.target as HTMLElement).textContent = err
