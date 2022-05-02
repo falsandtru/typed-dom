@@ -131,8 +131,9 @@ function defineAttrs<T extends Element>(el: T, attrs: Attrs): T {
         if (name.length < 3) throw new Error(`TypedDOM: Attribute names for event listeners must have an event name but got "${name}".`);
         const names = name.split(/\s+/);
         for (const name of names) {
-          if (name.slice(0, 2) !== 'on') throw new Error(`TypedDOM: Attribute names for event listeners must start with "on" but got "${name}".`);
-          el.addEventListener(name.slice(2), value, {
+          if (!name.startsWith('on')) throw new Error(`TypedDOM: Attribute names for event listeners must start with "on" but got "${name}".`);
+          const eventname = name.slice(2).toLowerCase();
+          el.addEventListener(eventname, value, {
             passive: [
               'wheel',
               'mousewheel',
@@ -140,9 +141,14 @@ function defineAttrs<T extends Element>(el: T, attrs: Attrs): T {
               'touchmove',
               'touchend',
               'touchcancel',
-            ].includes(name.slice(2)),
+            ].includes(eventname),
           });
-          el[name.toLowerCase()] ??= '';
+          switch (eventname) {
+            case 'mutate':
+            case 'connect':
+            case 'disconnect':
+              el[`on${eventname}`] ??= '';
+          }
         }
         continue;
       case 'object':
