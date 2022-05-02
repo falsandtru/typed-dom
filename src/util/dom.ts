@@ -147,7 +147,10 @@ function defineAttrs<T extends Element>(el: T, attrs: Attrs): T {
             case 'mutate':
             case 'connect':
             case 'disconnect':
-              el[`on${eventname}`] ??= '';
+              const prop = `on${eventname}`;
+              prop in el
+                ? el[prop] ??= (ev: Event) => ev.returnValue
+                : el[prop] ??= '';
           }
         }
         continue;
