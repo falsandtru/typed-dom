@@ -73,7 +73,7 @@ function handle
       if (isElChildren(attrs)) return build(void 0, attrs, factory);
       attrs ??= {} as typeof attrs;
       const el = elem(tag, factory, attrs, children);
-      return new Elem(tag, el, attrs, children, container?.(el));
+      return new Elem(tag, el, children, container?.(el));
     };
   }
 

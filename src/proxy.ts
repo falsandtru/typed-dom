@@ -71,14 +71,13 @@ export class Elem<
   constructor(
     public readonly tag: T,
     public readonly element: E,
-    attrs: Attrs,
     children: C,
     container: Element | ShadowRoot = element,
   ) {
     const events = this[privates.events];
-    events.mutate = (attrs?.['onmutate'] ?? attrs?.['onMutate']) != null;
-    events.connect = (attrs?.['onconnect'] ?? attrs?.['onConnect']) != null;
-    events.disconnect = (attrs?.['ondisconnect'] ?? attrs?.['onDisconnect']) != null;
+    events.mutate = element['onmutate'] != null;
+    events.connect = element['onconnect'] != null;
+    events.disconnect = element['ondisconnect'] != null;
     this[privates.children] = children;
     this[privates.container] = container;
     switch (true) {

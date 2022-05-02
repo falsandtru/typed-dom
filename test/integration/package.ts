@@ -581,16 +581,16 @@ describe('Integration: Typed DOM', function () {
         <T extends keyof HTMLElementTagNameMap>(
           html: Factory<HTMLElementTagNameMap>,
           tag: T,
-          attrs: Attrs,
+          _: Attrs,
           children: K,
         ) =>
-          html(tag, void Object.assign<Attrs, Attrs>(attrs, {
+          html(tag, {
             onmutate: ev =>
               void i18n.init((err, t) =>
                 (ev.target as HTMLElement).textContent = err
                   ? '{% Failed to initialize the translator. %}'
                   : t(children, data) ?? `{% Failed to translate "${children}". %}`),
-          }));
+          });
 
       const el = Trans.span('Greeting', bind({ name: 'world' }));
       assert(el.children === 'Hello, world.');

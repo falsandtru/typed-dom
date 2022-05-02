@@ -142,6 +142,7 @@ function defineAttrs<T extends Element>(el: T, attrs: Attrs): T {
               'touchcancel',
             ].includes(name.slice(2)),
           });
+          el[name.toLowerCase()] ??= '';
         }
         continue;
       case 'object':
