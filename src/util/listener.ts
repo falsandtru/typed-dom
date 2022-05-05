@@ -1,6 +1,5 @@
 import { AtomicPromise } from 'spica/promise';
 import { singleton } from 'spica/function';
-import { noop } from 'spica/noop';
 
 export const currentTarget = Symbol.for('typed-dom::currentTarget');
 
@@ -57,17 +56,14 @@ export function delegate<T extends keyof HTMLElementEventMap>(target: Document |
 export function delegate<T extends keyof SVGElementEventMap>(target: Document | ShadowRoot | SVGElement, selector: string, type: T, listener: (ev: SVGElementEventMap[T]) => unknown, option?: AddEventListenerOptions): () => undefined;
 export function delegate<T extends keyof ElementEventMap>(target: Document | ShadowRoot | Element, selector: string, type: T, listener: (ev: ElementEventMap[T]) => unknown, option?: AddEventListenerOptions): () => undefined;
 export function delegate<T extends keyof ElementEventMap>(target: Document | ShadowRoot | Element, selector: string, type: T, listener: (ev: ElementEventMap[T]) => unknown, option: AddEventListenerOptions = {}): () => undefined {
-  let unbind = noop;
   return bind(target as Element, type, ev => {
     assert(ev.target instanceof Element);
     assert(ev.composedPath()[0] instanceof Element);
-    unbind();
     const cx = (ev.target as Element).shadowRoot
       ? (ev.composedPath()[0] as Element)?.closest(selector)
       : (ev.target as Element)?.closest(selector);
-    return cx
-      ? unbind = once(cx, type, listener, option)
-      : void 0;
+    cx && once(cx, type, e => e === ev ? listener(ev) : e.returnValue, option);
+    return ev.returnValue;
   }, { ...option, capture: true });
 }
 
