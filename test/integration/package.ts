@@ -103,7 +103,7 @@ describe('Integration: Typed DOM', function () {
       assert(dom.children.every(({ element }, i) => element === dom.element.children[i]));
 
       // Property test
-      const el = HTML.ul([HTML.li('')]);
+      const el = HTML.ul([]);
       const es = Sequence.from([HTML.li('1'), HTML.li('2'), HTML.li('3')]);
       el.children = [];
       Sequence.from([
@@ -120,7 +120,7 @@ describe('Integration: Typed DOM', function () {
     it('collection children partial update', function () {
       const dom = HTML.ul([
         HTML.li()
-      ] as const);
+      ]);
       // @ts-expect-error
       () => dom.children[0] = dom.children[0];
       //() => dom.children[0] = HTML.li();
@@ -129,6 +129,8 @@ describe('Integration: Typed DOM', function () {
       //() => dom.children.length = 0;
       // @ts-expect-error
       () => dom.children = [undefined];
+      // @ts-expect-error
+      () => dom.children = [HTML.li(), undefined];
       assert(dom.children.length === 1);
       assert(dom.children.every(({ element }, i) => element === dom.element.children[i]));
     });
@@ -482,9 +484,11 @@ describe('Integration: Typed DOM', function () {
       }
 
       (): El => new Component();
-      (empty = HTML.section()): typeof empty => new Component();
       // @ts-expect-error
       (): El<''> => new Component();
+      () => HTML.div().children = '';
+      () => HTML.div().children = [new Component()];
+      () => HTML.div().children = { a: new Component() };
       const dom = new Component();
       assert(dom.children[0].children === 'item');
       dom.children = [
