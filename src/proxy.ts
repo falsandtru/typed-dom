@@ -118,7 +118,7 @@ export class Elem<
         this[privates.isInit] = false;
         return;
       default:
-        throw new Error(`TypedDOM: Unreachable code.`);
+        throw new Error(`TypedDOM: Invalid children type.`);
     }
   }
   private readonly [privates.events] = {
@@ -168,7 +168,7 @@ export class Elem<
   private [privates.isObserverUpdate] = false;
   private [privates.observe](children: El.Children.Struct): El.Children.Struct {
     return ObjectDefineProperties(children, ObjectKeys(children).reduce((obj, name) => {
-      if (name in {}) throw new Error(`TypedDOM: Child names must be different from the object property names.`);
+      if (name in {}) throw new Error(`TypedDOM: Child names conflicted with the object property names.`);
       let child = children[name];
       obj[name] = {
         configurable: true,
@@ -329,5 +329,5 @@ function events(child: El): Elem[typeof privates.events] | undefined {
 function throwErrorIfNotUsable(child: El, newParent?: ParentNode): void {
   const oldParent = child.element.parentNode;
   if (!oldParent || oldParent === newParent || !(proxy in oldParent)) return;
-  throw new Error(`TypedDOM: Typed DOM children must not be used to another typed DOM.`);
+  throw new Error(`TypedDOM: Typed DOM children cannot be used to another typed DOM.`);
 }
