@@ -5,16 +5,16 @@ describe('Unit: util/listener', () => {
   describe('bind', () => {
     it('click', done => {
       let cnt = 0;
-      const a = HTML.a().element;
-      bind(a, 'click', ev => {
+      const el = HTML.a().element;
+      bind(el, 'click', ev => {
         assert(ev instanceof Event);
         assert(ev[currentTarget] === ev.currentTarget);
         ++cnt;
-        bind(a, 'click', () => void assert(cnt === 2 && ++cnt) || done());
+        bind(el, 'click', () => void assert(cnt === 2 && ++cnt) || done());
       });
-      document.createDocumentFragment().appendChild(a);
-      a.click();
-      a.click();
+      document.createDocumentFragment().appendChild(el);
+      el.click();
+      el.click();
     });
 
   });
@@ -41,16 +41,16 @@ describe('Unit: util/listener', () => {
   describe('listen', () => {
     it('bind', done => {
       let cnt = 0;
-      const a = HTML.a().element;
-      listen(a, 'click', ev => {
+      const el = HTML.a().element;
+      listen(el, 'click', ev => {
         assert(ev instanceof Event);
         assert(ev[currentTarget] === ev.currentTarget);
         ++cnt;
-        listen(a, 'click', () => void assert(cnt === 2 && ++cnt) || done());
+        listen(el, 'click', () => void assert(cnt === 2 && ++cnt) || done());
       });
-      document.createDocumentFragment().appendChild(a);
-      a.click();
-      a.click();
+      document.createDocumentFragment().appendChild(el);
+      el.click();
+      el.click();
     });
 
     it('delegate', done => {
@@ -74,16 +74,16 @@ describe('Unit: util/listener', () => {
   describe('once', () => {
     it('bind', done => {
       let cnt = 0;
-      const a = HTML.a().element;
-      once(a, 'click', ev => {
+      const el = HTML.a().element;
+      once(el, 'click', ev => {
         assert(ev instanceof Event);
         assert(ev[currentTarget] === ev.currentTarget);
         assert(cnt === 0 && ++cnt);
-        once(a, 'click', () => void assert(cnt === 1 && ++cnt) || done());
+        once(el, 'click', () => void assert(cnt === 1 && ++cnt) || done());
       });
-      document.createDocumentFragment().appendChild(a);
-      a.click();
-      a.click();
+      document.createDocumentFragment().appendChild(el);
+      el.click();
+      el.click();
     });
 
     it('delegate', done => {
@@ -104,14 +104,14 @@ describe('Unit: util/listener', () => {
 
   describe('wait', () => {
     it('bind', done => {
-      const a = HTML.a().element;
-      wait(a, 'click').then(ev => {
+      const el = HTML.a().element;
+      wait(el, 'click').then(ev => {
         assert(ev instanceof Event);
         assert(ev[currentTarget] === ev.currentTarget);
         done();
       });
-      document.createDocumentFragment().appendChild(a);
-      a.click();
+      document.createDocumentFragment().appendChild(el);
+      el.click();
     });
 
     it('delegate', done => {
