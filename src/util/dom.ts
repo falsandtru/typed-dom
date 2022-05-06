@@ -109,6 +109,7 @@ function elem(context: Document | ShadowRoot, ns: NS, tag: string): Element {
 export function define<T extends Element>(el: T, attrs?: Attrs, children?: Children): T;
 export function define<T extends Element | DocumentFragment | ShadowRoot>(node: T, children?: Children): T;
 export function define<T extends Element | DocumentFragment | ShadowRoot>(node: T, attrs?: Attrs | Children, children?: Children): T {
+  // Bug: TypeScript
   // Need the next type assertions to suppress an impossible type error on dependent projects.
   // Probably caused by typed-query-selector.
   //
