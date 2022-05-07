@@ -486,8 +486,11 @@ describe('Integration: Typed DOM', function () {
       (): El => new Component();
       // @ts-expect-error
       (): El<''> => new Component();
+      // @ts-expect-error
       () => HTML.div().children = '';
+      // @ts-expect-error
       () => HTML.div().children = [new Component()];
+      // @ts-expect-error
       () => HTML.div().children = { a: new Component() };
       const dom = new Component();
       assert(dom.children[0].children === 'item');
