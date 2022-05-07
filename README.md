@@ -177,12 +177,12 @@ APIs replace the `:scope` selector with `:host`, `#<id>`, or `.<generated-id>`.
 import { HTML } from 'typed-dom';
 
 const dom = HTML.article({
-  style: HTML.style(`:scope { color: red; }`),
-  title: HTML.h1(`Title`),
+  style: HTML.style(':scope { color: red; }'),
+  title: HTML.h1('Title'),
   content: HTML.ul([
-    HTML.li(`item`),
-    HTML.li(`item`),
-  ])
+    HTML.li('item'),
+    HTML.li('item'),
+  ]),
 });
 ```
 
@@ -269,9 +269,9 @@ import { Shadow, HTML, El } from 'typed-dom';
 
 class Component implements El {
   private readonly dom = HTML.section({
-    style: HTML.style(`:scope { color: red; }`),
+    style: HTML.style(':scope { color: red; }'),
     content: HTML.ul([
-      HTML.li(`item`),
+      HTML.li('item'),
     ]),
   });
   public readonly tag = this.dom.tag;
@@ -286,9 +286,9 @@ class Component implements El {
 
 class ShadowComponent implements El {
   private readonly dom = Shadow.section({
-    style: HTML.style(`:scope { color: red; }`),
+    style: HTML.style(':scope { color: red; }'),
     content: HTML.ul([
-      HTML.li(`item`),
+      HTML.li('item'),
     ]),
   });
   public readonly tag = this.dom.tag;
@@ -318,9 +318,9 @@ class Component extends Coroutine implements El {
     }, { trigger: 'element', capacity: 0 });
   }
   private readonly dom = Shadow.section({
-    style: HTML.style(`:scope { color: red; }`),
+    style: HTML.style(':scope { color: red; }'),
     content: HTML.ul([
-      HTML.li(`item`),
+      HTML.li('item'),
     ]),
   });
   public readonly tag = this.dom.tag;

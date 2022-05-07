@@ -49,13 +49,13 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('text', function () {
-      const dom = HTML.p(`a`);
+      const dom = HTML.p('a');
       assert(dom.element.outerHTML === '<p>a</p>');
       assert(dom.children === 'a');
     });
 
     it('text children update', function () {
-      const dom = HTML.p(`a`);
+      const dom = HTML.p('a');
       // @ts-expect-error
       () => dom.children = undefined;
       dom.children = 'b';
@@ -64,7 +64,7 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('text with factory', function () {
-      const dom = HTML.p(`a`, (h, tag) =>
+      const dom = HTML.p('a', (h, tag) =>
         h(tag, { id: 'test' }));
       assert(dom.element.id === 'test');
       assert(dom.children === 'a');
@@ -72,8 +72,8 @@ describe('Integration: Typed DOM', function () {
 
     it('collection', function () {
       const dom = HTML.ul([
-        HTML.li(`1`),
-        HTML.li(`2`)
+        HTML.li('1'),
+        HTML.li('2'),
       ]);
       assert(dom.element.outerHTML === '<ul><li>1</li><li>2</li></ul>');
       assert(dom.children.length === 2);
@@ -84,19 +84,19 @@ describe('Integration: Typed DOM', function () {
       this.timeout(9 * 1e3);
 
       const dom = HTML.ul([
-        HTML.li(`1`)
+        HTML.li('1'),
       ]);
       assert.doesNotThrow(() => dom.children = dom.children);
-      assert.throws(() => dom.children = HTML.ul([HTML.li(`1`)]).children);
+      assert.throws(() => dom.children = HTML.ul([HTML.li('1')]).children);
       dom.children = [
         HTML.li('2'),
-        HTML.li('3')
+        HTML.li('3'),
       ];
       assert(dom.element.outerHTML === '<ul><li>2</li><li>3</li></ul>');
       assert(dom.children.length === 2);
       assert(dom.children.every(({ element }, i) => element === dom.element.children[i]));
       dom.children = [
-        HTML.li('4')
+        HTML.li('4'),
       ];
       assert(dom.element.outerHTML === '<ul><li>4</li></ul>');
       assert(dom.children.length === 1);
@@ -119,7 +119,7 @@ describe('Integration: Typed DOM', function () {
 
     it('collection children partial update', function () {
       const dom = HTML.ul([
-        HTML.li()
+        HTML.li(),
       ]);
       // @ts-expect-error
       () => dom.children[0] = dom.children[0];
@@ -144,8 +144,8 @@ describe('Integration: Typed DOM', function () {
 
     it('struct', function () {
       const dom = HTML.article({
-        title: HTML.h1(`title`),
-        content: HTML.p()
+        title: HTML.h1('title'),
+        content: HTML.p(),
       });
       assert(dom.element.outerHTML === '<article><h1>title</h1><p></p></article>');
       assert(dom.children.title.element === dom.element.firstChild);
@@ -159,15 +159,15 @@ describe('Integration: Typed DOM', function () {
 
     it('struct children update', function () {
       const dom = HTML.article({
-        title: HTML.h1(`a`),
+        title: HTML.h1('a'),
       });
       assert.doesNotThrow(() => dom.children = dom.children);
-      assert.throws(() => dom.children = HTML.article({ title: HTML.h1(`b`) }).children);
+      assert.throws(() => dom.children = HTML.article({ title: HTML.h1('b') }).children);
       assert(dom.children.title.element === dom.element.firstChild);
       assert(dom.children.title.element.textContent === 'a');
       assert(dom.children.title.children === 'a');
       dom.children = {
-        title: HTML.h1(`b`)
+        title: HTML.h1('b'),
       };
       assert(dom.children.title.element === dom.element.firstChild);
       assert(dom.children.title.element.textContent === 'b');
@@ -176,15 +176,15 @@ describe('Integration: Typed DOM', function () {
 
     it('struct children partial update', function () {
       const dom = HTML.article({
-        title: HTML.h1(`a`),
-        content: HTML.p()
+        title: HTML.h1('a'),
+        content: HTML.p(),
       });
       assert.doesNotThrow(() => dom.children.title = dom.children.title);
-      assert.throws(() => dom.children.title = HTML.article({ title: HTML.h1(`b`) }).children.title);
+      assert.throws(() => dom.children.title = HTML.article({ title: HTML.h1('b') }).children.title);
       assert(dom.children.title.element === dom.element.firstChild);
       assert(dom.children.title.element.textContent === 'a');
       assert(dom.children.title.children === 'a');
-      dom.children.title = HTML.h1(`b`);
+      dom.children.title = HTML.h1('b');
       assert(dom.children.title.element === dom.element.firstChild);
       assert(dom.children.title.element.textContent === 'b');
       assert(dom.children.title.children === 'b');
@@ -193,13 +193,13 @@ describe('Integration: Typed DOM', function () {
       assert(dom.children.title.element.textContent === 'c');
       assert(dom.children.title.children === 'c');
       dom.children = {
-        title: HTML.h1(`d`),
+        title: HTML.h1('d'),
       };
       assert(dom.children.title.element === dom.element.firstChild);
       assert(dom.children.title.element.textContent === 'd');
       assert(dom.children.title.children === 'd');
       dom.children = {
-        title: HTML.h1(`e`),
+        title: HTML.h1('e'),
         content: undefined,
       };
       assert(dom.children.content.element === dom.element.lastChild);
@@ -311,8 +311,8 @@ describe('Integration: Typed DOM', function () {
       assert(Shadow.div([HTML.style(':scope {}')]).element.outerHTML === '<div></div>');
       assert(Shadow.div([HTML.style(':scope {}')]).children[0].element.innerHTML === ':host {}');
       assert(Shadow.div([HTML.style('/* :scope */:scope/* :scope */{content:" :scope "}')]).children[0].element.innerHTML === '/* :scope */:host/* :scope */{content:" :scope "}');
-      assert(HTML.div([HTML.style(`<script>`)]).children[0].element.children.length === 0);
-      assert(HTML.div([HTML.style(`:scope{}<script>`)]).children[0].element.children.length === 0);
+      assert(HTML.div([HTML.style('<script>')]).children[0].element.children.length === 0);
+      assert(HTML.div([HTML.style(':scope{}<script>')]).children[0].element.children.length === 0);
     });
 
     it('clear', function () {
@@ -468,9 +468,9 @@ describe('Integration: Typed DOM', function () {
     it('component', function () {
       class Component implements El {
         private readonly dom = HTML.section({
-          style: HTML.style(`:scope { color: red; }`),
+          style: HTML.style(':scope { color: red; }'),
           content: HTML.ul([
-            HTML.li(`item`)
+            HTML.li('item'),
           ]),
         });
         public readonly tag = this.dom.tag;
@@ -492,7 +492,7 @@ describe('Integration: Typed DOM', function () {
       const dom = new Component();
       assert(dom.children[0].children === 'item');
       dom.children = [
-        HTML.li('Item')
+        HTML.li('Item'),
       ];
       assert(dom.children[0].children === 'Item');
       assert(HTML.div([dom]));
@@ -501,9 +501,9 @@ describe('Integration: Typed DOM', function () {
     it('component shadow', function () {
       class Component implements El {
         private readonly dom = Shadow.section({
-          style: HTML.style(`:scope { color: red; }`),
+          style: HTML.style(':scope { color: red; }'),
           content: HTML.ul([
-            HTML.li(`item`)
+            HTML.li('item'),
           ]),
         });
         public readonly tag = this.dom.tag;
@@ -519,7 +519,7 @@ describe('Integration: Typed DOM', function () {
       const dom = new Component();
       assert(dom.children[0].children === 'item');
       dom.children = [
-        HTML.li('Item')
+        HTML.li('Item'),
       ];
       assert(dom.children[0].children === 'Item');
       assert(HTML.div([dom]));
@@ -542,9 +542,9 @@ describe('Integration: Typed DOM', function () {
           assert(this.children[0].children === 'ITEM');
         }
         private readonly dom = Shadow.section({
-          style: HTML.style(`:scope { color: red; }`),
+          style: HTML.style(':scope { color: red; }'),
           content: HTML.ul([
-            HTML.li(`item`)
+            HTML.li('item'),
           ]),
         });
         public readonly tag = this.dom.tag;
@@ -560,7 +560,7 @@ describe('Integration: Typed DOM', function () {
       const dom = new Component();
       assert(dom.children[0].children === 'ITEM');
       dom.children = [
-        HTML.li('item')
+        HTML.li('item'),
       ];
       assert(dom.children[0].children === 'item');
       assert(HTML.div([dom]));
