@@ -3,6 +3,14 @@ import { isArray, hasOwnProperty, ObjectDefineProperties, ObjectKeys } from 'spi
 import { TagNameMap, Attrs, Factory as BaseFactory } from './util/dom';
 import { identity } from './util/identity';
 
+declare global {
+  interface ElementEventMap {
+    'mutate': Event;
+    'connect': Event;
+    'disconnect': Event;
+  }
+}
+
 const proxy = Symbol.for('typed-dom::proxy');
 
 export interface El<

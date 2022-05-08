@@ -6,10 +6,3 @@ export { NS, Attrs, Children, Factory, shadow, frag, html, svg, text, element, d
 export { listen, delegate, bind, once, wait, currentTarget } from './src/util/listener';
 export { querySelector, querySelectorAll } from './src/util/query';
 export { identity } from './src/util/identity';
-
-declare global {
-  interface ElementEventMap {
-    'connect': Event;
-    'disconnect': Event;
-  }
-}
