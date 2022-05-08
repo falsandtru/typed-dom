@@ -361,7 +361,7 @@ describe('Integration: Typed DOM', function () {
     it('observe text', function () {
       const dom = HTML.span(
         {
-          onmutate: (ev, el = ev.target as HTMLElement) =>
+          onmutate: ({ currentTarget: el }) =>
             el.textContent += el.textContent!,
         },
         'a');
@@ -372,9 +372,9 @@ describe('Integration: Typed DOM', function () {
 
     it('observe collection', function () {
       const attrs: Attrs = {
-        onconnect: (ev, el = ev.target as HTMLElement) =>
+        onconnect: ({ currentTarget: el }) =>
           el.textContent += el.textContent!.toUpperCase(),
-        ondisconnect: (ev, el = ev.target as HTMLElement) =>
+        ondisconnect: ({ currentTarget: el }) =>
           el.textContent += el.textContent!,
       };
       const dom = HTML.ul([
@@ -404,9 +404,9 @@ describe('Integration: Typed DOM', function () {
 
     it('observe record', function () {
       const attrs: Attrs = {
-        onconnect: (ev, el = ev.target as HTMLElement) =>
+        onconnect: ({ currentTarget: el }) =>
           el.textContent += el.textContent![0].toUpperCase(),
-        ondisconnect: (ev, el = ev.target as HTMLElement) =>
+        ondisconnect: ({ currentTarget: el }) =>
           el.textContent += el.textContent![0].toLowerCase(),
       };
       const dom = HTML.ul({
@@ -594,7 +594,7 @@ describe('Integration: Typed DOM', function () {
           html(tag, {
             onmutate: ev =>
               void i18n.init((err, t) =>
-                (ev.target as HTMLElement).textContent = err
+                ev.currentTarget.textContent = err
                   ? '{% Failed to initialize the translator. %}'
                   : t(children, data) ?? `{% Failed to translate "${children}". %}`),
           });

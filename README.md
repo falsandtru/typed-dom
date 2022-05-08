@@ -365,7 +365,7 @@ const bind = <K extends keyof TransDataMap>(data: TransDataMap[K]) =>
     html(tag, {
       onmutate: ev =>
         void i18n.init((err, t) =>
-          (ev.target as HTMLElement).textContent = err
+          ev.currentTarget.textContent = err
             ? '{% Failed to initialize the translator. %}'
             : t(children, data) ?? `{% Failed to translate "${children}". %}`),
     });

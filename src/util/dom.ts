@@ -33,13 +33,20 @@ export const enum NS {
   MathML = 'MathML',
 }
 
+// {HTML,SVG,}ElementEventMapを使用しないがEvent型しか使われてないので問題ない
+interface NodeEvent<N extends Node> extends Event {
+  readonly target: Node;
+  readonly currentTarget: N;
+}
+type NodeEventListener<N extends Node> = (ev: NodeEvent<N>) => void;
+
 export type TagNameMap = object;
-export type Attrs = Record<string, string | EventListener | null | undefined>;
+export type Attrs<E extends Element = Element> = Record<string, string | NodeEventListener<E> | null | undefined>;
 export type Children = Iterable<string | Node> | string | undefined;
 
 export interface Factory<M extends TagNameMap> {
   <T extends keyof M & string>(tag: T, children?: Children): M[T];
-  <T extends keyof M & string>(tag: T, attrs: Attrs | undefined, children?: Children): M[T];
+  <T extends keyof M & string>(tag: T, attrs: Attrs<Extract<M[T], Element>> | undefined, children?: Children): M[T];
 }
 
 namespace caches {
@@ -106,21 +113,21 @@ function elem(context: Document | ShadowRoot, ns: NS, tag: string): Element {
   }
 }
 
-export function define<T extends Element>(el: T, attrs?: Attrs, children?: Children): T;
-export function define<T extends Element | DocumentFragment | ShadowRoot>(node: T, children?: Children): T;
-export function define<T extends Element | DocumentFragment | ShadowRoot>(node: T, attrs?: Attrs | Children, children?: Children): T {
+export function define<E extends Element>(el: E, attrs?: Attrs<E>, children?: Children): E;
+export function define<E extends Element | DocumentFragment | ShadowRoot>(node: E, children?: Children): E;
+export function define<E extends Element | DocumentFragment | ShadowRoot>(node: E, attrs?: Attrs | Children, children?: Children): E {
   // Bug: TypeScript
   // Need the next type assertions to suppress an impossible type error on dependent projects.
   // Probably caused by typed-query-selector.
   //
-  //   typed-dom/dom.ts(113,3): Error TS2322: Type 'ParentNode & Node' is not assignable to type 'T'.
-  //     'T' could be instantiated with an arbitrary type which could be unrelated to 'ParentNode & Node'.
+  //   typed-dom/dom.ts(113,3): Error TS2322: Type 'ParentNode & Node' is not assignable to type 'E'.
+  //     'E' could be instantiated with an arbitrary type which could be unrelated to 'ParentNode & Node'.
   //
   return !attrs || isChildren(attrs)
-    ? defineChildren(node, attrs ?? children) as T
-    : defineChildren(defineAttrs(node as Element, attrs), children) as T;
+    ? defineChildren(node, attrs ?? children) as E
+    : defineChildren(defineAttrs(node as Element, attrs), children) as E;
 }
-function defineAttrs<T extends Element>(el: T, attrs: Attrs): T {
+function defineAttrs<E extends Element>(el: E, attrs: Attrs): E {
   for (const name in attrs) {
     if (!hasOwnProperty(attrs, name)) continue;
     const value = attrs[name];
@@ -150,7 +157,7 @@ function defineAttrs<T extends Element>(el: T, attrs: Attrs): T {
             case 'disconnect':
               const prop = `on${eventname}`;
               prop in el
-                ? el[prop] ??= (ev: Event) => ev.returnValue
+                ? el[prop] ??= (ev: NodeEvent<E>) => ev.returnValue
                 : el[prop] ??= '';
           }
         }
@@ -165,7 +172,7 @@ function defineAttrs<T extends Element>(el: T, attrs: Attrs): T {
   }
   return el;
 }
-function defineChildren<T extends ParentNode & Node>(node: T, children: Children | readonly (string | Node)[]): T {
+function defineChildren<N extends ParentNode & Node>(node: N, children: Children | readonly (string | Node)[]): N {
   if (children === void 0) return node;
   if (typeof children === 'string') {
     node.textContent = children;
@@ -188,7 +195,7 @@ export function isChildren(value: Attrs | Children | ShadowRootInit): value is N
   return !!value?.[Symbol.iterator];
 }
 
-export function append<T extends ParentNode & Node>(node: T, children: Children): T {
+export function append<N extends ParentNode & Node>(node: N, children: Children): N {
   if (children === void 0) return node;
   if (typeof children === 'string') {
     node.append(children);
@@ -203,7 +210,7 @@ export function append<T extends ParentNode & Node>(node: T, children: Children)
   return node;
 }
 
-export function prepend<T extends ParentNode & Node>(node: T, children: Children): T {
+export function prepend<N extends ParentNode & Node>(node: N, children: Children): N {
   if (children === void 0) return node;
   if (typeof children === 'string') {
     node.prepend(children);
@@ -218,7 +225,7 @@ export function prepend<T extends ParentNode & Node>(node: T, children: Children
   return node;
 }
 
-export function defrag<T extends Node | string>(nodes: ArrayLike<T>): T[];
+export function defrag<N extends Node | string>(nodes: ArrayLike<N>): N[];
 export function defrag(nodes: ArrayLike<Node | string>): (Node | string)[] {
   assert(Array.from(nodes).every(n => typeof n === 'string' || n instanceof Node));
   const acc: (Node | string)[] = [];
