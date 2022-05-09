@@ -71,15 +71,16 @@ function handle
       if (typeof children === 'function') return build(attrs, void 0, children);
       if (typeof attrs === 'function') return build(void 0, void 0, attrs);
       if (isElChildren(attrs)) return build(void 0, attrs, factory);
-      attrs ??= {} as typeof attrs;
+      // Bug: TypeScript
+      //assert(attrs = attrs as Attrs | undefined);
       const el = elem(tag, factory, attrs, children);
       return new Elem(tag, el, children, container?.(el));
     };
   }
 
-  function elem(tag: keyof M & string, factory: El.Factory<M, F, keyof M & string, El.Children> | undefined, attrs: Attrs, children: El.Children): Element {
+  function elem(tag: keyof M & string, factory: El.Factory<M, F, keyof M & string, El.Children> | undefined, attrs: Attrs | undefined, children: El.Children): Element {
     const el = factory
-      ? define(factory(baseFactory, tag, attrs, children) as unknown as Element, attrs)
+      ? define(factory(baseFactory, tag, attrs ?? {}, children) as unknown as Element, attrs)
       : baseFactory(tag, attrs) as unknown as Element;
     if (tag.toLowerCase() !== el.tagName.toLowerCase()) throw new Error(`TypedDOM: Expected tag name is "${tag.toLowerCase()}" but actually "${el.tagName.toLowerCase()}".`);
     return el;
