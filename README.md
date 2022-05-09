@@ -312,7 +312,8 @@ import { Coroutine } from 'spica/coroutine';
 class Component extends Coroutine implements El {
   constructor() {
     super(async function* (this: Component) {
-      while (true) {
+      for (const child of this.children) {
+        child.children = child.children.toUpperCase();
         yield;
       }
     }, { trigger: 'element', capacity: 0 });

@@ -534,11 +534,8 @@ describe('Integration: Typed DOM', function () {
           super(async function* (this: Component) {
             assert(this.element);
             assert(this.children);
-            this.children = this.children.map(child => {
+            for (const child of this.children) {
               child.children = child.children.toUpperCase();
-              return child;
-            });
-            while (true) {
               yield;
             }
           }, { trigger: 'element', capacity: 0 });
