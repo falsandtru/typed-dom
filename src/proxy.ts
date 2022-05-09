@@ -44,7 +44,13 @@ export namespace El {
     Partial<C>;
   // Bug: TypeScript: Type U must not affect Type C
   //export type Factory<M extends TagNameMap, F extends BaseFactory<M> = BaseFactory<M>, T extends keyof M & string = keyof M & string, C extends El.Children = El.Children> = <U extends T>(baseFactory: F, tag: U, attrs: Attrs, children: C) => M[U];
-  export type Factory<M extends TagNameMap, F extends BaseFactory<M> = BaseFactory<M>, T extends keyof M & string = keyof M & string, C extends El.Children = El.Children> = (baseFactory: F, tag: T, attrs: Attrs, children: C) => M[T];
+  export type Factory<
+    M extends TagNameMap,
+    F extends BaseFactory<M> = BaseFactory<M>,
+    T extends keyof M & string = keyof M & string,
+    C extends El.Children = El.Children,
+    > =
+    (baseFactory: F, tag: T, attrs: Attrs, children: C) => M[T];
 }
 const enum ElChildType {
   Void,
