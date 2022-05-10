@@ -1,4 +1,4 @@
-import { API, Shadow, HTML, SVG, El, Attrs, Factory, shadow, html } from '../..';
+import { API, Shadow, HTML, SVG, El, Attrs, shadow, html } from '../..';
 import { Coroutine } from 'spica/coroutine';
 import { Sequence } from 'spica/sequence';
 
@@ -584,13 +584,11 @@ describe('Integration: Typed DOM', function () {
         'Greeting': { name: string; };
       }
       const Trans = API<HTMLElementTagNameMap>(html);
-      const data = <K extends keyof TransDataMap>(data: TransDataMap[K]) =>
-        <T extends keyof HTMLElementTagNameMap>(
-          html: Factory<HTMLElementTagNameMap>,
-          tag: T,
-          _: Attrs,
-          children: K,
-        ) =>
+      function data
+        <K extends keyof TransDataMap>
+        (data: TransDataMap[K])
+        : El.Factory<HTMLElementTagNameMap, K> {
+        return (html, tag, _, children) =>
           html(tag, {
             onmutate: ev =>
               void i18n.init((err, t) =>
@@ -598,6 +596,7 @@ describe('Integration: Typed DOM', function () {
                   ? '{% Failed to initialize the translator. %}'
                   : t(children, data) ?? `{% Failed to translate "${children}". %}`),
           });
+      }
 
       const el = Trans.span('Greeting', data({ name: 'world' }));
       assert(el.children === 'Hello, world.');
@@ -609,13 +608,11 @@ describe('Integration: Typed DOM', function () {
       // @ts-expect-error
       () => Trans.span(data({ name: 'world' }));
 
-      const bind = <K extends keyof TransDataMap>(children: K, data: TransDataMap[K]) =>
-        <T extends keyof HTMLElementTagNameMap>(
-          html: Factory<HTMLElementTagNameMap>,
-          tag: T,
-          _: Attrs,
-          __: El.Children.Void,
-        ) => {
+      function bind
+        <K extends keyof TransDataMap>
+        (children: K, data: TransDataMap[K])
+        : El.Factory<HTMLElementTagNameMap, void> {
+        return (html, tag, _, __) => {
           const el = html(tag);
           i18n.init((err, t) =>
             el.textContent = err
@@ -623,6 +620,7 @@ describe('Integration: Typed DOM', function () {
               : t(children, data) ?? `{% Failed to translate "${children}". %}`);
           return el;
         };
+      }
 
       assert(Trans.span(bind('Greeting', { name: 'world' })).children === undefined);
       assert(Trans.span(bind('Greeting', { name: 'world' })).element.textContent === 'Hello, world.');

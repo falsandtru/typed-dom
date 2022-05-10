@@ -350,7 +350,7 @@ Create a custom API for translation.
 Typed-DOM provides `mutate`, `connect`, and `disconnect` events.
 
 ```ts
-import { API, Attrs, Factory, html } from 'typed-dom';
+import { API, El, html } from 'typed-dom';
 
 const i18n = i18next.createInstance({
   lng: 'en',
@@ -366,13 +366,11 @@ interface TransDataMap {
   'Greeting': { name: string; };
 }
 const Trans = API<HTMLElementTagNameMap>(html);
-const data = <K extends keyof TransDataMap>(data: TransDataMap[K]) =>
-  <T extends keyof HTMLElementTagNameMap>(
-    html: Factory<HTMLElementTagNameMap>,
-    tag: T,
-    _: Attrs,
-    children: K,
-  ) =>
+function data
+  <K extends keyof TransDataMap>
+  (data: TransDataMap[K])
+  : El.Factory<HTMLElementTagNameMap, K> {
+  return (html, tag, _, children) =>
     html(tag, {
       onmutate: ev =>
         void i18n.init((err, t) =>
@@ -380,6 +378,7 @@ const data = <K extends keyof TransDataMap>(data: TransDataMap[K]) =>
             ? '{% Failed to initialize the translator. %}'
             : t(children, data) ?? `{% Failed to translate "${children}". %}`),
     });
+}
 
 const el = Trans.span('Greeting', data({ name: 'world' }));
 assert(el.children === 'Hello, world.');
@@ -389,13 +388,11 @@ assert(el.element.textContent === 'Hello, world.');
 Or
 
 ```ts
-const bind = <K extends keyof TransDataMap>(children: K, data: TransDataMap[K]) =>
-  <T extends keyof HTMLElementTagNameMap>(
-    html: Factory<HTMLElementTagNameMap>,
-    tag: T,
-    _: Attrs,
-    __: El.Children.Void,
-  ) => {
+function bind
+  <K extends keyof TransDataMap>
+  (children: K, data: TransDataMap[K])
+  : El.Factory<HTMLElementTagNameMap, void> {
+  return (html, tag, _, __) => {
     const el = html(tag);
     i18n.init((err, t) =>
       el.textContent = err
@@ -403,6 +400,7 @@ const bind = <K extends keyof TransDataMap>(children: K, data: TransDataMap[K]) 
         : t(children, data) ?? `{% Failed to translate "${children}". %}`);
     return el;
   };
+}
 
 const el = Trans.span(bind('Greeting', { name: 'world' }));
 assert(el.children === undefined);
