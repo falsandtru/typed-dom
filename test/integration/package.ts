@@ -603,11 +603,11 @@ describe('Integration: Typed DOM', function () {
       assert(el.children === 'Hello, world.');
       assert(el.element.textContent === 'Hello, world.');
       // @ts-expect-error
-      Trans.span('Greeting', data({}));
+      () => Trans.span('Greeting', data({}));
       // @ts-expect-error
-      Trans.span('', data({ name: 'world' }));
+      () => Trans.span('', data({ name: 'world' }));
       // @ts-expect-error
-      Trans.span(data({ name: 'world' }));
+      () => Trans.span(data({ name: 'world' }));
 
       const bind = <K extends keyof TransDataMap>(children: K, data: TransDataMap[K]) =>
         <T extends keyof HTMLElementTagNameMap>(
@@ -625,8 +625,13 @@ describe('Integration: Typed DOM', function () {
         };
 
       assert(Trans.span(bind('Greeting', { name: 'world' })).children === undefined);
+      assert(Trans.span(bind('Greeting', { name: 'world' })).element.textContent === 'Hello, world.');
       assert(Trans.span({}, bind('Greeting', { name: 'world' })).children === undefined);
       assert(Trans.span({}, bind('Greeting', { name: 'world' })).element.textContent === 'Hello, world.');
+      // @ts-expect-error
+      () => Trans.span(bind('Greeting', {}));
+      // @ts-expect-error
+      () => Trans.span(bind('', { name: 'world' }));
     });
 
   });
