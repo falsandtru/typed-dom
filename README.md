@@ -366,6 +366,7 @@ interface TransDataMap {
   'Greeting': { name: string; };
 }
 const Trans = API<HTMLElementTagNameMap>(html);
+
 function data
   <K extends keyof TransDataMap>
   (data: TransDataMap[K])
