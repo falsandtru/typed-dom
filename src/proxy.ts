@@ -77,7 +77,7 @@ namespace privates {
 let id = identity();
 let counter = 0;
 
-export class Elem<
+export class ElementProxy<
   T extends string = string,
   E extends Element = Element,
   C extends El.Children = El.Children,
@@ -336,7 +336,7 @@ export class Elem<
   }
 }
 
-function events(child: El): Elem[typeof privates.events] | undefined {
+function events(child: El): ElementProxy[typeof privates.events] | undefined {
   return child[privates.events] ?? child.element[proxy]?.[privates.events];
 }
 

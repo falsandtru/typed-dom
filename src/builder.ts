@@ -1,6 +1,6 @@
 import { Symbol } from 'spica/global';
 import { hasOwnProperty } from 'spica/alias';
-import { Elem, El } from './proxy';
+import { El, ElementProxy } from './proxy';
 import { Factory, TagNameMap, Attrs, shadow, html, svg, define } from './util/dom';
 
 export type API
@@ -74,7 +74,7 @@ function handle
       // Bug: TypeScript
       //assert(attrs = attrs as Attrs | undefined);
       const el = elem(tag, factory, attrs, children);
-      return new Elem(tag, el, children, container?.(el));
+      return new ElementProxy(tag, el, children, container?.(el));
     };
   }
 
