@@ -4,14 +4,14 @@ import { El, ElementProxy } from './proxy';
 import { Factory, TagNameMap, Attrs, shadow, html, svg, define } from './util/dom';
 
 export type API
-  <M extends TagNameMap, F extends Factory<M> = Factory<M>> =
-  BuilderFunction<M, F> &
-  { readonly [P in K<M>]: BuilderMethod<M, F, P>; };
+  <M extends TagNameMap> =
+  BuilderFunction<M> &
+  { readonly [P in K<M>]: BuilderMethod<M, P>; };
 export function API
-  <M extends TagNameMap, F extends Factory<M> = Factory<M>>
-  (baseFactory: F, container?: <E extends Element>(el: E) => ShadowRoot)
-  : API<M, F> {
-  return new Proxy<API<M, F>>((() => 0) as any, handle(baseFactory, container));
+  <M extends TagNameMap>
+  (baseFactory: Factory<M>, container?: <E extends Element>(el: E) => ShadowRoot)
+  : API<M> {
+  return new Proxy<API<M>>((() => 0) as any, handle(baseFactory, container));
 }
 
 export const Shadow = API<ShadowHostHTMLElementTagNameMap>(html, shadow);
@@ -22,40 +22,40 @@ type K<M> = keyof M & string;
 type E<V> = Extract<V, Element>;
 type El_Children_Unit = readonly [];
 
-interface BuilderFunction<M extends TagNameMap, F extends Factory<M>> {
-  <T extends K<M>, C extends El.Children.Void  >(tag: T, attrs: Attrs<E<M[T]>> | undefined,              factory?: El.Factory<M, F, T, C>): El<T, E<M[T]>, El.Children.Void>;
-  <T extends K<M>, C extends El.Children.Void  >(tag: T, attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: El.Factory<M, F, T, C>): El<T, E<M[T]>, El.Children.Void>;
-  <T extends K<M>, C extends El.Children.Text  >(tag: T, attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: El.Factory<M, F, T, C>): El<T, E<M[T]>, El.Children.Text>;
-  <T extends K<M>, C extends El_Children_Unit  >(tag: T, attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: El.Factory<M, F, T, C>): El<T, E<M[T]>, El.Children.Array>;
-  <T extends K<M>, C extends El.Children.Array >(tag: T, attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: El.Factory<M, F, T, C>): El<T, E<M[T]>, Readonly<C>>;
-  <T extends K<M>, C extends El.Children.Struct>(tag: T, attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: El.Factory<M, F, T, C>): El<T, E<M[T]>, C>;
-  <T extends K<M>, C extends El.Children.Void  >(tag: T,                                    children: C, factory?: El.Factory<M, F, T, C>): El<T, E<M[T]>, El.Children.Void>;
-  <T extends K<M>, C extends El.Children.Text  >(tag: T,                                    children: C, factory?: El.Factory<M, F, T, C>): El<T, E<M[T]>, El.Children.Text>;
-  <T extends K<M>, C extends El_Children_Unit  >(tag: T,                                    children: C, factory?: El.Factory<M, F, T, C>): El<T, E<M[T]>, El.Children.Array>;
-  <T extends K<M>, C extends El.Children.Array >(tag: T,                                    children: C, factory?: El.Factory<M, F, T, C>): El<T, E<M[T]>, Readonly<C>>;
-  <T extends K<M>, C extends El.Children.Struct>(tag: T,                                    children: C, factory?: El.Factory<M, F, T, C>): El<T, E<M[T]>, C>;
-  <T extends K<M>, C extends El.Children.Void  >(tag: T,                                                 factory?: El.Factory<M, F, T, C>): El<T, E<M[T]>, El.Children.Void>;
+interface BuilderFunction<M extends TagNameMap> {
+  <T extends K<M>, C extends El.Children.Void  >(tag: T, attrs: Attrs<E<M[T]>> | undefined,              factory?: El.Factory<M, T, C>): El<T, E<M[T]>, El.Children.Void>;
+  <T extends K<M>, C extends El.Children.Void  >(tag: T, attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: El.Factory<M, T, C>): El<T, E<M[T]>, El.Children.Void>;
+  <T extends K<M>, C extends El.Children.Text  >(tag: T, attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: El.Factory<M, T, C>): El<T, E<M[T]>, El.Children.Text>;
+  <T extends K<M>, C extends El_Children_Unit  >(tag: T, attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: El.Factory<M, T, C>): El<T, E<M[T]>, El.Children.Array>;
+  <T extends K<M>, C extends El.Children.Array >(tag: T, attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: El.Factory<M, T, C>): El<T, E<M[T]>, Readonly<C>>;
+  <T extends K<M>, C extends El.Children.Struct>(tag: T, attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: El.Factory<M, T, C>): El<T, E<M[T]>, C>;
+  <T extends K<M>, C extends El.Children.Void  >(tag: T,                                    children: C, factory?: El.Factory<M, T, C>): El<T, E<M[T]>, El.Children.Void>;
+  <T extends K<M>, C extends El.Children.Text  >(tag: T,                                    children: C, factory?: El.Factory<M, T, C>): El<T, E<M[T]>, El.Children.Text>;
+  <T extends K<M>, C extends El_Children_Unit  >(tag: T,                                    children: C, factory?: El.Factory<M, T, C>): El<T, E<M[T]>, El.Children.Array>;
+  <T extends K<M>, C extends El.Children.Array >(tag: T,                                    children: C, factory?: El.Factory<M, T, C>): El<T, E<M[T]>, Readonly<C>>;
+  <T extends K<M>, C extends El.Children.Struct>(tag: T,                                    children: C, factory?: El.Factory<M, T, C>): El<T, E<M[T]>, C>;
+  <T extends K<M>, C extends El.Children.Void  >(tag: T,                                                 factory?: El.Factory<M, T, C>): El<T, E<M[T]>, El.Children.Void>;
 }
 
-interface BuilderMethod<M extends TagNameMap, F extends Factory<M>, T extends K<M>> {
-                  <C extends El.Children.Void  >(        attrs: Attrs<E<M[T]>> | undefined,              factory?: El.Factory<M, F, T, C>): El<T, E<M[T]>, El.Children.Void>;
-                  <C extends El.Children.Void  >(        attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: El.Factory<M, F, T, C>): El<T, E<M[T]>, El.Children.Void>;
-                  <C extends El.Children.Text  >(        attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: El.Factory<M, F, T, C>): El<T, E<M[T]>, El.Children.Text>;
-                  <C extends El_Children_Unit  >(        attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: El.Factory<M, F, T, C>): El<T, E<M[T]>, El.Children.Array>;
-                  <C extends El.Children.Array >(        attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: El.Factory<M, F, T, C>): El<T, E<M[T]>, Readonly<C>>;
-                  <C extends El.Children.Struct>(        attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: El.Factory<M, F, T, C>): El<T, E<M[T]>, C>;
-                  <C extends El.Children.Void  >(                                           children: C, factory?: El.Factory<M, F, T, C>): El<T, E<M[T]>, El.Children.Void>;
-                  <C extends El.Children.Text  >(                                           children: C, factory?: El.Factory<M, F, T, C>): El<T, E<M[T]>, El.Children.Text>;
-                  <C extends El_Children_Unit  >(                                           children: C, factory?: El.Factory<M, F, T, C>): El<T, E<M[T]>, El.Children.Array>;
-                  <C extends El.Children.Array >(                                           children: C, factory?: El.Factory<M, F, T, C>): El<T, E<M[T]>, Readonly<C>>;
-                  <C extends El.Children.Struct>(                                           children: C, factory?: El.Factory<M, F, T, C>): El<T, E<M[T]>, C>;
-                  <C extends El.Children.Void  >(                                                        factory?: El.Factory<M, F, T, C>): El<T, E<M[T]>, El.Children.Void>;
+interface BuilderMethod<M extends TagNameMap, T extends K<M>> {
+                  <C extends El.Children.Void  >(        attrs: Attrs<E<M[T]>> | undefined,              factory?: El.Factory<M, T, C>): El<T, E<M[T]>, El.Children.Void>;
+                  <C extends El.Children.Void  >(        attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: El.Factory<M, T, C>): El<T, E<M[T]>, El.Children.Void>;
+                  <C extends El.Children.Text  >(        attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: El.Factory<M, T, C>): El<T, E<M[T]>, El.Children.Text>;
+                  <C extends El_Children_Unit  >(        attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: El.Factory<M, T, C>): El<T, E<M[T]>, El.Children.Array>;
+                  <C extends El.Children.Array >(        attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: El.Factory<M, T, C>): El<T, E<M[T]>, Readonly<C>>;
+                  <C extends El.Children.Struct>(        attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: El.Factory<M, T, C>): El<T, E<M[T]>, C>;
+                  <C extends El.Children.Void  >(                                           children: C, factory?: El.Factory<M, T, C>): El<T, E<M[T]>, El.Children.Void>;
+                  <C extends El.Children.Text  >(                                           children: C, factory?: El.Factory<M, T, C>): El<T, E<M[T]>, El.Children.Text>;
+                  <C extends El_Children_Unit  >(                                           children: C, factory?: El.Factory<M, T, C>): El<T, E<M[T]>, El.Children.Array>;
+                  <C extends El.Children.Array >(                                           children: C, factory?: El.Factory<M, T, C>): El<T, E<M[T]>, Readonly<C>>;
+                  <C extends El.Children.Struct>(                                           children: C, factory?: El.Factory<M, T, C>): El<T, E<M[T]>, C>;
+                  <C extends El.Children.Void  >(                                                        factory?: El.Factory<M, T, C>): El<T, E<M[T]>, El.Children.Void>;
 }
 
 function handle
-  <M extends TagNameMap, F extends Factory<M>>
-  (baseFactory: F, container?: <E extends Element>(el: E) => ShadowRoot,
-): ProxyHandler<API<M, F>> {
+  <M extends TagNameMap>
+  (baseFactory: Factory<M>, container?: <E extends Element>(el: E) => ShadowRoot,
+): ProxyHandler<API<M>> {
   return {
     apply(target, _, [tag, ...args]) {
       return this.get!(target, tag, target)(...args);
@@ -67,7 +67,7 @@ function handle
   };
 
   function builder(tag: keyof M & string) {
-    return function build(attrs?: Attrs | El.Children, children?: El.Children, factory?: El.Factory<M, F, keyof M & string, El.Children>): El {
+    return function build(attrs?: Attrs | El.Children, children?: El.Children, factory?: El.Factory<M, keyof M & string, El.Children>): El {
       if (typeof children === 'function') return build(attrs, void 0, children);
       if (typeof attrs === 'function') return build(void 0, void 0, attrs);
       if (isElChildren(attrs)) return build(void 0, attrs, factory);
@@ -78,7 +78,7 @@ function handle
     };
   }
 
-  function elem(tag: keyof M & string, factory: El.Factory<M, F, keyof M & string, El.Children> | undefined, attrs: Attrs | undefined, children: El.Children): Element {
+  function elem(tag: keyof M & string, factory: El.Factory<M, keyof M & string, El.Children> | undefined, attrs: Attrs | undefined, children: El.Children): Element {
     const el = factory
       ? define(factory(baseFactory, tag, attrs ?? {}, children) as unknown as Element, attrs)
       : baseFactory(tag, attrs) as unknown as Element;
