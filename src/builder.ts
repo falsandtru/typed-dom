@@ -5,8 +5,7 @@ import { Factory, TagNameMap, Attrs, shadow, html, svg, define } from './util/do
 
 export type API
   <M extends TagNameMap> =
-  BuilderFunction<M> &
-  { readonly [P in K<M>]: BuilderMethod<M, P>; };
+  BuilderFunction<M> & { readonly [P in K<M>]: BuilderMethod<M, P>; };
 export function API
   <M extends TagNameMap>
   (baseFactory: Factory<M>, container?: <E extends Element>(el: E) => ShadowRoot)
