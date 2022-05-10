@@ -153,7 +153,7 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('struct empty', function () {
-      const dom = HTML.div({});
+      const dom = HTML.div({}, {});
       assert.deepStrictEqual(dom.children, {});
     });
 
@@ -207,13 +207,15 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('struct with factory', function () {
-      const dom = HTML.article({}, (h, tag) =>
+      const dom = HTML.article({}, {}, (h, tag) =>
         h(tag, { id: 'test' }));
       assert(dom.element.id === 'test');
       assert.deepStrictEqual(dom.children, {});
     });
 
     it('attr', function () {
+      (): void => HTML.div({}).children;
+      assert.deepStrictEqual(HTML.div({}).children, undefined);
       const dom = HTML.div({ id: 'test', class: 'test' });
       assert(dom.element.id === 'test');
       assert(dom.element.className === 'test');
@@ -222,10 +224,11 @@ describe('Integration: Typed DOM', function () {
 
     it('attr with factory', function () {
       const dom = HTML.div({ id: 'test' }, (h, tag) =>
-        h(tag, { id: 'id', class: 'test' }));
+        h(tag, { id: 'id', class: 'test' }, 'test'));
       assert(dom.element.id === 'test');
       assert(dom.element.className === 'test');
       assert(dom.children === undefined);
+      assert(HTML.div({}, (h, tag) => h(tag, 'test')).element.textContent === 'test');
     });
 
     it('attr with text', function () {
@@ -322,8 +325,8 @@ describe('Integration: Typed DOM', function () {
       assert(HTML.p('', () => HTML.p('a').element).children === '');
       assert(HTML.p([], () => HTML.p('a').element).element.childNodes.length === 0);
       assert.deepStrictEqual(HTML.p([], () => HTML.p('a').element).children, []);
-      assert(HTML.p({}, () => HTML.p('a').element).element.childNodes.length === 0);
-      assert.deepStrictEqual(HTML.p({}, () => HTML.p('a').element).children, {});
+      assert(HTML.p({}, {}, () => HTML.p('a').element).element.childNodes.length === 0);
+      assert.deepStrictEqual(HTML.p({}, {}, () => HTML.p('a').element).children, {});
     });
 
     it('fragment', function () {
@@ -581,7 +584,7 @@ describe('Integration: Typed DOM', function () {
         'Greeting': { name: string; };
       }
       const Trans = API<HTMLElementTagNameMap>(html);
-      const bind = <K extends keyof TransDataMap>(data: TransDataMap[K]) =>
+      const data = <K extends keyof TransDataMap>(data: TransDataMap[K]) =>
         <T extends keyof HTMLElementTagNameMap>(
           html: Factory<HTMLElementTagNameMap>,
           tag: T,
@@ -596,15 +599,34 @@ describe('Integration: Typed DOM', function () {
                   : t(children, data) ?? `{% Failed to translate "${children}". %}`),
           });
 
-      const el = Trans.span('Greeting', bind({ name: 'world' }));
+      const el = Trans.span('Greeting', data({ name: 'world' }));
       assert(el.children === 'Hello, world.');
       assert(el.element.textContent === 'Hello, world.');
       // @ts-expect-error
-      Trans.span('Greeting', bind({}));
+      Trans.span('Greeting', data({}));
       // @ts-expect-error
-      Trans.span('', bind({ name: 'world' }));
+      Trans.span('', data({ name: 'world' }));
       // @ts-expect-error
-      Trans.span(bind({ name: 'world' }));
+      Trans.span(data({ name: 'world' }));
+
+      const bind = <K extends keyof TransDataMap>(children: K, data: TransDataMap[K]) =>
+        <T extends keyof HTMLElementTagNameMap>(
+          html: Factory<HTMLElementTagNameMap>,
+          tag: T,
+          _: Attrs,
+          __: El.Children.Void,
+        ) => {
+          const el = html(tag);
+          i18n.init((err, t) =>
+            el.textContent = err
+              ? '{% Failed to initialize the translator. %}'
+              : t(children, data) ?? `{% Failed to translate "${children}". %}`);
+          return el;
+        };
+
+      assert(Trans.span(bind('Greeting', { name: 'world' })).children === undefined);
+      assert(Trans.span({}, bind('Greeting', { name: 'world' })).children === undefined);
+      assert(Trans.span({}, bind('Greeting', { name: 'world' })).element.textContent === 'Hello, world.');
     });
 
   });

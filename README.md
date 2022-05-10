@@ -366,7 +366,7 @@ interface TransDataMap {
   'Greeting': { name: string; };
 }
 const Trans = API<HTMLElementTagNameMap>(html);
-const bind = <K extends keyof TransDataMap>(data: TransDataMap[K]) =>
+const data = <K extends keyof TransDataMap>(data: TransDataMap[K]) =>
   <T extends keyof HTMLElementTagNameMap>(
     html: Factory<HTMLElementTagNameMap>,
     tag: T,
@@ -381,8 +381,31 @@ const bind = <K extends keyof TransDataMap>(data: TransDataMap[K]) =>
             : t(children, data) ?? `{% Failed to translate "${children}". %}`),
     });
 
-const el = Trans.span('Greeting', bind({ name: 'world' }));
+const el = Trans.span('Greeting', data({ name: 'world' }));
 assert(el.children === 'Hello, world.');
+assert(el.element.textContent === 'Hello, world.');
+```
+
+Or
+
+```ts
+const bind = <K extends keyof TransDataMap>(children: K, data: TransDataMap[K]) =>
+  <T extends keyof HTMLElementTagNameMap>(
+    html: Factory<HTMLElementTagNameMap>,
+    tag: T,
+    _: Attrs,
+    __: El.Children.Void,
+  ) => {
+    const el = html(tag);
+    i18n.init((err, t) =>
+      el.textContent = err
+        ? '{% Failed to initialize the translator. %}'
+        : t(children, data) ?? `{% Failed to translate "${children}". %}`);
+    return el;
+  };
+
+const el = Trans.span(bind('Greeting', { name: 'world' }));
+assert(el.children === undefined);
 assert(el.element.textContent === 'Hello, world.');
 ```
 
