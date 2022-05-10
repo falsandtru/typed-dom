@@ -88,9 +88,8 @@ function handle
 }
 
 function isElChildren(value: Attrs | El.Children): value is NonNullable<El.Children> {
-  if (value?.[Symbol.iterator]) return true;
-  assert(value !== '');
-  if (!value) return false;
+  if (value === void 0) return false;
+  if (value[Symbol.iterator]) return true;
   for (const name in value as Attrs | El.Children.Struct) {
     if (!hasOwnProperty(value, name)) continue;
     const val = value[name];
