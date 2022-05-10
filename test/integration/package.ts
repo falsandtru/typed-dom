@@ -216,7 +216,7 @@ describe('Integration: Typed DOM', function () {
     it('attr', function () {
       const dom = HTML.div({ id: 'test', class: 'test' });
       assert(dom.element.id === 'test');
-      assert(dom.element.getAttribute('class') === 'test');
+      assert(dom.element.className === 'test');
       assert(dom.children === undefined);
     });
 
@@ -231,21 +231,21 @@ describe('Integration: Typed DOM', function () {
     it('attr with text', function () {
       const dom = HTML.div({ id: 'test', class: 'test' }, '');
       assert(dom.element.id === 'test');
-      assert(dom.element.getAttribute('class') === 'test');
+      assert(dom.element.className === 'test');
       assert(dom.children === '');
     });
 
     it('attr with collection', function () {
       const dom = HTML.div({ id: 'test', class: 'test' }, []);
       assert(dom.element.id === 'test');
-      assert(dom.element.getAttribute('class') === 'test');
+      assert(dom.element.className === 'test');
       assert.deepStrictEqual(dom.children, []);
     });
 
     it('attr with struct', function () {
       const dom = HTML.div({ id: 'test', class: 'test' }, {});
       assert(dom.element.id === 'test');
-      assert(dom.element.getAttribute('class') === 'test');
+      assert(dom.element.className === 'test');
       assert.deepStrictEqual(dom.children, {});
     });
 
