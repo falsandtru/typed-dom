@@ -55,12 +55,12 @@ namespace caches {
   export const fragment = document.createDocumentFragment();
 }
 
-export function shadow<M extends ShadowHostHTMLElementTagNameMap>(el: keyof M & string | Element, factory?: Factory<M>): ShadowRoot;
-export function shadow<M extends ShadowHostHTMLElementTagNameMap>(el: keyof M & string | Element, children?: Children, factory?: Factory<M>): ShadowRoot;
-export function shadow<M extends ShadowHostHTMLElementTagNameMap>(el: keyof M & string | Element, opts?: ShadowRootInit, factory?: Factory<M>): ShadowRoot;
-export function shadow<M extends ShadowHostHTMLElementTagNameMap>(el: keyof M & string | Element, opts?: ShadowRootInit, children?: Children, factory?: Factory<M>): ShadowRoot;
-export function shadow<M extends ShadowHostHTMLElementTagNameMap>(el: keyof M & string | Element, opts?: ShadowRootInit | Factory<M> | Children, children?: Factory<M> | Children, factory: Factory<M> = html as unknown as Factory<M>): ShadowRoot {
-  if (typeof el === 'string') return shadow(factory(el) as unknown as Element, opts as ShadowRootInit, children as Children, factory);
+export function shadow<M extends ShadowHostHTMLElementTagNameMap>(el: keyof M & string | Extract<M[keyof M & string], Element>, factory?: Factory<M>): ShadowRoot;
+export function shadow<M extends ShadowHostHTMLElementTagNameMap>(el: keyof M & string | Extract<M[keyof M & string], Element>, children?: Children, factory?: Factory<M>): ShadowRoot;
+export function shadow<M extends ShadowHostHTMLElementTagNameMap>(el: keyof M & string | Extract<M[keyof M & string], Element>, opts?: ShadowRootInit, factory?: Factory<M>): ShadowRoot;
+export function shadow<M extends ShadowHostHTMLElementTagNameMap>(el: keyof M & string | Extract<M[keyof M & string], Element>, opts?: ShadowRootInit, children?: Children, factory?: Factory<M>): ShadowRoot;
+export function shadow<M extends ShadowHostHTMLElementTagNameMap>(el: keyof M & string | Extract<M[keyof M & string], Element>, opts?: ShadowRootInit | Factory<M> | Children, children?: Factory<M> | Children, factory: Factory<M> = html as unknown as Factory<M>): ShadowRoot {
+  if (typeof el === 'string') return shadow(factory(el) as Extract<M[keyof M & string], Element>, opts as ShadowRootInit, children as Children, factory);
   if (typeof opts === 'function') return shadow(el, void 0, children as Children, opts);
   if (typeof children === 'function') return shadow(el, opts as ShadowRootInit, void 0, children);
   if (isChildren(opts)) return shadow(el, void 0, opts, factory);

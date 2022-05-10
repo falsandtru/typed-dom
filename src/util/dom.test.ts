@@ -18,11 +18,11 @@ describe('Unit: util/dom', () => {
       assert(shadow(html('section', 'a'), [html('slot')]).host.innerHTML === 'a');
       assert(shadow(html('section', 'a'), { mode: 'closed' }, [html('slot')]).innerHTML === '<slot></slot>');
       assert(shadow(html('section', 'a'), { mode: 'closed' }, [html('slot')]).host.innerHTML === 'a');
-      assert(shadow(shadow('section').host));
-      assert(shadow(shadow('section', { mode: 'open' }).host));
-      assert(shadow(shadow('section', { mode: 'closed' }).host));
-      assert.throws(() => shadow(shadow('section', { mode: 'open' }).host, { mode: 'closed' }));
-      assert.throws(() => shadow(shadow('section', { mode: 'closed' }).host, { mode: 'open' }));
+      assert(shadow(shadow('section').host as HTMLElement));
+      assert(shadow(shadow('section', { mode: 'open' }).host as HTMLElement));
+      assert(shadow(shadow('section', { mode: 'closed' }).host as HTMLElement));
+      assert.throws(() => shadow(shadow('section', { mode: 'open' }).host as HTMLElement, { mode: 'closed' }));
+      assert.throws(() => shadow(shadow('section', { mode: 'closed' }).host as HTMLElement, { mode: 'open' }));
     });
 
   });
