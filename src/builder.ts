@@ -20,7 +20,7 @@ export const SVG = API<SVGElementTagNameMap>(svg);
 type K<M> = keyof M & string;
 type E<V> = Extract<V, Element>;
 type El_Children_Unit = readonly [];
-export type ElFactory<
+type ElFactory<
   M extends TagNameMap,
   T extends keyof M & string = keyof M & string,
   C extends El.Children = El.Children,
