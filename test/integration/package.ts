@@ -612,7 +612,7 @@ describe('Integration: Typed DOM', function () {
         <K extends keyof TransDataMap>
         (children: K, data: TransDataMap[K])
         : El.Factory<HTMLElementTagNameMap, void> {
-        return (html, tag, _, __) => {
+        return (html, tag) => {
           const el = html(tag);
           i18n.init((err, t) =>
             el.textContent = err
