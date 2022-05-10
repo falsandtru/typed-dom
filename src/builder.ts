@@ -28,7 +28,7 @@ export type ElFactory<
   > =
   // Bug: TypeScript: Type U must not affect Type C
   //<U extends T>(baseFactory: Factory<M>, tag: U, attrs: Attrs, children: C) => M[U];
-  (baseFactory: Factory<M>, tag: T, attrs: Attrs, children: C) => M[T];
+  (baseFactory: Factory<M>, tag: T, attrs: Attrs<E<M[T]>>, children: C) => M[T];
 
 interface BuilderFunction<M extends TagNameMap> {
   <T extends K<M>, C extends El.Children.Void  >(tag: T, attrs: Attrs<E<M[T]>> | undefined,              factory?: ElFactory<M, T, C>): El<T, E<M[T]>, El.Children.Void>;

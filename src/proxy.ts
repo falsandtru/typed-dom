@@ -46,7 +46,12 @@ export namespace El {
     M extends TagNameMap,
     C extends El.Children = El.Children,
     > =
-    <T extends keyof M & string>(baseFactory: BaseFactory<M>, tag: T, attrs: Attrs, children: C) => M[T];
+    <T extends keyof M & string>(
+      baseFactory: BaseFactory<M>,
+      tag: T,
+      attrs: Attrs<Extract<M[T], Element>>,
+      children: C,
+    ) => M[T];
 }
 const enum ElChildType {
   Void,
