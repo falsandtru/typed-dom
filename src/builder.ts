@@ -1,4 +1,4 @@
-import { Symbol } from 'spica/global';
+import { Symbol, Proxy } from 'spica/global';
 import { hasOwnProperty } from 'spica/alias';
 import { El, ElementProxy } from './proxy';
 import { Factory, TagNameMap, Attrs, shadow, html, svg, define } from './util/dom';
