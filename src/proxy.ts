@@ -334,23 +334,21 @@ export class ElementProxy<
   }
   private dispatchConnectionEvent(
     listeners: El[] | undefined = this[privates.listeners].values,
-    isConnected = listeners.length !== 0 && this.isConnected,
   ): void {
     if (listeners.length === 0) return;
-    if (listeners !== this[privates.listeners].values && !isConnected) return;
+    if (listeners !== this[privates.listeners].values && !this.isConnected) return;
     for (const listener of listeners) {
-      listener.element[proxy].dispatchConnectionEvent(void 0, isConnected);
+      listener.element[proxy].dispatchConnectionEvent();
       getListeners(listener)?.connect && listener.element.dispatchEvent(new Event('connect', { bubbles: false, cancelable: true }));
     }
   }
   private dispatchDisconnectionEvent(
     listeners: El[] | undefined = this[privates.listeners].values,
-    isConnected = listeners.length !== 0 && this.isConnected,
   ): void {
     if (listeners.length === 0) return;
-    if (listeners !== this[privates.listeners].values && !isConnected) return;
+    if (listeners !== this[privates.listeners].values && !this.isConnected) return;
     for (const listener of listeners) {
-      listener.element[proxy].dispatchDisconnectionEvent(void 0, isConnected);
+      listener.element[proxy].dispatchDisconnectionEvent();
       getListeners(listener)?.disconnect && listener.element.dispatchEvent(new Event('disconnect', { bubbles: false, cancelable: true }));
     }
   }
