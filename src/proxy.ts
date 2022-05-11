@@ -62,7 +62,6 @@ const enum ElChildType {
 }
 
 namespace privates {
-  export const events = Symbol.for('typed-dom::events');
   export const listeners = Symbol.for('typed-dom::listeners');
 }
 
@@ -80,11 +79,11 @@ export class ElementProxy<
     children: C,
     container: Element | ShadowRoot = element,
   ) {
-    const events = this[privates.events];
+    const listeners = this[privates.listeners];
     assert('' != null);
-    events.mutate = 'onmutate' in element && element['onmutate'] != null;
-    events.connect = 'onconnect' in element && element['onconnect'] != null;
-    events.disconnect = 'ondisconnect' in element && element['ondisconnect'] != null;
+    listeners.mutate = 'onmutate' in element && element['onmutate'] != null;
+    listeners.connect = 'onconnect' in element && element['onconnect'] != null;
+    listeners.disconnect = 'ondisconnect' in element && element['ondisconnect'] != null;
     this.children_ = children;
     this.container = container;
     switch (true) {
@@ -127,12 +126,10 @@ export class ElementProxy<
         throw new Error(`TypedDOM: Invalid children type.`);
     }
   }
-  private readonly [privates.events] = {
+  private [privates.listeners] = {
     mutate: false,
     connect: false,
     disconnect: false,
-  };
-  private [privates.listeners] = {
     values: [] as El[],
     add(child: El): void {
       this.values.push(child);
@@ -227,7 +224,7 @@ export class ElementProxy<
       case ElChildType.Void:
         return;
       case ElChildType.Text: {
-        if (this.isInit || !this[privates.events].mutate) {
+        if (this.isInit || !this[privates.listeners].mutate) {
           container.textContent = children as El.Children.Text;
           isMutated = true;
           break;
@@ -251,7 +248,7 @@ export class ElementProxy<
           if (newChild.element.parentNode !== this.element) {
             this.scope(newChild);
             assert(!addedChildren.includes(newChild));
-            (events(newChild)?.connect || events(newChild)?.disconnect || listeners(newChild)) && addedChildren.push(newChild) && this[privates.listeners].add(newChild);
+            hasListener(newChild) && addedChildren.push(newChild) && this[privates.listeners].add(newChild);
           }
         }
         if (container.firstChild) {
@@ -267,7 +264,7 @@ export class ElementProxy<
           const oldChild = targetChildren[i];
           if (oldChild.element.parentNode !== container) {
             assert(!removedChildren.includes(oldChild));
-            (events(oldChild)?.connect || events(oldChild)?.disconnect || listeners(oldChild)) && removedChildren.push(oldChild) && this[privates.listeners].delete(oldChild);
+            hasListener(oldChild) && removedChildren.push(oldChild) && this[privates.listeners].delete(oldChild);
             assert(isMutated);
           }
         }
@@ -286,7 +283,7 @@ export class ElementProxy<
             this.scope(newChild);
             container.appendChild(newChild.element);
             assert(!addedChildren.includes(newChild));
-            (events(newChild)?.connect || events(newChild)?.disconnect || listeners(newChild)) && addedChildren.push(newChild) && this[privates.listeners].add(newChild);
+            hasListener(newChild) && addedChildren.push(newChild) && this[privates.listeners].add(newChild);
             isMutated = true;
           }
           break;
@@ -306,9 +303,9 @@ export class ElementProxy<
             container.replaceChild(newChild.element, oldChild.element);
             assert(!oldChild.element.parentNode);
             assert(!addedChildren.includes(newChild));
-            (events(newChild)?.connect || events(newChild)?.disconnect || listeners(newChild)) && addedChildren.push(newChild) && this[privates.listeners].add(newChild);
+            hasListener(newChild) && addedChildren.push(newChild) && this[privates.listeners].add(newChild);
             assert(!removedChildren.includes(oldChild));
-            (events(oldChild)?.connect || events(oldChild)?.disconnect || listeners(oldChild)) && removedChildren.push(oldChild) && this[privates.listeners].delete(oldChild);
+            hasListener(oldChild) && removedChildren.push(oldChild) && this[privates.listeners].delete(oldChild);
           }
           else {
             assert(newChild.element.parentNode === oldChild.element.parentNode);
@@ -325,36 +322,45 @@ export class ElementProxy<
         break;
       }
     }
-    removedChildren.length > 0 && this.dispatchDisconnectionEvent(removedChildren);
-    addedChildren.length > 0 && this.dispatchConnectionEvent(addedChildren);
+    this.dispatchDisconnectionEvent(removedChildren);
+    this.dispatchConnectionEvent(addedChildren);
     assert(isMutated || removedChildren.length + addedChildren.length === 0);
-    if (isMutated && this[privates.events].mutate) {
+    if (isMutated && this[privates.listeners].mutate) {
       this.element.dispatchEvent(new Event('mutate', { bubbles: false, cancelable: true }));
     }
   }
-  private dispatchConnectionEvent(listeners: El[] | undefined = this[privates.listeners].values): void {
+  private get isConnected(): boolean {
+    return !!this.element.parentNode && this.element.isConnected;
+  }
+  private dispatchConnectionEvent(
+    listeners: El[] | undefined = this[privates.listeners].values,
+    isConnected = listeners.length !== 0 && this.isConnected,
+  ): void {
     if (listeners.length === 0) return;
-    if (listeners !== this[privates.listeners].values && !this.element.isConnected) return;
+    if (listeners !== this[privates.listeners].values && !isConnected) return;
     for (const listener of listeners) {
-      listener.element[proxy].dispatchConnectionEvent();
-      events(listener)?.connect && listener.element.dispatchEvent(new Event('connect', { bubbles: false, cancelable: true }));
+      listener.element[proxy].dispatchConnectionEvent(void 0, isConnected);
+      getListeners(listener)?.connect && listener.element.dispatchEvent(new Event('connect', { bubbles: false, cancelable: true }));
     }
   }
-  private dispatchDisconnectionEvent(listeners: El[] | undefined = this[privates.listeners].values): void {
+  private dispatchDisconnectionEvent(
+    listeners: El[] | undefined = this[privates.listeners].values,
+    isConnected = listeners.length !== 0 && this.isConnected,
+  ): void {
     if (listeners.length === 0) return;
-    if (listeners !== this[privates.listeners].values && !this.element.isConnected) return;
+    if (listeners !== this[privates.listeners].values && !isConnected) return;
     for (const listener of listeners) {
-      listener.element[proxy].dispatchDisconnectionEvent();
-      events(listener)?.disconnect && listener.element.dispatchEvent(new Event('disconnect', { bubbles: false, cancelable: true }));
+      listener.element[proxy].dispatchDisconnectionEvent(void 0, isConnected);
+      getListeners(listener)?.disconnect && listener.element.dispatchEvent(new Event('disconnect', { bubbles: false, cancelable: true }));
     }
   }
 }
 
-function events(child: El): ElementProxy[typeof privates.events] | undefined {
-  return child[privates.events] ?? child.element[proxy]?.[privates.events];
+function hasListener(child: El): boolean {
+  const ls = getListeners(child);
+  return ls?.connect || ls?.disconnect || ls?.values.length! > 0;
 }
-
-function listeners(child: El): ElementProxy[typeof privates.listeners] | undefined {
+function getListeners(child: El): ElementProxy[typeof privates.listeners] | undefined {
   return child[privates.listeners] ?? child.element[proxy]?.[privates.listeners];
 }
 
