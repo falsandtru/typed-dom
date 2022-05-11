@@ -72,6 +72,15 @@ export function bind<T extends keyof HTMLElementEventMap>(target: HTMLElement, t
 export function bind<T extends keyof SVGElementEventMap>(target: SVGElement, type: T, listener: (ev: SVGElementEventMap[T]) => void, option?: boolean | AddEventListenerOptions): () => undefined;
 export function bind<T extends keyof ElementEventMap>(target: Element, type: T, listener: (ev: ElementEventMap[T]) => void, option?: boolean | AddEventListenerOptions): () => undefined;
 export function bind<T extends keyof WindowEventMap | keyof DocumentEventMap | keyof ElementEventMap>(target: Window | Document | ShadowRoot | Element, type: T, listener: (ev: Event) => void, option: boolean | AddEventListenerOptions = false): () => undefined {
+  switch (type) {
+    case 'mutate':
+    case 'connect':
+    case 'disconnect':
+      const prop = `on${type}`;
+      prop in target
+        ? target[prop] ??= (ev: Event) => ev.returnValue
+        : target[prop] ??= '';
+  }
   target.addEventListener(type, handler, option);
   return singleton(() => void target.removeEventListener(type, handler, option));
 

@@ -134,14 +134,26 @@ function defineAttrs<E extends Element>(el: E, attrs: Attrs): E {
     switch (typeof value) {
       case 'string':
         el.setAttribute(name, value);
+        if (name.startsWith('on')) {
+          const type = name.slice(2).toLowerCase();
+          switch (type) {
+            case 'mutate':
+            case 'connect':
+            case 'disconnect':
+              const prop = `on${type}`;
+              prop in el
+                ? el[prop] ??= (ev: NodeEvent<E>) => ev.returnValue
+                : el[prop] ??= '';
+          }
+        }
         continue;
       case 'function':
         if (name.length < 3) throw new Error(`TypedDOM: Attribute names for event listeners must have an event name but got "${name}".`);
         const names = name.split(/\s+/);
         for (const name of names) {
           if (!name.startsWith('on')) throw new Error(`TypedDOM: Attribute names for event listeners must start with "on" but got "${name}".`);
-          const eventname = name.slice(2).toLowerCase();
-          el.addEventListener(eventname, value, {
+          const type = name.slice(2).toLowerCase();
+          el.addEventListener(type, value, {
             passive: [
               'wheel',
               'mousewheel',
@@ -149,13 +161,13 @@ function defineAttrs<E extends Element>(el: E, attrs: Attrs): E {
               'touchmove',
               'touchend',
               'touchcancel',
-            ].includes(eventname),
+            ].includes(type),
           });
-          switch (eventname) {
+          switch (type) {
             case 'mutate':
             case 'connect':
             case 'disconnect':
-              const prop = `on${eventname}`;
+              const prop = `on${type}`;
               prop in el
                 ? el[prop] ??= (ev: NodeEvent<E>) => ev.returnValue
                 : el[prop] ??= '';

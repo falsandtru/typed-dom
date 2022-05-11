@@ -1,6 +1,7 @@
 import { Shadow, HTML, SVG, El, Attrs, shadow, html } from '../..';
 import { Coroutine } from 'spica/coroutine';
 import { Sequence } from 'spica/sequence';
+import { wait } from 'spica/timer';
 
 declare global {
   interface ShadowHostHTMLElementTagNameMap {
@@ -580,24 +581,27 @@ describe('Integration: Typed DOM', function () {
       assert(HTML.div([dom]));
     });
 
-    it('component coroutine', function () {
+    it('component coroutine', async function () {
       class Component extends Coroutine implements El {
         constructor() {
           super(async function* (this: Component) {
             assert(this.element);
-            assert(this.children);
-            for (const child of this.children) {
-              child.children = child.children.toUpperCase();
+            let count = 0;
+            this.children = `${count}`;
+            while (true) {
+              if (!this.element.isConnected) {
+                await new Promise(resolve =>
+                  this.element.addEventListener('connect', resolve, { once: true }));
+              }
+              this.children = `${++count}`;
               yield;
+              await new Promise(resolve => setTimeout(resolve, 100));
             }
-          }, { trigger: 'element', capacity: 0 });
-          assert(this.children[0].children === 'ITEM');
+          }, { trigger: 'element' });
         }
-        private readonly dom = Shadow.section({
+        private readonly dom = Shadow.section({ onconnect: '' }, {
           style: HTML.style(':scope { color: red; }'),
-          content: HTML.ul([
-            HTML.li('item'),
-          ]),
+          content: HTML.p(''),
         });
         public readonly tag = this.dom.tag;
         public readonly element = this.dom.element;
@@ -610,12 +614,19 @@ describe('Integration: Typed DOM', function () {
       }
 
       const dom = new Component();
-      assert(dom.children[0].children === 'ITEM');
-      dom.children = [
-        HTML.li('item'),
-      ];
-      assert(dom.children[0].children === 'item');
-      assert(HTML.div([dom]));
+      assert(dom.children === '0');
+      doc.children = [dom];
+      await 0;
+      assert(dom.children === '1');
+      await wait(110);
+      assert(dom.children === '2');
+      doc.children = [];
+      await wait(110);
+      assert(dom.children === '2');
+      doc.children = [dom];
+      await 0;
+      assert(dom.children === '3');
+      doc.children = [];
     });
 
     it('translate', function () {

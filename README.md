@@ -177,6 +177,22 @@ export const Shadow = API<ShadowHostScopedCustomHTMLElementTagNameMap>(html, sha
 - querySelector
 - querySelectorAll
 
+## Events
+
+These events are enabled only when an event listener is set using the Typed-DOM APIs.
+
+### mutate
+
+It will be dispatched when the children property value is changed.
+
+### connect
+
+It will be dispatched when added to another proxy connected to the context object.
+
+### disconnect
+
+It will be dispatched when removed from the parent proxy connected to the context object.
+
 ## Usage
 
 Build a Typed-DOM component with styling.
@@ -327,17 +343,22 @@ import { Coroutine } from 'spica/coroutine';
 class Component extends Coroutine implements El {
   constructor() {
     super(async function* (this: Component) {
-      for (const child of this.children) {
-        child.children = child.children.toUpperCase();
+      let count = 0;
+      this.children = `${count}`;
+      while (true) {
+        if (!this.element.isConnected) {
+          await new Promise(resolve =>
+            this.element.addEventListener('connect', resolve));
+        }
+        this.children = `${++count}`;
         yield;
+        await new Promise(resolve => setTimeout(resolve, 100));
       }
-    }, { trigger: 'element', capacity: 0 });
+    }, { trigger: 'element' });
   }
-  private readonly dom = Shadow.section({
+  private readonly dom = Shadow.section({ onconnect: '' }, {
     style: HTML.style(':scope { color: red; }'),
-    content: HTML.ul([
-      HTML.li('item'),
-    ]),
+    content: HTML.p(''),
   });
   public readonly tag = this.dom.tag;
   public readonly element = this.dom.element;
@@ -353,7 +374,6 @@ class Component extends Coroutine implements El {
 ### i18n
 
 Create a helper function of APIs for i18n.
-Typed-DOM provides `mutate`, `connect`, and `disconnect` events.
 
 ```ts
 import { HTML, El, html } from 'typed-dom';
