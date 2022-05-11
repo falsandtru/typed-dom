@@ -1,7 +1,8 @@
-import { Set, Event } from 'spica/global';
+import { Event } from 'spica/global';
 import { isArray, hasOwnProperty, ObjectDefineProperties, ObjectKeys } from 'spica/alias';
 import { TagNameMap, Attrs, Factory as BaseFactory } from './util/dom';
 import { identity } from './util/identity';
+import { splice } from 'spica/array';
 
 declare global {
   interface ElementEventMap {
@@ -131,10 +132,16 @@ export class ElementProxy<
     connect: false,
     disconnect: false,
   };
-  private listeners?: Set<El>;
-  private get [privates.listeners](): Set<El> {
-    return this.listeners ??= new Set();
-  }
+  private [privates.listeners] = {
+    values: [] as El[],
+    add(child: El): void {
+      this.values.push(child);
+    },
+    delete(child: El): void {
+      assert(this.values.indexOf(child) > -1);
+      splice(this.values, this.values.indexOf(child), 1);
+    },
+  };
   private id_ = '';
   private get id(): string {
     if (this.id_) return this.id_;
@@ -325,17 +332,17 @@ export class ElementProxy<
       this.element.dispatchEvent(new Event('mutate', { bubbles: false, cancelable: true }));
     }
   }
-  private dispatchConnectionEvent(listeners: Iterable<El> | undefined = this.listeners): void {
-    if (!listeners) return;
-    if (listeners !== this.listeners && !this.element.isConnected) return;
+  private dispatchConnectionEvent(listeners: El[] | undefined = this[privates.listeners].values): void {
+    if (listeners.length === 0) return;
+    if (listeners !== this[privates.listeners].values && !this.element.isConnected) return;
     for (const listener of listeners) {
       listener.element[proxy].dispatchConnectionEvent();
       events(listener)?.connect && listener.element.dispatchEvent(new Event('connect', { bubbles: false, cancelable: true }));
     }
   }
-  private dispatchDisconnectionEvent(listeners: Iterable<El> | undefined = this.listeners): void {
-    if (!listeners) return;
-    if (listeners !== this.listeners && !this.element.isConnected) return;
+  private dispatchDisconnectionEvent(listeners: El[] | undefined = this[privates.listeners].values): void {
+    if (listeners.length === 0) return;
+    if (listeners !== this[privates.listeners].values && !this.element.isConnected) return;
     for (const listener of listeners) {
       listener.element[proxy].dispatchDisconnectionEvent();
       events(listener)?.disconnect && listener.element.dispatchEvent(new Event('disconnect', { bubbles: false, cancelable: true }));
