@@ -400,6 +400,9 @@ describe('Integration: Typed DOM', function () {
           'aA',
           'bB',
         ]);
+      assert.deepStrictEqual(
+        dom.children.map(v => v.element),
+        [...dom.element.children]);
       dom.children = [
         dom.children[1],
         HTML.li(attrs, 'c'),
@@ -420,6 +423,9 @@ describe('Integration: Typed DOM', function () {
           'bBb',
           'cCc',
         ]);
+      assert.deepStrictEqual(
+        dom.children.map(v => v.element),
+        [...dom.element.children]);
     });
 
     it('observe record', function () {
@@ -455,6 +461,9 @@ describe('Integration: Typed DOM', function () {
           ['d', 'dD'],
           ['e', 'eE'],
         ]);
+      assert.deepStrictEqual(
+        [...Object.values(dom.children)].map(v => v.element),
+        [...dom.element.children]);
       dom.children = {
         a: dom.children.a,
         b: dom.children.c,
@@ -471,6 +480,19 @@ describe('Integration: Typed DOM', function () {
           ['c', 'bB'],
           ['d', 'fF'],
           ['e', 'gG'],
+        ]);
+      assert.deepStrictEqual(
+        [...Object.values(dom.children)].map(v => v.element),
+        [...dom.element.children]);
+      doc.children = [];
+      assert.deepStrictEqual(
+        Object.entries(dom.children).map(([k, v]) => [k, v.children]),
+        [
+          ['a', 'aAa'],
+          ['b', 'cCc'],
+          ['c', 'bBb'],
+          ['d', 'fFf'],
+          ['e', 'gGg'],
         ]);
       assert.deepStrictEqual(
         [...Object.values(dom.children)].map(v => v.element),
