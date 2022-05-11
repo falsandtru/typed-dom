@@ -631,6 +631,8 @@ describe('Integration: Typed DOM', function () {
       () => Trans.span(bind('Greeting', {}));
       // @ts-expect-error
       () => Trans.span(bind('', { name: 'world' }));
+      // @ts-expect-error
+      () => Trans.span('', bind('Greeting', { name: 'world' }));
     });
 
   });
