@@ -5,6 +5,8 @@ import { querySelector, querySelectorAll } from '../src/util/query';
 describe('Benchmark:', function () {
   this.timeout(30 * 1e3);
 
+  if (navigator.userAgent.includes('Firefox')) return;
+
   const el = html('div', [html('a'), html('a'), html('a')]);
 
   describe('querySelector', function () {
