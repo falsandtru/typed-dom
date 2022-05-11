@@ -68,7 +68,7 @@ Shadow.section();
 
 #### Create APIs
 
-All the APIs creating an element can be redefined as follows:
+All the APIs creating an element can be recreated as follows:
 
 ```ts
 import { API, NS, shadow, element } from 'typed-dom';
@@ -81,9 +81,15 @@ const HTML = API<HTMLElementTagNameMap>(html);
 const SVG = API<SVGElementTagNameMap>(svg);
 ```
 
+A closed shadow DOM API can be created as follows:
+
+```ts
+const Shadow = API<ShadowHostHTMLElementTagNameMap>(html, el => shadow(el, { mode: 'closed' }));
+```
+
 #### Extend APIs
 
-Custom elements can be defined by extending `ShadowHostHTMLElementTagNameMap`, `HTMLElementTagNameMap`, or `SVGElementTagNameMap` interface.
+Custom elements can be created by extending `ShadowHostHTMLElementTagNameMap`, `HTMLElementTagNameMap`, or `SVGElementTagNameMap` interface.
 
 ```ts
 import { Shadow, HTML } from 'typed-dom';
@@ -104,7 +110,7 @@ HTML.custom().element.outerHTML; // '<custom></custom>'
 ```
 
 However, since scoped custom elements don't inherit global custom elements you shouldn't extend the built-in interfaces such as HTMLElementTagNameMap.
-Instead, you should define new interfaces and new APIs to define custom elements.
+Instead, you should create new interfaces and new APIs to define custom elements.
 
 ```ts
 import { API, shadow, html } from 'typed-dom';
@@ -262,7 +268,7 @@ dom.children.title.element.outerHTML; // '<h1>title</h1>'
 
 ## Examples
 
-Typed-DOM supports custom elements but they are unrecommended since most of customizations can be implemented by customizing proxies or APIs instead of elements.
+Typed-DOM supports custom elements but they are unrecommended since most of purposes of customizations can be realized by customizing proxies or APIs instead of elements.
 
 ### DOM Components
 
