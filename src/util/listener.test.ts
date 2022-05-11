@@ -1,4 +1,4 @@
-import { bind, delegate, listen, once, wait, currentTarget } from './listener';
+import { bind, delegate, listen, once, currentTarget } from './listener';
 import { Shadow, HTML } from '../builder';
 
 describe('Unit: util/listener', () => {
@@ -79,7 +79,12 @@ describe('Unit: util/listener', () => {
         assert(ev instanceof Event);
         assert(ev[currentTarget] === ev.currentTarget);
         assert(cnt === 0 && ++cnt);
-        once(el, 'click', () => void assert(cnt === 1 && ++cnt) || done());
+        once(el, 'click', () => void assert(cnt === 2 && ++cnt) || done());
+      });
+      once(el, 'click').then(ev => {
+        assert(ev instanceof Event);
+        assert(ev[currentTarget] === ev.currentTarget);
+        assert(cnt === 1 && ++cnt);
       });
       document.createDocumentFragment().appendChild(el);
       el.click();
@@ -93,35 +98,15 @@ describe('Unit: util/listener', () => {
         assert(ev instanceof Event);
         assert(ev[currentTarget] === ev.currentTarget);
         assert(cnt === 0 && ++cnt);
-        once(dom.element, 'click', () => void assert(cnt === 1 && ++cnt) || done());
+        once(dom.element, 'click', () => void assert(cnt === 2 && ++cnt) || done());
+      });
+      once(dom.element, 'a', 'click').then(ev => {
+        assert(ev instanceof Event);
+        assert(ev[currentTarget] === ev.currentTarget);
+        assert(cnt === 1 && ++cnt);
       });
       document.createDocumentFragment().appendChild(dom.element);
       dom.children[0].element.click();
-      dom.children[0].element.click();
-    });
-
-  });
-
-  describe('wait', () => {
-    it('bind', done => {
-      const el = HTML.a().element;
-      wait(el, 'click').then(ev => {
-        assert(ev instanceof Event);
-        assert(ev[currentTarget] === ev.currentTarget);
-        done();
-      });
-      document.createDocumentFragment().appendChild(el);
-      el.click();
-    });
-
-    it('delegate', done => {
-      const dom = Shadow.section([HTML.a()]);
-      wait(dom.element, 'a', 'click').then(ev => {
-        assert(ev instanceof Event);
-        assert(ev[currentTarget] === ev.currentTarget);
-        done();
-      });
-      document.createDocumentFragment().appendChild(dom.element);
       dom.children[0].element.click();
     });
 
