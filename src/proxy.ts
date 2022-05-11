@@ -62,17 +62,6 @@ const enum ElChildType {
 
 namespace privates {
   export const events = Symbol.for('typed-dom::events');
-  export const id = Symbol('id');
-  export const id_ = Symbol('id_');
-  export const query = Symbol('query');
-  export const query_ = Symbol('query_');
-  export const scope = Symbol('scope');
-  export const observe = Symbol('observe');
-  export const type = Symbol('type');
-  export const container = Symbol('container');
-  export const children = Symbol('children');
-  export const isInit = Symbol('isInit');
-  export const isObserverUpdate = Symbol('isObserverUpdate');
 }
 
 let id = identity();
@@ -94,43 +83,43 @@ export class ElementProxy<
     events.mutate = 'onmutate' in element && element['onmutate'] != null;
     events.connect = 'onconnect' in element && element['onconnect'] != null;
     events.disconnect = 'ondisconnect' in element && element['ondisconnect'] != null;
-    this[privates.children] = children;
-    this[privates.container] = container;
+    this.children_ = children;
+    this.container = container;
     switch (true) {
       case children === void 0:
-        this[privates.type] = ElChildType.Void;
+        this.type = ElChildType.Void;
         break;
       case typeof children === 'string':
-        this[privates.type] = ElChildType.Text
+        this.type = ElChildType.Text
         break;
       case isArray(children):
-        this[privates.type] = ElChildType.Array;
+        this.type = ElChildType.Array;
         break;
       case children && typeof children === 'object':
-        this[privates.type] = ElChildType.Struct;
+        this.type = ElChildType.Struct;
         break;
       default:
         throw new Error(`TypedDOM: Invalid children type.`);
     }
     throwErrorIfNotUsable(this);
     this.element[proxy] = this;
-    switch (this[privates.type]) {
+    switch (this.type) {
       case ElChildType.Void:
-        this[privates.isInit] = false;
+        this.isInit = false;
         return;
       case ElChildType.Text:
         this.children = children as El.Setter<C>;
-        this[privates.isInit] = false;
+        this.isInit = false;
         return;
       case ElChildType.Array:
-        this[privates.children] = [] as El.Children.Array as C;
+        this.children_ = [] as El.Children.Array as C;
         this.children = children as El.Setter<C>;
-        this[privates.isInit] = false;
+        this.isInit = false;
         return;
       case ElChildType.Struct:
-        this[privates.children] = this[privates.observe](children as El.Children.Struct) as C;
+        this.children_ = this.observe(children as El.Children.Struct) as C;
         this.children = children as El.Setter<C>;
-        this[privates.isInit] = false;
+        this.isInit = false;
         return;
       default:
         throw new Error(`TypedDOM: Invalid children type.`);
@@ -141,47 +130,47 @@ export class ElementProxy<
     connect: false,
     disconnect: false,
   };
-  private [privates.id_] = '';
-  private get [privates.id](): string {
-    if (this[privates.id_]) return this[privates.id_];
-    this[privates.id_] = this.element.id;
-    if (/^[a-z][\w-]*$/i.test(this[privates.id_])) return this[privates.id_];
+  private id_ = '';
+  private get id(): string {
+    if (this.id_) return this.id_;
+    this.id_ = this.element.id;
+    if (/^[a-z][\w-]*$/i.test(this.id_)) return this.id_;
     if (counter === 999) {
       id = identity();
       counter = 0;
     }
-    this[privates.id_] = `rnd-${id}-${++counter}`;
-    assert(!this.element.classList.contains(this[privates.id_]));
-    this.element.classList.add(this[privates.id_]);
-    return this[privates.id_];
+    this.id_ = `rnd-${id}-${++counter}`;
+    assert(!this.element.classList.contains(this.id_));
+    this.element.classList.add(this.id_);
+    return this.id_;
   }
-  private [privates.query_] = '';
-  private get [privates.query](): string {
-    if (this[privates.query_]) return this[privates.query_];
+  private query_ = '';
+  private get query(): string {
+    if (this.query_) return this.query_;
     switch (true) {
-      case this.element !== this[privates.container]:
-        return this[privates.query_] = ':host';
-      case this[privates.id] === this.element.id:
-        return this[privates.query_] = `#${this[privates.id]}`;
+      case this.element !== this.container:
+        return this.query_ = ':host';
+      case this.id === this.element.id:
+        return this.query_ = `#${this.id}`;
       default:
-        return this[privates.query_] = `.${this[privates.id]}`;
+        return this.query_ = `.${this.id}`;
     }
   }
-  private [privates.scope](child: El): void {
+  private scope(child: El): void {
     if (child.tag.toUpperCase() !== 'STYLE') return;
     const source = child.element.innerHTML;
     if (!source.includes(':scope')) return;
     const scope = /(^|[>~+,}/])(\s*)\:scope(?!\w)(?=\s*[A-Za-z#.:[>~+,{/])/g;
-    const style = source.replace(scope, (...$) => `${$[1]}${$[2]}${this[privates.query]}`);
-    assert(!this[privates.query_] || style !== source);
+    const style = source.replace(scope, (...$) => `${$[1]}${$[2]}${this.query}`);
+    assert(!this.query_ || style !== source);
     if (style === source) return;
     child.element.innerHTML = style;
-    assert(/^[:#.][\w-]+$/.test(this[privates.query]));
+    assert(/^[:#.][\w-]+$/.test(this.query));
     assert(child.element.children.length === 0);
     child.element.firstElementChild && child.element.replaceChildren();
   }
-  private [privates.isObserverUpdate] = false;
-  private [privates.observe](children: El.Children.Struct): El.Children.Struct {
+  private isObserverUpdate = false;
+  private observe(children: El.Children.Struct): El.Children.Struct {
     return ObjectDefineProperties(children, ObjectKeys(children).reduce((obj, name) => {
       if (name in {}) throw new Error(`TypedDOM: Child names conflicted with the object property names.`);
       let child = children[name];
@@ -192,11 +181,11 @@ export class ElementProxy<
           return child;
         },
         set: (newChild: El) => {
-          if (!this[privates.isObserverUpdate]) {
+          if (!this.isObserverUpdate) {
             this.children = { [name]: newChild } as El.Setter<C>;
           }
           else {
-            this[privates.isObserverUpdate] = false;
+            this.isObserverUpdate = false;
           }
           child = newChild;
         },
@@ -204,29 +193,29 @@ export class ElementProxy<
       return obj;
     }, {}));
   }
-  private readonly [privates.type]: ElChildType;
-  private readonly [privates.container]: Element | ShadowRoot;
-  private [privates.isInit] = true;
-  private [privates.children]: C;
+  private readonly type: ElChildType;
+  private readonly container: Element | ShadowRoot;
+  private isInit = true;
+  private children_: C;
   public get children(): El.Getter<C> {
-    switch (this[privates.type]) {
+    switch (this.type) {
       case ElChildType.Text:
-        return this[privates.container].textContent as El.Getter<C>;
+        return this.container.textContent as El.Getter<C>;
       default:
-        return this[privates.children] as El.Getter<C>;
+        return this.children_ as El.Getter<C>;
     }
   }
   public set children(children: El.Setter<C>) {
-    assert(!this[privates.isObserverUpdate]);
-    const container = this[privates.container];
+    assert(!this.isObserverUpdate);
+    const container = this.container;
     const removedChildren: El[] = [];
     const addedChildren: El[] = [];
     let isMutated = false;
-    switch (this[privates.type]) {
+    switch (this.type) {
       case ElChildType.Void:
         return;
       case ElChildType.Text: {
-        if (this[privates.isInit] || !this[privates.events].mutate) {
+        if (this.isInit || !this[privates.events].mutate) {
           container.textContent = children as El.Children.Text;
           isMutated = true;
           break;
@@ -240,15 +229,15 @@ export class ElementProxy<
       }
       case ElChildType.Array: {
         const sourceChildren = children as El.Children.Array;
-        const targetChildren = this[privates.children] as El.Children.Array;
+        const targetChildren = this.children_ as El.Children.Array;
         isMutated ||= sourceChildren.length !== targetChildren.length;
         for (let i = 0; i < sourceChildren.length; ++i) {
           const newChild = sourceChildren[i];
           const oldChild = targetChildren[i];
-          throwErrorIfNotUsable(newChild, this[privates.container]);
+          throwErrorIfNotUsable(newChild, this.container);
           isMutated ||= newChild.element !== oldChild.element;
           if (newChild.element.parentNode !== this.element) {
-            this[privates.scope](newChild);
+            this.scope(newChild);
             assert(!addedChildren.includes(newChild));
             events(newChild)?.connect && addedChildren.push(newChild);
           }
@@ -261,7 +250,7 @@ export class ElementProxy<
             container.appendChild(sourceChildren[i].element);
           }
         }
-        this[privates.children] = sourceChildren as C;
+        this.children_ = sourceChildren as C;
         for (let i = 0; i < targetChildren.length; ++i) {
           const oldChild = targetChildren[i];
           if (oldChild.element.parentNode !== container) {
@@ -275,14 +264,14 @@ export class ElementProxy<
         break;
       }
       case ElChildType.Struct: {
-        if (this[privates.isInit]) {
+        if (this.isInit) {
           container.firstChild && container.replaceChildren();
           const sourceChildren = children as El.Children.Struct;
           for (const name in sourceChildren) {
             if (!hasOwnProperty(sourceChildren, name)) continue;
             const newChild = sourceChildren[name];
-            throwErrorIfNotUsable(newChild, this[privates.container]);
-            this[privates.scope](newChild);
+            throwErrorIfNotUsable(newChild, this.container);
+            this.scope(newChild);
             container.appendChild(newChild.element);
             assert(!addedChildren.includes(newChild));
             events(newChild)?.connect && addedChildren.push(newChild);
@@ -291,7 +280,7 @@ export class ElementProxy<
           break;
         }
         const sourceChildren = children as El.Children.Struct;
-        const targetChildren = this[privates.children] as El.Children.Struct;
+        const targetChildren = this.children_ as El.Children.Struct;
         if (sourceChildren === targetChildren) break;
         for (const name in sourceChildren) {
           if (!hasOwnProperty(sourceChildren, name)) continue;
@@ -299,9 +288,9 @@ export class ElementProxy<
           const oldChild = targetChildren[name];
           if (!newChild || !oldChild) continue;
           if (newChild === oldChild) continue;
-          throwErrorIfNotUsable(newChild, this[privates.container]);
+          throwErrorIfNotUsable(newChild, this.container);
           if (newChild !== oldChild && newChild.element.parentNode !== oldChild.element.parentNode) {
-            this[privates.scope](newChild);
+            this.scope(newChild);
             container.replaceChild(newChild.element, oldChild.element);
             assert(!oldChild.element.parentNode);
             assert(!addedChildren.includes(newChild));
@@ -316,10 +305,10 @@ export class ElementProxy<
             container.insertBefore(oldChild.element, ref);
           }
           isMutated = true;
-          this[privates.isObserverUpdate] = true;
+          this.isObserverUpdate = true;
           targetChildren[name] = newChild;
-          assert(!this[privates.isObserverUpdate]);
-          this[privates.isObserverUpdate] = false;
+          assert(!this.isObserverUpdate);
+          this.isObserverUpdate = false;
         }
         break;
       }
