@@ -1,4 +1,4 @@
-import { API, Shadow, HTML, SVG, El, Attrs, shadow, html } from '../..';
+import { Shadow, HTML, SVG, El, Attrs, shadow, html } from '../..';
 import { Coroutine } from 'spica/coroutine';
 import { Sequence } from 'spica/sequence';
 
@@ -570,7 +570,7 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('translate', function () {
-      const i18n = i18next.createInstance({
+      const translator = i18next.createInstance({
         lng: 'en',
         resources: {
           en: {
@@ -583,7 +583,6 @@ describe('Integration: Typed DOM', function () {
       interface TransDataMap {
         'Greeting': { name: string; };
       }
-      const Trans = API<HTMLElementTagNameMap>(html);
 
       function data
         <K extends keyof TransDataMap>
@@ -592,30 +591,30 @@ describe('Integration: Typed DOM', function () {
         return (html, tag, _, children) =>
           html(tag, {
             onmutate: ev =>
-              void i18n.init((err, t) =>
+              void translator.init((err, t) =>
                 ev.currentTarget.textContent = err
                   ? '{% Failed to initialize the translator. %}'
                   : t(children, data) ?? `{% Failed to translate "${children}". %}`),
           });
       }
 
-      const el = Trans.span('Greeting', data({ name: 'world' }));
+      const el = HTML.span('Greeting', data({ name: 'world' }));
       assert(el.children === 'Hello, world.');
       assert(el.element.textContent === 'Hello, world.');
       // @ts-expect-error
-      () => Trans.span('Greeting', data({}));
+      () => HTML.span('Greeting', data({}));
       // @ts-expect-error
-      () => Trans.span('', data({ name: 'world' }));
+      () => HTML.span('', data({ name: 'world' }));
       // @ts-expect-error
-      () => Trans.span(data({ name: 'world' }));
+      () => HTML.span(data({ name: 'world' }));
 
-      function bind
+      function intl
         <K extends keyof TransDataMap>
         (children: K, data: TransDataMap[K])
-        : El.Factory<HTMLElementTagNameMap, void> {
+        : El.Factory<HTMLElementTagNameMap, El.Children.Void> {
         return (html, tag) => {
           const el = html(tag);
-          i18n.init((err, t) =>
+          translator.init((err, t) =>
             el.textContent = err
               ? '{% Failed to initialize the translator. %}'
               : t(children, data) ?? `{% Failed to translate "${children}". %}`);
@@ -623,16 +622,16 @@ describe('Integration: Typed DOM', function () {
         };
       }
 
-      assert(Trans.span(bind('Greeting', { name: 'world' })).children === undefined);
-      assert(Trans.span(bind('Greeting', { name: 'world' })).element.textContent === 'Hello, world.');
-      assert(Trans.span({}, bind('Greeting', { name: 'world' })).children === undefined);
-      assert(Trans.span({}, bind('Greeting', { name: 'world' })).element.textContent === 'Hello, world.');
+      assert(HTML.span(intl('Greeting', { name: 'world' })).children === undefined);
+      assert(HTML.span(intl('Greeting', { name: 'world' })).element.textContent === 'Hello, world.');
+      assert(HTML.span({}, intl('Greeting', { name: 'world' })).children === undefined);
+      assert(HTML.span({}, intl('Greeting', { name: 'world' })).element.textContent === 'Hello, world.');
       // @ts-expect-error
-      () => Trans.span(bind('Greeting', {}));
+      () => HTML.span(intl('Greeting', {}));
       // @ts-expect-error
-      () => Trans.span(bind('', { name: 'world' }));
+      () => HTML.span(intl('', { name: 'world' }));
       // @ts-expect-error
-      () => Trans.span('', bind('Greeting', { name: 'world' }));
+      () => HTML.span('', intl('Greeting', { name: 'world' }));
     });
 
   });

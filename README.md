@@ -344,15 +344,15 @@ class Component extends Coroutine implements El {
 }
 ```
 
-### Translation
+### i18n
 
-Create a custom API for translation.
+Create a helper function of APIs for i18n.
 Typed-DOM provides `mutate`, `connect`, and `disconnect` events.
 
 ```ts
-import { API, El, html } from 'typed-dom';
+import { HTML, El, html } from 'typed-dom';
 
-const i18n = i18next.createInstance({
+const translator = i18next.createInstance({
   lng: 'en',
   resources: {
     en: {
@@ -365,7 +365,6 @@ const i18n = i18next.createInstance({
 interface TransDataMap {
   'Greeting': { name: string; };
 }
-const Trans = API<HTMLElementTagNameMap>(html);
 
 function data
   <K extends keyof TransDataMap>
@@ -374,14 +373,14 @@ function data
   return (html, tag, _, children) =>
     html(tag, {
       onmutate: ev =>
-        void i18n.init((err, t) =>
+        void translator.init((err, t) =>
           ev.currentTarget.textContent = err
             ? '{% Failed to initialize the translator. %}'
             : t(children, data) ?? `{% Failed to translate "${children}". %}`),
     });
 }
 
-const el = Trans.span('Greeting', data({ name: 'world' }));
+const el = HTML.span('Greeting', data({ name: 'world' }));
 assert(el.children === 'Hello, world.');
 assert(el.element.textContent === 'Hello, world.');
 ```
@@ -389,13 +388,13 @@ assert(el.element.textContent === 'Hello, world.');
 Or
 
 ```ts
-function bind
+function intl
   <K extends keyof TransDataMap>
   (children: K, data: TransDataMap[K])
-  : El.Factory<HTMLElementTagNameMap, void> {
+  : El.Factory<HTMLElementTagNameMap, El.Children.Void> {
   return (html, tag) => {
     const el = html(tag);
-    i18n.init((err, t) =>
+    translator.init((err, t) =>
       el.textContent = err
         ? '{% Failed to initialize the translator. %}'
         : t(children, data) ?? `{% Failed to translate "${children}". %}`);
@@ -403,7 +402,7 @@ function bind
   };
 }
 
-const el = Trans.span(bind('Greeting', { name: 'world' }));
+const el = HTML.span(intl('Greeting', { name: 'world' }));
 assert(el.children === undefined);
 assert(el.element.textContent === 'Hello, world.');
 ```
