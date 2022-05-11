@@ -589,15 +589,12 @@ describe('Integration: Typed DOM', function () {
             let count = 0;
             this.children = `${count}`;
             while (true) {
-              if (!this.element.isConnected) {
-                await new Promise(resolve =>
-                  this.element.addEventListener('connect', resolve, { once: true }));
-              }
+              this.element.isConnected || await new Promise<unknown>(resolve =>
+                this.element.addEventListener('connect', resolve, { once: true }));
               this.children = `${++count}`;
               yield;
-              await new Promise(resolve => setTimeout(resolve, 100));
             }
-          }, { trigger: 'element' });
+          }, { trigger: 'element', interval: 100 });
         }
         private readonly dom = Shadow.section({ onconnect: '' }, {
           style: HTML.style(':scope { color: red; }'),
