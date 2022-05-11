@@ -13,6 +13,9 @@ declare global {
 
 declare const _: { shuffle<T>(as: T[]): T[]; };
 
+const doc = Shadow.section([]);
+document.body.appendChild(doc.element);
+
 describe('Integration: Typed DOM', function () {
   describe('spec', function () {
     it('call', function () {
@@ -376,14 +379,21 @@ describe('Integration: Typed DOM', function () {
     it('observe collection', function () {
       const attrs: Attrs = {
         onconnect: ({ currentTarget: el }) =>
-          el.textContent += el.textContent!.toUpperCase(),
+          el.textContent += el.textContent![0].toUpperCase(),
         ondisconnect: ({ currentTarget: el }) =>
-          el.textContent += el.textContent!,
+          el.textContent += el.textContent![0].toLowerCase(),
       };
       const dom = HTML.ul([
         HTML.li(attrs, 'a'),
         HTML.li(attrs, 'b'),
       ]);
+      assert.deepStrictEqual(
+        dom.children.map(child => child.children),
+        [
+          'a',
+          'b',
+        ]);
+      doc.children = [dom];
       assert.deepStrictEqual(
         dom.children.map(child => child.children),
         [
@@ -403,6 +413,13 @@ describe('Integration: Typed DOM', function () {
       assert.deepStrictEqual(
         dom.children.map(v => v.element),
         [...dom.element.children]);
+      doc.children = [];
+      assert.deepStrictEqual(
+        dom.children.map(child => child.children),
+        [
+          'bBb',
+          'cCc',
+        ]);
     });
 
     it('observe record', function () {
@@ -419,6 +436,16 @@ describe('Integration: Typed DOM', function () {
         d: HTML.li(attrs, 'd'),
         e: HTML.li(attrs, 'e'),
       });
+      assert.deepStrictEqual(
+        Object.entries(dom.children).map(([k, v]) => [k, v.children]),
+        [
+          ['a', 'a'],
+          ['b', 'b'],
+          ['c', 'c'],
+          ['d', 'd'],
+          ['e', 'e'],
+        ]);
+      doc.children = [Shadow.section([dom])];
       assert.deepStrictEqual(
         Object.entries(dom.children).map(([k, v]) => [k, v.children]),
         [
