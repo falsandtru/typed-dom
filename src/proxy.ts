@@ -248,7 +248,8 @@ export class ElementProxy<
           const oldChild = targetChildren[i];
           if (oldChild.element.parentNode !== container) {
             assert(!removedChildren.includes(oldChild));
-            hasListener(oldChild) && removedChildren.push(oldChild) && this[publics.events].del(oldChild);
+            hasListener(oldChild) && removedChildren.push(oldChild);
+            this[publics.events].del(oldChild);
             assert(isMutated);
           }
         }
@@ -289,7 +290,8 @@ export class ElementProxy<
             assert(!addedChildren.includes(newChild));
             hasListener(newChild) && addedChildren.push(newChild) && this[publics.events].add(newChild);
             assert(!removedChildren.includes(oldChild));
-            hasListener(oldChild) && removedChildren.push(oldChild) && this[publics.events].del(oldChild);
+            hasListener(oldChild) && removedChildren.push(oldChild);
+            this[publics.events].del(oldChild);
           }
           else {
             assert(newChild.element.parentNode === oldChild.element.parentNode);
@@ -357,12 +359,12 @@ class Events {
   }
   public readonly listeners: El[] = [];
   public add(child: El): void {
-    assert(this.listeners.indexOf(child) === -1);
-    this.listeners.push(child);
+    const i = this.listeners.indexOf(child);
+    ~i || this.listeners.push(child);
   }
   public del(child: El): void {
-    assert(this.listeners.indexOf(child) !== -1);
-    splice(this.listeners, this.listeners.indexOf(child), 1);
+    const i = this.listeners.indexOf(child);
+    ~i && splice(this.listeners, i, 1);
   }
 }
 
