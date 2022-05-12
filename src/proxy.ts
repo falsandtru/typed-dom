@@ -322,8 +322,8 @@ export class ElementProxy<
         break;
       }
     }
-    this.dispatchDisconnectionEvent(removedChildren);
-    this.dispatchConnectionEvent(addedChildren);
+    this.dispatchDisconnectEvent(removedChildren);
+    this.dispatchConnectEvent(addedChildren);
     assert(isMutated || removedChildren.length + addedChildren.length === 0);
     if (isMutated && this[privates.listeners].mutate) {
       this.element.dispatchEvent(new Event('mutate', { bubbles: false, cancelable: true }));
@@ -332,23 +332,23 @@ export class ElementProxy<
   private get isConnected(): boolean {
     return !!this.element.parentNode && this.element.isConnected;
   }
-  private dispatchConnectionEvent(
+  private dispatchConnectEvent(
     listeners: El[] | undefined = this[privates.listeners].values,
   ): void {
     if (listeners.length === 0) return;
     if (listeners !== this[privates.listeners].values && !this.isConnected) return;
     for (const listener of listeners) {
-      listener.element[proxy].dispatchConnectionEvent();
+      (listener.element[proxy] as this).dispatchConnectEvent();
       getListeners(listener)?.connect && listener.element.dispatchEvent(new Event('connect', { bubbles: false, cancelable: true }));
     }
   }
-  private dispatchDisconnectionEvent(
+  private dispatchDisconnectEvent(
     listeners: El[] | undefined = this[privates.listeners].values,
   ): void {
     if (listeners.length === 0) return;
     if (listeners !== this[privates.listeners].values && !this.isConnected) return;
     for (const listener of listeners) {
-      listener.element[proxy].dispatchDisconnectionEvent();
+      (listener.element[proxy] as this).dispatchDisconnectEvent();
       getListeners(listener)?.disconnect && listener.element.dispatchEvent(new Event('disconnect', { bubbles: false, cancelable: true }));
     }
   }
