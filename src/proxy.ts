@@ -157,10 +157,9 @@ export class ElementProxy<
     const style = source.replace(scope, (...$) => `${$[1]}${$[2]}${this.query}`);
     assert(!this.$query || style !== source);
     if (style === source) return;
-    child.element.innerHTML = style;
     assert(/^[:#.][\w-]+$/.test(this.query));
+    child.element.textContent = style;
     assert(child.element.children.length === 0);
-    child.element.firstElementChild && child.element.replaceChildren();
   }
   private isObserverUpdate = false;
   private observe(children: El.Children.Struct): El.Children.Struct {
