@@ -183,20 +183,20 @@ These events are enabled only when an event listener is set using the Typed-DOM 
 
 ### mutate
 
-It will be dispatched when the children property value is changed.
+The mutate event is dispatched when the children property value is changed.
 
 ### connect
 
-It will be dispatched when added to another proxy connected to the context object.
+The connect event is dispatched when added to another proxy connected to the context object.
 
 ### disconnect
 
-It will be dispatched when removed from the parent proxy connected to the context object.
+The disconnect event is dispatched when removed from the parent proxy connected to the context object.
 
 ## Usage
 
 Build a Typed-DOM component with styling.
-APIs replace the `:scope` selector with `:host`, `#<id>`, or `.<generated-id>`.
+`:scope` selectors are replaced with `:host`, `#<id>`, or `.<generated-id>`.
 
 ```ts
 import { HTML } from 'typed-dom';
