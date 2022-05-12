@@ -339,7 +339,7 @@ export class ElementProxy<
     if (listeners !== this[privates.listeners].values && !this.isConnected) return;
     for (const listener of listeners) {
       (listener.element[proxy] as this).dispatchConnectEvent();
-      getListeners(listener)?.connect && listener.element.dispatchEvent(new Event('connect', { bubbles: false, cancelable: true }));
+      getListeners(listener).connect && listener.element.dispatchEvent(new Event('connect', { bubbles: false, cancelable: true }));
     }
   }
   private dispatchDisconnectEvent(
@@ -349,17 +349,17 @@ export class ElementProxy<
     if (listeners !== this[privates.listeners].values && !this.isConnected) return;
     for (const listener of listeners) {
       (listener.element[proxy] as this).dispatchDisconnectEvent();
-      getListeners(listener)?.disconnect && listener.element.dispatchEvent(new Event('disconnect', { bubbles: false, cancelable: true }));
+      getListeners(listener).disconnect && listener.element.dispatchEvent(new Event('disconnect', { bubbles: false, cancelable: true }));
     }
   }
 }
 
 function hasListener(child: El): boolean {
   const ls = getListeners(child);
-  return ls?.connect || ls?.disconnect || ls?.values.length! > 0;
+  return ls.connect || ls.disconnect || ls.values.length > 0;
 }
-function getListeners(child: El): ElementProxy[typeof privates.listeners] | undefined {
-  return child[privates.listeners] ?? child.element[proxy]?.[privates.listeners];
+function getListeners(child: El): ElementProxy[typeof privates.listeners] {
+  return child[privates.listeners] ?? (child.element[proxy] as ElementProxy)[privates.listeners];
 }
 
 function throwErrorIfNotUsable(child: El, newParent?: ParentNode): void {
