@@ -232,7 +232,7 @@ export class ElementProxy<
           if (newChild.element.parentNode !== this.element) {
             this.scope(newChild);
             assert(!addedChildren.includes(newChild));
-            hasListener(newChild) && addedChildren.push(newChild) && this[publics.events].add(newChild);
+            hasConnectionListener(newChild) && addedChildren.push(newChild) && this[publics.events].add(newChild);
           }
         }
         if (container.firstChild) {
@@ -248,7 +248,7 @@ export class ElementProxy<
           const oldChild = targetChildren[i];
           if (oldChild.element.parentNode !== container) {
             assert(!removedChildren.includes(oldChild));
-            hasListener(oldChild) && removedChildren.push(oldChild);
+            hasConnectionListener(oldChild) && removedChildren.push(oldChild);
             this[publics.events].del(oldChild);
             assert(isMutated);
           }
@@ -268,7 +268,7 @@ export class ElementProxy<
             this.scope(newChild);
             container.appendChild(newChild.element);
             assert(!addedChildren.includes(newChild));
-            hasListener(newChild) && addedChildren.push(newChild) && this[publics.events].add(newChild);
+            hasConnectionListener(newChild) && addedChildren.push(newChild) && this[publics.events].add(newChild);
             isMutated = true;
           }
           break;
@@ -288,9 +288,9 @@ export class ElementProxy<
             container.replaceChild(newChild.element, oldChild.element);
             assert(!oldChild.element.parentNode);
             assert(!addedChildren.includes(newChild));
-            hasListener(newChild) && addedChildren.push(newChild) && this[publics.events].add(newChild);
+            hasConnectionListener(newChild) && addedChildren.push(newChild) && this[publics.events].add(newChild);
             assert(!removedChildren.includes(oldChild));
-            hasListener(oldChild) && removedChildren.push(oldChild);
+            hasConnectionListener(oldChild) && removedChildren.push(oldChild);
             this[publics.events].del(oldChild);
           }
           else {
@@ -368,7 +368,7 @@ class Events {
   }
 }
 
-function hasListener(child: El): boolean {
+function hasConnectionListener(child: El): boolean {
   const events = getEvents(child);
   return events.listeners.length > 0 || events.connect || events.disconnect;
 }
