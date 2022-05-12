@@ -81,7 +81,7 @@ export class ElementProxy<
     children: C,
     container: Element | ShadowRoot = element,
   ) {
-    this.children_ = children;
+    this.$children = children;
     this.container = container;
     switch (true) {
       case children === void 0:
@@ -110,12 +110,12 @@ export class ElementProxy<
         this.isInit = false;
         return;
       case ElChildType.Array:
-        this.children_ = [] as El.Children.Array as C;
+        this.$children = [] as El.Children.Array as C;
         this.children = children as El.Setter<C>;
         this.isInit = false;
         return;
       case ElChildType.Struct:
-        this.children_ = this.observe(children as El.Children.Struct) as C;
+        this.$children = this.observe(children as El.Children.Struct) as C;
         this.children = children as El.Setter<C>;
         this.isInit = false;
         return;
@@ -123,30 +123,30 @@ export class ElementProxy<
         throw new Error(`TypedDOM: Invalid children type.`);
     }
   }
-  private id_ = '';
+  private $id = '';
   private get id(): string {
-    if (this.id_) return this.id_;
-    this.id_ = this.element.id;
-    if (/^[a-z][\w-]*$/i.test(this.id_)) return this.id_;
+    if (this.$id) return this.$id;
+    this.$id = this.element.id;
+    if (/^[a-z][\w-]*$/i.test(this.$id)) return this.$id;
     if (counter === 999) {
       id = identity();
       counter = 0;
     }
-    this.id_ = `rnd-${id}-${++counter}`;
-    assert(!this.element.classList.contains(this.id_));
-    this.element.classList.add(this.id_);
-    return this.id_;
+    this.$id = `rnd-${id}-${++counter}`;
+    assert(!this.element.classList.contains(this.$id));
+    this.element.classList.add(this.$id);
+    return this.$id;
   }
-  private query_ = '';
+  private $query = '';
   private get query(): string {
-    if (this.query_) return this.query_;
+    if (this.$query) return this.$query;
     switch (true) {
       case this.element !== this.container:
-        return this.query_ = ':host';
+        return this.$query = ':host';
       case this.id === this.element.id:
-        return this.query_ = `#${this.id}`;
+        return this.$query = `#${this.id}`;
       default:
-        return this.query_ = `.${this.id}`;
+        return this.$query = `.${this.id}`;
     }
   }
   private scope(child: El): void {
@@ -155,7 +155,7 @@ export class ElementProxy<
     if (!source.includes(':scope')) return;
     const scope = /(^|[>~+,}/])(\s*)\:scope(?!\w)(?=\s*[A-Za-z#.:[>~+,{/])/g;
     const style = source.replace(scope, (...$) => `${$[1]}${$[2]}${this.query}`);
-    assert(!this.query_ || style !== source);
+    assert(!this.$query || style !== source);
     if (style === source) return;
     child.element.innerHTML = style;
     assert(/^[:#.][\w-]+$/.test(this.query));
@@ -189,14 +189,14 @@ export class ElementProxy<
   private readonly type: ElChildType;
   private readonly container: Element | ShadowRoot;
   private isInit = true;
-  private children_: C;
+  private $children: C;
   public readonly [publics.events] = new Events(this.element);
   public get children(): El.Getter<C> {
     switch (this.type) {
       case ElChildType.Text:
         return this.container.textContent as El.Getter<C>;
       default:
-        return this.children_ as El.Getter<C>;
+        return this.$children as El.Getter<C>;
     }
   }
   public set children(children: El.Setter<C>) {
@@ -223,7 +223,7 @@ export class ElementProxy<
       }
       case ElChildType.Array: {
         const sourceChildren = children as El.Children.Array;
-        const targetChildren = this.children_ as El.Children.Array;
+        const targetChildren = this.$children as El.Children.Array;
         isMutated ||= sourceChildren.length !== targetChildren.length;
         for (let i = 0; i < sourceChildren.length; ++i) {
           const newChild = sourceChildren[i];
@@ -244,7 +244,7 @@ export class ElementProxy<
             container.appendChild(sourceChildren[i].element);
           }
         }
-        this.children_ = sourceChildren as C;
+        this.$children = sourceChildren as C;
         for (let i = 0; i < targetChildren.length; ++i) {
           const oldChild = targetChildren[i];
           if (oldChild.element.parentNode !== container) {
@@ -274,7 +274,7 @@ export class ElementProxy<
           break;
         }
         const sourceChildren = children as El.Children.Struct;
-        const targetChildren = this.children_ as El.Children.Struct;
+        const targetChildren = this.$children as El.Children.Struct;
         if (sourceChildren === targetChildren) break;
         for (const name in sourceChildren) {
           if (!hasOwnProperty(sourceChildren, name)) continue;
