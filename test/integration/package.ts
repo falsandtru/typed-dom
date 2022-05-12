@@ -372,9 +372,13 @@ describe('Integration: Typed DOM', function () {
             el.textContent += el.textContent!,
         },
         'a');
+      assert.deepStrictEqual({ ...dom.element }, {});
+      assert(dom.element['onmutate'] === '');
       assert(dom.children === 'aa');
       dom.children = 'b';
       assert(dom.children === 'bb');
+      dom.element['onmutate'] = null;
+      assert(dom.element['onmutate'] === null);
     });
 
     it('observe collection', function () {
@@ -388,6 +392,8 @@ describe('Integration: Typed DOM', function () {
         HTML.li(attrs, 'a'),
         HTML.li(attrs, 'b'),
       ]);
+      assert(dom.element['onconnect'] === undefined);
+      assert(dom.element['ondisconnect'] === undefined);
       assert.deepStrictEqual(
         dom.children.map(child => child.children),
         [
