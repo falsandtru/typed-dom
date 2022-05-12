@@ -1,5 +1,5 @@
 import { Symbol, document } from 'spica/global';
-import { isArray, hasOwnProperty } from 'spica/alias';
+import { isArray, hasOwnProperty, ObjectDefineProperty } from 'spica/alias';
 import { memoize } from 'spica/memoize';
 
 declare global {
@@ -141,9 +141,14 @@ function defineAttrs<E extends Element>(el: E, attrs: Attrs): E {
             case 'connect':
             case 'disconnect':
               const prop = `on${type}`;
-              prop in el
-                ? el[prop] ??= (ev: NodeEvent<E>) => ev.returnValue
-                : el[prop] ??= '';
+              el[prop] ?? ObjectDefineProperty(el, prop, {
+                configurable: true,
+                enumerable: false,
+                writable: true,
+                value: prop in el
+                  ? (ev: Event) => ev.returnValue
+                  : '',
+              });
           }
         }
         continue;
@@ -168,9 +173,14 @@ function defineAttrs<E extends Element>(el: E, attrs: Attrs): E {
             case 'connect':
             case 'disconnect':
               const prop = `on${type}`;
-              prop in el
-                ? el[prop] ??= (ev: NodeEvent<E>) => ev.returnValue
-                : el[prop] ??= '';
+              el[prop] ?? ObjectDefineProperty(el, prop, {
+                configurable: true,
+                enumerable: false,
+                writable: true,
+                value: prop in el
+                  ? (ev: Event) => ev.returnValue
+                  : '',
+              });
           }
         }
         continue;

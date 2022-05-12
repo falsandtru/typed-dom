@@ -1,3 +1,4 @@
+import { ObjectDefineProperty } from 'spica/alias';
 import { AtomicPromise } from 'spica/promise';
 import { singleton } from 'spica/function';
 
@@ -129,9 +130,14 @@ export function bind<T extends keyof WindowEventMap | keyof DocumentEventMap | k
     case 'connect':
     case 'disconnect':
       const prop = `on${type}`;
-      prop in target
-        ? target[prop] ??= (ev: Event) => ev.returnValue
-        : target[prop] ??= '';
+      target[prop] ?? ObjectDefineProperty(target, prop, {
+        configurable: true,
+        enumerable: false,
+        writable: true,
+        value: prop in target
+          ? (ev: Event) => ev.returnValue
+          : '',
+      });
   }
   target.addEventListener(type, handler, option);
   return singleton(() => void target.removeEventListener(type, handler, option));
