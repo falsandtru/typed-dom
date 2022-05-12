@@ -370,7 +370,7 @@ class Events {
 
 function hasListener(child: El): boolean {
   const events = getEvents(child);
-  return events.connect || events.disconnect || events.listeners.length > 0;
+  return events.listeners.length > 0 || events.connect || events.disconnect;
 }
 function getEvents(child: El): Events {
   return child[publics.events] ?? (child.element[proxy] as ElementProxy)[publics.events];
