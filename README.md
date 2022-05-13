@@ -72,6 +72,16 @@ export namespace El {
   export type Setter<C extends El.Children> =
     C extends Node | readonly unknown[] ? C :
     Partial<C>;
+  export type Factory<
+    M extends TagNameMap,
+    C extends El.Children = El.Children,
+    > =
+    <T extends keyof M & string>(
+      baseFactory: BaseFactory<M>,
+      tag: T,
+      attrs: Attrs<Extract<M[T], Element>>,
+      children: C,
+    ) => M[T];
 }
 ```
 
@@ -261,7 +271,7 @@ Create an HTML element proxy.
 
 - attrs: Record<string, string | EventListener | null | undefined>
 - children: undefined | string | El[] | Record<string, El> | DocumentFragment
-- factory: () => Element
+- factory: (html, tag, attrs, children) => HTMLElement
 
 ```ts
 import { HTML, frag } from 'typed-dom';
@@ -283,7 +293,7 @@ Create an SVG element proxy.
 
 - attrs: Record<string, string | EventListener | null | undefined>
 - children: undefined | string | El[] | Record<string, El> | DocumentFragment
-- factory: () => Element
+- factory: (svg, tag, attrs, children) => SVGElement
 
 ```ts
 import { SVG } from 'typed-dom';
@@ -297,7 +307,7 @@ Create an HTML element proxy assigning the children to the own open shadow DOM.
 
 - attrs: Record<string, string | EventListener | null | undefined>
 - children: undefined | string | El[] | Record<string, El> | DocumentFragment
-- factory: () => Element
+- factory: (html, tag, attrs, children) => HTMLElement
 
 ```ts
 import { Shadow } from 'typed-dom';
