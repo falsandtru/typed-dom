@@ -253,7 +253,7 @@ assert(el.element.textContent === 'Hello, world.');
 
 ## APIs
 
-### HTML: { [tagname]: (attrs?, children?, factory?) => El; };
+### HTML: { [tag]: (attrs?, children?, factory?) => El; (tag: string, ...): El; };
 
 Create an HTML element proxy.
 
@@ -271,9 +271,10 @@ HTML.p({ link: HTML.a() }]);
 HTML.p({ id: 'id' });
 HTML.p(() => document.createElement('p'));
 HTML.p(() => document.querySelector('p'));
+HTML('p', 'text');
 ```
 
-### SVG: { [tagname]: (attrs?, children?, factory?) => El; };
+### SVG: { [tag]: (attrs?, children?, factory?) => El; (tag: string, ...): El; };
 
 Create an SVG element proxy.
 
@@ -287,7 +288,7 @@ import { SVG } from 'typed-dom';
 SVG.svg();
 ```
 
-### Shadow: { [tagname]: (attrs?, children?, factory?) => El; };
+### Shadow: { [tag]: (attrs?, children?, factory?) => El; (tag: string, ...): El; };
 
 Create an HTML element proxy assigning the children to the own open shadow DOM.
 
