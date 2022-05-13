@@ -67,11 +67,11 @@ export namespace El {
     export type Struct = { [field: string]: El; };
   }
   export type Getter<C extends El.Children> =
-    C extends Node | readonly unknown[] ? C :
+    C extends Children.Struct ? C :
     C;
   export type Setter<C extends El.Children> =
-    C extends Node | readonly unknown[] ? C :
-    Partial<C>;
+    C extends Children.Struct ? Partial<C> :
+    C;
   export type Factory<
     M extends TagNameMap,
     C extends El.Children = El.Children,
