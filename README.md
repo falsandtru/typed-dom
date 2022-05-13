@@ -14,185 +14,6 @@ const dom: El<"article", HTMLElement, {
 }>
 ```
 
-## APIs
-
-### HTML: { [tagname]: (attrs?, children?, factory?) => El; };
-
-Create an HTML element proxy.
-
-- attrs: Record<string, string | EventListener | null | undefined>
-- children: undefined | string | El[] | Record<string, El>
-- factory: () => Element
-
-```ts
-import { HTML } from 'typed-dom';
-
-HTML.p();
-HTML.p('text');
-HTML.p([HTML.a()]);
-HTML.p({ link: HTML.a() }]);
-HTML.p({ id: 'id' });
-HTML.p(() => document.createElement('p'));
-HTML.p(() => document.querySelector('p'));
-```
-
-### SVG: { [tagname]: (attrs?, children?, factory?) => El; };
-
-Create an SVG element proxy.
-
-- attrs: Record<string, string | EventListener | null | undefined>
-- children: undefined | string | El[] | Record<string, El>
-- factory: () => Element
-
-```ts
-import { SVG } from 'typed-dom';
-
-SVG.svg();
-```
-
-### Shadow: { [tagname]: (attrs?, children?, factory?) => El; };
-
-Create an HTML element proxy assigning the children to the own open shadow DOM.
-
-- attrs: Record<string, string | EventListener | null | undefined>
-- children: undefined | string | El[] | Record<string, El>
-- factory: () => Element
-
-```ts
-import { Shadow } from 'typed-dom';
-
-Shadow.section();
-```
-
-### API
-
-#### Create APIs
-
-All the APIs creating an element can be recreated as follows:
-
-```ts
-import { API, NS, shadow, element } from 'typed-dom';
-
-const html = element<HTMLElementTagNameMap>(document, NS.HTML);
-const svg = element<SVGElementTagNameMap>(document, NS.SVG);
-
-const Shadow = API<ShadowHostHTMLElementTagNameMap>(html, shadow);
-const HTML = API<HTMLElementTagNameMap>(html);
-const SVG = API<SVGElementTagNameMap>(svg);
-```
-
-A closed shadow DOM API can be created as follows:
-
-```ts
-const Shadow = API<ShadowHostHTMLElementTagNameMap>(html, el => shadow(el, { mode: 'closed' }));
-```
-
-#### Extend APIs
-
-Custom elements can be created by extending `ShadowHostHTMLElementTagNameMap`, `HTMLElementTagNameMap`, or `SVGElementTagNameMap` interface.
-
-```ts
-import { Shadow, HTML } from 'typed-dom';
-
-declare global {
-  interface ShadowHostHTMLElementTagNameMap {
-    'custom-tag': HTMLElement;
-  }
-  interface HTMLElementTagNameMap {
-    'custom': HTMLElement;
-  }
-}
-
-window.customElements.define('custom-tag', class extends HTMLElement { });
-Shadow('custom-tag').element.outerHTML; // '<custom-tag></custom-tag>'
-HTML('custom-tag').element.outerHTML; // '<custom-tag></custom-tag>'
-HTML.custom().element.outerHTML; // '<custom></custom>'
-```
-
-However, since scoped custom elements don't inherit global custom elements you shouldn't extend the built-in interfaces such as HTMLElementTagNameMap.
-Instead, you should create new interfaces and new APIs to define custom elements.
-
-```ts
-import { API, shadow, html } from 'typed-dom';
-
-interface CustomShadowHostElementTagNameMap extends ShadowHostHTMLElementTagNameMap {
-  'custom-tag': HTMLElement;
-}
-interface CustomHTMLElementTagNameMap extends HTMLElementTagNameMap, CustomShadowHostElementTagNameMap {
-  'custom': HTMLElement;
-}
-
-export const Shadow = API<CustomShadowHostElementTagNameMap>(html, shadow);
-export const HTML = API<CustomHTMLElementTagNameMap>(html);
-```
-
-Ideally, you should define custom elements only as scoped custom elements.
-
-```ts
-import { API, NS, shadow, html as h, element } from 'typed-dom';
-
-interface ShadowHostScopedCustomHTMLElementTagNameMap extends ShadowHostHTMLElementTagNameMap {
-  'custom-tag': HTMLElement;
-}
-interface ScopedCustomHTMLElementTagNameMap extends HTMLElementTagNameMap, ShadowHostScopedCustomHTMLElementTagNameMap {
-  'custom': HTMLElement;
-}
-
-// Note that the following code is based on the unstandardized APIs of scoped custom elements.
-const registry = new CustomElementRegistry();
-// This Host function creates a proxy and makes its shadow DOM in the base document (light DOM).
-export const Host = API<ShadowHostHTMLElementTagNameMap>(h, el =>
-  shadow(el, { mode: 'open', registry }));
-// This html function creates a scoped custom element in a shadow DOM.
-export const html = element<ScopedCustomHTMLElementTagNameMap>(
-  shadow('body', { mode: 'open', registry }),
-  NS.HTML);
-// This HTML function creates a scoped custom element proxy in a shadow DOM.
-export const HTML = API<ScopedCustomHTMLElementTagNameMap>(html);
-// This Shadow function creates a scoped custom element proxy and makes its shadow DOM in a shadow DOM.
-export const Shadow = API<ShadowHostScopedCustomHTMLElementTagNameMap>(html, shadow);
-```
-
-### Others
-
-- El
-- NS
-- Attrs
-- Children
-- Factory
-- shadow
-- frag
-- html
-- svg
-- text
-- define
-- append
-- prepend
-- defrag
-- listen
-- once
-- delegate
-- bind
-- currentTarget
-- querySelector
-- querySelectorAll
-
-## Events
-
-These events are enabled only when an event listener is set using the Typed-DOM APIs.
-
-### mutate
-
-The mutate event is dispatched when the children property value is changed.
-
-### connect
-
-The connect event is dispatched when added to another proxy connected to the context object.
-
-### disconnect
-
-The disconnect event is dispatched when removed from the parent proxy connected to the context object.
-
 ## Usage
 
 Build a Typed-DOM component with styling.
@@ -429,6 +250,185 @@ const el = HTML.span(intl('Greeting', { name: 'world' }));
 assert(el.children === undefined);
 assert(el.element.textContent === 'Hello, world.');
 ```
+
+## APIs
+
+### HTML: { [tagname]: (attrs?, children?, factory?) => El; };
+
+Create an HTML element proxy.
+
+- attrs: Record<string, string | EventListener | null | undefined>
+- children: undefined | string | El[] | Record<string, El>
+- factory: () => Element
+
+```ts
+import { HTML } from 'typed-dom';
+
+HTML.p();
+HTML.p('text');
+HTML.p([HTML.a()]);
+HTML.p({ link: HTML.a() }]);
+HTML.p({ id: 'id' });
+HTML.p(() => document.createElement('p'));
+HTML.p(() => document.querySelector('p'));
+```
+
+### SVG: { [tagname]: (attrs?, children?, factory?) => El; };
+
+Create an SVG element proxy.
+
+- attrs: Record<string, string | EventListener | null | undefined>
+- children: undefined | string | El[] | Record<string, El>
+- factory: () => Element
+
+```ts
+import { SVG } from 'typed-dom';
+
+SVG.svg();
+```
+
+### Shadow: { [tagname]: (attrs?, children?, factory?) => El; };
+
+Create an HTML element proxy assigning the children to the own open shadow DOM.
+
+- attrs: Record<string, string | EventListener | null | undefined>
+- children: undefined | string | El[] | Record<string, El>
+- factory: () => Element
+
+```ts
+import { Shadow } from 'typed-dom';
+
+Shadow.section();
+```
+
+### API
+
+#### Create APIs
+
+All the APIs creating an element can be recreated as follows:
+
+```ts
+import { API, NS, shadow, element } from 'typed-dom';
+
+const html = element<HTMLElementTagNameMap>(document, NS.HTML);
+const svg = element<SVGElementTagNameMap>(document, NS.SVG);
+
+const Shadow = API<ShadowHostHTMLElementTagNameMap>(html, shadow);
+const HTML = API<HTMLElementTagNameMap>(html);
+const SVG = API<SVGElementTagNameMap>(svg);
+```
+
+A closed shadow DOM API can be created as follows:
+
+```ts
+const Shadow = API<ShadowHostHTMLElementTagNameMap>(html, el => shadow(el, { mode: 'closed' }));
+```
+
+#### Extend APIs
+
+Custom elements can be created by extending `ShadowHostHTMLElementTagNameMap`, `HTMLElementTagNameMap`, or `SVGElementTagNameMap` interface.
+
+```ts
+import { Shadow, HTML } from 'typed-dom';
+
+declare global {
+  interface ShadowHostHTMLElementTagNameMap {
+    'custom-tag': HTMLElement;
+  }
+  interface HTMLElementTagNameMap {
+    'custom': HTMLElement;
+  }
+}
+
+window.customElements.define('custom-tag', class extends HTMLElement { });
+Shadow('custom-tag').element.outerHTML; // '<custom-tag></custom-tag>'
+HTML('custom-tag').element.outerHTML; // '<custom-tag></custom-tag>'
+HTML.custom().element.outerHTML; // '<custom></custom>'
+```
+
+However, since scoped custom elements don't inherit global custom elements you shouldn't extend the built-in interfaces such as HTMLElementTagNameMap.
+Instead, you should create new interfaces and new APIs to define custom elements.
+
+```ts
+import { API, shadow, html } from 'typed-dom';
+
+interface CustomShadowHostElementTagNameMap extends ShadowHostHTMLElementTagNameMap {
+  'custom-tag': HTMLElement;
+}
+interface CustomHTMLElementTagNameMap extends HTMLElementTagNameMap, CustomShadowHostElementTagNameMap {
+  'custom': HTMLElement;
+}
+
+export const Shadow = API<CustomShadowHostElementTagNameMap>(html, shadow);
+export const HTML = API<CustomHTMLElementTagNameMap>(html);
+```
+
+Ideally, you should define custom elements only as scoped custom elements.
+
+```ts
+import { API, NS, shadow, html as h, element } from 'typed-dom';
+
+interface ShadowHostScopedCustomHTMLElementTagNameMap extends ShadowHostHTMLElementTagNameMap {
+  'custom-tag': HTMLElement;
+}
+interface ScopedCustomHTMLElementTagNameMap extends HTMLElementTagNameMap, ShadowHostScopedCustomHTMLElementTagNameMap {
+  'custom': HTMLElement;
+}
+
+// Note that the following code is based on the unstandardized APIs of scoped custom elements.
+const registry = new CustomElementRegistry();
+// This Host function creates a proxy and makes its shadow DOM in the base document (light DOM).
+export const Host = API<ShadowHostHTMLElementTagNameMap>(h, el =>
+  shadow(el, { mode: 'open', registry }));
+// This html function creates a scoped custom element in a shadow DOM.
+export const html = element<ScopedCustomHTMLElementTagNameMap>(
+  shadow('body', { mode: 'open', registry }),
+  NS.HTML);
+// This HTML function creates a scoped custom element proxy in a shadow DOM.
+export const HTML = API<ScopedCustomHTMLElementTagNameMap>(html);
+// This Shadow function creates a scoped custom element proxy and makes its shadow DOM in a shadow DOM.
+export const Shadow = API<ShadowHostScopedCustomHTMLElementTagNameMap>(html, shadow);
+```
+
+### Others
+
+- El
+- NS
+- Attrs
+- Children
+- Factory
+- shadow
+- frag
+- html
+- svg
+- text
+- define
+- append
+- prepend
+- defrag
+- listen
+- once
+- delegate
+- bind
+- currentTarget
+- querySelector
+- querySelectorAll
+
+## Events
+
+These events are enabled only when an event listener is set using the Typed-DOM APIs.
+
+### mutate
+
+The mutate event is dispatched when the children property value is changed.
+
+### connect
+
+The connect event is dispatched when added to another proxy connected to the context object.
+
+### disconnect
+
+The disconnect event is dispatched when removed from the parent proxy connected to the context object.
 
 ## Dependencies
 
