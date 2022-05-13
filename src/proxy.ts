@@ -81,19 +81,20 @@ export class ElementProxy<
     children: C,
     container: Element | ShadowRoot = element,
   ) {
-    this.$children = children;
     this.container = container;
+    this.$children = children;
+    const type = typeof children;
     switch (true) {
-      case children === void 0:
+      case type === 'undefined':
         this.type = ElChildType.Void;
         break;
-      case typeof children === 'string':
+      case type === 'string':
         this.type = ElChildType.Text
         break;
       case isArray(children):
         this.type = ElChildType.Array;
         break;
-      case children && typeof children === 'object':
+      case type === 'object':
         this.type = ElChildType.Struct;
         break;
       default:
