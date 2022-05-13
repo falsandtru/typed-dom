@@ -1,6 +1,6 @@
 import { Event } from 'spica/global';
 import { isArray, hasOwnProperty, ObjectDefineProperties, ObjectKeys } from 'spica/alias';
-import { TagNameMap, Attrs, Factory as BaseFactory, define } from './util/dom';
+import { TagNameMap, Attrs, Factory as BaseFactory } from './util/dom';
 import { identity } from './util/identity';
 import { splice } from 'spica/array';
 
@@ -29,6 +29,7 @@ export namespace El {
   export type Children =
     | Children.Void
     | Children.Text
+    | Children.Node
     | Children.Array
     | Children.Struct;
   export namespace Children {
@@ -39,14 +40,14 @@ export namespace El {
     export type Struct = { [field: string]: El; };
   }
   export type Getter<C extends El.Children> =
-    C extends readonly unknown[] ? C :
+    C extends Node | readonly unknown[] ? C :
     C;
   export type Setter<C extends El.Children> =
-    C extends readonly unknown[] ? C :
+    C extends Node | readonly unknown[] ? C :
     Partial<C>;
   export type Factory<
     M extends TagNameMap,
-    C extends El.Children | El.Children.Node = El.Children | El.Children.Node,
+    C extends El.Children = El.Children,
     > =
     <T extends keyof M & string>(
       baseFactory: BaseFactory<M>,
@@ -58,6 +59,7 @@ export namespace El {
 const enum ElChildType {
   Void,
   Text,
+  Node,
   Array,
   Struct,
 }
@@ -79,23 +81,21 @@ export class ElementProxy<
   constructor(
     public readonly tag: T,
     public readonly element: E,
-    children: C | El.Children.Node,
+    children: C,
     container: Element | ShadowRoot = element,
   ) {
     this.container = container;
     this.$children = children as C;
     const type = typeof children;
     switch (true) {
-      case type === 'object' && typeof children['nodeType'] === 'number':
-        this.type = ElChildType.Void;
-        this.$children = void 0 as C;
-        define(container, [children as El.Children.Node]);
-        break;
       case type === 'undefined':
         this.type = ElChildType.Void;
         break;
       case type === 'string':
         this.type = ElChildType.Text
+        break;
+      case type === 'object' && typeof children['nodeType'] === 'number':
+        this.type = ElChildType.Node;
         break;
       case isArray(children):
         this.type = ElChildType.Array;
@@ -113,6 +113,7 @@ export class ElementProxy<
         this.isInit = false;
         return;
       case ElChildType.Text:
+      case ElChildType.Node:
         this.children = children as El.Setter<C>;
         this.isInit = false;
         return;
@@ -214,6 +215,10 @@ export class ElementProxy<
     let isMutated = false;
     switch (this.type) {
       case ElChildType.Void:
+        return;
+      case ElChildType.Node:
+        this.$children = children as C;
+        container.replaceChildren(children as El.Children.Node);
         return;
       case ElChildType.Text: {
         if (this.isInit || !this[publics.events].mutate) {

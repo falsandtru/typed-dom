@@ -77,7 +77,11 @@ describe('Integration: Typed DOM', function () {
     it('node', function () {
       const dom = Shadow.p(frag(['a', html('br'), 'b']));
       assert(dom.element.shadowRoot?.innerHTML === 'a<br>b');
-      assert(dom.children === undefined);
+      assert(dom.children instanceof DocumentFragment);
+      assert(dom.children.childNodes.length === 0);
+      dom.children = frag(['c']);
+      assert(dom.element.shadowRoot?.innerHTML === 'c');
+      assert(dom.children.childNodes.length === 0);
     });
 
     it('collection', function () {
