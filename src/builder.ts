@@ -32,14 +32,14 @@ type ElFactory<
 interface BuilderFunction<M extends TagNameMap> {
   <T extends K<M>, C extends El.Children.Void  >(tag: T, attrs: Attrs<E<M[T]>> | undefined,              factory?: ElFactory<M, T, C>): El<T, E<M[T]>, El.Children.Void>;
   <T extends K<M>, C extends El.Children.Void  >(tag: T, attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, El.Children.Void>;
-  <T extends K<M>, C extends El.Children.Node  >(tag: T, attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, C>;
   <T extends K<M>, C extends El.Children.Text  >(tag: T, attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, El.Children.Text>;
+  <T extends K<M>, C extends El.Children.Node  >(tag: T, attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, C>;
   <T extends K<M>, C extends El_Children_Unit  >(tag: T, attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, El.Children.Array>;
   <T extends K<M>, C extends El.Children.Array >(tag: T, attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, Readonly<C>>;
   <T extends K<M>, C extends El.Children.Struct>(tag: T, attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, C>;
   <T extends K<M>, C extends El.Children.Void  >(tag: T,                                    children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, El.Children.Void>;
-  <T extends K<M>, C extends El.Children.Node  >(tag: T,                                    children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, C>;
   <T extends K<M>, C extends El.Children.Text  >(tag: T,                                    children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, El.Children.Text>;
+  <T extends K<M>, C extends El.Children.Node  >(tag: T,                                    children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, C>;
   <T extends K<M>, C extends El_Children_Unit  >(tag: T,                                    children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, El.Children.Array>;
   <T extends K<M>, C extends El.Children.Array >(tag: T,                                    children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, Readonly<C>>;
   <T extends K<M>, C extends El.Children.Struct>(tag: T,                                    children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, C>;
@@ -49,14 +49,14 @@ interface BuilderFunction<M extends TagNameMap> {
 interface BuilderMethod<M extends TagNameMap, T extends K<M>> {
                   <C extends El.Children.Void  >(        attrs: Attrs<E<M[T]>> | undefined,              factory?: ElFactory<M, T, C>): El<T, E<M[T]>, El.Children.Void>;
                   <C extends El.Children.Void  >(        attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, El.Children.Void>;
-                  <C extends El.Children.Node  >(        attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, C>;
                   <C extends El.Children.Text  >(        attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, El.Children.Text>;
+                  <C extends El.Children.Node  >(        attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, C>;
                   <C extends El_Children_Unit  >(        attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, El.Children.Array>;
                   <C extends El.Children.Array >(        attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, Readonly<C>>;
                   <C extends El.Children.Struct>(        attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, C>;
                   <C extends El.Children.Void  >(                                           children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, El.Children.Void>;
-                  <C extends El.Children.Node  >(                                           children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, C>;
                   <C extends El.Children.Text  >(                                           children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, El.Children.Text>;
+                  <C extends El.Children.Node  >(                                           children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, C>;
                   <C extends El_Children_Unit  >(                                           children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, El.Children.Array>;
                   <C extends El.Children.Array >(                                           children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, Readonly<C>>;
                   <C extends El.Children.Struct>(                                           children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, C>;
