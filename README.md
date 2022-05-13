@@ -61,6 +61,7 @@ export namespace El {
   export namespace Children {
     export type Void = void;
     export type Text = string;
+    export type Node = DocumentFragment;
     export type Array = readonly El[];
     export type Struct = { [field: string]: El; };
   }
@@ -258,14 +259,15 @@ assert(el.element.textContent === 'Hello, world.');
 Create an HTML element proxy.
 
 - attrs: Record<string, string | EventListener | null | undefined>
-- children: undefined | string | El[] | Record<string, El>
+- children: undefined | string | El[] | Record<string, El> | DocumentFragment
 - factory: () => Element
 
 ```ts
-import { HTML } from 'typed-dom';
+import { HTML, frag } from 'typed-dom';
 
 HTML.p();
 HTML.p('text');
+HTML.p(frag(['a', html('br'), 'b']));
 HTML.p([HTML.a()]);
 HTML.p({ link: HTML.a() }]);
 HTML.p({ id: 'id' });
@@ -279,7 +281,7 @@ HTML('p', 'text');
 Create an SVG element proxy.
 
 - attrs: Record<string, string | EventListener | null | undefined>
-- children: undefined | string | El[] | Record<string, El>
+- children: undefined | string | El[] | Record<string, El> | DocumentFragment
 - factory: () => Element
 
 ```ts
@@ -293,7 +295,7 @@ SVG.svg();
 Create an HTML element proxy assigning the children to the own open shadow DOM.
 
 - attrs: Record<string, string | EventListener | null | undefined>
-- children: undefined | string | El[] | Record<string, El>
+- children: undefined | string | El[] | Record<string, El> | DocumentFragment
 - factory: () => Element
 
 ```ts

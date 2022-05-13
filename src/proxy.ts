@@ -1,6 +1,6 @@
 import { Event } from 'spica/global';
 import { isArray, hasOwnProperty, ObjectDefineProperties, ObjectKeys } from 'spica/alias';
-import { TagNameMap, Attrs, Factory as BaseFactory } from './util/dom';
+import { TagNameMap, Attrs, Factory as BaseFactory, define } from './util/dom';
 import { identity } from './util/identity';
 import { splice } from 'spica/array';
 
@@ -34,6 +34,7 @@ export namespace El {
   export namespace Children {
     export type Void = void;
     export type Text = string;
+    export type Node = DocumentFragment;
     export type Array = readonly El[];
     export type Struct = { [field: string]: El; };
   }
@@ -45,7 +46,7 @@ export namespace El {
     Partial<C>;
   export type Factory<
     M extends TagNameMap,
-    C extends El.Children = El.Children,
+    C extends El.Children | El.Children.Node = El.Children | El.Children.Node,
     > =
     <T extends keyof M & string>(
       baseFactory: BaseFactory<M>,
@@ -78,13 +79,18 @@ export class ElementProxy<
   constructor(
     public readonly tag: T,
     public readonly element: E,
-    children: C,
+    children: C | El.Children.Node,
     container: Element | ShadowRoot = element,
   ) {
     this.container = container;
-    this.$children = children;
+    this.$children = children as C;
     const type = typeof children;
     switch (true) {
+      case type === 'object' && typeof children['nodeType'] === 'number':
+        this.type = ElChildType.Void;
+        this.$children = void 0 as C;
+        define(container, [children as El.Children.Node]);
+        break;
       case type === 'undefined':
         this.type = ElChildType.Void;
         break;

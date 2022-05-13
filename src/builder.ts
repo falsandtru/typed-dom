@@ -23,7 +23,7 @@ type El_Children_Unit = readonly [];
 type ElFactory<
   M extends TagNameMap,
   T extends keyof M & string = keyof M & string,
-  C extends El.Children = El.Children,
+  C extends El.Children | El.Children.Node = El.Children | El.Children.Node,
   > =
   // Bug: TypeScript: Type U must not affect Type C
   //<U extends T>(baseFactory: Factory<M>, tag: U, attrs: Attrs, children: C) => M[U];
@@ -32,11 +32,13 @@ type ElFactory<
 interface BuilderFunction<M extends TagNameMap> {
   <T extends K<M>, C extends El.Children.Void  >(tag: T, attrs: Attrs<E<M[T]>> | undefined,              factory?: ElFactory<M, T, C>): El<T, E<M[T]>, El.Children.Void>;
   <T extends K<M>, C extends El.Children.Void  >(tag: T, attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, El.Children.Void>;
+  <T extends K<M>, C extends El.Children.Node  >(tag: T, attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, El.Children.Void>;
   <T extends K<M>, C extends El.Children.Text  >(tag: T, attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, El.Children.Text>;
   <T extends K<M>, C extends El_Children_Unit  >(tag: T, attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, El.Children.Array>;
   <T extends K<M>, C extends El.Children.Array >(tag: T, attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, Readonly<C>>;
   <T extends K<M>, C extends El.Children.Struct>(tag: T, attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, C>;
   <T extends K<M>, C extends El.Children.Void  >(tag: T,                                    children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, El.Children.Void>;
+  <T extends K<M>, C extends El.Children.Node  >(tag: T,                                    children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, El.Children.Void>;
   <T extends K<M>, C extends El.Children.Text  >(tag: T,                                    children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, El.Children.Text>;
   <T extends K<M>, C extends El_Children_Unit  >(tag: T,                                    children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, El.Children.Array>;
   <T extends K<M>, C extends El.Children.Array >(tag: T,                                    children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, Readonly<C>>;
@@ -47,11 +49,13 @@ interface BuilderFunction<M extends TagNameMap> {
 interface BuilderMethod<M extends TagNameMap, T extends K<M>> {
                   <C extends El.Children.Void  >(        attrs: Attrs<E<M[T]>> | undefined,              factory?: ElFactory<M, T, C>): El<T, E<M[T]>, El.Children.Void>;
                   <C extends El.Children.Void  >(        attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, El.Children.Void>;
+                  <C extends El.Children.Node  >(        attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, El.Children.Void>;
                   <C extends El.Children.Text  >(        attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, El.Children.Text>;
                   <C extends El_Children_Unit  >(        attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, El.Children.Array>;
                   <C extends El.Children.Array >(        attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, Readonly<C>>;
                   <C extends El.Children.Struct>(        attrs: Attrs<E<M[T]>> | undefined, children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, C>;
                   <C extends El.Children.Void  >(                                           children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, El.Children.Void>;
+                  <C extends El.Children.Node  >(                                           children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, El.Children.Void>;
                   <C extends El.Children.Text  >(                                           children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, El.Children.Text>;
                   <C extends El_Children_Unit  >(                                           children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, El.Children.Array>;
                   <C extends El.Children.Array >(                                           children: C, factory?: ElFactory<M, T, C>): El<T, E<M[T]>, Readonly<C>>;
@@ -74,7 +78,11 @@ function handle
   };
 
   function builder(tag: keyof M & string) {
-    return function build(attrs?: Attrs | El.Children, children?: El.Children, factory?: ElFactory<M, keyof M & string, El.Children>): El {
+    return function build(
+      attrs?: Attrs | El.Children,
+      children?: El.Children | El.Children.Node,
+      factory?: ElFactory<M, keyof M & string, El.Children>,
+    ): El {
       if (typeof children === 'function') return build(attrs, void 0, children);
       if (typeof attrs === 'function') return build(void 0, void 0, attrs);
       if (isElChildren(attrs)) return build(void 0, attrs, factory);
@@ -85,7 +93,12 @@ function handle
     };
   }
 
-  function elem(tag: keyof M & string, factory: ElFactory<M, keyof M & string, El.Children> | undefined, attrs: Attrs | undefined, children: El.Children): Element {
+  function elem(
+    tag: keyof M & string,
+    factory: ElFactory<M, keyof M & string> | undefined,
+    attrs: Attrs | undefined,
+    children: El.Children | El.Children.Node,
+  ): Element {
     const el = factory
       ? define(factory(baseFactory, tag, attrs ?? {}, children) as unknown as Element, attrs)
       : baseFactory(tag, attrs) as unknown as Element;
@@ -94,9 +107,12 @@ function handle
   }
 }
 
-function isElChildren(value: Attrs | El.Children): value is NonNullable<El.Children> {
+function isElChildren
+  (value: Attrs | El.Children | El.Children.Node)
+  : value is NonNullable<El.Children | El.Children.Node> {
   if (value === void 0) return false;
   if (value[Symbol.iterator]) return true;
+  if (typeof value['nodeType'] === 'number') return true;
   for (const name in value as Attrs | El.Children.Struct) {
     if (!hasOwnProperty(value, name)) continue;
     const val = value[name];

@@ -1,4 +1,4 @@
-import { Shadow, HTML, SVG, El, Attrs, shadow, html } from '../..';
+import { Shadow, HTML, SVG, El, Attrs, shadow, frag, html } from '../..';
 import { Coroutine } from 'spica/coroutine';
 import { Sequence } from 'spica/sequence';
 import { wait } from 'spica/timer';
@@ -72,6 +72,12 @@ describe('Integration: Typed DOM', function () {
         h(tag, { id: 'test' }));
       assert(dom.element.id === 'test');
       assert(dom.children === 'a');
+    });
+
+    it('node', function () {
+      const dom = Shadow.p(frag(['a', html('br'), 'b']));
+      assert(dom.element.shadowRoot?.innerHTML === 'a<br>b');
+      assert(dom.children === undefined);
     });
 
     it('collection', function () {
