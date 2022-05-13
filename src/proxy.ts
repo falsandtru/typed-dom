@@ -164,13 +164,13 @@ export class ElementProxy<
   }
   private isObserverUpdate = false;
   private observe(children: El.Children.Struct): El.Children.Struct {
-    return ObjectDefineProperties(children, ObjectKeys(children).reduce((obj, name) => {
+    return ObjectDefineProperties(children, ObjectKeys(children).reduce((acc, name) => {
       if (name in {}) throw new Error(`TypedDOM: Child names conflicted with the object property names.`);
       let child = children[name];
-      obj[name] = {
+      acc[name] = {
         configurable: true,
         enumerable: true,
-        get: (): El => {
+        get(): El {
           return child;
         },
         set: (newChild: El) => {
@@ -183,7 +183,7 @@ export class ElementProxy<
           child = newChild;
         },
       };
-      return obj;
+      return acc;
     }, {}));
   }
   private readonly type: ElChildType;
