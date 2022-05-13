@@ -153,11 +153,12 @@ export class ElementProxy<
     if (child.tag.toUpperCase() !== 'STYLE') return;
     const source = child.element.innerHTML;
     if (!source.includes(':scope')) return;
-    const scope = /(^|[>~+,}/])(\s*)\:scope(?!\w)(?=\s*[A-Za-z#.:[>~+,{/])/g;
-    const style = source.replace(scope, (...$) => `${$[1]}${$[2]}${this.query}`);
+    const style = source.replace(
+      /(^|[>~+,}/])(\s*):scope(?!\w)(?=\s*[A-Za-z#.:[>~+,{/])/g,
+      (...$) => `${$[1]}${$[2]}${this.query}`);
     assert(!this.$query || style !== source);
     if (style === source) return;
-    assert(/^[:#.][\w-]+$/.test(this.query));
+    assert(/^[:#.][a-z][\w-]+$/i.test(this.query));
     child.element.textContent = style;
     assert(child.element.children.length === 0);
   }
