@@ -212,7 +212,6 @@ describe('Integration: Typed DOM', function () {
       assert(dom.children.title.element === dom.element.firstChild);
       assert(dom.children.title.element.textContent === 'd');
       assert(dom.children.title.children === 'd');
-      // @ts-expect-error
       dom.children = {
         title: HTML.h1('e'),
         content: undefined,
