@@ -124,7 +124,7 @@ Typed-DOM supports custom elements but they are unrecommended since most of purp
 Define composable DOM components.
 
 ```ts
-import { Shadow, HTML, El } from 'typed-dom';
+import { HTML, El } from 'typed-dom';
 
 class Component implements El {
   private readonly dom = HTML.section({
@@ -148,6 +148,8 @@ Switch to shadow DOM.
 Access to elemets in shadow DOM is transparent.
 
 ```ts
+import { Shadow, HTML, El } from 'typed-dom';
+
 class ShadowComponent implements El {
   private readonly dom = Shadow.section({
     style: HTML.style(':scope { color: red; }'),
