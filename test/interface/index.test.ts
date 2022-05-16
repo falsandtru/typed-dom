@@ -1,4 +1,4 @@
-import { API, Shadow, HTML, SVG, NS, shadow, frag, html, svg, text, element, define, append, prepend, defrag, listen, once, bind, delegate, currentTarget, querySelector, querySelectorAll, identity } from '../..';
+import { API, Shadow, HTML, SVG, NS, shadow, frag, html, svg, text, element, define, append, prepend, defrag, listen, once, bind, delegate, currentTarget, querySelector, querySelectorAll, identity } from '../../index';
 
 describe('Interface: Package', function () {
   describe('Typed', function () {

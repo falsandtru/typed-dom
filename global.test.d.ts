@@ -1,9 +1,13 @@
 import assert from 'power-assert';
 import { i18n } from 'i18next';
 
-type Assert = typeof assert;
+declare namespace NS {
+  export {
+    assert,
+  }
+}
 
 declare global {
-  const assert: Assert;
+  const assert: typeof NS.assert;
   const i18next: i18n;
 }

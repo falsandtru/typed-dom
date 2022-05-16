@@ -1,46 +1,26 @@
 module.exports = function (config) {
   config.set({
-    basePath: '',
+    browsers: ['Chrome', 'Firefox'],
     frameworks: ['mocha'],
     files: [
-      { pattern: 'https://cdn.polyfill.io/v2/polyfill.js?flags=gated&features=default,NodeList.prototype.@@iterator', watched: false, served: false, included: true },
-      { pattern: 'https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js', watched: false, served: false, included: true },
-      { pattern: 'https://cdnjs.cloudflare.com/ajax/libs/i18next/11.3.2/i18next.min.js', watched: false, served: false, included: true },
-      { pattern: 'node_modules/power-assert/build/power-assert.js', watched: true, served: true, included: true },
-      { pattern: 'node_modules/benchmark/benchmark.js', watched: true, served: true, included: true },
-      { pattern: 'dist/*.test.js', watched: true, served: true, included: true }
+      { pattern: 'https://cdn.jsdelivr.net/npm/power-assert@1.6.1/build/power-assert.js', watched: false, served: false, included: true, integrity: 'sha256-MuDC5CQFh3oWtiG0YE000HlkK08xAilD2v0ndZR+Kds=' },
+      { pattern: 'https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.js', watched: false, served: false, included: true, integrity: 'sha512-2iwCHjuj+PmdCyvb88rMOch0UcKQxVHi/gsAml1fN3eg82IDaO/cdzzeXX4iF2VzIIes7pODE1/G0ts3QBwslA==' },
+      { pattern: 'https://cdnjs.cloudflare.com/ajax/libs/benchmark/2.1.4/benchmark.js', watched: false, served: false, included: true, integrity: 'sha512-XnVGk21Ij51MbU8XezQpkwZ1/GA8b5qmoVGIOdJLBYycutjkaeemipzRJP7P6mEJl99OfnweA7M3e4WLfuG7Aw==' },
+      { pattern: 'https://cdnjs.cloudflare.com/ajax/libs/i18next/21.8.2/i18next.js', watched: false, served: false, included: true, integrity: 'sha512-EVhL1duaW91yzWs3H1LKLMEy3DvZYOCVT6Oi1C7n2yOR3hM72H3tIWJnw+IXeQeRVXeT1zsiJnfTDlpBkGs2YA==' },
+      { pattern: 'dist/**/*.{js,map}', watched: true, served: true, included: true },
     ],
-    exclude: [
-    ],
-    espowerPreprocessor: {
-      options: {
-        emitActualCode: false,
-        ignoreUpstreamSourceMap: true
-      }
+    reporters: ['dots', 'coverage'],
+    preprocessors: {
+      'dist/**/*.js': ['coverage'],
     },
-    reporters: ['dots'],
-    coverageIstanbulReporter: {
-      reports: ['html', 'lcovonly', 'text-summary'],
+    coverageReporter: {
       dir: 'coverage',
-      combineBrowserReports: true,
-      skipFilesWithNoCoverage: false,
-      verbose: false,
-      'report-config': {
-        html: {
-          subdir: 'html',
-        },
-      },
-      instrumentation: {
-        'default-excludes': false,
-      },
+      reporters: [
+        { type: 'html', subdir: browser => browser.split(/\s/)[0] },
+        { type: 'text-summary', subdir: '.', file: 'summary.txt' },
+      ],
     },
-    coverageIstanbulInstrumenter: {
-      esModules: true,
-    },
-    autoWatch: true,
-    autoWatchBatchDelay: 500,
-    browserDisconnectTimeout: 30000,
-    browsers: ['Chrome'],
-    singleRun: true,
+    browserDisconnectTimeout: 60 * 1e3,
+    browserNoActivityTimeout: 90 * 1e3,
   });
 };
