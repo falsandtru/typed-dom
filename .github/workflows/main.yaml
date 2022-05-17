@@ -24,10 +24,11 @@ jobs:
           restore-keys: ${{ runner.os }}-
       - uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: '16'
       - run: |
           npm install
           xvfb-run --auto-servernum npm test
+          npm run lint
 
   deploy:
     name: Deploy on ${{ matrix.os }}
@@ -47,7 +48,7 @@ jobs:
           restore-keys: ${{ runner.os }}-
       - uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: '16'
           registry-url: 'https://registry.npmjs.org'
       - run: |
           npm install
@@ -55,7 +56,7 @@ jobs:
           sed -i 's/"private":\ true/"private":\ false/' package.json
           sed -i -E 's/^dist\/?.*$//' .gitignore
           cp dist/src/util/*.ts dist
-          cp dist/*.{ts,js} .
+          cp dist/*.* .
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
@@ -78,7 +79,7 @@ jobs:
           restore-keys: ${{ runner.os }}-
       - uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: '16'
       - run: |
           npm install
           xvfb-run --auto-servernum npm run bench

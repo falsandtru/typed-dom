@@ -55,7 +55,7 @@
     "karma-mocha": "^2.0.1",
     "mocha": "^10.0.0",
     "npm-check-updates": "^13.0.0",
-    "spica": "0.0.547",
+    "spica": "0.0.549",
     "ts-loader": "^9.3.0",
     "typescript": "4.6.4",
     "webpack": "^5.72.1",
@@ -64,8 +64,9 @@
   },
   "scripts": {
     "update": "ncu -u && npm i --no-shrinkwrap",
-    "dev": "concurrently \"webpack --env mode=dev -w\" \"karma start --auto-watch\"",
+    "dev": "concurrently \"webpack --env mode=test -w\" \"karma start --auto-watch\"",
     "test": "webpack --env mode=test && karma start --single-run --concurrency 1",
+    "lint": "webpack --env mode=lint",
     "bench": "webpack --env mode=bench && karma start --single-run --concurrency 1 --reporters dots",
     "dist": "webpack --env mode=dist"
   },

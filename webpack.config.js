@@ -21,25 +21,23 @@ module.exports = env => {
         },
       },
     },
-    plugins: 'replace',
+    plugins: 'append',
   });
   const config = {
     mode: 'production',
+    externals: {
+      benchmark: 'Benchmark',
+    },
     resolve: {
       extensions: ['.ts', '.js'],
     },
-    entry: Object.fromEntries(glob.sync('./*.ts', {
-      ignore: './**/*{.d,.test}.ts',
-    }).map(path => [path.match(/[\w.]+(?=\.)/)[0], path])),
+    entry: glob.sync('./{src,test}/**/*.ts'),
     output: {
       filename: 'index.js',
       path: path.resolve(__dirname, 'dist'),
       library: pkg.name,
       libraryTarget: 'umd',
       globalObject: 'globalThis',
-    },
-    optimization: {
-      minimize: false,
     },
     module: {
       rules: [
@@ -49,9 +47,6 @@ module.exports = env => {
           use: [
             {
               loader: 'babel-loader',
-              options: {
-                plugins: ['babel-plugin-unassert'],
-              },
             },
             {
               loader: 'ts-loader',
@@ -67,75 +62,46 @@ module.exports = env => {
       new webpack.BannerPlugin({
         banner: `${pkg.name} v${pkg.version} ${pkg.repository.url} | (c) 2016, ${pkg.author} | ${pkg.license} License`,
       }),
-      new ESLintPlugin({
-        extensions: ['ts'],
-      }),
     ],
-    externals: {
-      benchmark: 'Benchmark',
+    optimization: {
+      minimize: false,
     },
   };
   switch (env.mode) {
-    case 'dev':
+    case 'test':
+      return merge(config);
+    case 'lint':
       return merge(config, {
-        entry: glob.sync('./{src,test}/**/*.ts', {
-          ignore: './**/*.d.ts',
-        }),
-        module: {
-          rules: [
-            {
-              test: /\.ts$/,
-              //exclude: /node_modules/,
-              use: [
-                {
-                  loader: 'babel-loader',
-                  options: {},
-                },
-              ],
-            },
-          ],
-        },
+        entry: glob.sync('./!(node_modules)**/*.ts'),
         plugins: [
           new ESLintPlugin({
             extensions: ['ts'],
-            overrideConfig: {
-              rules: {
-                'redos/no-vulnerable': 'off',
-              },
-            },
           }),
         ],
       });
-    case 'test':
+    case 'bench':
       return merge(config, {
-        entry: glob.sync('./{src,test}/**/*.ts', {
-          ignore: './**/*.d.ts',
-        }),
+        entry: glob.sync('./benchmark/**/*.ts'),
         module: {
           rules: [
             {
               test: /\.ts$/,
-              //exclude: /node_modules/,
               use: [
                 {
                   loader: 'babel-loader',
-                  options: {},
+                  options: {
+                    plugins: ['babel-plugin-unassert'],
+                  },
                 },
               ],
             },
           ],
         },
       });
-    case 'bench':
-      return merge(config, {
-        entry: glob.sync('./benchmark/**/*.ts', {
-          ignore: './**/*.d.ts',
-        }),
-      });
     case 'dist':
       return merge(config, {
-        entry: Object.fromEntries(glob.sync('./{,src/util/}*.ts', {
-          ignore: './**/*{.d,.test}.ts',
+        entry: Object.fromEntries(glob.sync('./{index,src/util/*}.ts', {
+          ignore: './**/*.test.ts',
         }).map(path => [path.match(/[\w.]+(?=\.)/)[0], path])),
         output: {
           filename: '[name].js',
@@ -144,7 +110,17 @@ module.exports = env => {
           rules: [
             {
               test: /\.ts$/,
-              //exclude: /node_modules/,
+              use: [
+                {
+                  loader: 'babel-loader',
+                  options: {
+                    plugins: ['babel-plugin-unassert'],
+                  },
+                },
+              ],
+            },
+            {
+              test: /\.ts$/,
               use: [
                 {
                   loader: 'ts-loader',
