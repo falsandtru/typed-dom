@@ -445,7 +445,3 @@ The connect event is dispatched when added to another proxy connected to the con
 ### disconnect
 
 The disconnect event is dispatched when removed from the parent proxy connected to the context object.
-
-## Dependencies
-
-- unassert (in compiling source code)
