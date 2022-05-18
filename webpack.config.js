@@ -117,11 +117,6 @@ module.exports = env => {
                     plugins: ['babel-plugin-unassert'],
                   },
                 },
-              ],
-            },
-            {
-              test: /\.ts$/,
-              use: [
                 {
                   loader: 'ts-loader',
                   options: {
