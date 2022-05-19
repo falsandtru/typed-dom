@@ -287,7 +287,7 @@ HTML.p({ link: HTML.a() }]);
 HTML.p({ id: 'id' });
 HTML.p(() => document.createElement('p'));
 HTML.p(() => document.querySelector('p'));
-HTML('p', 'text');
+HTML('p');
 ```
 
 ### SVG: { [tag]: (attrs?, children?, factory?) => El; (tag: string, ...): El; };
