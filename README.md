@@ -175,18 +175,20 @@ This coroutine supports the actor model and the supervisor/worker pattern (using
 import { Shadow, HTML, El } from 'typed-dom';
 import { Coroutine } from 'spica/coroutine';
 
-class Component extends Coroutine implements El {
+class Component extends Coroutine<number> implements El {
   constructor() {
     super(async function* (this: Component) {
       let count = 0;
-      this.children = `${count}`;
+      this.text = count;
       while (true) {
         this.element.isConnected || await new Promise<unknown>(resolve =>
           this.element.addEventListener('connect', resolve, { once: true }));
-        this.children = `${++count}`;
-        yield;
+        yield this.text = ++count;
       }
     }, { trigger: 'element', interval: 100 });
+  }
+  private set text(count: number) {
+    this.children = `Counted ${count} times.`;
   }
   private readonly dom = Shadow.section({ onconnect: '' }, {
     style: HTML.style(':scope { color: red; }'),

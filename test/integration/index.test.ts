@@ -600,19 +600,21 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('component coroutine', async function () {
-      class Component extends Coroutine implements El {
+      class Component extends Coroutine<number> implements El {
         constructor() {
           super(async function* (this: Component) {
             assert(this.element);
             let count = 0;
-            this.children = `${count}`;
+            this.text = count;
             while (true) {
               this.element.isConnected || await new Promise<unknown>(resolve =>
                 this.element.addEventListener('connect', resolve, { once: true }));
-              this.children = `${++count}`;
-              yield;
+              yield this.text = ++count;
             }
           }, { trigger: 'element', interval: 100 });
+        }
+        private set text(count: number) {
+          this.children = `Counted ${count} times.`;
         }
         private readonly dom = Shadow.section({ onconnect: '' }, {
           style: HTML.style(':scope { color: red; }'),
@@ -629,19 +631,32 @@ describe('Integration: Typed DOM', function () {
       }
 
       const dom = new Component();
-      assert(dom.children === '0');
+      assert(dom.children === 'Counted 0 times.');
       doc.children = [dom];
       await 0;
-      assert(dom.children === '1');
+      assert(dom.children === 'Counted 1 times.');
       await wait(110);
-      assert(dom.children === '2');
+      assert(dom.children === 'Counted 2 times.');
       doc.children = [];
       await wait(110);
-      assert(dom.children === '2');
+      assert(dom.children === 'Counted 2 times.');
       doc.children = [dom];
       await 0;
-      assert(dom.children === '3');
-      doc.children = [];
+      assert(dom.children === 'Counted 3 times.');
+      for await (const count of dom) {
+        switch (count) {
+          case 3:
+          case 4:
+          case 5:
+            assert(dom.children === `Counted ${count} times.`);
+            continue;
+          case 6:
+            doc.children = [];
+            return;
+          default:
+            assert(false);
+        }
+      }
     });
 
     it('translate', function () {
