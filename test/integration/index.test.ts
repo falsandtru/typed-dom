@@ -223,10 +223,23 @@ describe('Integration: Typed DOM', function () {
     });
 
     it('struct with factory', function () {
-      const dom = HTML.article({}, {}, (h, tag) =>
-        h(tag, { id: 'test' }));
+      const dom = HTML.article(
+        {
+          content: HTML.p('b'),
+        },
+        (h, tag, _, children) =>
+          h(tag, { id: 'test' }, [
+            html('h1', 'a'),
+            children.content.element,
+            'z',
+          ]));
       assert(dom.element.id === 'test');
-      assert.deepStrictEqual(dom.children, {});
+      assert.deepStrictEqual(dom.children, { content: dom.children.content });
+      assert(dom.element.innerHTML === '<h1>a</h1><p>b</p>z');
+      dom.children.content.children = 'c';
+      assert(dom.element.innerHTML === '<h1>a</h1><p>c</p>z');
+      dom.children.content = HTML.p('d');
+      assert(dom.element.innerHTML === '<h1>a</h1><p>d</p>z');
     });
 
     it('attr', function () {
@@ -339,9 +352,9 @@ describe('Integration: Typed DOM', function () {
       assert(HTML.p(() => HTML.p('a').element).children === undefined);
       assert(HTML.p('', () => HTML.p('a').element).element.innerHTML === '');
       assert(HTML.p('', () => HTML.p('a').element).children === '');
-      assert(HTML.p([], () => HTML.p('a').element).element.childNodes.length === 0);
+      assert(HTML.p([], () => HTML.p('a').element).element.innerHTML === '');
       assert.deepStrictEqual(HTML.p([], () => HTML.p('a').element).children, []);
-      assert(HTML.p({}, {}, () => HTML.p('a').element).element.childNodes.length === 0);
+      assert(HTML.p({}, {}, () => HTML.p('a').element).element.innerHTML === 'a');
       assert.deepStrictEqual(HTML.p({}, {}, () => HTML.p('a').element).children, {});
     });
 

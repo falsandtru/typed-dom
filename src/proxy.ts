@@ -273,14 +273,13 @@ export class ElementProxy<
       }
       case ElChildType.Struct: {
         if (this.isInit) {
-          container.firstChild && container.replaceChildren();
           const sourceChildren = children as El.Children.Struct;
           for (const name in sourceChildren) {
             if (!hasOwnProperty(sourceChildren, name)) continue;
             const newChild = sourceChildren[name];
             throwErrorIfNotUsable(newChild, this.container);
             this.scope(newChild);
-            container.appendChild(newChild.element);
+            newChild.element.parentNode !== container && container.appendChild(newChild.element);
             assert(!addedChildren.includes(newChild));
             hasConnectionListener(newChild) && addedChildren.push(newChild) && this[publics.events].add(newChild);
             isMutated = true;
