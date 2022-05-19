@@ -12,8 +12,6 @@ declare global {
   }
 }
 
-const proxy = Symbol.for('typed-dom::proxy');
-
 export interface El<
   T extends string = string,
   E extends Element = Element,
@@ -64,9 +62,8 @@ const enum ElChildType {
   Struct,
 }
 
-// All the properties accessed from its parent must avoid conflicts with
-// the same properties of custom proxies.
-namespace publics {
+namespace symbols {
+  export const proxy = Symbol.for('typed-dom::proxy');
   export const events = Symbol.for('typed-dom::events');
 }
 
@@ -107,7 +104,7 @@ export class ElementProxy<
         throw new Error(`TypedDOM: Invalid children type.`);
     }
     throwErrorIfNotUsable(this);
-    this.element[proxy] = this;
+    this.element[symbols.proxy] = this;
     assert.deepStrictEqual({ ...this.element }, {});
     switch (this.type) {
       case ElChildType.Void:
@@ -199,7 +196,7 @@ export class ElementProxy<
   private readonly container: Element | ShadowRoot;
   private isInit = true;
   private $children: C;
-  public readonly [publics.events] = new Events(this.element);
+  public readonly [symbols.events] = new Events(this.element);
   public get children(): El.Getter<C> {
     switch (this.type) {
       case ElChildType.Text:
@@ -222,7 +219,7 @@ export class ElementProxy<
         container.replaceChildren(children as El.Children.Node);
         return;
       case ElChildType.Text: {
-        if (this.isInit || !this[publics.events].mutate) {
+        if (this.isInit || !this[symbols.events].mutate) {
           container.textContent = children as El.Children.Text;
           isMutated = true;
           break;
@@ -246,7 +243,7 @@ export class ElementProxy<
           if (newChild.element.parentNode !== this.element) {
             this.scope(newChild);
             assert(!addedChildren.includes(newChild));
-            hasConnectionListener(newChild) && addedChildren.push(newChild) && this[publics.events].add(newChild);
+            hasConnectionListener(newChild) && addedChildren.push(newChild) && this[symbols.events].add(newChild);
           }
         }
         if (container.firstChild) {
@@ -263,7 +260,7 @@ export class ElementProxy<
           if (oldChild.element.parentNode !== container) {
             assert(!removedChildren.includes(oldChild));
             hasConnectionListener(oldChild) && removedChildren.push(oldChild);
-            this[publics.events].del(oldChild);
+            this[symbols.events].del(oldChild);
             assert(isMutated);
           }
         }
@@ -281,7 +278,7 @@ export class ElementProxy<
             this.scope(newChild);
             newChild.element.parentNode !== container && container.appendChild(newChild.element);
             assert(!addedChildren.includes(newChild));
-            hasConnectionListener(newChild) && addedChildren.push(newChild) && this[publics.events].add(newChild);
+            hasConnectionListener(newChild) && addedChildren.push(newChild) && this[symbols.events].add(newChild);
             isMutated = true;
           }
           break;
@@ -301,10 +298,10 @@ export class ElementProxy<
             container.replaceChild(newChild.element, oldChild.element);
             assert(!oldChild.element.parentNode);
             assert(!addedChildren.includes(newChild));
-            hasConnectionListener(newChild) && addedChildren.push(newChild) && this[publics.events].add(newChild);
+            hasConnectionListener(newChild) && addedChildren.push(newChild) && this[symbols.events].add(newChild);
             assert(!removedChildren.includes(oldChild));
             hasConnectionListener(oldChild) && removedChildren.push(oldChild);
-            this[publics.events].del(oldChild);
+            this[symbols.events].del(oldChild);
           }
           else {
             assert(newChild.element.parentNode === oldChild.element.parentNode);
@@ -324,7 +321,7 @@ export class ElementProxy<
     this.dispatchDisconnectEvent(removedChildren);
     this.dispatchConnectEvent(addedChildren);
     assert(isMutated || removedChildren.length + addedChildren.length === 0);
-    if (isMutated && this[publics.events].mutate) {
+    if (isMutated && this[symbols.events].mutate) {
       this.element.dispatchEvent(new Event('mutate', { bubbles: false, cancelable: true }));
     }
   }
@@ -332,22 +329,22 @@ export class ElementProxy<
     return !!this.element.parentNode && this.element.isConnected;
   }
   private dispatchConnectEvent(
-    listeners: El[] | undefined = this[publics.events].listeners,
+    listeners: El[] | undefined = this[symbols.events].listeners,
   ): void {
     if (listeners.length === 0) return;
-    if (listeners !== this[publics.events].listeners && !this.isConnected) return;
+    if (listeners !== this[symbols.events].listeners && !this.isConnected) return;
     for (const listener of listeners) {
-      (listener.element[proxy] as this).dispatchConnectEvent();
+      (listener.element[symbols.proxy] as this).dispatchConnectEvent();
       getEvents(listener).connect && listener.element.dispatchEvent(new Event('connect', { bubbles: false, cancelable: true }));
     }
   }
   private dispatchDisconnectEvent(
-    listeners: El[] | undefined = this[publics.events].listeners,
+    listeners: El[] | undefined = this[symbols.events].listeners,
   ): void {
     if (listeners.length === 0) return;
-    if (listeners !== this[publics.events].listeners && !this.isConnected) return;
+    if (listeners !== this[symbols.events].listeners && !this.isConnected) return;
     for (const listener of listeners) {
-      (listener.element[proxy] as this).dispatchDisconnectEvent();
+      (listener.element[symbols.proxy] as this).dispatchDisconnectEvent();
       getEvents(listener).disconnect && listener.element.dispatchEvent(new Event('disconnect', { bubbles: false, cancelable: true }));
     }
   }
@@ -386,11 +383,11 @@ function hasConnectionListener(child: El): boolean {
   return events.listeners.length > 0 || events.connect || events.disconnect;
 }
 function getEvents(child: El): Events {
-  return child[publics.events] ?? (child.element[proxy] as ElementProxy)[publics.events];
+  return child[symbols.events] ?? (child.element[symbols.proxy] as ElementProxy)[symbols.events];
 }
 
 function throwErrorIfNotUsable(child: El, newParent?: ParentNode): void {
   const oldParent = child.element.parentNode;
-  if (!oldParent || oldParent === newParent || !(proxy in oldParent)) return;
+  if (!oldParent || oldParent === newParent || !(symbols.proxy in oldParent)) return;
   throw new Error(`TypedDOM: Typed DOM children cannot be used to another typed DOM.`);
 }
