@@ -138,6 +138,7 @@ export function bind<T extends keyof WindowEventMap | keyof DocumentEventMap | k
           ? (ev: Event) => ev.returnValue
           : '',
       });
+      assert.deepStrictEqual({ ...target }, {});
   }
   target.addEventListener(type, handler, option);
   return singleton(() => void target.removeEventListener(type, handler, option));

@@ -108,6 +108,7 @@ export class ElementProxy<
     }
     throwErrorIfNotUsable(this);
     this.element[proxy] = this;
+    assert.deepStrictEqual({ ...this.element }, {});
     switch (this.type) {
       case ElChildType.Void:
         this.isInit = false;

@@ -40,6 +40,7 @@ describe('Integration: Typed DOM', function () {
       const dom = HTML.p();
       assert(dom.element.outerHTML === '<p></p>');
       assert(dom.children === undefined);
+      assert.deepStrictEqual({ ...dom.element }, {});
     });
 
     it('factory', function () {

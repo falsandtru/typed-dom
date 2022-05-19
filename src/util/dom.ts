@@ -149,6 +149,7 @@ function defineAttrs<E extends Element>(el: E, attrs: Attrs): E {
                   ? (ev: Event) => ev.returnValue
                   : '',
               });
+              assert.deepStrictEqual({ ...el }, {});
           }
         }
         continue;
@@ -181,6 +182,7 @@ function defineAttrs<E extends Element>(el: E, attrs: Attrs): E {
                   ? (ev: Event) => ev.returnValue
                   : '',
               });
+              assert.deepStrictEqual({ ...el }, {});
           }
         }
         continue;
