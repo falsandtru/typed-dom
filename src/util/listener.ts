@@ -1,4 +1,4 @@
-import { ObjectDefineProperty } from 'spica/alias';
+import { hasOwnProperty, ObjectDefineProperty } from 'spica/alias';
 import { AtomicPromise } from 'spica/promise';
 import { singleton } from 'spica/function';
 
@@ -134,7 +134,7 @@ export function bind<T extends keyof WindowEventMap | keyof DocumentEventMap | k
         configurable: true,
         enumerable: false,
         writable: true,
-        value: prop in target
+        value: prop in target && !hasOwnProperty(target, prop)
           ? (ev: Event) => ev.returnValue
           : '',
       });

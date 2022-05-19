@@ -145,7 +145,7 @@ function defineAttrs<E extends Element>(el: E, attrs: Attrs): E {
                 configurable: true,
                 enumerable: false,
                 writable: true,
-                value: prop in el
+                value: prop in el && !hasOwnProperty(el, prop)
                   ? (ev: Event) => ev.returnValue
                   : '',
               });
@@ -178,7 +178,7 @@ function defineAttrs<E extends Element>(el: E, attrs: Attrs): E {
                 configurable: true,
                 enumerable: false,
                 writable: true,
-                value: prop in el
+                value: prop in el && !hasOwnProperty(el, prop)
                   ? (ev: Event) => ev.returnValue
                   : '',
               });
