@@ -210,7 +210,7 @@ class Component extends Coroutine<number> implements El {
 Create a helper function of APIs for i18n.
 
 ```ts
-import { HTML, El, html } from 'typed-dom';
+import { HTML, El, html, define } from 'typed-dom';
 import i18next from 'i18next';
 
 const translator = i18next.createInstance({
@@ -229,10 +229,10 @@ interface TransDataMap {
 
 function data
   <K extends keyof TransDataMap>
-  (data: TransDataMap[K])
+  (data: TransDataMap[K], factory?: El.Factory<HTMLElementTagNameMap, K>)
   : El.Factory<HTMLElementTagNameMap, K> {
-  return (html, tag, _, children) =>
-    html(tag, {
+  return (html, tag, attrs, children) =>
+    define(factory?.(html, tag, attrs, children) ?? html(tag), {
       onmutate: ev =>
         void translator.init((err, t) =>
           ev.currentTarget.textContent = err
@@ -251,10 +251,10 @@ Or
 ```ts
 function intl
   <K extends keyof TransDataMap>
-  (children: K, data: TransDataMap[K])
+  (children: K, data: TransDataMap[K], factory?: El.Factory<HTMLElementTagNameMap, El.Children.Void>)
   : El.Factory<HTMLElementTagNameMap, El.Children.Void> {
-  return (html, tag) => {
-    const el = html(tag);
+  return (html, tag, attrs) => {
+    const el = factory?.(html, tag, attrs) ?? html(tag);
     translator.init((err, t) =>
       el.textContent = err
         ? '{% Failed to initialize the translator. %}'

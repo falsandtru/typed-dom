@@ -1,4 +1,4 @@
-import { Shadow, HTML, SVG, El, Attrs, shadow, frag, html } from '../../index';
+import { Shadow, HTML, SVG, El, Attrs, shadow, frag, html, define } from '../../index';
 import { Coroutine } from 'spica/coroutine';
 import { Sequence } from 'spica/sequence';
 import { wait } from 'spica/timer';
@@ -689,10 +689,10 @@ describe('Integration: Typed DOM', function () {
 
       function data
         <K extends keyof TransDataMap>
-        (data: TransDataMap[K])
+        (data: TransDataMap[K], factory?: El.Factory<HTMLElementTagNameMap, K>)
         : El.Factory<HTMLElementTagNameMap, K> {
-        return (html, tag, _, children) =>
-          html(tag, {
+        return (html, tag, attrs, children) =>
+          define(factory?.(html, tag, attrs, children) ?? html(tag), {
             onmutate: ev =>
               void translator.init((err, t) =>
                 ev.currentTarget.textContent = err
@@ -713,10 +713,10 @@ describe('Integration: Typed DOM', function () {
 
       function intl
         <K extends keyof TransDataMap>
-        (children: K, data: TransDataMap[K])
+        (children: K, data: TransDataMap[K], factory?: El.Factory<HTMLElementTagNameMap, El.Children.Void>)
         : El.Factory<HTMLElementTagNameMap, El.Children.Void> {
-        return (html, tag) => {
-          const el = html(tag);
+        return (html, tag, attrs) => {
+          const el = factory?.(html, tag, attrs) ?? html(tag);
           translator.init((err, t) =>
             el.textContent = err
               ? '{% Failed to initialize the translator. %}'
