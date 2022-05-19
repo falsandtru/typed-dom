@@ -209,6 +209,7 @@ Create a helper function of APIs for i18n.
 
 ```ts
 import { HTML, El, html } from 'typed-dom';
+import i18next from 'i18next';
 
 const translator = i18next.createInstance({
   lng: 'en',

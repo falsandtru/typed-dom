@@ -27,6 +27,7 @@ module.exports = env => {
     mode: 'production',
     externals: {
       benchmark: 'Benchmark',
+      i18next: 'i18next',
     },
     resolve: {
       extensions: ['.ts', '.js'],

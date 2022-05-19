@@ -2,6 +2,7 @@ import { Shadow, HTML, SVG, El, Attrs, shadow, frag, html } from '../../index';
 import { Coroutine } from 'spica/coroutine';
 import { Sequence } from 'spica/sequence';
 import { wait } from 'spica/timer';
+import i18next from 'i18next';
 
 declare global {
   interface ShadowHostHTMLElementTagNameMap {
