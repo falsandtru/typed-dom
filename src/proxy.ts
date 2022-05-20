@@ -389,5 +389,5 @@ function getEvents(child: El): Events {
 function throwErrorIfNotUsable(child: El, newParent?: ParentNode): void {
   const oldParent = child.element.parentNode;
   if (!oldParent || oldParent === newParent || !(symbols.proxy in oldParent)) return;
-  throw new Error(`TypedDOM: Typed DOM children cannot be used to another typed DOM.`);
+  throw new Error(`TypedDOM: Proxy children must be removed from the old parent proxy before assigning to the new parent proxy.`);
 }

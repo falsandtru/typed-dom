@@ -18,7 +18,7 @@ declare const _: { shuffle<T>(as: T[]): T[]; };
 const doc = Shadow.section([]);
 document.body.appendChild(doc.element);
 
-describe('Integration: Typed DOM', function () {
+describe('Integration: Package', function () {
   describe('spec', function () {
     it('call', function () {
       assert(HTML('p').element.outerHTML === '<p></p>');
