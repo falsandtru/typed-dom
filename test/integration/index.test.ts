@@ -687,30 +687,6 @@ describe('Integration: Package', function () {
         'Greeting': { name: string; };
       }
 
-      function data
-        <K extends keyof TransDataMap>
-        (data: TransDataMap[K], factory?: El.Factory<HTMLElementTagNameMap, K>)
-        : El.Factory<HTMLElementTagNameMap, K> {
-        return (html, tag, attrs, children) =>
-          define(factory?.(html, tag, attrs, children) ?? html(tag), {
-            onmutate: ev =>
-              void translator.init((err, t) =>
-                ev.currentTarget.textContent = err
-                  ? '{% Failed to initialize the translator. %}'
-                  : t(children, data) ?? `{% Failed to translate "${children}". %}`),
-          });
-      }
-
-      const el = HTML.span('Greeting', data({ name: 'world' }));
-      assert(el.children === 'Hello, world.');
-      assert(el.element.textContent === 'Hello, world.');
-      // @ts-expect-error
-      () => HTML.span('Greeting', data({}));
-      // @ts-expect-error
-      () => HTML.span('', data({ name: 'world' }));
-      // @ts-expect-error
-      () => HTML.span(data({ name: 'world' }));
-
       function intl
         <K extends keyof TransDataMap>
         (children: K, data: TransDataMap[K], factory?: El.Factory<HTMLElementTagNameMap, El.Children.Void>)
@@ -735,6 +711,29 @@ describe('Integration: Package', function () {
       () => HTML.span(intl('', { name: 'world' }));
       // @ts-expect-error
       () => HTML.span('', intl('Greeting', { name: 'world' }));
+
+      function data
+        <K extends keyof TransDataMap>
+        (data: TransDataMap[K], factory?: El.Factory<HTMLElementTagNameMap, K>)
+        : El.Factory<HTMLElementTagNameMap, K> {
+        return (html, tag, attrs, children) =>
+          define(factory?.(html, tag, attrs, children) ?? html(tag), {
+            onmutate: ev =>
+              void translator.init((err, t) =>
+                ev.currentTarget.textContent = err
+                  ? '{% Failed to initialize the translator. %}'
+                  : t(children, data) ?? `{% Failed to translate "${children}". %}`),
+          });
+      }
+
+      assert(HTML.span('Greeting', data({ name: 'world' })).children === 'Hello, world.');
+      assert(HTML.span('Greeting', data({ name: 'world' })).element.textContent === 'Hello, world.');
+      // @ts-expect-error
+      () => HTML.span('Greeting', data({}));
+      // @ts-expect-error
+      () => HTML.span('', data({ name: 'world' }));
+      // @ts-expect-error
+      () => HTML.span(data({ name: 'world' }));
     });
 
   });

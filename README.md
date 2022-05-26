@@ -227,28 +227,6 @@ interface TransDataMap {
   'Greeting': { name: string; };
 }
 
-function data
-  <K extends keyof TransDataMap>
-  (data: TransDataMap[K], factory?: El.Factory<HTMLElementTagNameMap, K>)
-  : El.Factory<HTMLElementTagNameMap, K> {
-  return (html, tag, attrs, children) =>
-    define(factory?.(html, tag, attrs, children) ?? html(tag), {
-      onmutate: ev =>
-        void translator.init((err, t) =>
-          ev.currentTarget.textContent = err
-            ? '{% Failed to initialize the translator. %}'
-            : t(children, data) ?? `{% Failed to translate "${children}". %}`),
-    });
-}
-
-const el = HTML.span('Greeting', data({ name: 'world' }));
-assert(el.children === 'Hello, world.');
-assert(el.element.textContent === 'Hello, world.');
-```
-
-Or
-
-```ts
 function intl
   <K extends keyof TransDataMap>
   (children: K, data: TransDataMap[K], factory?: El.Factory<HTMLElementTagNameMap, El.Children.Void>)
@@ -265,6 +243,28 @@ function intl
 
 const el = HTML.span(intl('Greeting', { name: 'world' }));
 assert(el.children === undefined);
+assert(el.element.textContent === 'Hello, world.');
+```
+
+Or
+
+```ts
+function data
+  <K extends keyof TransDataMap>
+  (data: TransDataMap[K], factory?: El.Factory<HTMLElementTagNameMap, K>)
+  : El.Factory<HTMLElementTagNameMap, K> {
+  return (html, tag, attrs, children) =>
+    define(factory?.(html, tag, attrs, children) ?? html(tag), {
+      onmutate: ev =>
+        void translator.init((err, t) =>
+          ev.currentTarget.textContent = err
+            ? '{% Failed to initialize the translator. %}'
+            : t(children, data) ?? `{% Failed to translate "${children}". %}`),
+    });
+}
+
+const el = HTML.span('Greeting', data({ name: 'world' }));
+assert(el.children === 'Hello, world.');
 assert(el.element.textContent === 'Hello, world.');
 ```
 
