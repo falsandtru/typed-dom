@@ -1,4 +1,5 @@
-import { hasOwnProperty, ObjectDefineProperty } from 'spica/alias';
+import { Object } from 'spica/global';
+import { hasOwnProperty } from 'spica/alias';
 import { AtomicPromise } from 'spica/promise';
 import { singleton } from 'spica/function';
 
@@ -130,7 +131,7 @@ export function bind<T extends keyof WindowEventMap | keyof DocumentEventMap | k
     case 'connect':
     case 'disconnect':
       const prop = `on${type}`;
-      target[prop] ?? ObjectDefineProperty(target, prop, {
+      target[prop] ?? Object.defineProperty(target, prop, {
         configurable: true,
         enumerable: false,
         writable: true,

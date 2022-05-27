@@ -1,5 +1,5 @@
-import { Event } from 'spica/global';
-import { isArray, hasOwnProperty, ObjectDefineProperties, ObjectKeys } from 'spica/alias';
+import { Object, Event } from 'spica/global';
+import { isArray, hasOwnProperty } from 'spica/alias';
 import { TagNameMap, Attrs, Factory as BaseFactory } from './util/dom';
 import { identity } from './util/identity';
 import { splice } from 'spica/array';
@@ -170,7 +170,7 @@ export class ElementProxy<
   }
   private isObserverUpdate = false;
   private observe(children: El.Children.Struct): El.Children.Struct {
-    return ObjectDefineProperties(children, ObjectKeys(children).reduce((acc, name) => {
+    return Object.defineProperties(children, Object.keys(children).reduce((acc, name) => {
       if (name in {}) throw new Error(`TypedDOM: Child names conflicted with the object property names.`);
       let child = children[name];
       acc[name] = {

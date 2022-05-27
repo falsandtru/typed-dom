@@ -1,5 +1,5 @@
-import { Symbol, document } from 'spica/global';
-import { isArray, hasOwnProperty, ObjectDefineProperty } from 'spica/alias';
+import { Symbol, Object, document } from 'spica/global';
+import { isArray, hasOwnProperty } from 'spica/alias';
 import { memoize } from 'spica/memoize';
 
 declare global {
@@ -141,7 +141,7 @@ function defineAttrs<E extends Element>(el: E, attrs: Attrs): E {
             case 'connect':
             case 'disconnect':
               const prop = `on${type}`;
-              el[prop] ?? ObjectDefineProperty(el, prop, {
+              el[prop] ?? Object.defineProperty(el, prop, {
                 configurable: true,
                 enumerable: false,
                 writable: true,
@@ -174,7 +174,7 @@ function defineAttrs<E extends Element>(el: E, attrs: Attrs): E {
             case 'connect':
             case 'disconnect':
               const prop = `on${type}`;
-              el[prop] ?? ObjectDefineProperty(el, prop, {
+              el[prop] ?? Object.defineProperty(el, prop, {
                 configurable: true,
                 enumerable: false,
                 writable: true,
