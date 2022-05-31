@@ -3,9 +3,7 @@ import { html } from '../src/util/dom';
 import { querySelector, querySelectorAll } from '../src/util/query';
 
 describe('Benchmark:', function () {
-  this.timeout(30 * 1e3);
-
-  if (navigator.userAgent.includes('Firefox')) return;
+  this.timeout(10 * 1e3);
 
   const el = html('div', [html('a'), html('a'), html('a')]);
 
