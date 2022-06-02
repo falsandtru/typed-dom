@@ -8,7 +8,7 @@ module.exports = function (config) {
       { pattern: 'https://cdnjs.cloudflare.com/ajax/libs/i18next/21.8.2/i18next.js', watched: false, served: false, included: true, integrity: 'sha512-EVhL1duaW91yzWs3H1LKLMEy3DvZYOCVT6Oi1C7n2yOR3hM72H3tIWJnw+IXeQeRVXeT1zsiJnfTDlpBkGs2YA==' },
       { pattern: 'dist/**/*.{js,map}', watched: true, served: true, included: true },
     ],
-    reporters: ['dots', 'coverage'],
+    reporters: ['dots'],
     preprocessors: {
       'dist/**/*.js': ['coverage'],
     },
