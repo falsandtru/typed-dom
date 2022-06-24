@@ -56,7 +56,7 @@
     "karma-power-assert": "^1.0.0",
     "mocha": "^10.0.0",
     "npm-check-updates": "^14.1.1",
-    "spica": "0.0.571",
+    "spica": "0.0.573",
     "ts-loader": "^9.3.1",
     "typescript": "4.7.4",
     "webpack": "^5.73.0",
