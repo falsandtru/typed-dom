@@ -1,4 +1,5 @@
 import type { ParseSelector } from 'typed-query-selector/parser';
+import { duff } from 'spica/duff';
 
 export function querySelector<T extends keyof HTMLElementTagNameMap>(node: ParentNode, selector: T): HTMLElementTagNameMap[T] | null;
 export function querySelector<T extends keyof SVGElementTagNameMap>(node: ParentNode, selector: T): SVGElementTagNameMap[T] | null;
@@ -20,8 +21,6 @@ export function querySelectorAll(node: ParentNode | Element, selector: string): 
     acc.push(node);
   }
   const nodes = node.querySelectorAll(selector);
-  for (let i = 0, len = nodes.length; i < len; ++i) {
-    acc.push(nodes[i]);
-  }
+  duff(nodes.length, i => void acc.push(nodes[i]));
   return acc;
 }
