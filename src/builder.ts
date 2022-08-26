@@ -86,8 +86,6 @@ function handle
       if (typeof children === 'function') return build(attrs, void 0, children);
       if (typeof attrs === 'function') return build(void 0, void 0, attrs);
       if (isElChildren(attrs)) return build(void 0, attrs, factory);
-      // Bug: TypeScript
-      //assert(attrs = attrs as Attrs | undefined);
       const el = elem(tag, factory, attrs, children);
       return new ElementProxy(tag, el, children, container?.(el));
     };
@@ -109,7 +107,7 @@ function handle
 
 function isElChildren
   (value: Attrs | El.Children)
-  : value is NonNullable<El.Children> {
+  : value is El.Children {
   if (value === void 0) return false;
   if (value[Symbol.iterator]) return true;
   if (typeof value['nodeType'] === 'number') return true;
