@@ -31,7 +31,7 @@ describe('Benchmark:', function () {
 
   describe('querySelectorAll loop', function () {
     it('native for-i', function (done) {
-      benchmark('querySelectorAll loop native for-i', () => {
+      benchmark('querySelectorAll loop native for', () => {
         for (let es = el.querySelectorAll('a'), i = 0, len = es.length; i < len; ++i) {
           es[i];
         }
@@ -39,7 +39,7 @@ describe('Benchmark:', function () {
     });
 
     it('custom for-i', function (done) {
-      benchmark('querySelectorAll loop custom for-i', () => {
+      benchmark('querySelectorAll loop custom for', () => {
         for (let es = querySelectorAll(el, 'a'), i = 0, len = es.length; i < len; ++i) {
           es[i];
         }
