@@ -16,7 +16,7 @@ const dom: El<"article", HTMLElement, {
 
 ## Concept
 
-- Statically visualize internal structures of DOM objects.
+- Statically type and visualize internal structures of DOM objects.
 - Make wrapper APIs of built-in DOM APIs.
 - Exclude blackboxing and complexness.
 
