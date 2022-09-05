@@ -88,11 +88,8 @@ export function element<M extends HTMLElementTagNameMap>(context: Document | Sha
 export function element<M extends SVGElementTagNameMap>(context: Document | ShadowRoot, ns: NS.SVG): Factory<M>;
 export function element<M extends TagNameMap>(context: Document | ShadowRoot, ns: NS.MathML): Factory<M>;
 export function element<M extends TagNameMap>(context: Document | ShadowRoot, ns: NS): Factory<M> {
-  const cache = memoize(elem, (_, ns, tag) => `${ns}:${tag}`);
   return (tag: string, attrs?: Attrs | Children, children?: Children) => {
-    const el = tag.includes('-')
-      ? elem(context, ns, tag)
-      : cache(context, ns, tag).cloneNode(true) as Element;
+    const el = elem(context, ns, tag);
     assert(el.attributes.length === 0);
     assert(el.childNodes.length === 0);
     return !attrs || isChildren(attrs)
