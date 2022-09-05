@@ -14,7 +14,7 @@ const dom: El<"article", HTMLElement, {
 }>
 ```
 
-## Concept
+## Concepts
 
 - Statically type and visualize internal structures of DOM objects.
 - Make wrapper APIs of built-in DOM APIs.
