@@ -436,8 +436,9 @@ export const Shadow = API<ShadowHostScopedCustomHTMLElementTagNameMap>(html, sha
 - delegate
 - bind
 - currentTarget
-- querySelector
 - querySelectorAll
+- querySelectorWith
+- querySelectorAllWith
 
 ## Events
 
