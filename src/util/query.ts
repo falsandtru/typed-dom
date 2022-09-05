@@ -23,6 +23,7 @@ export function querySelectorAllWith(node: ParentNode | Element, selector: strin
   return duffReduce(node.querySelectorAll(selector), (acc, node) => (acc.push(node), acc), acc);
 }
 
+// for文との二重反復をコールバックで解消しても変化なし
 export function querySelectorAll<T extends keyof HTMLElementTagNameMap>(node: ParentNode, selector: T): HTMLElementTagNameMap[T][];
 export function querySelectorAll<T extends keyof SVGElementTagNameMap>(node: ParentNode, selector: T): SVGElementTagNameMap[T][];
 export function querySelectorAll<T extends string>(node: ParentNode, selector: T): ParseSelector<T>[];
