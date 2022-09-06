@@ -20,7 +20,7 @@ export function querySelectorAllWith(node: ParentNode | Element, selector: strin
   if ('matches' in node && node.matches(selector)) {
     acc.push(node);
   }
-  return duffReduce(node.querySelectorAll(selector), (acc, node) => (acc.push(node), acc), acc);
+  return duffReduce(node.querySelectorAll(selector), (acc, el) => (acc.push(el), acc), acc);
 }
 
 // for文との二重反復をコールバックで解消しても変化なし
@@ -29,5 +29,5 @@ export function querySelectorAll<T extends keyof SVGElementTagNameMap>(node: Par
 export function querySelectorAll<T extends string>(node: ParentNode, selector: T): ParseSelector<T>[];
 export function querySelectorAll<T extends Element>(node: ParentNode, selector: string): T[];
 export function querySelectorAll(node: ParentNode | Element, selector: string): Element[] {
-  return duffReduce(node.querySelectorAll(selector), (acc, node) => (acc.push(node), acc), [] as Element[]);
+  return duffReduce(node.querySelectorAll(selector), (acc, el) => (acc.push(el), acc), [] as Element[]);
 }
