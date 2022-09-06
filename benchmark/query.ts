@@ -1,6 +1,7 @@
 import { benchmark } from './benchmark';
 import { html } from '../src/util/dom';
 import { querySelectorAll, querySelectorWith, querySelectorAllWith } from '../src/util/query';
+import { duffEach } from 'spica/duff';
 
 describe('Benchmark:', function () {
   const el = html('div', [html('a'), html('a'), html('a')]);
@@ -57,6 +58,12 @@ describe('Benchmark:', function () {
       it(`custom for-of ${length.toLocaleString('en')}`, function (done) {
         benchmark(`querySelectorAll custom for-of ${length.toLocaleString('en')}`, () => {
           for (const e of querySelectorAll(el, 'div')) e;
+        }, done);
+      });
+
+      it(`native duff   ${length.toLocaleString('en')}`, function (done) {
+        benchmark(`querySelectorAll native duff   ${length.toLocaleString('en')}`, () => {
+          duffEach(el.querySelectorAll('div'), e => e);
         }, done);
       });
     }
