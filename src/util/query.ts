@@ -1,3 +1,4 @@
+import { Array } from 'spica/global';
 import type { ParseSelector } from 'typed-query-selector/parser';
 import { duffReduce } from 'spica/duff';
 
@@ -29,5 +30,5 @@ export function querySelectorAll<T extends keyof SVGElementTagNameMap>(node: Par
 export function querySelectorAll<T extends string>(node: ParentNode, selector: T): ParseSelector<T>[];
 export function querySelectorAll<T extends Element>(node: ParentNode, selector: string): T[];
 export function querySelectorAll(node: ParentNode | Element, selector: string): Element[] {
-  return duffReduce(node.querySelectorAll(selector), (acc, el) => (acc.push(el), acc), [] as Element[]);
+  return duffReduce(node.querySelectorAll(selector), (acc, el) => (acc.push(el), acc), Array<Element>());
 }
