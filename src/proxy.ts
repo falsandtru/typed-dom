@@ -67,9 +67,6 @@ namespace symbols {
   export const events = Symbol.for('typed-dom::events');
 }
 
-let id = identity();
-let counter = 0;
-
 export class ElementProxy<
   T extends string = string,
   E extends Element = Element,
@@ -134,11 +131,7 @@ export class ElementProxy<
     if (this.$id) return this.$id;
     this.$id = this.element.id;
     if (/^[a-z][\w-]*$/i.test(this.$id)) return this.$id;
-    if (counter === 999) {
-      id = identity();
-      counter = 0;
-    }
-    this.$id = `rnd-${id}-${++counter}`;
+    this.$id = `rnd-${identity()}`;
     assert(!this.element.classList.contains(this.$id));
     this.element.classList.add(this.$id);
     return this.$id;
