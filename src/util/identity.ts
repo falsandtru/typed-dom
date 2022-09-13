@@ -1,14 +1,11 @@
 import { global } from 'spica/global';
-import { rnd0Z, unique } from 'spica/random';
 
-const rnd = unique(rnd0Z);
-const dict = [
-  ...[...Array(36)].map((_, i) => i.toString(36)),
-  ...[...Array(36)].map((_, i) => i.toString(36).toUpperCase()).slice(-26),
-].join('');
-assert(dict.length === 62);
+// uniqueによる実装はメモリを圧迫しqueryのベンチマークが落ちるため不可
+const rnd = (c => () => (c++).toString(36))(0);
+const dict = [...Array(36)].map((_, i) => i.toString(36)).join('');
+assert(dict.length === 36);
 assert(dict[0] === '0');
-assert(dict.at(-1) === 'Z');
+assert(dict.at(-1) === 'z');
 let r = '';
 let c = dict.length - 1;
 

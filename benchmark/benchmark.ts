@@ -1,10 +1,9 @@
 import Benchmark from 'benchmark';
-import { wait } from 'spica/timer';
 
 mocha.setup({
-  timeout: 600 * 1e3,
+  timeout: 300 * 1e3,
   rootHooks: {
-    beforeEach: () => wait(1e3),
+    beforeEach: () => gc!(),
   },
 });
 
