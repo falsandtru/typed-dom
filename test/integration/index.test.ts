@@ -339,7 +339,7 @@ describe('Integration: Package', function () {
       const style = template.replace(/\:scope/g, `#${id}`);
       assert(HTML.div({ id }, [HTML.style(template)]).children[0].element.innerHTML === style);
       assert(HTML.div({ id }, { style: HTML.style(template) }).children.style.element.innerHTML === style);
-      assert(HTML.div([HTML.style(':scope {}')]).element.className.match(/^rnd-\w+\d$/));
+      assert(HTML.div([HTML.style(':scope {}')]).element.className.match(/^rnd-\w+$/));
       assert(Shadow.div([HTML.style(':scope {}')]).element.outerHTML === '<div></div>');
       assert(Shadow.div([HTML.style(':scope {}')]).children[0].element.innerHTML === ':host {}');
       assert(Shadow.div([HTML.style('/* :scope */:scope/* :scope */{content:" :scope "}')]).children[0].element.innerHTML === '/* :scope */:host/* :scope */{content:" :scope "}');
