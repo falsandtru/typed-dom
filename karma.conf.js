@@ -5,7 +5,7 @@ module.exports = function (config) {
     files: [
       { pattern: 'https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.js', watched: false, served: false, included: true, integrity: 'sha512-2iwCHjuj+PmdCyvb88rMOch0UcKQxVHi/gsAml1fN3eg82IDaO/cdzzeXX4iF2VzIIes7pODE1/G0ts3QBwslA==' },
       { pattern: 'https://cdnjs.cloudflare.com/ajax/libs/benchmark/2.1.4/benchmark.js', watched: false, served: false, included: true, integrity: 'sha512-XnVGk21Ij51MbU8XezQpkwZ1/GA8b5qmoVGIOdJLBYycutjkaeemipzRJP7P6mEJl99OfnweA7M3e4WLfuG7Aw==' },
-      { pattern: 'https://cdnjs.cloudflare.com/ajax/libs/i18next/21.8.2/i18next.js', watched: false, served: false, included: true, integrity: 'sha512-EVhL1duaW91yzWs3H1LKLMEy3DvZYOCVT6Oi1C7n2yOR3hM72H3tIWJnw+IXeQeRVXeT1zsiJnfTDlpBkGs2YA==' },
+      { pattern: 'https://cdnjs.cloudflare.com/ajax/libs/i18next/21.9.1/i18next.js', watched: false, served: false, included: true, integrity: 'sha512-RPJ9t0x+XItXDIylxv55R6d2pqCR20MRa/KtCFhaYouqqXG2mQJw3Shwk21cCjkgwNcsriQ19ua79PHRn07dxA==' },
       { pattern: 'dist/**/*.{js,map}', watched: true, served: true, included: true },
     ],
     reporters: ['dots'],
