@@ -1,6 +1,4 @@
-import { Array } from 'spica/global';
 import type { ParseSelector } from 'typed-query-selector/parser';
-import { duffReduce } from 'spica/duff';
 
 export function querySelectorWith<T extends keyof HTMLElementTagNameMap>(node: ParentNode, selector: T): HTMLElementTagNameMap[T] | null;
 export function querySelectorWith<T extends keyof SVGElementTagNameMap>(node: ParentNode, selector: T): SVGElementTagNameMap[T] | null;
@@ -21,7 +19,10 @@ export function querySelectorAllWith(node: ParentNode | Element, selector: strin
   if ('matches' in node && node.matches(selector)) {
     acc.push(node);
   }
-  return duffReduce(node.querySelectorAll(selector), (acc, el) => (acc.push(el), acc), acc);
+  for (let es = node.querySelectorAll(selector), len = es.length, i = 0; i < len; ++i) {
+    acc.push(es[i]);
+  }
+  return acc;
 }
 
 // for文との二重反復をコールバックで解消しても変化なし
@@ -30,5 +31,9 @@ export function querySelectorAll<T extends keyof SVGElementTagNameMap>(node: Par
 export function querySelectorAll<T extends string>(node: ParentNode, selector: T): ParseSelector<T>[];
 export function querySelectorAll<T extends Element>(node: ParentNode, selector: string): T[];
 export function querySelectorAll(node: ParentNode | Element, selector: string): Element[] {
-  return duffReduce(node.querySelectorAll(selector), (acc, el) => (acc.push(el), acc), Array<Element>());
+  const acc: Element[] = [];
+  for (let es = node.querySelectorAll(selector), len = es.length, i = 0; i < len; ++i) {
+    acc.push(es[i]);
+  }
+  return acc;
 }
