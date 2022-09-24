@@ -691,8 +691,8 @@ describe('Integration: Package', function () {
         <K extends keyof TransDataMap>
         (children: K, data: TransDataMap[K], factory?: El.Factory<HTMLElementTagNameMap, El.Children.Void>)
         : El.Factory<HTMLElementTagNameMap, El.Children.Void> {
-        return (html, tag, attrs) => {
-          const el = factory?.(html, tag, attrs) ?? html(tag);
+        return (html, tag) => {
+          const el = factory?.(html, tag, {}) ?? html(tag);
           translator.init((err, t) =>
             el.textContent = err
               ? '{% Failed to initialize the translator. %}'
@@ -716,8 +716,8 @@ describe('Integration: Package', function () {
         <K extends keyof TransDataMap>
         (data: TransDataMap[K], factory?: El.Factory<HTMLElementTagNameMap, K>)
         : El.Factory<HTMLElementTagNameMap, K> {
-        return (html, tag, attrs, children) =>
-          define(factory?.(html, tag, attrs, children) ?? html(tag), {
+        return (html, tag, _, children) =>
+          define(factory?.(html, tag, {}, children) ?? html(tag), {
             onmutate: ev =>
               void translator.init((err, t) =>
                 ev.currentTarget.textContent = err
