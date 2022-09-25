@@ -20,6 +20,14 @@ const dom: El<"article", HTMLElement, {
 - Make wrapper APIs of built-in DOM APIs.
 - Exclude blackboxing and complexness.
 
+## Difference
+
+|Product|Search method|Problem|
+|-|-|-|
+|jQuery|Query|Breakable / Unclear dependency|
+|Typed-DOM|Type|Slow construction|
+|React|Create all and search difference|Breakable / Waste / Complex / Severely dependent / Incomplete clumsy reinvention of browsers|
+
 ## Usage
 
 Build a Typed-DOM component with styling.
@@ -123,7 +131,7 @@ dom.children.title.element.outerHTML; // '<h1>title</h1>'
 
 ## Examples
 
-Typed-DOM supports custom elements but they are unrecommended since most of purposes of customizations can be realized by customizing proxies or APIs instead of elements.
+Typed-DOM supports custom elements but they are unrecommended since most purposes of customizations can be realized by customizing proxies or APIs instead of elements.
 
 ### DOM Components
 
@@ -213,7 +221,7 @@ class Component extends Coroutine<number> implements El {
 
 ### i18n
 
-Create a helper function of APIs for i18n.
+Create a helper factory function for i18n.
 
 ```ts
 import { HTML, El, html, define } from 'typed-dom';
