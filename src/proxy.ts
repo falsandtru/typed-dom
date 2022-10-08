@@ -1,4 +1,3 @@
-import { Object, Event } from 'spica/global';
 import { isArray, hasOwnProperty } from 'spica/alias';
 import { TagNameMap, Attrs, Factory as BaseFactory } from './util/dom';
 import { identity } from './util/identity';

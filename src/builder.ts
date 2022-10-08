@@ -1,4 +1,3 @@
-import { Symbol, Proxy } from 'spica/global';
 import { hasOwnProperty } from 'spica/alias';
 import { El, ElementProxy } from './proxy';
 import { Factory, TagNameMap, Attrs, shadow, html, svg, define } from './util/dom';
@@ -83,9 +82,9 @@ function handle
       children?: El.Children,
       factory?: ElFactory<M, keyof M & string, El.Children>,
     ): El {
-      if (typeof children === 'function') return build(attrs, void 0, children);
-      if (typeof attrs === 'function') return build(void 0, void 0, attrs);
-      if (isElChildren(attrs)) return build(void 0, attrs, factory);
+      if (typeof children === 'function') return build(attrs, undefined, children);
+      if (typeof attrs === 'function') return build(undefined, undefined, attrs);
+      if (isElChildren(attrs)) return build(undefined, attrs, factory);
       const el = elem(tag, factory, attrs, children);
       return new ElementProxy(tag, el, children, container?.(el));
     };
@@ -108,7 +107,7 @@ function handle
 function isElChildren
   (value: Attrs | El.Children)
   : value is El.Children {
-  if (value === void 0) return false;
+  if (value === undefined) return false;
   if (value[Symbol.iterator]) return true;
   if (typeof value['nodeType'] === 'number') return true;
   for (const name in value as Attrs | El.Children.Struct) {

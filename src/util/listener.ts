@@ -1,4 +1,3 @@
-import { Object } from 'spica/global';
 import { hasOwnProperty } from 'spica/alias';
 import { AtomicPromise } from 'spica/promise';
 import { singleton } from 'spica/function';

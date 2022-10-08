@@ -1,3 +1,4 @@
+import 'spica/global';
 import { counter } from 'spica/counter';
 
 // uniqueによる実装はメモリを圧迫しqueryのベンチマークが落ちるため不可

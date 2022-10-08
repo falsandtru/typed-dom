@@ -1,4 +1,3 @@
-import { Symbol, Object, document } from 'spica/global';
 import { isArray, hasOwnProperty } from 'spica/alias';
 import { memoize } from 'spica/memoize';
 
@@ -61,9 +60,9 @@ export function shadow<M extends ShadowHostHTMLElementTagNameMap>(el: keyof M & 
 export function shadow<M extends ShadowHostHTMLElementTagNameMap>(el: keyof M & string | Extract<M[keyof M & string], Element>, opts?: ShadowRootInit, children?: Children, factory?: Factory<M>): ShadowRoot;
 export function shadow<M extends ShadowHostHTMLElementTagNameMap>(el: keyof M & string | Extract<M[keyof M & string], Element>, opts?: ShadowRootInit | Factory<M> | Children, children?: Factory<M> | Children, factory: Factory<M> = html as unknown as Factory<M>): ShadowRoot {
   if (typeof el === 'string') return shadow(factory(el) as Extract<M[keyof M & string], Element>, opts as ShadowRootInit, children as Children, factory);
-  if (typeof opts === 'function') return shadow(el, void 0, children as Children, opts);
-  if (typeof children === 'function') return shadow(el, opts as ShadowRootInit, void 0, children);
-  if (isChildren(opts)) return shadow(el, void 0, opts, factory);
+  if (typeof opts === 'function') return shadow(el, undefined, children as Children, opts);
+  if (typeof children === 'function') return shadow(el, opts as ShadowRootInit, undefined, children);
+  if (isChildren(opts)) return shadow(el, undefined, opts, factory);
   return defineChildren(
     !opts
       ? el.shadowRoot ?? caches.shadows.get(el) ?? el.attachShadow({ mode: 'open' })
@@ -194,7 +193,7 @@ function defineAttrs<E extends Element>(el: E, attrs: Attrs): E {
   return el;
 }
 function defineChildren<N extends ParentNode & Node>(node: N, children: Children | readonly (string | Node)[]): N {
-  if (children === void 0) return node;
+  if (children === undefined) return node;
   if (typeof children === 'string') {
     node.textContent = children;
   }
@@ -217,7 +216,7 @@ export function isChildren(value: Attrs | Children | ShadowRootInit): value is N
 }
 
 export function append<N extends ParentNode & Node>(node: N, children: Children): N {
-  if (children === void 0) return node;
+  if (children === undefined) return node;
   if (typeof children === 'string') {
     node.append(children);
   }
@@ -232,7 +231,7 @@ export function append<N extends ParentNode & Node>(node: N, children: Children)
 }
 
 export function prepend<N extends ParentNode & Node>(node: N, children: Children): N {
-  if (children === void 0) return node;
+  if (children === undefined) return node;
   if (typeof children === 'string') {
     node.prepend(children);
   }
