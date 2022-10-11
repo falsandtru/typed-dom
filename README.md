@@ -18,7 +18,7 @@ const dom: El<"article", HTMLElement, {
 
 - Statically type and visualize internal structures of DOM objects.
 - Make wrapper APIs of built-in DOM APIs.
-- Exclude blackboxing and complexness.
+- Exclude complexity and blackboxing.
 
 ## Difference
 
