@@ -1,6 +1,6 @@
 {
   "name": "typed-dom",
-  "version": "0.0.312",
+  "version": "0.0.313",
   "description": "A value-level and type-level DOM builder.",
   "private": true,
   "homepage": "https://github.com/falsandtru/typed-dom",
