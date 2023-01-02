@@ -232,7 +232,7 @@ export class ElementProxy<
           const oldChild = targetChildren[i];
           throwErrorIfNotUsable(newChild, this.container);
           isMutated ||= newChild.element !== oldChild.element;
-          if (newChild.element.parentNode !== this.element) {
+          if (newChild.element.parentNode !== container) {
             this.scope(newChild);
             assert(!addedChildren.includes(newChild));
             hasConnectionListener(newChild) && addedChildren.push(newChild) && this[symbols.events].add(newChild);
