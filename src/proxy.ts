@@ -230,7 +230,7 @@ export class ElementProxy<
         for (let i = 0; i < sourceChildren.length; ++i) {
           const newChild = sourceChildren[i];
           const oldChild = targetChildren[i];
-          throwErrorIfNotUsable(newChild, this.container);
+          throwErrorIfNotUsable(newChild, container);
           isMutated ||= newChild.element !== oldChild.element;
           if (newChild.element.parentNode !== container) {
             this.scope(newChild);
@@ -266,7 +266,7 @@ export class ElementProxy<
           for (const name in sourceChildren) {
             if (!hasOwnProperty(sourceChildren, name)) continue;
             const newChild = sourceChildren[name];
-            throwErrorIfNotUsable(newChild, this.container);
+            throwErrorIfNotUsable(newChild, container);
             this.scope(newChild);
             newChild.element.parentNode !== container && container.appendChild(newChild.element);
             assert(!addedChildren.includes(newChild));
@@ -284,7 +284,7 @@ export class ElementProxy<
           const oldChild = targetChildren[name];
           if (!newChild || !oldChild) continue;
           if (newChild === oldChild) continue;
-          throwErrorIfNotUsable(newChild, this.container);
+          throwErrorIfNotUsable(newChild, container);
           if (newChild !== oldChild && newChild.element.parentNode !== oldChild.element.parentNode) {
             this.scope(newChild);
             container.replaceChild(newChild.element, oldChild.element);
