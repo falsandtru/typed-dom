@@ -29,7 +29,7 @@ describe('Benchmark:', function () {
   });
 
   describe('querySelectorAll', function () {
-    for (const length of [1, 1e1, 1e2, 1e3, 1e4, 1e5, 1e6]) {
+    for (const length of [1, 1e1, 1e2, 1e3, 1e4, 1e5]) {
       const el = html('body');
       for (let i = 0; i < length; ++i) el.appendChild(html('div'));
 
