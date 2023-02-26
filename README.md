@@ -22,11 +22,13 @@ const dom: El<"article", HTMLElement, {
 
 ## Difference
 
+DOM manipulation must be easy and reliable. But that doesn't need virtual DOM or unique syntax. Typed-DOM is a minimal API set for easy and reliable DOM manipulation.
+
 |Product|Search method|Problem|
 |-|-|-|
 |jQuery|Query|Breakable / Unclear dependency|
 |Typed-DOM|Type|Slow construction|
-|React|Create all and search difference|Breakable / Waste / Complex / Severely dependent / Incomplete clumsy reinvention of browsers|
+|React|Create all and search difference|Breakable / Waste / Complex / Severely dependent / Incomplete clumsy reinventing the browser|
 
 ## Usage
 
@@ -159,7 +161,7 @@ class Component implements El {
 ```
 
 Switch to shadow DOM.
-Access to elemets in shadow DOM is transparent.
+Transparently accessible to elemets in shadow DOM.
 
 ```ts
 import { Shadow, HTML, El } from 'typed-dom';
