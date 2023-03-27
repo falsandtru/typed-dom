@@ -8,14 +8,14 @@ export namespace symbols {
 interface Target {
   readonly element: Element & {
     readonly [symbols.proxy]?: Target & {
-      readonly [symbols.events]: Events<Target>;
+      readonly [symbols.events]: Events;
     };
   };
-  readonly [symbols.events]?: Events<Target>;
+  readonly [symbols.events]?: Events;
 }
 
-export class Events<T extends Target> {
-  public static get(target: Target): Events<Target> {
+export class Events {
+  public static get(target: Target): Events {
     return target[symbols.events] ?? target.element[symbols.proxy]![symbols.events];
   }
   public static hasConnectionListener(target: Target): boolean {
@@ -38,12 +38,12 @@ export class Events<T extends Target> {
     return 'ondisconnect' in this.element
         && null != this.element['ondisconnect'];
   }
-  private readonly targets: T[] = [];
-  public add(target: T): void {
+  private readonly targets: Target[] = [];
+  public add(target: Target): void {
     const i = this.targets.indexOf(target);
     ~i || this.targets.push(target);
   }
-  public del(target: T): void {
+  public del(target: Target): void {
     const i = this.targets.indexOf(target);
     ~i && splice(this.targets, i, 1);
   }
