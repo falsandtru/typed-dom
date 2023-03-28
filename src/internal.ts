@@ -48,7 +48,8 @@ export class Events {
     i !== -1 && splice(this.targets, i, 1);
   }
   public dispatchMutateEvent(): void {
-    this.mutate && this.element.dispatchEvent(new Event('mutate', { bubbles: false, cancelable: false }));
+    if (!this.mutate) return;
+    this.element.dispatchEvent(new Event('mutate', { bubbles: false, cancelable: false }));
   }
   public dispatchConnectEvent(
     targets: readonly Target[] = this.targets,
@@ -58,7 +59,8 @@ export class Events {
     for (const target of targets) {
       const events = Events.get(target);
       events.dispatchConnectEvent();
-      events.connect && target.element.dispatchEvent(new Event('connect', { bubbles: false, cancelable: false }));
+      if (!events.connect) continue;
+      target.element.dispatchEvent(new Event('connect', { bubbles: false, cancelable: false }));
     }
   }
   public dispatchDisconnectEvent(
@@ -69,7 +71,8 @@ export class Events {
     for (const target of targets) {
       const events = Events.get(target);
       events.dispatchDisconnectEvent();
-      events.disconnect && target.element.dispatchEvent(new Event('disconnect', { bubbles: false, cancelable: false }));
+      if (!events.disconnect) continue;
+      target.element.dispatchEvent(new Event('disconnect', { bubbles: false, cancelable: false }));
     }
   }
 }
