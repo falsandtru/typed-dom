@@ -41,14 +41,11 @@ export class Events {
   private readonly targets: Target[] = [];
   public add(target: Target): void {
     const i = this.targets.indexOf(target);
-    ~i || this.targets.push(target);
+    i === -1 && this.targets.push(target);
   }
   public del(target: Target): void {
     const i = this.targets.indexOf(target);
-    ~i && splice(this.targets, i, 1);
-  }
-  private get isConnected(): boolean {
-    return !!this.element.parentNode && this.element.isConnected;
+    i !== -1 && splice(this.targets, i, 1);
   }
   public dispatchMutateEvent(): void {
     this.mutate && this.element.dispatchEvent(new Event('mutate', { bubbles: false, cancelable: false }));
@@ -57,7 +54,7 @@ export class Events {
     targets: readonly Target[] = this.targets,
   ): void {
     if (targets.length === 0) return;
-    if (targets !== this.targets && !this.isConnected) return;
+    if (targets !== this.targets && !this.element.isConnected) return;
     for (const target of targets) {
       const events = Events.get(target);
       events.dispatchConnectEvent();
@@ -68,7 +65,7 @@ export class Events {
     targets: readonly Target[] = this.targets,
   ): void {
     if (targets.length === 0) return;
-    if (targets !== this.targets && !this.isConnected) return;
+    if (targets !== this.targets && !this.element.isConnected) return;
     for (const target of targets) {
       const events = Events.get(target);
       events.dispatchDisconnectEvent();
