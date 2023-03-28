@@ -54,7 +54,7 @@ export class Events {
     this.mutate && this.element.dispatchEvent(new Event('mutate', { bubbles: false, cancelable: false }));
   }
   public dispatchConnectEvent(
-    targets: Target[] = this.targets,
+    targets: readonly Target[] = this.targets,
   ): void {
     if (targets.length === 0) return;
     if (targets !== this.targets && !this.isConnected) return;
@@ -65,7 +65,7 @@ export class Events {
     }
   }
   public dispatchDisconnectEvent(
-    targets: Target[] = this.targets,
+    targets: readonly Target[] = this.targets,
   ): void {
     if (targets.length === 0) return;
     if (targets !== this.targets && !this.isConnected) return;
