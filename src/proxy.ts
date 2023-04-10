@@ -207,7 +207,7 @@ export class ElementProxy<
         container.replaceChildren(children as El.Children.Node);
         return;
       case ElChildType.Text: {
-        if (this.isInit || !events.mutate) {
+        if (this.isInit || !events?.mutate) {
           container.textContent = children as El.Children.Text;
           isMutated = true;
           break;
@@ -231,7 +231,7 @@ export class ElementProxy<
           if (newChild.element.parentNode !== container) {
             this.scope(newChild);
             assert(!addedChildren.includes(newChild));
-            Events.hasConnectionListener(newChild) && addedChildren.push(newChild) && events.add(newChild);
+            Events.hasConnectionListener(newChild) && addedChildren.push(newChild) && events!.add(newChild);
           }
         }
         if (container.firstChild) {
@@ -247,8 +247,7 @@ export class ElementProxy<
           const oldChild = targetChildren[i];
           if (oldChild.element.parentNode !== container) {
             assert(!removedChildren.includes(oldChild));
-            Events.hasConnectionListener(oldChild) && removedChildren.push(oldChild);
-            events.del(oldChild);
+            Events.hasConnectionListener(oldChild) && removedChildren.push(oldChild) && events!.del(oldChild);
             assert(isMutated);
           }
         }
@@ -266,7 +265,7 @@ export class ElementProxy<
             this.scope(newChild);
             newChild.element.parentNode !== container && container.appendChild(newChild.element);
             assert(!addedChildren.includes(newChild));
-            Events.hasConnectionListener(newChild) && addedChildren.push(newChild) && events.add(newChild);
+            Events.hasConnectionListener(newChild) && addedChildren.push(newChild) && events!.add(newChild);
             isMutated = true;
           }
           break;
@@ -286,10 +285,9 @@ export class ElementProxy<
             container.replaceChild(newChild.element, oldChild.element);
             assert(!oldChild.element.parentNode);
             assert(!addedChildren.includes(newChild));
-            Events.hasConnectionListener(newChild) && addedChildren.push(newChild) && events.add(newChild);
+            Events.hasConnectionListener(newChild) && addedChildren.push(newChild) && events!.add(newChild);
             assert(!removedChildren.includes(oldChild));
-            Events.hasConnectionListener(oldChild) && removedChildren.push(oldChild);
-            events.del(oldChild);
+            Events.hasConnectionListener(oldChild) && removedChildren.push(oldChild) && events!.del(oldChild);
           }
           else {
             assert(newChild.element.parentNode === oldChild.element.parentNode);
@@ -306,10 +304,10 @@ export class ElementProxy<
         break;
       }
     }
-    events.dispatchDisconnectEvent(removedChildren);
-    events.dispatchConnectEvent(addedChildren);
+    events?.dispatchDisconnectEvent(removedChildren);
+    events?.dispatchConnectEvent(addedChildren);
     assert(isMutated || removedChildren.length + addedChildren.length === 0);
-    isMutated && events.dispatchMutateEvent();
+    isMutated && events?.dispatchMutateEvent();
   }
 }
 

@@ -1,26 +1,28 @@
 import { splice } from 'spica/array';
 
 export namespace symbols {
+  // Required
   export const proxy = Symbol.for('typed-dom::proxy');
+  // Optional
   export const events = Symbol.for('typed-dom::events');
 }
 
 interface Target {
   readonly element: Element & {
-    readonly [symbols.proxy]?: Target & {
-      readonly [symbols.events]: Events;
-    };
+    readonly [symbols.proxy]?: Target;
   };
   readonly [symbols.events]?: Events;
 }
 
 export class Events {
-  public static get(target: Target): Events {
+  public static get(target: Target): Events | undefined {
     return target[symbols.events] ?? target.element[symbols.proxy]![symbols.events];
   }
   public static hasConnectionListener(target: Target): boolean {
     const events = this.get(target);
-    return events.targets.length > 0 || events.connect || events.disconnect;
+    return events
+      ? events.targets.length > 0 || events.connect || events.disconnect
+      : false;
   }
   constructor(
     private readonly element: Element,
@@ -58,8 +60,8 @@ export class Events {
     if (targets !== this.targets && !this.element.isConnected) return;
     for (const target of targets) {
       const events = Events.get(target);
-      events.dispatchConnectEvent();
-      if (!events.connect) continue;
+      events?.dispatchConnectEvent();
+      if (!events?.connect) continue;
       target.element.dispatchEvent(new Event('connect', { bubbles: false, cancelable: false }));
     }
   }
@@ -70,8 +72,8 @@ export class Events {
     if (targets !== this.targets && !this.element.isConnected) return;
     for (const target of targets) {
       const events = Events.get(target);
-      events.dispatchDisconnectEvent();
-      if (!events.disconnect) continue;
+      events?.dispatchDisconnectEvent();
+      if (!events?.disconnect) continue;
       target.element.dispatchEvent(new Event('disconnect', { bubbles: false, cancelable: false }));
     }
   }
