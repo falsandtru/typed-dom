@@ -22,13 +22,13 @@ const dom: El<"article", HTMLElement, {
 
 ## Difference
 
-DOM manipulation must be easy and reliable, but that doesn't need virtual DOM or unique syntax. Typed-DOM is a minimal API set for easy and reliable DOM manipulation.
+DOM manipulation must be easy and reliable, but it doesn't need virtual DOM or unique syntax. Typed-DOM is a minimal API set for easy and reliable DOM manipulation.
 
-|Product|Search method|Problem|
-|-|-|-|
-|jQuery|Query|Breakable / Unclear dependency|
-|Typed-DOM|Type|Slow construction|
-|React|Create all and search difference|Breakable / Waste / Complex / Severely dependent / Incomplete clumsy reinventing the browser|
+|Product|Access|Dependence|Extensibility|Problem|
+|-|-|-|-|-|
+|jQuery|Query|Implementation|Plugin|Breakable / Unclear dependency|
+|Typed-DOM|Type|Interface|Fork|Slow construction|
+|React|Create all and search difference|Implementation|Component|Breakable / Waste / Complex / Severely dependent / Incomplete vain reinvention of the browser|
 
 ## Usage
 
