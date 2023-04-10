@@ -1,7 +1,7 @@
 import { splice } from 'spica/array';
 
 export namespace symbols {
-  // Required
+  // Optional
   export const proxy = Symbol.for('typed-dom::proxy');
   // Optional
   export const events = Symbol.for('typed-dom::events');
@@ -16,7 +16,7 @@ interface Target {
 
 export class Events {
   public static get(target: Target): Events | undefined {
-    return target[symbols.events] ?? target.element[symbols.proxy]![symbols.events];
+    return target[symbols.events] ?? target.element[symbols.proxy]?.[symbols.events];
   }
   public static hasConnectionListener(target: Target): boolean {
     const events = this.get(target);
