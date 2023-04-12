@@ -26,7 +26,7 @@ DOM manipulation must be easy and reliable, but it doesn't need virtual DOM or u
 
 |Product|Access|Dependence|Extensibility|Problem|
 |-|-|-|-|-|
-|jQuery|Query|Implementation|Plugin|Breakable / Unclear dependency|
+|jQuery|Query|Implementation|Plugin|Breakable / Implicit dependency|
 |Typed-DOM|Type|Interface|Fork|Slow construction|
 |React|Create all and search difference|Implementation|Component|Breakable / Waste / Complex / Severely dependent / Incomplete vain reinvention of the browser|
 
