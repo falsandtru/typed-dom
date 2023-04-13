@@ -4,24 +4,24 @@ export namespace symbols {
   // Optional
   export const proxy = Symbol.for('typed-dom::proxy');
   // Optional
-  export const events = Symbol.for('typed-dom::events');
+  export const listeners = Symbol.for('typed-dom::listeners');
 }
 
 interface Target {
   readonly element: Element & {
     readonly [symbols.proxy]?: Target;
   };
-  readonly [symbols.events]?: Events;
+  readonly [symbols.listeners]?: Listeners;
 }
 
-export class Events {
-  public static from(target: Target): Events | undefined {
-    return target[symbols.events] ?? target.element[symbols.proxy]?.[symbols.events];
+export class Listeners {
+  public static from(target: Target): Listeners | undefined {
+    return target[symbols.listeners] ?? target.element[symbols.proxy]?.[symbols.listeners];
   }
   public static hasConnectionListener(target: Target): boolean {
-    const events = this.from(target);
-    if (!events) return false;
-    return events.targets.length > 0 || events.connect || events.disconnect;
+    const listeners = this.from(target);
+    if (!listeners) return false;
+    return listeners.targets.length > 0 || listeners.connect || listeners.disconnect;
   }
   constructor(
     private readonly element: Element,
@@ -58,9 +58,9 @@ export class Events {
     if (targets.length === 0) return;
     if (targets !== this.targets && !this.element.isConnected) return;
     for (const target of targets) {
-      const events = Events.from(target);
-      events?.dispatchConnectEvent();
-      if (!events?.connect) continue;
+      const listeners = Listeners.from(target);
+      listeners?.dispatchConnectEvent();
+      if (!listeners?.connect) continue;
       target.element.dispatchEvent(new Event('connect', { bubbles: false, cancelable: false }));
     }
   }
@@ -70,9 +70,9 @@ export class Events {
     if (targets.length === 0) return;
     if (targets !== this.targets && !this.element.isConnected) return;
     for (const target of targets) {
-      const events = Events.from(target);
-      events?.dispatchDisconnectEvent();
-      if (!events?.disconnect) continue;
+      const listeners = Listeners.from(target);
+      listeners?.dispatchDisconnectEvent();
+      if (!listeners?.disconnect) continue;
       target.element.dispatchEvent(new Event('disconnect', { bubbles: false, cancelable: false }));
     }
   }

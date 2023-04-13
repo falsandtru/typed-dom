@@ -1,5 +1,5 @@
 import { isArray, hasOwnProperty } from 'spica/alias';
-import { symbols, Events } from './internal';
+import { symbols, Listeners } from './internal';
 import { TagNameMap, Attrs, Factory as BaseFactory } from './util/dom';
 import { identity } from './util/identity';
 
@@ -183,7 +183,7 @@ export class ElementProxy<
   private readonly container: Element | ShadowRoot;
   private isInit = true;
   private $children: C;
-  public readonly [symbols.events] = new Events(this.element);
+  public readonly [symbols.listeners] = new Listeners(this.element);
   public get children(): El.Getter<C> {
     switch (this.type) {
       case ElChildType.Text:
@@ -197,7 +197,7 @@ export class ElementProxy<
     const container = this.container;
     const removedChildren: El[] = [];
     const addedChildren: El[] = [];
-    const events = Events.from(this);
+    const listeners = Listeners.from(this);
     let isMutated = false;
     switch (this.type) {
       case ElChildType.Void:
@@ -207,7 +207,7 @@ export class ElementProxy<
         container.replaceChildren(children as El.Children.Node);
         return;
       case ElChildType.Text: {
-        if (this.isInit || !events?.mutate) {
+        if (this.isInit || !listeners?.mutate) {
           container.textContent = children as El.Children.Text;
           isMutated = true;
           break;
@@ -231,7 +231,7 @@ export class ElementProxy<
           if (newChild.element.parentNode !== container) {
             this.scope(newChild);
             assert(!addedChildren.includes(newChild));
-            Events.hasConnectionListener(newChild) && addedChildren.push(newChild) && events!.add(newChild);
+            Listeners.hasConnectionListener(newChild) && addedChildren.push(newChild) && listeners!.add(newChild);
           }
         }
         if (container.firstChild) {
@@ -247,7 +247,7 @@ export class ElementProxy<
           const oldChild = targetChildren[i];
           if (oldChild.element.parentNode !== container) {
             assert(!removedChildren.includes(oldChild));
-            Events.hasConnectionListener(oldChild) && removedChildren.push(oldChild) && events!.del(oldChild);
+            Listeners.hasConnectionListener(oldChild) && removedChildren.push(oldChild) && listeners!.del(oldChild);
             assert(isMutated);
           }
         }
@@ -265,7 +265,7 @@ export class ElementProxy<
             this.scope(newChild);
             newChild.element.parentNode !== container && container.appendChild(newChild.element);
             assert(!addedChildren.includes(newChild));
-            Events.hasConnectionListener(newChild) && addedChildren.push(newChild) && events!.add(newChild);
+            Listeners.hasConnectionListener(newChild) && addedChildren.push(newChild) && listeners!.add(newChild);
             isMutated = true;
           }
           break;
@@ -285,9 +285,9 @@ export class ElementProxy<
             container.replaceChild(newChild.element, oldChild.element);
             assert(!oldChild.element.parentNode);
             assert(!addedChildren.includes(newChild));
-            Events.hasConnectionListener(newChild) && addedChildren.push(newChild) && events!.add(newChild);
+            Listeners.hasConnectionListener(newChild) && addedChildren.push(newChild) && listeners!.add(newChild);
             assert(!removedChildren.includes(oldChild));
-            Events.hasConnectionListener(oldChild) && removedChildren.push(oldChild) && events!.del(oldChild);
+            Listeners.hasConnectionListener(oldChild) && removedChildren.push(oldChild) && listeners!.del(oldChild);
           }
           else {
             assert(newChild.element.parentNode === oldChild.element.parentNode);
@@ -304,10 +304,10 @@ export class ElementProxy<
         break;
       }
     }
-    events?.dispatchDisconnectEvent(removedChildren);
-    events?.dispatchConnectEvent(addedChildren);
+    listeners?.dispatchDisconnectEvent(removedChildren);
+    listeners?.dispatchConnectEvent(addedChildren);
     assert(isMutated || removedChildren.length + addedChildren.length === 0);
-    isMutated && events?.dispatchMutateEvent();
+    isMutated && listeners?.dispatchMutateEvent();
   }
 }
 
