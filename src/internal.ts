@@ -20,9 +20,8 @@ export class Events {
   }
   public static hasConnectionListener(target: Target): boolean {
     const events = this.from(target);
-    return events
-      ? events.targets.length > 0 || events.connect || events.disconnect
-      : false;
+    if (!events) return false;
+    return events.targets.length > 0 || events.connect || events.disconnect;
   }
   constructor(
     private readonly element: Element,
