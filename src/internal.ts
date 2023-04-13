@@ -15,11 +15,11 @@ interface Target {
 }
 
 export class Events {
-  public static get(target: Target): Events | undefined {
+  public static from(target: Target): Events | undefined {
     return target[symbols.events] ?? target.element[symbols.proxy]?.[symbols.events];
   }
   public static hasConnectionListener(target: Target): boolean {
-    const events = this.get(target);
+    const events = this.from(target);
     return events
       ? events.targets.length > 0 || events.connect || events.disconnect
       : false;
@@ -59,7 +59,7 @@ export class Events {
     if (targets.length === 0) return;
     if (targets !== this.targets && !this.element.isConnected) return;
     for (const target of targets) {
-      const events = Events.get(target);
+      const events = Events.from(target);
       events?.dispatchConnectEvent();
       if (!events?.connect) continue;
       target.element.dispatchEvent(new Event('connect', { bubbles: false, cancelable: false }));
@@ -71,7 +71,7 @@ export class Events {
     if (targets.length === 0) return;
     if (targets !== this.targets && !this.element.isConnected) return;
     for (const target of targets) {
-      const events = Events.get(target);
+      const events = Events.from(target);
       events?.dispatchDisconnectEvent();
       if (!events?.disconnect) continue;
       target.element.dispatchEvent(new Event('disconnect', { bubbles: false, cancelable: false }));

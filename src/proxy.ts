@@ -197,7 +197,7 @@ export class ElementProxy<
     const container = this.container;
     const removedChildren: El[] = [];
     const addedChildren: El[] = [];
-    const events = Events.get(this);
+    const events = Events.from(this);
     let isMutated = false;
     switch (this.type) {
       case ElChildType.Void:
