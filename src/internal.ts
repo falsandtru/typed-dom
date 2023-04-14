@@ -15,7 +15,7 @@ interface Target {
 }
 
 export class Listeners {
-  public static of(target: Target): Listeners | undefined {
+  private static of(target: Target): Listeners | undefined {
     return target[symbols.listeners] ?? target.element[symbols.proxy]?.[symbols.listeners];
   }
   public static hasConnectionListener(target: Target): boolean {
