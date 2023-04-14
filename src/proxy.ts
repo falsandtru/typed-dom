@@ -197,7 +197,7 @@ export class ElementProxy<
     const container = this.container;
     const removedChildren: El[] = [];
     const addedChildren: El[] = [];
-    const listeners = Listeners.from(this);
+    const listeners = Listeners.of(this);
     let isMutated = false;
     switch (this.type) {
       case ElChildType.Void:

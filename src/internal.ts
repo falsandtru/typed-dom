@@ -15,11 +15,11 @@ interface Target {
 }
 
 export class Listeners {
-  public static from(target: Target): Listeners | undefined {
+  public static of(target: Target): Listeners | undefined {
     return target[symbols.listeners] ?? target.element[symbols.proxy]?.[symbols.listeners];
   }
   public static hasConnectionListener(target: Target): boolean {
-    const listeners = this.from(target);
+    const listeners = this.of(target);
     if (!listeners) return false;
     return listeners.targets.length > 0 || listeners.connect || listeners.disconnect;
   }
@@ -58,7 +58,7 @@ export class Listeners {
     if (targets.length === 0) return;
     if (targets !== this.targets && !this.element.isConnected) return;
     for (const target of targets) {
-      const listeners = Listeners.from(target);
+      const listeners = Listeners.of(target);
       listeners?.dispatchConnectEvent();
       if (!listeners?.connect) continue;
       target.element.dispatchEvent(new Event('connect', { bubbles: false, cancelable: false }));
@@ -70,7 +70,7 @@ export class Listeners {
     if (targets.length === 0) return;
     if (targets !== this.targets && !this.element.isConnected) return;
     for (const target of targets) {
-      const listeners = Listeners.from(target);
+      const listeners = Listeners.of(target);
       listeners?.dispatchDisconnectEvent();
       if (!listeners?.disconnect) continue;
       target.element.dispatchEvent(new Event('disconnect', { bubbles: false, cancelable: false }));
