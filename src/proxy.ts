@@ -94,7 +94,7 @@ export class ElementProxy<
       default:
         throw new Error(`TypedDOM: Invalid children type.`);
     }
-    throwErrorIfNotUsable(this);
+    throwErrorIfUnavailable(this);
     this.element[symbols.proxy] = this;
     assert.deepStrictEqual({ ...this.element }, {});
     switch (this.type) {
@@ -226,7 +226,7 @@ export class ElementProxy<
         for (let i = 0; i < sourceChildren.length; ++i) {
           const newChild = sourceChildren[i];
           const oldChild = targetChildren[i];
-          throwErrorIfNotUsable(newChild, container);
+          throwErrorIfUnavailable(newChild, container);
           isMutated ||= newChild.element !== oldChild.element;
           if (newChild.element.parentNode !== container) {
             this.scope(newChild);
@@ -261,7 +261,7 @@ export class ElementProxy<
           for (const name in sourceChildren) {
             if (!hasOwnProperty(sourceChildren, name)) continue;
             const newChild = sourceChildren[name];
-            throwErrorIfNotUsable(newChild, container);
+            throwErrorIfUnavailable(newChild, container);
             this.scope(newChild);
             newChild.element.parentNode !== container && container.appendChild(newChild.element);
             assert(!addedChildren.includes(newChild));
@@ -279,7 +279,7 @@ export class ElementProxy<
           const oldChild = targetChildren[name];
           if (!newChild || !oldChild) continue;
           if (newChild === oldChild) continue;
-          throwErrorIfNotUsable(newChild, container);
+          throwErrorIfUnavailable(newChild, container);
           if (newChild !== oldChild && newChild.element.parentNode !== oldChild.element.parentNode) {
             this.scope(newChild);
             container.replaceChild(newChild.element, oldChild.element);
@@ -311,7 +311,7 @@ export class ElementProxy<
   }
 }
 
-function throwErrorIfNotUsable(child: El, newParent?: ParentNode): void {
+function throwErrorIfUnavailable(child: El, newParent?: ParentNode): void {
   const oldParent = child.element.parentNode;
   if (!oldParent || oldParent === newParent || !(symbols.proxy in oldParent)) return;
   throw new Error(`TypedDOM: Proxy children must be removed from the old parent proxy before assigning to the new parent proxy.`);
