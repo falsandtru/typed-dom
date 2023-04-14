@@ -207,7 +207,7 @@ export class ElementProxy<
         container.replaceChildren(children as El.Children.Node);
         return;
       case ElChildType.Text: {
-        if (this.isInit || !listeners.mutate) {
+        if (this.isInit || !listeners.mutation) {
           container.textContent = children as El.Children.Text;
           isMutated = true;
           break;
@@ -231,7 +231,7 @@ export class ElementProxy<
           if (newChild.element.parentNode !== container) {
             this.scope(newChild);
             assert(!addedChildren.includes(newChild));
-            Listeners.hasConnectionListener(newChild) && addedChildren.push(newChild) && listeners.add(newChild);
+            Listeners.of(newChild)?.haveConnectionListener() && addedChildren.push(newChild) && listeners.add(newChild);
           }
         }
         if (container.firstChild) {
@@ -247,7 +247,7 @@ export class ElementProxy<
           const oldChild = targetChildren[i];
           if (oldChild.element.parentNode !== container) {
             assert(!removedChildren.includes(oldChild));
-            Listeners.hasConnectionListener(oldChild) && removedChildren.push(oldChild) && listeners.del(oldChild);
+            Listeners.of(oldChild)?.haveConnectionListener() && removedChildren.push(oldChild) && listeners.del(oldChild);
             assert(isMutated);
           }
         }
@@ -265,7 +265,7 @@ export class ElementProxy<
             this.scope(newChild);
             newChild.element.parentNode !== container && container.appendChild(newChild.element);
             assert(!addedChildren.includes(newChild));
-            Listeners.hasConnectionListener(newChild) && addedChildren.push(newChild) && listeners.add(newChild);
+            Listeners.of(newChild)?.haveConnectionListener() && addedChildren.push(newChild) && listeners.add(newChild);
             isMutated = true;
           }
           break;
@@ -285,9 +285,9 @@ export class ElementProxy<
             container.replaceChild(newChild.element, oldChild.element);
             assert(!oldChild.element.parentNode);
             assert(!addedChildren.includes(newChild));
-            Listeners.hasConnectionListener(newChild) && addedChildren.push(newChild) && listeners.add(newChild);
+            Listeners.of(newChild)?.haveConnectionListener() && addedChildren.push(newChild) && listeners.add(newChild);
             assert(!removedChildren.includes(oldChild));
-            Listeners.hasConnectionListener(oldChild) && removedChildren.push(oldChild) && listeners.del(oldChild);
+            Listeners.of(oldChild)?.haveConnectionListener() && removedChildren.push(oldChild) && listeners.del(oldChild);
           }
           else {
             assert(newChild.element.parentNode === oldChild.element.parentNode);

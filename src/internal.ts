@@ -15,29 +15,27 @@ interface Target {
 }
 
 export class Listeners {
-  private static of(target: Target): Listeners | undefined {
+  public static of(target: Target): Listeners | undefined {
     return target[symbols.listeners] ?? target.element[symbols.proxy]?.[symbols.listeners];
-  }
-  public static hasConnectionListener(target: Target): boolean {
-    const listeners = this.of(target);
-    if (!listeners) return false;
-    return listeners.targets.length > 0 || listeners.connect || listeners.disconnect;
   }
   constructor(
     private readonly element: Element,
   ) {
   }
-  public get mutate(): boolean {
+  public get mutation(): boolean {
     return 'onmutate' in this.element
         && null != this.element['onmutate'];
   }
-  public get connect(): boolean {
+  public get connection(): boolean {
     return 'onconnect' in this.element
         && null != this.element['onconnect'];
   }
-  public get disconnect(): boolean {
+  public get disconnection(): boolean {
     return 'ondisconnect' in this.element
         && null != this.element['ondisconnect'];
+  }
+  public haveConnectionListener(): boolean {
+    return this.targets.length > 0 || this.connection || this.disconnection;
   }
   private readonly targets: Target[] = [];
   public add(target: Target): void {
@@ -49,7 +47,7 @@ export class Listeners {
     i !== -1 && splice(this.targets, i, 1);
   }
   public dispatchMutateEvent(): void {
-    if (!this.mutate) return;
+    if (!this.mutation) return;
     this.element.dispatchEvent(new Event('mutate', { bubbles: false, cancelable: false }));
   }
   public dispatchConnectEvent(
@@ -60,7 +58,7 @@ export class Listeners {
     for (const target of targets) {
       const listeners = Listeners.of(target);
       listeners?.dispatchConnectEvent();
-      if (!listeners?.connect) continue;
+      if (!listeners?.connection) continue;
       target.element.dispatchEvent(new Event('connect', { bubbles: false, cancelable: false }));
     }
   }
@@ -72,7 +70,7 @@ export class Listeners {
     for (const target of targets) {
       const listeners = Listeners.of(target);
       listeners?.dispatchDisconnectEvent();
-      if (!listeners?.disconnect) continue;
+      if (!listeners?.disconnection) continue;
       target.element.dispatchEvent(new Event('disconnect', { bubbles: false, cancelable: false }));
     }
   }
