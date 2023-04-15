@@ -183,6 +183,7 @@ describe('Integration: Package', function () {
     it('struct children update', function () {
       const dom = HTML.article({
         title: HTML.h1('a'),
+        content: HTML.p(),
       });
       assert.doesNotThrow(() => dom.children = dom.children);
       assert.throws(() => dom.children = HTML.article({ title: HTML.h1('b') }).children);
@@ -190,6 +191,7 @@ describe('Integration: Package', function () {
       assert(dom.children.title.element.textContent === 'a');
       assert(dom.children.title.children === 'a');
       dom.children = {
+        content: HTML.p(),
         title: HTML.h1('b'),
       };
       assert(dom.children.title.element === dom.element.firstChild);
