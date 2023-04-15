@@ -207,16 +207,16 @@ export class ElementProxy<
         container.replaceChildren(children as El.Children.Node);
         return;
       case ElChildType.Text: {
-        if (this.isInit || !listeners.mutation) {
-          container.textContent = children as El.Children.Text;
+        if (listeners.mutation) {
+          const newText = children;
+          const oldText = this.children;
+          if (newText === oldText) break;
+          container.textContent = newText as El.Children.Text;
           isMutated = true;
-          break;
         }
-        const newText = children;
-        const oldText = this.children;
-        if (newText === oldText) break;
-        container.textContent = newText as El.Children.Text;
-        isMutated = true;
+        else {
+          container.textContent = children as El.Children.Text;
+        }
         break;
       }
       case ElChildType.Array: {
@@ -230,9 +230,12 @@ export class ElementProxy<
           isMutated ||= newChild.element !== oldChild.element;
           if (newChild.element.parentNode !== container) {
             this.scope(newChild);
-            assert(!addedChildren.includes(newChild));
-            Listeners.of(newChild)?.haveConnectionListener() && addedChildren.push(newChild) && listeners.add(newChild);
           }
+          else if (!this.isInit) {
+            continue;
+          }
+          assert(!addedChildren.includes(newChild));
+          Listeners.of(newChild)?.haveConnectionListener() && addedChildren.push(newChild) && listeners.add(newChild);
         }
         if (container.firstChild) {
           container.replaceChildren(...sourceChildren.map(c => c.element));
@@ -245,11 +248,10 @@ export class ElementProxy<
         this.$children = sourceChildren as C;
         for (let i = 0; i < targetChildren.length; ++i) {
           const oldChild = targetChildren[i];
-          if (oldChild.element.parentNode !== container) {
-            assert(!removedChildren.includes(oldChild));
-            Listeners.of(oldChild)?.haveConnectionListener() && removedChildren.push(oldChild) && listeners.del(oldChild);
-            assert(isMutated);
-          }
+          if (oldChild.element.parentNode === container) continue;
+          assert(!removedChildren.includes(oldChild));
+          Listeners.of(oldChild)?.haveConnectionListener() && removedChildren.push(oldChild) && listeners.del(oldChild);
+          assert(isMutated);
         }
         assert(container.children.length === sourceChildren.length);
         assert(sourceChildren.every((child, i) => child.element === container.children[i]));
@@ -262,8 +264,10 @@ export class ElementProxy<
             if (!hasOwnProperty(sourceChildren, name)) continue;
             const newChild = sourceChildren[name];
             throwErrorIfUnavailable(newChild, container);
-            this.scope(newChild);
-            newChild.element.parentNode !== container && container.appendChild(newChild.element);
+            if (newChild.element.parentNode !== container) {
+              this.scope(newChild);
+              container.appendChild(newChild.element);
+            }
             assert(!addedChildren.includes(newChild));
             Listeners.of(newChild)?.haveConnectionListener() && addedChildren.push(newChild) && listeners.add(newChild);
             isMutated = true;
@@ -272,7 +276,6 @@ export class ElementProxy<
         }
         const sourceChildren = children as El.Children.Struct;
         const targetChildren = this.$children as El.Children.Struct;
-        if (sourceChildren === targetChildren) break;
         for (const name in sourceChildren) {
           if (!hasOwnProperty(sourceChildren, name)) continue;
           const newChild = sourceChildren[name];
@@ -280,7 +283,7 @@ export class ElementProxy<
           if (!newChild || !oldChild) continue;
           if (newChild === oldChild) continue;
           throwErrorIfUnavailable(newChild, container);
-          if (newChild !== oldChild && newChild.element.parentNode !== oldChild.element.parentNode) {
+          if (newChild.element.parentNode !== oldChild.element.parentNode) {
             this.scope(newChild);
             container.replaceChild(newChild.element, oldChild.element);
             assert(!oldChild.element.parentNode);
@@ -288,12 +291,6 @@ export class ElementProxy<
             Listeners.of(newChild)?.haveConnectionListener() && addedChildren.push(newChild) && listeners.add(newChild);
             assert(!removedChildren.includes(oldChild));
             Listeners.of(oldChild)?.haveConnectionListener() && removedChildren.push(oldChild) && listeners.del(oldChild);
-          }
-          else {
-            assert(newChild.element.parentNode === oldChild.element.parentNode);
-            const ref = newChild.element.nextSibling;
-            container.insertBefore(newChild.element, oldChild.element);
-            container.insertBefore(oldChild.element, ref);
           }
           isMutated = true;
           this.isObserverUpdate = true;
