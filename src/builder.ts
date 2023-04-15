@@ -104,13 +104,13 @@ function handle
   }
 }
 
-function isElChildren
-  (value: Attrs | El.Children)
-  : value is El.Children {
+function isElChildren(value: Attrs | El.Children): value is El.Children {
   if (value === undefined) return false;
   if (value[Symbol.iterator]) return true;
+  assert([value = value as Exclude<typeof value, El.Children.Text | El.Children.Array>]);
   if (typeof value['nodeType'] === 'number') return true;
-  for (const name in value as Attrs | El.Children.Struct) {
+  assert([value = value as Exclude<typeof value, El.Children.Node>]);
+  for (const name in value) {
     if (!hasOwnProperty(value, name)) continue;
     const val = value[name];
     return !!val && typeof val === 'object';
