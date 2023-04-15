@@ -7,7 +7,7 @@ export type API
   BuilderFunction<M> & { readonly [P in K<M>]: BuilderMethod<M, P>; };
 export function API
   <M extends TagNameMap>
-  (baseFactory: Factory<M>, container?: (el: E<M[K<M>]>) => ShadowRoot)
+  (baseFactory: Factory<M>, container?: (el: E<M[K<M>]>) => ShadowRoot | undefined)
   : API<M> {
   return new Proxy<API<M>>((() => 0) as any, handle(baseFactory, container));
 }
@@ -64,7 +64,7 @@ interface BuilderMethod<M extends TagNameMap, T extends K<M>> {
 
 function handle
   <M extends TagNameMap>
-  (baseFactory: Factory<M>, container?: (el: Element) => ShadowRoot,
+  (baseFactory: Factory<M>, container?: (el: Element) => ShadowRoot | undefined,
 ): ProxyHandler<API<M>> {
   return {
     apply(target, _, [tag, ...args]) {
