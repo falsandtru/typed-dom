@@ -117,6 +117,13 @@ describe('Integration: Package', function () {
       assert(dom.element.outerHTML === '<ul><li>4</li></ul>');
       assert(dom.children.length === 1);
       assert(dom.children.every(({ element }, i) => element === dom.element.children[i]));
+      dom.children = [
+        HTML.li('4'),
+        HTML.li('5'),
+      ];
+      assert(dom.element.outerHTML === '<ul><li>4</li><li>5</li></ul>');
+      assert(dom.children.length === 2);
+      assert(dom.children.every(({ element }, i) => element === dom.element.children[i]));
 
       // Property test
       const el = HTML.ul([]);
