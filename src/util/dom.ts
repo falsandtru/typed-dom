@@ -212,7 +212,7 @@ function defineChildren<N extends ParentNode & Node>(node: N, children: Children
 }
 
 export function isChildren(value: Attrs | Children | ShadowRootInit): value is NonNullable<Children> {
-  return !!value?.[Symbol.iterator];
+  return value?.[Symbol.iterator] !== undefined;
 }
 
 export function append<N extends ParentNode & Node>(node: N, children: Children): N {

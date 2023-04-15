@@ -113,7 +113,7 @@ function isElChildren(value: Attrs | El.Children): value is El.Children {
   for (const name in value) {
     if (!hasOwnProperty(value, name)) continue;
     const val = value[name];
-    return !!val && typeof val === 'object';
+    return val !== null && typeof val === 'object';
   }
   return false;
 }
