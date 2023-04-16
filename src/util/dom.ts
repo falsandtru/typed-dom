@@ -124,8 +124,7 @@ export function define<E extends Element | DocumentFragment | ShadowRoot>(node: 
     : defineChildren(defineAttrs(node as Element, attrs), children) as E;
 }
 function defineAttrs<E extends Element>(el: E, attrs: Attrs): E {
-  for (const name in attrs) {
-    if (!hasOwnProperty(attrs, name)) continue;
+  for (const name of Object.keys(attrs)) {
     const value = attrs[name];
     switch (typeof value) {
       case 'string':

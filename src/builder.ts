@@ -1,4 +1,3 @@
-import { hasOwnProperty } from 'spica/alias';
 import { El, ElementProxy } from './proxy';
 import { Factory, TagNameMap, Attrs, shadow, html, svg, define } from './util/dom';
 
@@ -110,8 +109,7 @@ function isElChildren(value: Attrs | El.Children): value is El.Children {
   assert([value = value as Exclude<typeof value, El.Children.Text | El.Children.Array>]);
   if (typeof value['nodeType'] === 'number') return true;
   assert([value = value as Exclude<typeof value, El.Children.Node>]);
-  for (const name in value) {
-    if (!hasOwnProperty(value, name)) continue;
+  for (const name of Object.keys(value)) {
     const val = value[name];
     return val !== null && typeof val === 'object';
   }

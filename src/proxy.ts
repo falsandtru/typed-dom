@@ -1,4 +1,4 @@
-import { isArray, hasOwnProperty } from 'spica/alias';
+import { isArray } from 'spica/alias';
 import { symbols, Listeners } from './internal';
 import { TagNameMap, Attrs, Factory as BaseFactory } from './util/dom';
 import { identity } from './util/identity';
@@ -160,10 +160,9 @@ export class ElementProxy<
   }
   private isInternalUpdate = false;
   private observe(children: El.Children.Struct): El.Children.Struct {
-    return Object.defineProperties(children, Object.keys(children).reduce((acc, name) => {
-      if (name in {}) throw new Error(`TypedDOM: Child names conflicted with the object property names.`);
+    for (const name of Object.keys(children)) {
       let child = children[name];
-      acc[name] = {
+      Object.defineProperty(children, name, {
         configurable: true,
         enumerable: true,
         get(): El {
@@ -179,9 +178,9 @@ export class ElementProxy<
           }
           assert(!this.isInternalUpdate);
         },
-      };
-      return acc;
-    }, {}));
+      });
+    }
+    return children;
   }
   private readonly type: ElChildType;
   private readonly container: Element | ShadowRoot;
@@ -278,8 +277,7 @@ export class ElementProxy<
       case ElChildType.Struct: {
         const sourceChildren = children as El.Children.Struct;
         const targetChildren = this.$children as El.Children.Struct;
-        for (const name in sourceChildren) {
-          if (!hasOwnProperty(sourceChildren, name)) continue;
+        for (const name of Object.keys(sourceChildren)) {
           const newChild = sourceChildren[name];
           const oldChild = targetChildren[name];
           if (!newChild) continue;
