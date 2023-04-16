@@ -99,26 +99,23 @@ export class ElementProxy<
     assert.deepStrictEqual({ ...this.element }, {});
     switch (this.type) {
       case ElChildType.Void:
-        this.isInit = false;
-        return;
+        break;
       case ElChildType.Text:
       case ElChildType.Node:
         this.children = children as El.Setter<C>;
-        this.isInit = false;
-        return;
+        break;
       case ElChildType.Array:
         this.$children = [] as El.Children.Array as C;
         this.children = children as El.Setter<C>;
-        this.isInit = false;
-        return;
+        break;
       case ElChildType.Struct:
         this.$children = this.observe(children as El.Children.Struct) as C;
         this.children = children as El.Setter<C>;
-        this.isInit = false;
-        return;
+        break;
       default:
         throw new Error(`TypedDOM: Invalid children type.`);
     }
+    this.isInit = false;
   }
   private $id = '';
   private get id(): string {
