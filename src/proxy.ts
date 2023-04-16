@@ -244,6 +244,7 @@ export class ElementProxy<
             continue;
           }
           else if (newChild === oldChild) {
+            assert(newChild.element === oldChild.element);
             continue;
           }
           else if (newChild.element.parentNode !== oldChild?.element.parentNode) {
@@ -251,6 +252,7 @@ export class ElementProxy<
             Listeners.of(newChild)?.haveConnectionListener() && addedChildren.push(newChild) && listeners.add(newChild);
           }
           assert(newChild !== oldChild);
+          assert(newChild.element !== oldChild?.element);
           isMutated = true;
         }
         if (container.firstChild) {
@@ -296,6 +298,7 @@ export class ElementProxy<
             continue;
           }
           else if (newChild === oldChild) {
+            assert(newChild.element === oldChild.element);
             continue;
           }
           else if (newChild.element.parentNode !== oldChild.element.parentNode) {
@@ -309,6 +312,7 @@ export class ElementProxy<
             Listeners.of(oldChild)?.haveConnectionListener() && removedChildren.push(oldChild) && listeners.del(oldChild);
           }
           assert(newChild !== oldChild);
+          assert(newChild.element !== oldChild.element);
           isMutated = true;
           this.isInternalUpdate = true;
           targetChildren[name] = newChild;
