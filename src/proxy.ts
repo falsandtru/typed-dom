@@ -105,7 +105,7 @@ export class ElementProxy<
         this.children = children as El.Setter<C>;
         break;
       case ElChildType.Array:
-        this.$children = [] as El.Children.Array as C;
+        this.$children = children as El.Children.Array as C;
         this.children = children as El.Setter<C>;
         break;
       case ElChildType.Struct:
@@ -230,11 +230,12 @@ export class ElementProxy<
           const newChild = sourceChildren[i];
           const oldChild = targetChildren[i];
           throwErrorIfUnavailable(newChild, container);
-          isMutated ||= newChild.element !== oldChild.element;
           if (newChild.element.parentNode !== container) {
             this.format(newChild);
+            isMutated = true;
           }
           else if (!this.isInit) {
+            isMutated ||= newChild.element !== oldChild.element;
             continue;
           }
           assert(!addedChildren.includes(newChild));
@@ -261,41 +262,35 @@ export class ElementProxy<
         break;
       }
       case ElChildType.Struct: {
-        if (this.isInit) {
-          const sourceChildren = children as El.Children.Struct;
-          for (const name in sourceChildren) {
-            if (!hasOwnProperty(sourceChildren, name)) continue;
-            const newChild = sourceChildren[name];
-            throwErrorIfUnavailable(newChild, container);
-            if (newChild.element.parentNode !== container) {
-              this.format(newChild);
-              container.appendChild(newChild.element);
-            }
-            assert(!addedChildren.includes(newChild));
-            Listeners.of(newChild)?.haveConnectionListener() && addedChildren.push(newChild) && listeners.add(newChild);
-            isMutated = true;
-          }
-          break;
-        }
         const sourceChildren = children as El.Children.Struct;
         const targetChildren = this.$children as El.Children.Struct;
         for (const name in sourceChildren) {
           if (!hasOwnProperty(sourceChildren, name)) continue;
           const newChild = sourceChildren[name];
           const oldChild = targetChildren[name];
-          if (!newChild || !oldChild) continue;
-          if (newChild === oldChild) continue;
-          throwErrorIfUnavailable(newChild, container);
-          if (newChild.element.parentNode !== oldChild.element.parentNode) {
+          if (!newChild) continue;
+          if (this.isInit) {
+            throwErrorIfUnavailable(newChild, container);
+            if (newChild.element.parentNode !== container) {
+              this.format(newChild);
+              container.appendChild(newChild.element);
+              isMutated = true;
+            }
+            assert(!addedChildren.includes(newChild));
+            Listeners.of(newChild)?.haveConnectionListener() && addedChildren.push(newChild) && listeners.add(newChild);
+          }
+          else if (newChild.element.parentNode !== oldChild.element.parentNode) {
+            if (newChild === oldChild) continue;
+            throwErrorIfUnavailable(newChild, container);
             this.format(newChild);
             container.replaceChild(newChild.element, oldChild.element);
             assert(!oldChild.element.parentNode);
+            isMutated = true;
             assert(!addedChildren.includes(newChild));
             Listeners.of(newChild)?.haveConnectionListener() && addedChildren.push(newChild) && listeners.add(newChild);
             assert(!removedChildren.includes(oldChild));
             Listeners.of(oldChild)?.haveConnectionListener() && removedChildren.push(oldChild) && listeners.del(oldChild);
           }
-          isMutated = true;
           this.isObserverUpdate = true;
           targetChildren[name] = newChild;
           assert(!this.isObserverUpdate);
