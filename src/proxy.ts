@@ -158,7 +158,7 @@ export class ElementProxy<
         return;
     }
   }
-  private isObserverUpdate = false;
+  private isInternalUpdate = false;
   private observe(children: El.Children.Struct): El.Children.Struct {
     return Object.defineProperties(children, Object.keys(children).reduce((acc, name) => {
       if (name in {}) throw new Error(`TypedDOM: Child names conflicted with the object property names.`);
@@ -170,14 +170,14 @@ export class ElementProxy<
           return child;
         },
         set: (newChild: El) => {
-          if (!this.isObserverUpdate) {
+          if (!this.isInternalUpdate) {
             this.children = { [name]: newChild } as El.Setter<C>;
           }
           else {
             child = newChild;
-            this.isObserverUpdate = false;
+            this.isInternalUpdate = false;
           }
-          assert(!this.isObserverUpdate);
+          assert(!this.isInternalUpdate);
         },
       };
       return acc;
@@ -197,7 +197,7 @@ export class ElementProxy<
     }
   }
   public set children(children: El.Setter<C>) {
-    assert(!this.isObserverUpdate);
+    assert(!this.isInternalUpdate);
     const container = this.container;
     const removedChildren: El[] = [];
     const addedChildren: El[] = [];
@@ -310,9 +310,9 @@ export class ElementProxy<
           }
           assert(newChild !== oldChild);
           isMutated = true;
-          this.isObserverUpdate = true;
+          this.isInternalUpdate = true;
           targetChildren[name] = newChild;
-          assert(!this.isObserverUpdate);
+          assert(!this.isInternalUpdate);
         }
         break;
       }
