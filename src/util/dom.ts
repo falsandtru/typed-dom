@@ -88,24 +88,22 @@ export function element<M extends SVGElementTagNameMap>(context: Document | Shad
 export function element<M extends TagNameMap>(context: Document | ShadowRoot, ns: NS.MathML): Factory<M>;
 export function element<M extends TagNameMap>(context: Document | ShadowRoot, ns: NS): Factory<M> {
   return (tag: string, attrs?: Attrs | Children, children?: Children) => {
-    const el = elem(context, ns, tag);
-    assert(el.attributes.length === 0);
-    assert(el.childNodes.length === 0);
     return !attrs || isChildren(attrs)
-      ? defineChildren(el, attrs ?? children)
-      : defineChildren(defineAttrs(el, attrs), children);
+      ? defineChildren(elem(context, ns, tag, {}), attrs ?? children)
+      : defineChildren(defineAttrs(elem(context, ns, tag, attrs), attrs), children);
   };
 }
 
-function elem(context: Document | ShadowRoot, ns: NS, tag: string): Element {
+function elem(context: Document | ShadowRoot, ns: NS, tag: string, attrs: Attrs): Element {
   if (!('createElement' in context)) throw new Error(`TypedDOM: Scoped custom elements are not supported on this browser.`);
+  const opts = 'is' in attrs ? { is: attrs['is'] as string } : undefined;
   switch (ns) {
     case NS.HTML:
-      return context.createElement(tag);
+      return context.createElement(tag, opts);
     case NS.SVG:
-      return context.createElementNS('http://www.w3.org/2000/svg', tag);
+      return context.createElementNS('http://www.w3.org/2000/svg', tag, opts);
     case NS.MathML:
-      return context.createElementNS('http://www.w3.org/1998/Math/MathML', tag);
+      return context.createElementNS('http://www.w3.org/1998/Math/MathML', tag, opts);
   }
 }
 
@@ -125,6 +123,10 @@ export function define<E extends Element | DocumentFragment | ShadowRoot>(node: 
 }
 function defineAttrs<E extends Element>(el: E, attrs: Attrs): E {
   for (const name of Object.keys(attrs)) {
+    switch (name) {
+      case 'is':
+        continue;
+    }
     const value = attrs[name];
     switch (typeof value) {
       case 'string':

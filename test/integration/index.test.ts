@@ -6,10 +6,13 @@ import i18next from 'i18next';
 
 declare global {
   interface ShadowHostHTMLElementTagNameMap {
-    'custom-tag': HTMLElement;
+    'custom-tag': HTMLCustomElement;
   }
   interface HTMLElementTagNameMap {
     'custom': HTMLElement;
+  }
+  interface HTMLCustomElement extends HTMLElement {
+    custom: true;
   }
 }
 
@@ -385,10 +388,26 @@ describe('Integration: Package', function () {
     });
 
     it('extend', function () {
-      window.customElements.define('custom-tag', class extends HTMLElement { });
+      assert(HTML.custom().element.outerHTML === '<custom></custom>');
+
+      window.customElements.define('custom-tag', class extends HTMLElement {
+        custom = true;
+      });
       assert(Shadow('custom-tag').element.outerHTML === '<custom-tag></custom-tag>');
       assert(HTML('custom-tag').element.outerHTML === '<custom-tag></custom-tag>');
-      assert(HTML.custom().element.outerHTML === '<custom></custom>');
+      assert(HTML('custom-tag').element.custom === true);
+
+      window.customElements.define('custom-div', class extends HTMLDivElement {
+        static get observedAttributes() {
+          return ['is', 'class'];
+        }
+        attributeChangedCallback(name: string) {
+          assert(name !== 'is');
+          this.textContent += name;
+        }
+      }, { extends: 'div' });
+      assert(HTML.div({ is: 'custom-div' }).element.outerHTML === '<div is="custom-div"></div>');
+      assert(HTML.div({ is: 'custom-div', class: '' }).element.outerHTML === '<div is="custom-div" class="">class</div>');
     });
 
     it('swap', function () {

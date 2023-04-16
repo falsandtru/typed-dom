@@ -96,7 +96,6 @@ export class ElementProxy<
     }
     throwErrorIfUnavailable(this);
     this.element[symbols.proxy] = this;
-    assert.deepStrictEqual({ ...this.element }, {});
     switch (this.type) {
       case ElChildType.Void:
         break;
