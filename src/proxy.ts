@@ -174,9 +174,10 @@ export class ElementProxy<
             this.children = { [name]: newChild } as El.Setter<C>;
           }
           else {
+            child = newChild;
             this.isObserverUpdate = false;
           }
-          child = newChild;
+          assert(!this.isObserverUpdate);
         },
       };
       return acc;
@@ -312,7 +313,6 @@ export class ElementProxy<
           this.isObserverUpdate = true;
           targetChildren[name] = newChild;
           assert(!this.isObserverUpdate);
-          this.isObserverUpdate = false;
         }
         break;
       }
