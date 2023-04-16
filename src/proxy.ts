@@ -142,18 +142,24 @@ export class ElementProxy<
         return this.$query = `.${this.id}`;
     }
   }
-  private scope(child: El): void {
-    if (child.tag.toUpperCase() !== 'STYLE') return;
-    const source = child.element.innerHTML;
-    if (!source.includes(':scope')) return;
-    const style = source.replace(
-      /(^|[>~+,}/])(\s*):scope(?!\w)(?=\s*[A-Za-z#.:[>~+,{/])/g,
-      (...$) => `${$[1]}${$[2]}${this.query}`);
-    assert(!this.$query || style !== source);
-    if (style === source) return;
-    assert(/^[:#.][a-z][\w-]+$/i.test(this.query));
-    child.element.textContent = style;
-    assert(child.element.children.length === 0);
+  private format(child: El): void {
+    switch (child.tag.toUpperCase()) {
+      case 'STYLE': {
+        const source = child.element.innerHTML;
+        if (!source.includes(':scope')) return;
+        const style = source.replace(
+          /(^|[>~+,}/])(\s*):scope(?!\w)(?=\s*[A-Za-z#.:[>~+,{/])/g,
+          (...$) => `${$[1]}${$[2]}${this.query}`);
+        assert(!this.$query || style !== source);
+        if (style === source) return;
+        assert(/^[:#.][a-z][\w-]+$/i.test(this.query));
+        child.element.textContent = style;
+        assert(child.element.children.length === 0);
+        return;
+      }
+      default:
+        return;
+    }
   }
   private isObserverUpdate = false;
   private observe(children: El.Children.Struct): El.Children.Struct {
@@ -229,7 +235,7 @@ export class ElementProxy<
           throwErrorIfUnavailable(newChild, container);
           isMutated ||= newChild.element !== oldChild.element;
           if (newChild.element.parentNode !== container) {
-            this.scope(newChild);
+            this.format(newChild);
           }
           else if (!this.isInit) {
             continue;
@@ -265,7 +271,7 @@ export class ElementProxy<
             const newChild = sourceChildren[name];
             throwErrorIfUnavailable(newChild, container);
             if (newChild.element.parentNode !== container) {
-              this.scope(newChild);
+              this.format(newChild);
               container.appendChild(newChild.element);
             }
             assert(!addedChildren.includes(newChild));
@@ -284,7 +290,7 @@ export class ElementProxy<
           if (newChild === oldChild) continue;
           throwErrorIfUnavailable(newChild, container);
           if (newChild.element.parentNode !== oldChild.element.parentNode) {
-            this.scope(newChild);
+            this.format(newChild);
             container.replaceChild(newChild.element, oldChild.element);
             assert(!oldChild.element.parentNode);
             assert(!addedChildren.includes(newChild));
