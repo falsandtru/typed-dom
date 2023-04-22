@@ -92,7 +92,7 @@ export class ElementProxy<
         this.type = ElChildType.Struct;
         break;
       default:
-        throw new Error(`TypedDOM: Invalid children type`);
+        throw new TypeError(`TypedDOM: Invalid children type`);
     }
     throwErrorIfUnavailable(this);
     this.element[symbols.proxy] = this;
@@ -112,7 +112,7 @@ export class ElementProxy<
         this.children = children as El.Setter<C>;
         break;
       default:
-        throw new Error(`TypedDOM: Invalid children type`);
+        throw new TypeError(`TypedDOM: Invalid children type`);
     }
     this.isInit = false;
   }
