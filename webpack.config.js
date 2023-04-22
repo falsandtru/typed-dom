@@ -82,7 +82,7 @@ module.exports = env => {
       });
     case 'bench':
       return merge(config, {
-        entry: glob.sync('./benchmark/**/*.ts', { absolute: true }),
+        entry: glob.sync('./benchmark/**/*.ts', { absolute: true }).sort(),
         module: {
           rules: [
             {
