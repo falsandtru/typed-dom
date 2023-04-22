@@ -139,7 +139,8 @@ export class ElementProxy<
     }
   }
   private format(child: El): void {
-    switch (child.tag.toUpperCase()) {
+    switch (child.tag) {
+      case 'style':
       case 'STYLE': {
         const source = child.element.innerHTML;
         if (!source.includes(':scope')) return;
