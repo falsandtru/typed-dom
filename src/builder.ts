@@ -98,7 +98,7 @@ function handle
     const el = factory
       ? define(factory(baseFactory, tag, attrs ?? {}, children) as unknown as Element, attrs)
       : baseFactory(tag, attrs) as unknown as Element;
-    if (tag.toLowerCase() !== el.tagName.toLowerCase()) throw new Error(`TypedDOM: Expected tag name is "${tag.toLowerCase()}" but actually "${el.tagName.toLowerCase()}".`);
+    if (tag.toLowerCase() !== el.tagName.toLowerCase()) throw new Error(`TypedDOM: Expected tag name is "${tag.toLowerCase()}" but actually "${el.tagName.toLowerCase()}"`);
     return el;
   }
 }
