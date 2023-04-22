@@ -95,11 +95,15 @@ function handle
     attrs: Attrs | undefined,
     children: El.Children,
   ): Element {
-    const el = factory
-      ? define(factory(baseFactory, tag, attrs ?? {}, children) as unknown as Element, attrs)
-      : baseFactory(tag, attrs) as unknown as Element;
-    if (tag.toLowerCase() !== el.tagName.toLowerCase()) throw new Error(`TypedDOM: Expected tag name is "${tag.toLowerCase()}" but actually "${el.tagName.toLowerCase()}"`);
-    return el;
+    if(!factory) return baseFactory(tag, attrs) as unknown as Element;
+    const el = define(factory(baseFactory, tag, attrs ?? {}, children) as unknown as Element, attrs);
+    switch (el.tagName) {
+      case tag:
+      case tag.toUpperCase():
+        return el;
+      default:
+        throw new Error(`TypedDOM: Expected tag name is "${tag.toLowerCase()}" but actually "${el.tagName.toLowerCase()}"`);
+    }
   }
 }
 
