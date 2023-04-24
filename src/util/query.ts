@@ -2,6 +2,7 @@ import type { ParseSelector } from 'typed-query-selector/parser';
 
 export function querySelectorWith<T extends keyof HTMLElementTagNameMap>(node: ParentNode, selector: T): HTMLElementTagNameMap[T] | null;
 export function querySelectorWith<T extends keyof SVGElementTagNameMap>(node: ParentNode, selector: T): SVGElementTagNameMap[T] | null;
+export function querySelectorWith<T extends keyof MathMLElementTagNameMap>(node: ParentNode, selector: T): MathMLElementTagNameMap[T] | null;
 export function querySelectorWith<T extends string>(node: ParentNode, selector: T): ParseSelector<T>;
 export function querySelectorWith<T extends Element>(node: ParentNode, selector: string): T | null;
 export function querySelectorWith(node: ParentNode | Element, selector: string): Element | null {
@@ -12,6 +13,7 @@ export function querySelectorWith(node: ParentNode | Element, selector: string):
 
 export function querySelectorAllWith<T extends keyof HTMLElementTagNameMap>(node: ParentNode, selector: T): HTMLElementTagNameMap[T][];
 export function querySelectorAllWith<T extends keyof SVGElementTagNameMap>(node: ParentNode, selector: T): SVGElementTagNameMap[T][];
+export function querySelectorAllWith<T extends keyof MathMLElementTagNameMap>(node: ParentNode, selector: T): MathMLElementTagNameMap[T][];
 export function querySelectorAllWith<T extends string>(node: ParentNode, selector: T): ParseSelector<T>[];
 export function querySelectorAllWith<T extends Element>(node: ParentNode, selector: string): T[];
 export function querySelectorAllWith(node: ParentNode | Element, selector: string): Element[] {
@@ -28,6 +30,7 @@ export function querySelectorAllWith(node: ParentNode | Element, selector: strin
 // for文との二重反復をコールバックで解消しても変化なし
 export function querySelectorAll<T extends keyof HTMLElementTagNameMap>(node: ParentNode, selector: T): HTMLElementTagNameMap[T][];
 export function querySelectorAll<T extends keyof SVGElementTagNameMap>(node: ParentNode, selector: T): SVGElementTagNameMap[T][];
+export function querySelectorAll<T extends keyof MathMLElementTagNameMap>(node: ParentNode, selector: T): MathMLElementTagNameMap[T][];
 export function querySelectorAll<T extends string>(node: ParentNode, selector: T): ParseSelector<T>[];
 export function querySelectorAll<T extends Element>(node: ParentNode, selector: string): T[];
 export function querySelectorAll(node: ParentNode | Element, selector: string): Element[] {

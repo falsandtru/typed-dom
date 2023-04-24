@@ -29,7 +29,7 @@ declare global {
 export const enum NS {
   HTML = 'HTML',
   SVG = 'SVG',
-  MathML = 'MathML',
+  Math = 'MathML',
 }
 
 // {HTML,SVG,}ElementEventMapを使用しないがEvent型しか使われてないので問題ない
@@ -85,7 +85,7 @@ export function text(source: string): Text {
 
 export function element<M extends HTMLElementTagNameMap>(context: Document | ShadowRoot, ns: NS.HTML): Factory<M>;
 export function element<M extends SVGElementTagNameMap>(context: Document | ShadowRoot, ns: NS.SVG): Factory<M>;
-export function element<M extends TagNameMap>(context: Document | ShadowRoot, ns: NS.MathML): Factory<M>;
+export function element<M extends MathMLElementTagNameMap>(context: Document | ShadowRoot, ns: NS.Math): Factory<M>;
 export function element<M extends TagNameMap>(context: Document | ShadowRoot, ns: NS): Factory<M> {
   return (tag: string, attrs?: Attrs | Children, children?: Children) => {
     return !attrs || isChildren(attrs)
@@ -102,7 +102,7 @@ function elem(context: Document | ShadowRoot, ns: NS, tag: string, attrs: Attrs)
       return context.createElement(tag, opts);
     case NS.SVG:
       return context.createElementNS('http://www.w3.org/2000/svg', tag, opts);
-    case NS.MathML:
+    case NS.Math:
       return context.createElementNS('http://www.w3.org/1998/Math/MathML', tag, opts);
   }
 }
