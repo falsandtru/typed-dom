@@ -322,6 +322,20 @@ import { SVG } from 'typed-dom';
 SVG.svg();
 ```
 
+### Math: { [tag]: (attrs?, children?, factory?) => El; (tag: string, ...): El; };
+
+Create an MathML element proxy.
+
+- attrs: Record<string, string | EventListener | null | undefined>
+- children: undefined | string | El[] | Record<string, El> | DocumentFragment
+- factory: (svg, tag, attrs, children) => MathMLElement
+
+```ts
+import { Math } from 'typed-dom';
+
+Math.math();
+```
+
 ### Shadow: { [tag]: (attrs?, children?, factory?) => El; (tag: string, ...): El; };
 
 Create an HTML element proxy assigning the children to the own open shadow DOM.
@@ -347,10 +361,12 @@ import { API, NS, shadow, element } from 'typed-dom';
 
 const html = element<HTMLElementTagNameMap>(document, NS.HTML);
 const svg = element<SVGElementTagNameMap>(document, NS.SVG);
+const math = element<MathMLElementTagNameMap>(document, NS.Math);
 
 const Shadow = API<ShadowHostHTMLElementTagNameMap>(html, shadow);
 const HTML = API<HTMLElementTagNameMap>(html);
 const SVG = API<SVGElementTagNameMap>(svg);
+const Math = API<MathMLElementTagNameMap>(math);
 ```
 
 A closed shadow DOM API can be created as follows:
@@ -436,6 +452,7 @@ export const Shadow = API<ShadowHostScopedCustomHTMLElementTagNameMap>(html, sha
 - frag
 - html
 - svg
+- math
 - text
 - define
 - append

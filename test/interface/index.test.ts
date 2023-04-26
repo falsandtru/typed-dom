@@ -1,6 +1,6 @@
 import {
-  API, Shadow, HTML, SVG, NS,
-  shadow, frag, html, svg, text, element, define, append, prepend, defrag,
+  API, Shadow, HTML, SVG, Math, NS,
+  shadow, frag, html, svg, math, text, element, define, append, prepend, defrag,
   listen, once, bind, delegate, currentTarget,
   querySelectorAll, querySelectorWith, querySelectorAllWith,
   identity,
@@ -25,6 +25,10 @@ describe('Interface: Package', function () {
       assert(typeof SVG === 'function');
     });
 
+    it('Math', function () {
+      assert(typeof Math === 'function');
+    });
+
   });
 
   describe('Native', function () {
@@ -47,6 +51,10 @@ describe('Interface: Package', function () {
 
     it('svg', function () {
       assert(typeof svg === 'function');
+    });
+
+    it('math', function () {
+      assert(typeof math === 'function');
     });
 
     it('text', function () {

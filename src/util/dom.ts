@@ -78,6 +78,7 @@ export function frag(children?: Children): DocumentFragment {
 
 export const html = element<HTMLElementTagNameMap>(document, NS.HTML);
 export const svg = element<SVGElementTagNameMap>(document, NS.SVG);
+export const math = element<MathMLElementTagNameMap>(document, NS.Math);
 
 export function text(source: string): Text {
   return document.createTextNode(source);

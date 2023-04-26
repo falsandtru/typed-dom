@@ -1,5 +1,5 @@
 import { El, ElementProxy } from './proxy';
-import { Factory, TagNameMap, Attrs, shadow, html, svg, define } from './util/dom';
+import { Factory, TagNameMap, Attrs, shadow, html, svg, math, define } from './util/dom';
 
 export type API
   <M extends TagNameMap> =
@@ -14,6 +14,7 @@ export function API
 export const Shadow = API<ShadowHostHTMLElementTagNameMap>(html, shadow);
 export const HTML = API<HTMLElementTagNameMap>(html);
 export const SVG = API<SVGElementTagNameMap>(svg);
+export const Math = API<MathMLElementTagNameMap>(math);
 
 type K<M> = keyof M & string;
 type E<V> = Extract<V, Element>;
