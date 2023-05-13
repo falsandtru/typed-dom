@@ -252,7 +252,7 @@ export function defrag(nodes: ArrayLike<Node | string>): (Node | string)[] {
   assert(Array.from(nodes).every(n => typeof n === 'string' || n instanceof Node));
   const acc: (Node | string)[] = [];
   let appendable = false;
-  for (let i = 0; i < nodes.length; ++i) {
+  for (let i = 0, len = nodes.length; i < len; ++i) {
     const node = nodes[i];
     if (node === '') continue;
     if (typeof node === 'string') {
