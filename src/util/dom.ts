@@ -254,16 +254,15 @@ export function defrag(nodes: ArrayLike<Node | string>): (Node | string)[] {
   let appendable = false;
   for (let i = 0, len = nodes.length; i < len; ++i) {
     const node = nodes[i];
-    if (node === '') continue;
-    if (typeof node === 'string') {
+    if (typeof node === 'object') {
+      acc.push(node);
+      appendable = false;
+    }
+    else if (node !== '') {
       appendable
         ? acc[acc.length - 1] += node
         : acc.push(node);
       appendable = true;
-    }
-    else {
-      acc.push(node);
-      appendable = false;
     }
   }
   return acc;
