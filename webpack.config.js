@@ -104,7 +104,7 @@ module.exports = env => {
         entry: Object.fromEntries(glob.sync('./{index,src/util/*}.ts', {
           absolute: true,
           ignore: './**/*.test.ts',
-        }).map(path => [path.match(/[\w.]+(?=\.)/)[0], path])).sort(),
+        }).map(path => [path.match(/[\w.]+(?=\.)/)[0], path]).sort()),
         output: {
           filename: '[name].js',
         },
