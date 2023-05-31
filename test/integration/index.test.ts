@@ -57,6 +57,16 @@ describe('Integration: Package', function () {
       assert(dom.children.every(child => child.element instanceof HTMLAnchorElement));
     });
 
+    it('node', function () {
+      const dom = Shadow.p(frag(['a', html('br'), 'b']));
+      assert(dom.element.shadowRoot?.innerHTML === 'a<br>b');
+      assert(dom.children instanceof DocumentFragment);
+      assert(dom.children.childNodes.length === 0);
+      dom.children = frag(['c']);
+      assert(dom.element.shadowRoot?.innerHTML === 'c');
+      assert(dom.children.childNodes.length === 0);
+    });
+
     it('text', function () {
       const dom = HTML.p('a');
       assert(dom.element.outerHTML === '<p>a</p>');
@@ -77,16 +87,6 @@ describe('Integration: Package', function () {
         h(tag, { id: 'test' }));
       assert(dom.element.id === 'test');
       assert(dom.children === 'a');
-    });
-
-    it('node', function () {
-      const dom = Shadow.p(frag(['a', html('br'), 'b']));
-      assert(dom.element.shadowRoot?.innerHTML === 'a<br>b');
-      assert(dom.children instanceof DocumentFragment);
-      assert(dom.children.childNodes.length === 0);
-      dom.children = frag(['c']);
-      assert(dom.element.shadowRoot?.innerHTML === 'c');
-      assert(dom.children.childNodes.length === 0);
     });
 
     it('collection', function () {

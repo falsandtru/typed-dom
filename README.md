@@ -71,14 +71,14 @@ export interface El<
 export namespace El {
   export type Children =
     | Children.Void
-    | Children.Text
     | Children.Node
+    | Children.Text
     | Children.Array
     | Children.Struct;
   export namespace Children {
     export type Void = void;
-    export type Text = string;
     export type Node = DocumentFragment;
+    export type Text = string;
     export type Array = readonly El[];
     export type Struct = { [field: string]: El; };
   }
