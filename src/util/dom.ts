@@ -49,6 +49,7 @@ export interface Factory<M extends TagNameMap> {
 }
 
 namespace caches {
+  // Closed only.
   export const shadows = new WeakMap<Element, ShadowRoot>();
   export const shadow = memoize((el: Element, opts: ShadowRootInit) => el.attachShadow(opts), shadows);
   export const fragment = document.createDocumentFragment();
@@ -68,7 +69,7 @@ export function shadow<M extends ShadowHostHTMLElementTagNameMap>(el: keyof M & 
       ? el.shadowRoot ?? caches.shadows.get(el) ?? el.attachShadow({ mode: 'open' })
       : opts.mode === 'open'
         ? el.shadowRoot ?? el.attachShadow(opts)
-        : caches.shadows.get(el) ?? caches.shadow(el, opts),
+        : caches.shadow(el, opts),
     children);
 }
 
