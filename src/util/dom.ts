@@ -200,7 +200,7 @@ function defineChildren<N extends ParentNode & Node>(node: N, children: Children
   if (typeof children === 'string') {
     node.textContent = children;
   }
-  else if (isArray(children) && !node.firstChild) {
+  else if ((isArray(children) || !(Symbol.iterator in children)) && !node.firstChild) {
     for (let i = 0; i < children.length; ++i) {
       const child = children[i];
       typeof child === 'object'
@@ -223,6 +223,14 @@ export function append<N extends ParentNode & Node>(node: N, children: Children)
   if (typeof children === 'string') {
     node.append(children);
   }
+  else if (isArray(children) || !(Symbol.iterator in children)) {
+    for (let i = 0; i < children.length; ++i) {
+      const child = children[i];
+      typeof child === 'object'
+        ? node.appendChild(child)
+        : node.append(child);
+    }
+  }
   else {
     for (const child of children) {
       typeof child === 'object'
@@ -237,6 +245,14 @@ export function prepend<N extends ParentNode & Node>(node: N, children: Children
   if (children === undefined) return node;
   if (typeof children === 'string') {
     node.prepend(children);
+  }
+  else if (isArray(children) || !(Symbol.iterator in children)) {
+    for (let i = 0; i < children.length; ++i) {
+      const child = children[i];
+      typeof child === 'object'
+        ? node.insertBefore(child, null)
+        : node.prepend(child);
+    }
   }
   else {
     for (const child of children) {
