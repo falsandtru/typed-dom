@@ -701,6 +701,10 @@ describe('Integration: Package', function () {
     });
 
     it('translate', function () {
+      interface TransDataMap {
+        'Greeting': { name: string; };
+      }
+
       const translator = i18next.createInstance({
         lng: 'en',
         resources: {
@@ -708,12 +712,9 @@ describe('Integration: Package', function () {
             translation: {
               'Greeting': 'Hello, {{name}}.',
             },
-          },
+          } satisfies Record<string, { [P in keyof TransDataMap]: string; }>,
         },
       });
-      interface TransDataMap {
-        'Greeting': { name: string; };
-      }
 
       function intl
         <K extends keyof TransDataMap>

@@ -229,6 +229,10 @@ Create a helper factory function for i18n.
 import { HTML, El, html, define } from 'typed-dom';
 import i18next from 'i18next';
 
+interface TransDataMap {
+  'Greeting': { name: string; };
+}
+
 const translator = i18next.createInstance({
   lng: 'en',
   resources: {
@@ -236,12 +240,9 @@ const translator = i18next.createInstance({
       translation: {
         'Greeting': 'Hello, {{name}}.',
       },
-    },
+    } satisfies Record<string, { [P in keyof TransDataMap]: string; }>,
   },
 });
-interface TransDataMap {
-  'Greeting': { name: string; };
-}
 
 function intl
   <K extends keyof TransDataMap>
