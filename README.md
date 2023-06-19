@@ -240,9 +240,10 @@ const translator = i18next.createInstance({
       translation: {
         'Greeting': 'Hello, {{name}}.',
       },
-    } satisfies Record<string, { [P in keyof TransDataMap]: string; }>,
-  },
+    },
+  } satisfies Record<string, { translation: { [P in keyof TransDataMap]: string; }; }>,
 });
+translator.init();
 
 function intl
   <K extends keyof TransDataMap>
@@ -250,10 +251,8 @@ function intl
   : El.Factory<HTMLElementTagNameMap, El.Children.Void> {
   return (html, tag) => {
     const el = factory?.(html, tag, {}) ?? html(tag);
-    translator.init((err, t) =>
-      el.textContent = err
-        ? '{% Failed to initialize the translator. %}'
-        : t(children, data) ?? `{% Failed to translate "${children}". %}`);
+    el.textContent = translator.t(children, data)
+      ?? `{% Failed to translate "${children}". %}`;
     return el;
   };
 }
@@ -272,11 +271,10 @@ function data
   : El.Factory<HTMLElementTagNameMap, K> {
   return (html, tag, _, children) =>
     define(factory?.(html, tag, {}, children) ?? html(tag), {
-      onmutate: ev =>
-        void translator.init((err, t) =>
-          ev.currentTarget.textContent = err
-            ? '{% Failed to initialize the translator. %}'
-            : t(children, data) ?? `{% Failed to translate "${children}". %}`),
+      onmutate: ev => {
+        ev.currentTarget.textContent = translator.t(children, data)
+          ?? `{% Failed to translate "${children}". %}`;
+      },
     });
 }
 
