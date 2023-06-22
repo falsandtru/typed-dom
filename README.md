@@ -82,9 +82,7 @@ export namespace El {
     export type Array = readonly El[];
     export type Struct = { [field: string]: El; };
   }
-  export type Getter<C extends El.Children> =
-    C extends Children.Struct ? C :
-    C;
+  export type Getter<C extends El.Children> = C;
   export type Setter<C extends El.Children> =
     C extends Children.Struct ? Partial<C> :
     C;
