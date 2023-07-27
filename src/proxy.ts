@@ -68,9 +68,8 @@ export class ElementProxy<
     public readonly tag: T,
     public readonly element: E,
     children: C,
-    container: Element | ShadowRoot = element,
+    private readonly container: Element | ShadowRoot = element,
   ) {
-    this.container = container;
     this.$children = children as C;
     const type = typeof children;
     switch (true) {
@@ -181,7 +180,6 @@ export class ElementProxy<
     return children;
   }
   private readonly type: ElChildType;
-  private readonly container: Element | ShadowRoot;
   private isInit = true;
   private $children: C;
   public readonly [symbols.listeners] = new Listeners(this.element);
