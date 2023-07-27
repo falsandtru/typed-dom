@@ -113,27 +113,11 @@ export class ElementProxy<
     }
     this.isInit = false;
   }
-  private $id = '';
-  private get id(): string {
-    if (this.$id) return this.$id;
-    this.$id = this.element.id;
-    if (/^[a-z][\w-]*$/i.test(this.$id)) return this.$id;
-    this.$id = `rnd-${identity()}`;
-    assert(!this.element.classList.contains(this.$id));
-    this.element.classList.add(this.$id);
-    return this.$id;
-  }
-  private $query = '';
-  private get query(): string {
-    if (this.$query) return this.$query;
-    switch (true) {
-      case this.element !== this.container:
-        return this.$query = ':host';
-      case this.id === this.element.id:
-        return this.$query = `#${this.id}`;
-      default:
-        return this.$query = `.${this.id}`;
-    }
+  private readonly $selector = this.element === this.container
+    ? new Selector(this.element)
+    : undefined;
+  private get selector(): string {
+    return this.$selector?.selector ?? ':host';
   }
   private format(child: El): void {
     switch (child.tag) {
@@ -143,10 +127,8 @@ export class ElementProxy<
         if (!source.includes('$scope')) return;
         const style = source.replace(
           /(^|[>~+,}/])(\s*)\$scope(?!\w)(?=\s*[A-Za-z#.:[>~+,{/])/g,
-          (...$) => `${$[1]}${$[2]}${this.query}`);
-        assert(!this.$query || style !== source);
+          (...$) => `${$[1]}${$[2]}${this.selector}`);
         if (style === source) return;
-        assert(/^[:#.][a-z][\w-]+$/i.test(this.query));
         child.element.textContent = style;
         assert(child.element.children.length === 0);
         return;
@@ -320,6 +302,35 @@ export class ElementProxy<
     listeners.dispatchConnectEvent(addedChildren);
     assert(isMutated || removedChildren.length + addedChildren.length === 0);
     isMutated && listeners.dispatchMutateEvent();
+  }
+}
+
+class Selector {
+  constructor(private readonly element: Element) {
+  }
+  private $id = '';
+  private get id(): string {
+    if (this.$id) return this.$id;
+    this.$id = this.element.id;
+    if (/^[a-z][\w-]*$/i.test(this.$id)) return this.$id;
+    this.$id = `rnd-${identity()}`;
+    assert(!this.element.classList.contains(this.$id));
+    assert(/^[a-z][\w-]*$/i.test(this.$id));
+    this.element.classList.add(this.$id);
+    assert(this.element.matches(`.${this.$id}`));
+    return this.$id;
+  }
+  private $selector = '';
+  public get selector(): string {
+    if (this.$selector) return this.$selector;
+    switch (true) {
+      //case this.element !== this.container:
+      //  return this.$query = ':host';
+      case this.id === this.element.id:
+        return this.$selector = `#${this.id}`;
+      default:
+        return this.$selector = `.${this.id}`;
+    }
   }
 }
 
