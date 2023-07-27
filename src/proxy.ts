@@ -246,6 +246,7 @@ export class ElementProxy<
           }
           else if (newChild.element.parentNode !== oldChild?.element.parentNode) {
             assert(!addedChildren.includes(newChild));
+            this.format(newChild);
             Listeners.of(newChild)?.haveConnectionListener() && addedChildren.push(newChild) && listeners.add(newChild);
           }
           assert(newChild !== oldChild);
