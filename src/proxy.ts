@@ -125,7 +125,7 @@ export class ElementProxy<
       case 'STYLE': {
         const source = child.element.innerHTML;
         const style = source.replace(
-          /(^|[>~+,}/])(\s*)\$scope(?!\w)(?=\s*[A-Za-z#.:[>~+,{/])/g,
+          /(^|[>~+,/}])(\s*)\$scope(?![\w\-$])(?=\s*[\w\-$>~+,/#.:[{])/g,
           (...$) => `${$[1]}${$[2]}${this.selector}`);
         if (style === source) return;
         child.element.textContent = style;
