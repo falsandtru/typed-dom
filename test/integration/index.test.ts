@@ -344,10 +344,13 @@ describe('Integration: Package', function () {
         '$scope,$scope {}',
         '$scope{}$scope{}',
         '  $scope  {}',
+        '[$scope]{}',
         '$scope/* */ {}',
         '/* */$scope {}',
-        '/* $scope */',
-        '$scope{ content: " $scope "; }',
+        '/*}$scope{*/',
+        '//}$scope{',
+        '$scope{ content: "}$scope{"; }',
+        "$scope{ content: '}$scope{'; }",
       ].join('\n');
       const style = [
         '#id{}',
@@ -360,10 +363,13 @@ describe('Integration: Package', function () {
         '#id,#id {}',
         '#id{}#id{}',
         '  #id  {}',
+        '[$scope]{}',
         '#id/* */ {}',
         '/* */#id {}',
-        '/* $scope */',
-        '#id{ content: " $scope "; }',
+        '/*}$scope{*/',
+        '//}$scope{',
+        '#id{ content: "}$scope{"; }',
+        "#id{ content: '}$scope{'; }",
       ].join('\n');
       const id = 'id';
       assert(HTML.div({ id }, [HTML.style(template)]).children[0].element.innerHTML === style);

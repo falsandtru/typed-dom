@@ -123,11 +123,11 @@ export class ElementProxy<
     switch (child.tag) {
       case 'style':
       case 'STYLE': {
-        const source = child.element.innerHTML;
-        const style = source.replace(
-          /(^|[>~+,/}])(\s*)\$scope(?![\w\-$])(?=\s*[\w\-$>~+,/#.:[{])/g,
-          (...$) => `${$[1]}${$[2]}${this.selector}`);
-        if (style === source) return;
+        let changed = '';
+        const style = child.element.innerHTML.replace(
+          /(?<![\w\-$\[])\$scope(?![\w\-$])|"(?:[^"]|\\.)+"?|'(?:[^']|\\.)+'?|\/\*(?:(?!\*\/).)+(?:\*\/)?|\/\/[^\r\n]+/sg,
+          (...$) => $[0][0] === '$' ? changed = this.selector : $[0]);
+        if (!changed) return;
         child.element.textContent = style;
         assert(child.element.children.length === 0);
         return;
