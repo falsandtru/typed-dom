@@ -125,7 +125,7 @@ export class ElementProxy<
       case 'STYLE': {
         let changed = '';
         const style = child.element.innerHTML.replace(
-          /(?<![\w\-$\[])\$scope(?![\w\-$])|"(?:[^"]|\\.)+"?|'(?:[^']|\\.)+'?|\/\*(?:(?!\*\/).)+(?:\*\/)?|\/\/[^\r\n]+/sg,
+          /(?<![\w\-$\[])\$scope(?![\w\-$])|"(?:\\.|[^\\"])+"?|'(?:\\.|[^\\'])+'?|\/\*(?:(?!\*\/).)+(?:\*\/)?|\/\/[^\r\n]+/sg,
           (...$) => $[0][0] === '$' ? changed = this.selector : $[0]);
         if (!changed) return;
         child.element.textContent = style;
