@@ -343,18 +343,34 @@ describe('Integration: Package', function () {
         '$scope>div {}',
         '$scope,$scope {}',
         '$scope{}$scope{}',
+        '  $scope  {}',
         '$scope/* */ {}',
         '/* */$scope {}',
-        '  $scope  {}',
+        '/* $scope */',
+        '$scope{ content: " $scope "; }',
+      ].join('\n');
+      const style = [
+        '#id{}',
+        '#id:empty {}',
+        '#id[id] {}',
+        '#id#id {}',
+        '#id.class {}',
+        '#id div {}',
+        '#id>div {}',
+        '#id,#id {}',
+        '#id{}#id{}',
+        '  #id  {}',
+        '#id/* */ {}',
+        '/* */#id {}',
+        '/* $scope */',
+        '#id{ content: " $scope "; }',
       ].join('\n');
       const id = 'id';
-      const style = template.replace(/\$scope/g, `#${id}`);
       assert(HTML.div({ id }, [HTML.style(template)]).children[0].element.innerHTML === style);
       assert(HTML.div({ id }, { style: HTML.style(template) }).children.style.element.innerHTML === style);
       assert(HTML.div([HTML.style('$scope {}')]).element.className.match(/^rnd-\w+$/));
       assert(Shadow.div([HTML.style('$scope {}')]).element.outerHTML === '<div></div>');
       assert(Shadow.div([HTML.style('$scope {}')]).children[0].element.innerHTML === ':host {}');
-      assert(Shadow.div([HTML.style('/* $scope */$scope/* $scope */{content:" $scope "}')]).children[0].element.innerHTML === '/* $scope */:host/* $scope */{content:" $scope "}');
       assert(HTML.div([HTML.style('<script>')]).children[0].element.children.length === 0);
       assert(HTML.div([HTML.style('$scope{}<script>')]).children[0].element.children.length === 0);
     });
