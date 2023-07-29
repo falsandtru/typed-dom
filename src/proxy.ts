@@ -210,9 +210,9 @@ export class ElementProxy<
           throwErrorIfUnavailable(newChild, container);
           if (this.isInit) {
             assert(newChild === oldChild);
+            this.format(newChild);
             const hasListener = Listeners.of(newChild)?.haveConnectionListener();
             if (newChild.element.parentNode !== container) {
-              this.format(newChild);
               isMutated = true;
               assert(!addedChildren.includes(newChild));
               hasListener && addedChildren.push(newChild);
@@ -228,8 +228,8 @@ export class ElementProxy<
             continue;
           }
           else if (newChild.element.parentNode !== oldChild?.element.parentNode) {
-            assert(!addedChildren.includes(newChild));
             this.format(newChild);
+            assert(!addedChildren.includes(newChild));
             Listeners.of(newChild)?.haveConnectionListener() && addedChildren.push(newChild) && listeners.add(newChild);
           }
           assert(newChild !== oldChild);
@@ -261,9 +261,9 @@ export class ElementProxy<
           if (this.isInit) {
             throwErrorIfUnavailable(newChild, container);
             assert(newChild === oldChild);
+            this.format(newChild);
             const hasListener = Listeners.of(newChild)?.haveConnectionListener();
             if (newChild.element.parentNode !== container) {
-              this.format(newChild);
               container.appendChild(newChild.element);
               isMutated = true;
               assert(!addedChildren.includes(newChild));
