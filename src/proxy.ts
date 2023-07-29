@@ -217,6 +217,9 @@ export class ElementProxy<
               assert(!addedChildren.includes(newChild));
               hasListener && addedChildren.push(newChild);
             }
+            else {
+              isMutated ||= newChild.element !== container.childNodes[i];
+            }
             hasListener && listeners.add(newChild);
             continue;
           }
