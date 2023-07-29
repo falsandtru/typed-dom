@@ -236,7 +236,9 @@ export class ElementProxy<
           assert(newChild.element !== oldChild?.element);
           isMutated = true;
         }
-        container.replaceChildren(...sourceChildren.map(c => c.element));
+        if (isMutated || sourceChildren.length === 0 && container.firstChild) {
+          container.replaceChildren(...sourceChildren.map(c => c.element));
+        }
         this.$children = sourceChildren as C;
         for (let i = 0; i < targetChildren.length; ++i) {
           const oldChild = targetChildren[i];
