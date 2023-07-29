@@ -185,7 +185,8 @@ export class ElementProxy<
       case ElChildType.Node:
         this.$children = children as C;
         container.replaceChildren(children as El.Children.Node);
-        return;
+        isMutated = true;
+        break;
       case ElChildType.Text: {
         if (listeners.mutation) {
           const newText = children;
