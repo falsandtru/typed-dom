@@ -208,8 +208,8 @@ export class ElementProxy<
           const newChild = sourceChildren[i];
           const oldChild = targetChildren[i];
           if (this.isInit) {
-            throwErrorIfUnavailable(newChild, container);
             assert(newChild === oldChild);
+            throwErrorIfUnavailable(newChild, container);
             this.format(newChild);
             const hasListener = Listeners.of(newChild)?.haveConnectionListener();
             if (newChild.element.parentNode !== container) {
@@ -260,8 +260,8 @@ export class ElementProxy<
           const oldChild = targetChildren[name];
           if (!newChild) continue;
           if (this.isInit) {
-            throwErrorIfUnavailable(newChild, container);
             assert(newChild === oldChild);
+            throwErrorIfUnavailable(newChild, container);
             this.format(newChild);
             const hasListener = Listeners.of(newChild)?.haveConnectionListener();
             if (newChild.element.parentNode !== container) {
