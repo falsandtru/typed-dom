@@ -102,7 +102,7 @@ function handle<M extends TagNameMap>(
       case tag.toUpperCase():
         return el;
       default:
-        throw new Error(`TypedDOM: Expected tag name is "${tag.toLowerCase()}" but actually "${el.tagName.toLowerCase()}"`);
+        throw new Error(`Typed-DOM: Expected tag name is "${tag.toLowerCase()}" but actually "${el.tagName.toLowerCase()}"`);
     }
   }
 }

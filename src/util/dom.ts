@@ -97,7 +97,7 @@ export function element<M extends TagNameMap>(context: Document | ShadowRoot, ns
 }
 
 function elem(context: Document | ShadowRoot, ns: NS, tag: string, attrs: Attrs): Element {
-  if (!('createElement' in context)) throw new Error(`TypedDOM: Scoped custom elements are not supported on this browser`);
+  if (!('createElement' in context)) throw new Error(`Typed-DOM: Scoped custom elements are not supported on this browser`);
   const opts = 'is' in attrs ? { is: attrs['is'] as string } : undefined;
   switch (ns) {
     case NS.HTML:
@@ -153,10 +153,10 @@ function defineAttrs<E extends Element>(el: E, attrs: Attrs): E {
         }
         continue;
       case 'function':
-        if (name.length < 3) throw new Error(`TypedDOM: Attribute names for event listeners must have an event name but got "${name}"`);
+        if (name.length < 3) throw new Error(`Typed-DOM: Attribute names for event listeners must have an event name but got "${name}"`);
         const names = name.split(/\s+/);
         for (const name of names) {
-          if (!name.startsWith('on')) throw new Error(`TypedDOM: Attribute names for event listeners must start with "on" but got "${name}"`);
+          if (!name.startsWith('on')) throw new Error(`Typed-DOM: Attribute names for event listeners must start with "on" but got "${name}"`);
           const type = name.slice(2).toLowerCase();
           el.addEventListener(type, value, {
             passive: [

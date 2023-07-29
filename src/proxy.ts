@@ -89,7 +89,7 @@ export class ElementProxy<
         this.type = ElChildType.Struct;
         break;
       default:
-        throw new TypeError(`TypedDOM: Invalid children type`);
+        throw new TypeError(`Typed-DOM: Invalid children type`);
     }
     throwErrorIfUnavailable(this);
     this.element[symbols.proxy] = this;
@@ -109,7 +109,7 @@ export class ElementProxy<
         this.children = children as El.Setter<C>;
         break;
       default:
-        throw new TypeError(`TypedDOM: Invalid children type`);
+        throw new TypeError(`Typed-DOM: Invalid children type`);
     }
     this.isInit = false;
   }
@@ -336,5 +336,5 @@ class Selector {
 function throwErrorIfUnavailable(child: El, newParent?: ParentNode): void {
   const oldParent = child.element.parentNode;
   if (!oldParent || oldParent === newParent || !(symbols.proxy in oldParent)) return;
-  throw new Error(`TypedDOM: Proxy children must be removed from the old parent proxy before assigning to the new parent proxy`);
+  throw new Error(`Typed-DOM: Proxy children must be removed from the old parent proxy before assigning to the new parent proxy`);
 }
