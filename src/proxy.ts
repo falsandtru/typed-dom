@@ -232,14 +232,7 @@ export class ElementProxy<
           assert(newChild.element !== oldChild?.element);
           isMutated = true;
         }
-        if (container.firstChild) {
-          container.replaceChildren(...sourceChildren.map(c => c.element));
-        }
-        else {
-          for (let i = 0; i < sourceChildren.length; ++i) {
-            container.appendChild(sourceChildren[i].element);
-          }
-        }
+        container.replaceChildren(...sourceChildren.map(c => c.element));
         this.$children = sourceChildren as C;
         for (let i = 0; i < targetChildren.length; ++i) {
           const oldChild = targetChildren[i];
