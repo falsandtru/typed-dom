@@ -222,6 +222,11 @@ class Component extends Coroutine<number> implements El {
 ### i18n
 
 Create a helper factory function for i18n.
+However, client-side translation is inefficient except live updates due to the following increase in traffic data size.
+
+- Schema of translation data.
+- Logic of translation.
+- Unused or duplicate data.
 
 ```ts
 import { HTML, El, html, define } from 'typed-dom';
