@@ -741,12 +741,12 @@ describe('Integration: Package', function () {
 
       function intl
         <K extends keyof TransDataMap>
-        (children: K, data: TransDataMap[K], factory?: El.Factory<HTMLElementTagNameMap, El.Children.Void>)
+        (text: K, data: TransDataMap[K], factory?: El.Factory<HTMLElementTagNameMap, El.Children.Void>)
         : El.Factory<HTMLElementTagNameMap, El.Children.Void> {
         return (html, tag) => {
           const el = factory?.(html, tag, {}) ?? html(tag);
-          el.textContent = translator.t(children, data)
-            ?? `{% Failed to translate "${children}". %}`;
+          el.textContent = translator.t(text, data)
+            ?? `{% Failed to translate "${text}". %}`;
           return el;
         };
       }
