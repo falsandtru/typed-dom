@@ -2,6 +2,10 @@
 
 ![CI](https://github.com/falsandtru/typed-dom/workflows/CI/badge.svg)
 
+*Professional programmers dislike being deprived of control and prefer to have complete control over everything. No magic needed. Only amateurs prefer magic.*
+
+## Abstract
+
 A value-level and type-level DOM builder.
 
 **Visualize** DOM structures and **Assist** DOM access using static types.
@@ -28,7 +32,7 @@ DOM manipulation must be easy and reliable, but it doesn't need virtual DOM or u
 |-|-|-|-|-|
 |Typed-DOM|Type|Interface|API, Fork|Slow construction|
 |jQuery|Query|Implementation|Plugin|Breakable, Implicit dependency|
-|React|Create all and search difference|Implementation|Component|Breakable, Waste, Complex, Severely dependent, Incomplete vain reinvention of the browsers|
+|React|Create all and search difference|Implementation|Component|Breakable, Waste, Complex, Uncontrollable, Severely dependent, Incomplete vain reinvention of the browsers|
 
 ## Usage
 
