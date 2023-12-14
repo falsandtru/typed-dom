@@ -24,15 +24,25 @@ const dom: El<"article", HTMLElement, {
 - Make wrapper APIs of built-in DOM APIs.
 - Exclude complexity and blackboxing.
 
+## Assurance
+
+Problems of DOM manipulation arise when the expected DOM structure differs from the actual DOM structure. Typed-DOM assures by type that the expected DOM structure and the actual DOM structure match. Assured reliable DOM manipulation is all you need. Assurance by type is best, and assurance by template is wasteful and inflexible.
+
+|Product|Approach|Problems|
+|-|-|-|
+|Typed-DOM|Type|-|
+|jQuery|-|Breakable|
+|React|Template|Wasteful, Inflexible|
+
 ## Difference
 
-DOM manipulation must be easy and reliable, but it doesn't need virtual DOM or unique syntax. Typed-DOM is a minimal API set for easy and reliable DOM manipulation.
+DOM manipulation must be easy and reliable, and it doesn't need virtual DOM or unique syntax. Typed-DOM is a minimal API set for easy and reliable DOM manipulation.
 
-|Product|Access|Dependence|Extensibility|Problem|
+|Product|Access|Dependence|Extensibility|Problems|
 |-|-|-|-|-|
 |Typed-DOM|Type|Interface|API, Fork|Slow construction|
 |jQuery|Query|Implementation|Plugin|Breakable, Implicit dependency|
-|React|Create all and search difference|Implementation|Component|Breakable, Waste, Complex, Uncontrollable, Severely dependent, Incomplete vain reinvention of the browsers|
+|React|Create all and search difference|Implementation|Component|Breakable, Wasteful, Complex, Uncontrollable, Severely dependent, Incomplete vain reinvention of the browsers|
 
 ## Usage
 
