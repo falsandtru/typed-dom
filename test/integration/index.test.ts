@@ -745,6 +745,7 @@ describe('Integration: Package', function () {
         : El.Factory<HTMLElementTagNameMap, El.Children.Void> {
         return (html, tag) => {
           const el = factory?.(html, tag, {}) ?? html(tag);
+          // @ts-ignore
           el.textContent = translator.t(text, data)
             ?? `{% Failed to translate "${text}". %}`;
           return el;
@@ -769,6 +770,7 @@ describe('Integration: Package', function () {
         return (html, tag, _, children) =>
           define(factory?.(html, tag, {}, children) ?? html(tag), {
             onmutate: ev => {
+              // @ts-ignore
               ev.currentTarget.textContent = translator.t(children, data)
                 ?? `{% Failed to translate "${children}". %}`;
             },
