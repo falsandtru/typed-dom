@@ -77,7 +77,7 @@ export class ElementProxy<
         this.type = ElChildType.Void;
         break;
       case type === 'string':
-        this.type = ElChildType.Text
+        this.type = ElChildType.Text;
         break;
       case type === 'object' && typeof children['nodeType'] === 'number':
         this.type = ElChildType.Node;
