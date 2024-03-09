@@ -47,13 +47,12 @@ DOM manipulation must be easy and reliable, and it doesn't need virtual DOM or u
 ## Usage
 
 Build a Typed-DOM component with styling.
-`$scope` selectors are replaced with `:host`, `#<id>`, or `.<generated-id>`.
 
 ```ts
 import { HTML } from 'typed-dom';
 
 const dom = HTML.article({
-  style: HTML.style('$scope { color: red; }'),
+  style: HTML.style('@scope { & { color: red; } }'),
   title: HTML.h1('Title'),
   content: HTML.ul([
     HTML.li('item'),
@@ -156,7 +155,7 @@ import { HTML, El } from 'typed-dom';
 
 class Component implements El {
   private readonly dom = HTML.section({
-    style: HTML.style('$scope { color: red; }'),
+    style: HTML.style('@scope { & { color: red; } }'),
     content: HTML.ul([
       HTML.li('item'),
     ]),
@@ -180,7 +179,7 @@ import { Shadow, HTML, El } from 'typed-dom';
 
 class ShadowComponent implements El {
   private readonly dom = Shadow.section({
-    style: HTML.style('$scope { color: red; }'),
+    style: HTML.style('@scope { & { color: red; } }'),
     content: HTML.ul([
       HTML.li('item'),
     ]),
@@ -219,7 +218,7 @@ class Component extends Coroutine<number> implements El {
     this.children = `Counted ${count} times.`;
   }
   private readonly dom = Shadow.section({ onconnect: '' }, {
-    style: HTML.style('$scope { color: red; }'),
+    style: HTML.style('@scope { & { color: red; } }'),
     content: HTML.p(''),
   });
   public readonly tag = this.dom.tag;

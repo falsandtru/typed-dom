@@ -1,7 +1,6 @@
 import { isArray } from 'spica/alias';
 import { symbols, Listeners } from './internal';
 import { TagNameMap, Attrs, Factory as BaseFactory } from './util/dom';
-import { identity } from './util/identity';
 
 declare global {
   interface ElementEventMap {
@@ -113,29 +112,6 @@ export class ElementProxy<
     }
     this.isInit = false;
   }
-  private readonly $selector = this.element === this.container
-    ? new Selector(this.element)
-    : undefined;
-  private get selector(): string {
-    return this.$selector?.selector ?? ':host';
-  }
-  private format(child: El): void {
-    switch (child.tag) {
-      case 'style':
-      case 'STYLE': {
-        let changed = '';
-        const style = child.element.innerHTML.replace(
-          /(?<![\w\-$[])\$scope(?![\w\-$])|"(?:\\.|[^\\"])+"?|'(?:\\.|[^\\'])+'?|\/\*(?:(?!\*\/).)+(?:\*\/)?|\/\/[^\r\n]+/sg,
-          (...$) => $[0][0] === '$' ? changed = this.selector : $[0]);
-        if (!changed) return;
-        child.element.textContent = style;
-        assert(child.element.children.length === 0);
-        return;
-      }
-      default:
-        return;
-    }
-  }
   private isInternalUpdate = false;
   private observe(children: El.Children.Struct): El.Children.Struct {
     for (const name of Object.keys(children)) {
@@ -210,7 +186,6 @@ export class ElementProxy<
           if (this.isInit) {
             assert(newChild === oldChild);
             throwErrorIfUnavailable(newChild, container);
-            this.format(newChild);
             const hasListener = Listeners.of(newChild)?.haveConnectionListener();
             if (newChild.element.parentNode !== container) {
               isMutated = true;
@@ -229,7 +204,6 @@ export class ElementProxy<
           }
           else if (newChild.element.parentNode !== oldChild?.element.parentNode) {
             throwErrorIfUnavailable(newChild, container);
-            this.format(newChild);
             assert(!addedChildren.includes(newChild));
             Listeners.of(newChild)?.haveConnectionListener() && addedChildren.push(newChild) && listeners.add(newChild);
           }
@@ -262,7 +236,6 @@ export class ElementProxy<
           if (this.isInit) {
             assert(newChild === oldChild);
             throwErrorIfUnavailable(newChild, container);
-            this.format(newChild);
             const hasListener = Listeners.of(newChild)?.haveConnectionListener();
             if (newChild.element.parentNode !== container) {
               container.appendChild(newChild.element);
@@ -279,7 +252,6 @@ export class ElementProxy<
           }
           else if (newChild.element.parentNode !== oldChild.element.parentNode) {
             throwErrorIfUnavailable(newChild, container);
-            this.format(newChild);
             container.replaceChild(newChild.element, oldChild.element);
             assert(!oldChild.element.parentNode);
             assert(!addedChildren.includes(newChild));
@@ -301,35 +273,6 @@ export class ElementProxy<
     listeners.dispatchConnectEvent(addedChildren);
     assert(isMutated || removedChildren.length + addedChildren.length === 0);
     isMutated && listeners.dispatchMutateEvent();
-  }
-}
-
-class Selector {
-  constructor(private readonly element: Element) {
-  }
-  private $id = '';
-  private get id(): string {
-    if (this.$id) return this.$id;
-    this.$id = this.element.id;
-    if (/^[a-z][\w-]*$/i.test(this.$id)) return this.$id;
-    this.$id = `rnd-${identity()}`;
-    assert(!this.element.classList.contains(this.$id));
-    assert(/^[a-z][\w-]*$/i.test(this.$id));
-    this.element.classList.add(this.$id);
-    assert(this.element.matches(`.${this.$id}`));
-    return this.$id;
-  }
-  private $selector = '';
-  public get selector(): string {
-    if (this.$selector) return this.$selector;
-    switch (true) {
-      //case this.element !== this.container:
-      //  return this.$query = ':host';
-      case this.id === this.element.id:
-        return this.$selector = `#${this.id}`;
-      default:
-        return this.$selector = `.${this.id}`;
-    }
   }
 }
 

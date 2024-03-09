@@ -3,7 +3,6 @@ import {
   shadow, frag, html, svg, math, text, element, define, append, prepend, defrag,
   listen, once, bind, delegate, currentTarget,
   querySelectorAll, querySelectorWith, querySelectorAllWith,
-  identity,
 } from '../../index';
 
 describe('Interface: Package', function () {
@@ -111,10 +110,6 @@ describe('Interface: Package', function () {
 
     it('querySelectorAllWith', function () {
       assert(typeof querySelectorAllWith === 'function');
-    });
-
-    it('identity', function () {
-      assert(typeof identity === 'function');
     });
 
   });
