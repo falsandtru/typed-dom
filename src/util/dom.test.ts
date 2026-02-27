@@ -87,21 +87,28 @@ describe('Unit: util/dom', () => {
 
   describe('defrag', () => {
     it('', () => {
+      const el = html('span');
       assert.deepStrictEqual(
-        defrag([]),
+        [...defrag([])],
         []);
       assert.deepStrictEqual(
-        defrag(['']),
+        [...defrag([''])],
         []);
       assert.deepStrictEqual(
-        defrag(['', 'a']),
+        [...defrag(['', 'a'])],
         ['a']);
       assert.deepStrictEqual(
-        defrag(['a', '']),
+        [...defrag(['a', ''])],
         ['a']);
       assert.deepStrictEqual(
-        defrag(['a', 'b']),
+        [...defrag(['a', 'b'])],
         ['ab']);
+      assert.deepStrictEqual(
+        [...defrag(['a', ' ', 'b'])],
+        ['a b']);
+      assert.deepStrictEqual(
+        [...defrag(['a', el, 'b'])],
+        ['a', el, 'b']);
     });
 
   });

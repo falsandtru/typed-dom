@@ -264,23 +264,34 @@ export function prepend<N extends ParentNode & Node>(node: N, children: Children
   return node;
 }
 
-export function defrag<N extends Node | string>(nodes: ArrayLike<N>): N[];
-export function defrag(nodes: ArrayLike<Node | string>): (Node | string)[] {
-  assert(Array.from(nodes).every(n => typeof n === 'string' || n instanceof Node));
-  const acc: (Node | string)[] = [];
-  let appendable = false;
-  for (let i = 0, len = nodes.length; i < len; ++i) {
-    const node = nodes[i];
-    if (typeof node === 'object') {
-      acc.push(node);
-      appendable = false;
-    }
-    else if (node !== '') {
-      appendable
-        ? acc[acc.length - 1] += node
-        : acc.push(node);
-      appendable = true;
+export function defrag<N extends Node>(nodes: ArrayLike<N> | Iterable<N>): Iterable<N>;
+export function defrag<N extends string | Node>(nodes: ArrayLike<N> | Iterable<N>): Iterable<string | N>;
+export function* defrag<N extends string | Node>(nodes: ArrayLike<N> | Iterable<N>): Iterable<string | N> {
+  let acc = '';
+  if (Symbol.iterator in nodes) {
+    for (const node of nodes) {
+      if (typeof node === 'object') {
+        if (acc) yield acc;
+        acc = '';
+        yield node;
+      }
+      else {
+        acc += node;
+      }
     }
   }
-  return acc;
+  else if ('length' in nodes) {
+    for (let i = 0, len = nodes.length; i < len; ++i) {
+      const node = nodes[i];
+      if (typeof node === 'object') {
+        if (acc) yield acc;
+        acc = '';
+        yield node;
+      }
+      else {
+        acc += node;
+      }
+    }
+  }
+  if (acc) yield acc;
 }
