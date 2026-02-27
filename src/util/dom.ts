@@ -1,4 +1,4 @@
-import { isArray, hasOwnProperty } from 'spica/alias';
+import { hasOwnProperty } from 'spica/alias';
 import { memoize } from 'spica/memoize';
 
 declare global {
@@ -195,18 +195,10 @@ function defineAttrs<E extends Element>(el: E, attrs: Attrs): E {
   }
   return el;
 }
-function defineChildren<N extends ParentNode & Node>(node: N, children: Children | readonly (string | Node)[]): N {
+function defineChildren<N extends ParentNode & Node>(node: N, children: Children): N {
   if (children === undefined) return node;
   if (typeof children === 'string') {
     node.textContent = children;
-  }
-  else if ((isArray(children) || !(Symbol.iterator in children)) && !node.firstChild) {
-    for (let i = 0; i < children.length; ++i) {
-      const child = children[i];
-      typeof child === 'object'
-        ? node.appendChild(child)
-        : node.append(child);
-    }
   }
   else {
     node.replaceChildren(...children);
@@ -223,14 +215,6 @@ export function append<N extends ParentNode & Node>(node: N, children: Children)
   if (typeof children === 'string') {
     node.append(children);
   }
-  else if (isArray(children) || !(Symbol.iterator in children)) {
-    for (let i = 0; i < children.length; ++i) {
-      const child = children[i];
-      typeof child === 'object'
-        ? node.appendChild(child)
-        : node.append(child);
-    }
-  }
   else {
     for (const child of children) {
       typeof child === 'object'
@@ -246,14 +230,6 @@ export function prepend<N extends ParentNode & Node>(node: N, children: Children
   if (typeof children === 'string') {
     node.prepend(children);
   }
-  else if (isArray(children) || !(Symbol.iterator in children)) {
-    for (let i = 0; i < children.length; ++i) {
-      const child = children[i];
-      typeof child === 'object'
-        ? node.insertBefore(child, null)
-        : node.prepend(child);
-    }
-  }
   else {
     for (const child of children) {
       typeof child === 'object'
@@ -264,33 +240,16 @@ export function prepend<N extends ParentNode & Node>(node: N, children: Children
   return node;
 }
 
-export function defrag<N extends Node>(nodes: ArrayLike<N> | Iterable<N>): Iterable<N>;
-export function defrag<N extends string | Node>(nodes: ArrayLike<N> | Iterable<N>): Iterable<string | N>;
-export function* defrag<N extends string | Node>(nodes: ArrayLike<N> | Iterable<N>): Iterable<string | N> {
+export function* defrag<N extends string | Node>(nodes: Iterable<N>): Iterable<string | N> {
   let acc = '';
-  if (Symbol.iterator in nodes) {
-    for (const node of nodes) {
-      if (typeof node === 'object') {
-        if (acc) yield acc;
-        acc = '';
-        yield node;
-      }
-      else {
-        acc += node;
-      }
+  for (const node of nodes) {
+    if (typeof node === 'string') {
+      acc += node;
     }
-  }
-  else if ('length' in nodes) {
-    for (let i = 0, len = nodes.length; i < len; ++i) {
-      const node = nodes[i];
-      if (typeof node === 'object') {
-        if (acc) yield acc;
-        acc = '';
-        yield node;
-      }
-      else {
-        acc += node;
-      }
+    else {
+      if (acc) yield acc;
+      acc = '';
+      yield node;
     }
   }
   if (acc) yield acc;
