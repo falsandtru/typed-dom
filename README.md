@@ -235,7 +235,7 @@ class Component extends Coroutine<number> implements El {
 ### i18n
 
 Create a helper factory function for i18n.
-However, client-side translation is inefficient except live updates due to the following increase in traffic data size.
+However, client-side translation is inefficient except live updates due to the following increase in traffic data size. Therefore, this is merely a demonstration of high extensibility of Typed-DOM.
 
 - Schema of translation data.
 - Logic of translation.
@@ -387,7 +387,7 @@ const Math = API<MathMLElementTagNameMap>(math);
 A closed shadow DOM API can be created as follows:
 
 ```ts
-const Shadow = API<ShadowHostHTMLElementTagNameMap>(html, el => shadow(el, { mode: 'closed' }));
+const Shadow = API<ShadowHostHTMLElementTagNameMap>(html, shadow, { mode: 'closed' });
 ```
 
 #### Extend APIs
@@ -399,61 +399,55 @@ import { Shadow, HTML } from 'typed-dom';
 
 declare global {
   interface ShadowHostHTMLElementTagNameMap {
-    'custom-tag': HTMLElement;
-  }
-  interface HTMLElementTagNameMap {
-    'custom': HTMLElement;
+    'global-custom': HTMLElement;
   }
 }
 
-window.customElements.define('custom-tag', class extends HTMLElement { });
-Shadow('custom-tag').element.outerHTML; // '<custom-tag></custom-tag>'
-HTML('custom-tag').element.outerHTML; // '<custom-tag></custom-tag>'
-HTML.custom().element.outerHTML; // '<custom></custom>'
+window.customElements.define('global-custom', class extends HTMLElement {
+  custom = true;
+});
+html('global-custom').outerHTML; // '<global-custom></global-custom>'
+html('global-custom').custom; // true
+HTML('global-custom').element.custom; // true
+Shadow('global-custom').element.custom; // true
 ```
 
 However, since scoped custom elements don't inherit global custom elements you shouldn't extend the built-in interfaces such as HTMLElementTagNameMap.
 Instead, you should create new interfaces and new APIs to define custom elements.
 
 ```ts
-import { API, shadow, html } from 'typed-dom';
+import { API, NS, shadow, element } from 'typed-dom';
 
 interface CustomShadowHostElementTagNameMap extends ShadowHostHTMLElementTagNameMap {
-  'custom-tag': HTMLElement;
+  'global-custom': HTMLElement;
 }
 interface CustomHTMLElementTagNameMap extends HTMLElementTagNameMap, CustomShadowHostElementTagNameMap {
-  'custom': HTMLElement;
 }
 
-export const Shadow = API<CustomShadowHostElementTagNameMap>(html, shadow);
+export const html = element<CustomHTMLElementTagNameMap>(
+  document,
+  NS.HTML);
 export const HTML = API<CustomHTMLElementTagNameMap>(html);
+export const Shadow = API<CustomShadowHostElementTagNameMap>(html, shadow);
 ```
 
-Ideally, you should define custom elements only as scoped custom elements.
+Furthermore, you can define scoped custom elements.
 
 ```ts
-import { API, NS, shadow, html as h, element } from 'typed-dom';
+import { API, NS, shadow, element } from 'typed-dom';
 
-interface ShadowHostScopedCustomHTMLElementTagNameMap extends ShadowHostHTMLElementTagNameMap {
-  'custom-tag': HTMLElement;
+interface ScopedCustomShadowHostHTMLElementTagNameMap extends ShadowHostHTMLElementTagNameMap {
+  'scoped-custom': HTMLElement;
 }
-interface ScopedCustomHTMLElementTagNameMap extends HTMLElementTagNameMap, ShadowHostScopedCustomHTMLElementTagNameMap {
-  'custom': HTMLElement;
+interface ScopedCustomHTMLElementTagNameMap extends HTMLElementTagNameMap, ScopedCustomShadowHostHTMLElementTagNameMap {
 }
 
-// Note that the following code is based on the unstandardized APIs of scoped custom elements.
 const registry = new CustomElementRegistry();
-// This Host function creates a proxy and makes its shadow DOM in the base document (light DOM).
-export const Host = API<ShadowHostHTMLElementTagNameMap>(h, el =>
-  shadow(el, { mode: 'open', registry }));
-// This html function creates a scoped custom element in a shadow DOM.
 export const html = element<ScopedCustomHTMLElementTagNameMap>(
-  shadow('body', { mode: 'open', registry }),
+  shadow('body', { mode: 'open', customElementRegistry: registry }),
   NS.HTML);
-// This HTML function creates a scoped custom element proxy in a shadow DOM.
 export const HTML = API<ScopedCustomHTMLElementTagNameMap>(html);
-// This Shadow function creates a scoped custom element proxy and makes its shadow DOM in a shadow DOM.
-export const Shadow = API<ShadowHostScopedCustomHTMLElementTagNameMap>(html, shadow);
+export const Shadow = API<ScopedCustomShadowHostHTMLElementTagNameMap>(html, shadow);
 ```
 
 ### Others

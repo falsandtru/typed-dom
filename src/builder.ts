@@ -5,9 +5,10 @@ export type API<M extends TagNameMap> =
   BuilderFunction<M> & { readonly [P in K<M>]: BuilderMethod<M, P>; };
 export function API<M extends TagNameMap>(
   baseFactory: Factory<M>,
-  container?: (el: E<M[K<M>]>) => ShadowRoot | undefined,
+  container?: (el: E<M[K<M>]>, opts?: ShadowRootInit) => ShadowRoot | undefined,
+  opts?: ShadowRootInit,
 ): API<M> {
-  return new Proxy<API<M>>((() => 0) as any, handle(baseFactory, container));
+  return new Proxy<API<M>>((() => 0) as any, handle(baseFactory, container, opts));
 }
 
 export const Shadow = API<ShadowHostHTMLElementTagNameMap>(html, shadow);
@@ -63,7 +64,8 @@ interface BuilderMethod<M extends TagNameMap, T extends K<M>> {
 
 function handle<M extends TagNameMap>(
   baseFactory: Factory<M>,
-  container?: (el: Element) => ShadowRoot | undefined,
+  container?: (el: Element, opts?: ShadowRootInit) => ShadowRoot | undefined,
+  opts?: ShadowRootInit,
 ): ProxyHandler<API<M>> {
   return {
     apply(target, _, [tag, ...args]) {
@@ -85,7 +87,7 @@ function handle<M extends TagNameMap>(
       if (typeof attrs === 'function') return build(undefined, undefined, attrs);
       if (isElChildren(attrs)) return build(undefined, attrs, factory);
       const el = elem(tag, factory, attrs, children);
-      return new ElementProxy(tag, el, children, container?.(el));
+      return new ElementProxy(tag, el, children, container?.(el, opts));
     };
   }
 

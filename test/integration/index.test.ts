@@ -1,18 +1,30 @@
-import { Shadow, HTML, SVG, El, Attrs, shadow, frag, html, define } from '../../index';
+import { API, Shadow, HTML, SVG, El, Attrs, NS, element, shadow, frag, html, define } from '../../index';
 import { Coroutine } from 'spica/coroutine';
 import { Sequence } from 'spica/sequence';
 import { wait } from 'spica/timer';
 import i18next from 'i18next';
 
 declare global {
-  interface ShadowHostHTMLElementTagNameMap {
-    'custom-tag': HTMLCustomElement;
+  interface CustomShadowHostHTMLElementTagNameMap extends ShadowHostHTMLElementTagNameMap {
+    'global-custom': CustomHTMLElement;
   }
-  interface HTMLElementTagNameMap {
-    'custom': HTMLElement;
+  interface CustomHTMLElementTagNameMap extends HTMLElementTagNameMap, CustomShadowHostHTMLElementTagNameMap {
   }
-  interface HTMLCustomElement extends HTMLElement {
+  interface CustomHTMLElement extends HTMLElement {
     custom: true;
+  }
+
+  interface ScopedCustomShadowHostHTMLElementTagNameMap extends ShadowHostHTMLElementTagNameMap {
+    'scoped-custom': ScopedCustomHTMLElement;
+  }
+  interface ScopedCustomHTMLElementTagNameMap extends HTMLElementTagNameMap, ScopedCustomShadowHostHTMLElementTagNameMap {
+  }
+  interface ScopedCustomHTMLElement extends HTMLElement {
+    scoped: true;
+  }
+
+  interface ShadowRootInit {
+    customElementRegistry?: CustomElementRegistry;
   }
 }
 
@@ -360,29 +372,6 @@ describe('Integration: Package', function () {
         });
     });
 
-    it('extend', function () {
-      assert(HTML.custom().element.outerHTML === '<custom></custom>');
-
-      window.customElements.define('custom-tag', class extends HTMLElement {
-        custom = true;
-      });
-      assert(Shadow('custom-tag').element.outerHTML === '<custom-tag></custom-tag>');
-      assert(HTML('custom-tag').element.outerHTML === '<custom-tag></custom-tag>');
-      assert(HTML('custom-tag').element.custom === true);
-
-      window.customElements.define('custom-div', class extends HTMLDivElement {
-        static get observedAttributes() {
-          return ['is', 'class'];
-        }
-        attributeChangedCallback(name: string) {
-          assert(name !== 'is');
-          this.textContent += name;
-        }
-      }, { extends: 'div' });
-      assert(HTML.div({ is: 'custom-div' }).element.outerHTML === '<div is="custom-div"></div>');
-      assert(HTML.div({ is: 'custom-div', class: '' }).element.outerHTML === '<div is="custom-div" class="">class</div>');
-    });
-
     it('swap', function () {
       const dom = HTML.article([HTML.p()]);
       const children = dom.children;
@@ -537,14 +526,93 @@ describe('Integration: Package', function () {
       assert(Shadow.section([HTML.slot()]).element.outerHTML === '<section></section>');
       assert(Shadow.section([HTML.slot()]).element.shadowRoot!.innerHTML === '<slot></slot>');
       assert(Shadow.section([HTML.slot()]).children[0].element.outerHTML === '<slot></slot>');
-      assert(Shadow.section([HTML.slot()], (h, t) => shadow(h(t), { mode: 'closed' }).host as HTMLElement).element.shadowRoot === null);
-      assert(Shadow.section([HTML.slot()], (h, t) => shadow(h(t), { mode: 'closed' }).host as HTMLElement).children[0].element.outerHTML === '<slot></slot>');
       const dom = HTML.div([Shadow.section([HTML.slot('a')])]);
       assert(dom.element.outerHTML === '<div><section></section></div>');
       assert(dom.children[0].children[0].element.outerHTML === '<slot>a</slot>');
       dom.children[0].children[0].children = 'b';
       assert(dom.element.outerHTML === '<div><section></section></div>');
       assert(dom.element.firstElementChild!.shadowRoot!.innerHTML === '<slot>b</slot>');
+    });
+
+    it('custom', function () {
+      const html = element<CustomHTMLElementTagNameMap>(
+        document,
+        NS.HTML);
+      const HTML = API<CustomHTMLElementTagNameMap>(html);
+      const Shadow = API<CustomShadowHostHTMLElementTagNameMap>(html, shadow);
+
+      window.customElements.define('global-custom', class extends HTMLElement {
+        custom = true;
+      });
+      assert(html('global-custom').outerHTML === '<global-custom></global-custom>');
+      assert(html('global-custom').custom === true);
+      assert(html('global-custom').shadowRoot === null);
+      assert(frag([html('global-custom', [html('a')])]).querySelector('a') !== null);
+      assert(HTML('global-custom').element.outerHTML === '<global-custom></global-custom>');
+      assert(HTML('global-custom').element.custom === true);
+      assert(HTML('global-custom').element.shadowRoot === null);
+      assert(frag([HTML('global-custom', [HTML('a')]).element]).querySelector('a') !== null);
+      assert(Shadow('global-custom').element.outerHTML === '<global-custom></global-custom>');
+      assert(Shadow('global-custom').element.custom === true);
+      assert(Shadow('global-custom').element.shadowRoot !== null);
+      assert(frag([Shadow('global-custom', [HTML('a')]).element]).querySelector('a') === null);
+
+      window.customElements.define('global-custom-div', class extends HTMLDivElement {
+        static get observedAttributes() {
+          return ['is', 'class'];
+        }
+        attributeChangedCallback(name: string) {
+          assert(name !== 'is');
+          this.textContent += 'custom';
+        }
+      }, { extends: 'div' });
+      assert(HTML.div({ is: 'global-custom-div' }).element.outerHTML === '<div is="global-custom-div"></div>');
+      assert(HTML.div({ is: 'global-custom-div', class: '' }).element.outerHTML === '<div is="global-custom-div" class="">custom</div>');
+      assert(Shadow.div({ is: 'global-custom-div' }).element.outerHTML === '<div is="global-custom-div"></div>');
+      assert(Shadow.div({ is: 'global-custom-div', class: '' }).element.outerHTML === '<div is="global-custom-div" class="">custom</div>');
+    });
+
+    it('scope', function () {
+      if (!navigator.userAgent.includes('Chrome')) return;
+
+      const registry = new CustomElementRegistry();
+      const html = element<ScopedCustomHTMLElementTagNameMap>(
+        shadow('body', { mode: 'open', customElementRegistry: registry }),
+        NS.HTML);
+      const HTML = API<ScopedCustomHTMLElementTagNameMap>(html);
+      const Shadow = API<ScopedCustomShadowHostHTMLElementTagNameMap>(html, shadow);
+
+      registry.define('scoped-custom', class extends HTMLElement {
+        scoped = true;
+      });
+      assert(html('scoped-custom').outerHTML === '<scoped-custom></scoped-custom>');
+      assert(html('scoped-custom').scoped === true);
+      assert(html('scoped-custom').shadowRoot === null);
+      assert(frag([html('scoped-custom', [html('a')])]).querySelector('a') !== null);
+      assert(HTML('scoped-custom').element.outerHTML === '<scoped-custom></scoped-custom>');
+      assert(HTML('scoped-custom').element.scoped === true);
+      assert(HTML('scoped-custom').element.shadowRoot === null);
+      assert(frag([HTML('scoped-custom', [HTML('a')]).element]).querySelector('a') !== null);
+      assert(Shadow('scoped-custom').element.outerHTML === '<scoped-custom></scoped-custom>');
+      assert(Shadow('scoped-custom').element.scoped === true);
+      assert(Shadow('scoped-custom').element.shadowRoot !== null);
+      assert(frag([Shadow('scoped-custom', [HTML('a')]).element]).querySelector('a') === null);
+
+      registry.define('scoped-custom-div', class extends HTMLDivElement {
+        static get observedAttributes() {
+          return ['is', 'class'];
+        }
+        attributeChangedCallback(name: string) {
+          assert(name !== 'is');
+          this.textContent += 'scoped';
+        }
+      }, { extends: 'div' });
+      assert(html('div', { is: 'scoped-custom-div' }).outerHTML === '<div is="scoped-custom-div"></div>');
+      assert(html('div', { is: 'scoped-custom-div', class: '' }).outerHTML === '<div is="scoped-custom-div" class="">scoped</div>');
+      assert(HTML.div({ is: 'scoped-custom-div' }).element.outerHTML === '<div is="scoped-custom-div"></div>');
+      assert(HTML.div({ is: 'scoped-custom-div', class: '' }).element.outerHTML === '<div is="scoped-custom-div" class="">scoped</div>');
+      assert(Shadow.div({ is: 'scoped-custom-div' }).element.outerHTML === '<div is="scoped-custom-div"></div>');
+      assert(Shadow.div({ is: 'scoped-custom-div', class: '' }).element.outerHTML === '<div is="scoped-custom-div" class="">scoped</div>');
     });
 
   });
@@ -665,8 +733,8 @@ describe('Integration: Package', function () {
             assert(dom.children === `Counted ${count} times.`);
             continue;
           case 6:
-            doc.children = [];
-            return;
+            dom[Coroutine.exit](0);
+            continue;
           default:
             assert(false);
         }

@@ -1,5 +1,4 @@
 import { hasOwnProperty } from 'spica/alias';
-import { memoize } from 'spica/memoize';
 
 declare global {
   interface ShadowHostHTMLElementTagNameMap {
@@ -48,13 +47,6 @@ export interface Factory<M extends TagNameMap> {
   <T extends keyof M & string>(tag: T, attrs: Attrs<Extract<M[T], Element>> | undefined, children?: Children): M[T];
 }
 
-namespace caches {
-  // Closed only.
-  export const shadows = new WeakMap<Element, ShadowRoot>();
-  export const shadow = memoize((el: Element, opts: ShadowRootInit) => el.attachShadow(opts), shadows);
-  export const fragment = document.createDocumentFragment();
-}
-
 export function shadow<M extends ShadowHostHTMLElementTagNameMap>(el: keyof M & string | Extract<M[keyof M & string], Element>, factory?: Factory<M>): ShadowRoot;
 export function shadow<M extends ShadowHostHTMLElementTagNameMap>(el: keyof M & string | Extract<M[keyof M & string], Element>, children?: Children, factory?: Factory<M>): ShadowRoot;
 export function shadow<M extends ShadowHostHTMLElementTagNameMap>(el: keyof M & string | Extract<M[keyof M & string], Element>, opts?: ShadowRootInit, factory?: Factory<M>): ShadowRoot;
@@ -65,16 +57,14 @@ export function shadow<M extends ShadowHostHTMLElementTagNameMap>(el: keyof M & 
   if (typeof children === 'function') return shadow(el, opts as ShadowRootInit, undefined, children);
   if (isChildren(opts)) return shadow(el, undefined, opts, factory);
   return defineChildren(
-    !opts
-      ? el.shadowRoot ?? caches.shadows.get(el) ?? el.attachShadow({ mode: 'open' })
-      : opts.mode === 'open'
-        ? el.shadowRoot ?? el.attachShadow(opts)
-        : caches.shadow(el, opts),
+    opts
+      ? el.attachShadow(opts)
+      : el.shadowRoot ?? el.attachShadow({ mode: 'open' }),
     children);
 }
 
 export function frag(children?: Children): DocumentFragment {
-  return defineChildren(caches.fragment.cloneNode(true) as DocumentFragment, children);
+  return defineChildren(document.createDocumentFragment(), children);
 }
 
 export const html = element<HTMLElementTagNameMap>(document, NS.HTML);
@@ -89,6 +79,12 @@ export function element<M extends HTMLElementTagNameMap>(context: Document | Sha
 export function element<M extends SVGElementTagNameMap>(context: Document | ShadowRoot, ns: NS.SVG): Factory<M>;
 export function element<M extends MathMLElementTagNameMap>(context: Document | ShadowRoot, ns: NS.Math): Factory<M>;
 export function element<M extends TagNameMap>(context: Document | ShadowRoot, ns: NS): Factory<M> {
+  if (context instanceof ShadowRoot) {
+    const root = context;
+    context = document.implementation.createHTMLDocument();
+    // @ts-ignore
+    root.customElementRegistry.initialize(context);
+  }
   return (tag: string, attrs?: Attrs | Children, children?: Children) => {
     return !attrs || isChildren(attrs)
       ? defineChildren(elem(context, ns, tag, {}), attrs ?? children)
@@ -96,9 +92,11 @@ export function element<M extends TagNameMap>(context: Document | ShadowRoot, ns
   };
 }
 
-function elem(context: Document | ShadowRoot, ns: NS, tag: string, attrs: Attrs): Element {
-  if (!('createElement' in context)) throw new Error(`Typed-DOM: Scoped custom elements are not supported on this browser`);
-  const opts = 'is' in attrs ? { is: attrs['is'] as string } : undefined;
+function elem(context: Document, ns: NS, tag: string, attrs: Attrs): Element {
+  const opts = {
+    is: attrs['is'],
+    customElementRegistry: attrs['customElementRegistry'],
+  } as ElementCreationOptions;
   switch (ns) {
     case NS.HTML:
       return context.createElement(tag, opts);
@@ -127,6 +125,7 @@ function defineAttrs<E extends Element>(el: E, attrs: Attrs): E {
   for (const name of Object.keys(attrs)) {
     switch (name) {
       case 'is':
+      case 'customElementRegistry':
         continue;
     }
     const value = attrs[name];

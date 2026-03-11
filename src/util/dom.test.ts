@@ -20,7 +20,7 @@ describe('Unit: util/dom', () => {
       assert(shadow(html('section', 'a'), { mode: 'closed' }, [html('slot')]).host.innerHTML === 'a');
       assert(shadow(shadow('section').host as HTMLElement));
       assert(shadow(shadow('section', { mode: 'open' }).host as HTMLElement));
-      assert(shadow(shadow('section', { mode: 'closed' }).host as HTMLElement));
+      assert.throws(() => shadow(shadow('section', { mode: 'closed' }).host as HTMLElement));
       assert.throws(() => shadow(shadow('section', { mode: 'open' }).host as HTMLElement, { mode: 'closed' }));
       assert.throws(() => shadow(shadow('section', { mode: 'closed' }).host as HTMLElement, { mode: 'open' }));
     });
