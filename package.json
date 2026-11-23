@@ -48,7 +48,7 @@
     "eslint-plugin-redos": "^4.4.5",
     "eslint-webpack-plugin": "^4.0.1",
     "glob": "^10.3.10",
-    "i18next": "23.10.1",
+    "i18next": "26.3.4",
     "karma": "^6.4.3",
     "karma-chrome-launcher": "^3.2.0",
     "karma-coverage": "^2.2.1",
